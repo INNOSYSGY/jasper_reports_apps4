@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Expenses" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="96431684-11b5-48ad-94e4-64690a7c2002">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/GL/Expense"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.18:8081/jasperserver/services/repository"/>
+	<queryString>
+		<![CDATA[select *
+from references
+where reference_type='EXPENSE'
+order by lpad(short_value,5,0)]]>
+	</queryString>
+	<field name="ID" class="java.lang.String"/>
+	<field name="REFERENCE_TYPE" class="java.lang.String"/>
+	<field name="REFERENCE_VALUE" class="java.lang.String"/>
+	<field name="SHORT_VALUE" class="java.lang.String"/>
+	<field name="ADDITIONAL_DETAIL" class="java.lang.String"/>
+	<field name="ADDITIONAL_DETAIL_2" class="java.lang.String"/>
+	<field name="START_DATE" class="java.sql.Timestamp"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="CREATED_BY" class="java.lang.String"/>
+	<field name="DATE_CREATED" class="java.sql.Timestamp"/>
+	<field name="LAST_MODIFIED_BY" class="java.lang.String"/>
+	<field name="DATE_LAST_MODIFIED" class="java.sql.Timestamp"/>
+	<field name="MACHINE_CREATED" class="java.lang.String"/>
+	<field name="MACHINE_LAST_MODIFIED" class="java.lang.String"/>
+	<variable name="ROW_COUNT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="85" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="79" uuid="55b70569-e64d-41e6-8ca6-ac0fbd428fdf"/>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA["LISTING OF EXPENSE"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LETTER_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="19" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="14" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="49fcdbdd-af53-416a-b396-e9ea87a41199"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="24" height="14" uuid="06ba7d49-0a3f-4e7a-818f-81d06c9baea4"/>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="24" y="0" width="228" height="14" uuid="62ebe9bb-920d-4d3a-83f1-ac615dc494ce"/>
+				<text><![CDATA[Expenses]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="0" width="48" height="14" uuid="2533741a-f43f-43bb-8275-18645032bb21"/>
+				<text><![CDATA[Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="0" width="141" height="14" uuid="081ac274-a98f-48f4-b82e-dbd765fc628f"/>
+				<text><![CDATA[Start Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="441" y="0" width="131" height="14" uuid="4fe98189-f40e-4961-b236-797cd67f30e4"/>
+				<text><![CDATA[End date]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="24" y="0" width="228" height="15" uuid="26947746-a086-40f7-9a87-5b30f9db7377"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REFERENCE_VALUE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="252" y="0" width="48" height="15" uuid="e953ca93-9b48-4476-8ff6-9ba27f2f7c2d"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SHORT_VALUE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd, MMM, yyyy, hh.mm a" isBlankWhenNull="true">
+				<reportElement x="300" y="0" width="141" height="15" uuid="65c7cecd-f0de-44b7-9966-1a141c30383e"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{START_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="441" y="0" width="131" height="15" uuid="8aba6908-13f4-4e76-b85d-08e8ee30d3e9"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{END_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="1" width="24" height="15" uuid="4c86579e-23f1-487a-9229-a140491bb988"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ROW_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="46" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

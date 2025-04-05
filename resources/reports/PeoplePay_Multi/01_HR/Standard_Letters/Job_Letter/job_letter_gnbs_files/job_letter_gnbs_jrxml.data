@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Employee Job Letter" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85bcab7d-a21c-457c-8b26-54349766927e">
+	<property name="ireport.zoom" value="1.5000000000000007"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="48"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Multi/01_HR/Standard_Letters/Job_Letter/job_letter_gnbs"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="akeem"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="AppsTester"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Multi/01_HR/Standard_Letters/Job_Letter/job_letter_gnbs_files/job_letter_gnbs_jrxml"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EMP_NO" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    b.id Emp_id,
+    b.ORG_ID,
+    b.EMP_COMPANY_NO,
+    M.EXT_LETTER_HEAD_LOGO,
+    M.REPORT_SIGNATURE,
+    address_to ADDRESS_TO,
+    'Dear Sir/Madam, ' salutation,
+    (SELECT ORGANISATION_NAME FROM HR_HCF_ORGANISATION e WHERE e.id = g.organisation) ADDRESS_TO2,
+    (SELECT TRIM(ADDRESS) FROM HR_HCF_ORGANISATION e WHERE e.id = g.organisation) ADDRESS_TO3,
+    'Please be informed that <b>' ||
+    (CASE WHEN a.sex_code='F' THEN 'Ms. ' ELSE 'Mr. ' END) ||
+    INITCAP(NVL(a.first_name,'') || ' ' || NVL(a.surname,'')) ||
+    '</b> of Lot ' ||
+    NVL(INITCAP(TRIM(
+        PKG_GLOBAL_FNTS.FN_ADDRESS('HOME', a.ID, 'LOT', SYSDATE) || ' ' ||
+        PKG_GLOBAL_FNTS.FN_ADDRESS('HOME', a.ID, 'STREET', SYSDATE) || ', ' ||
+        PKG_GLOBAL_FNTS.FN_ADDRESS('HOME', a.ID, 'VILLAGE_WARD', SYSDATE) || ', ' ||
+        PKG_GLOBAL_FNTS.FN_ADDRESS('HOME', a.ID, 'COUNTY', SYSDATE)
+    )), 'No given Address') ||
+    ' is currently employed as a <b>' ||
+    NVL(INITCAP(r.POSITION_NAME), 'Unknown Position') ||
+    '</b> at ' ||
+    NVL(M.ORGANISATION_NAME, '') || '.' LINE1,
+    (CASE WHEN a.sex_code='F' THEN '<b>Ms. ' ELSE '<b>Mr. ' END) ||
+    NVL(a.surname, '') ||
+    '</b> commenced working with ' ||
+    NVL(M.ORGANISATION_NAME, '') ||
+    ' since <b>' ||
+    INITCAP(TRIM(TO_CHAR(b.date_employed, 'Mon-DD-YYYY'))) ||
+    '</b> and is currently in receipt of a monthly gross salary of ' line_2, 
+    TO_CHAR(pkg_global_fnts.fn_personalrate(b.id, SYSDATE), '$999,999,999') basic_pay,
+    TO_CHAR((pkg_global_fnts.fn_personalrate(b.id, SYSDATE) + 
+            (SELECT NVL(SUM(c.amount), 0)
+             FROM hr_rcm_empentitle c 
+             JOIN pa_pcf_incomecode d ON c.income_code_id = d.id 
+             WHERE c.emp_id = $P{EMP_NO} 
+               AND (c.end_date IS NULL OR c.end_date > SYSDATE) 
+               AND c.admin_status = 'SYS')), '$999,999,999') total_pay,
+    (SELECT INITCAP(employee_name) FROM vw_position_location_v3 t WHERE t.emp_id = g.signiture_id) sig1,
+    (SELECT INITCAP(position_name) FROM vw_position_location_v3 t WHERE t.emp_id = g.signiture_id) sig2,
+    'Any assistance rendered to ' || (CASE WHEN a.sex_code='F' THEN '<b>Ms. ' ELSE '<b>Mr. ' END) ||
+    NVL(a.surname, '') ||
+    '</b> will be highly appreciated.' line4,
+    'Thank You.' line5   
+    
+FROM
+    hr_rcm_individual a
+JOIN
+    hr_rcm_employee b ON a.id = b.ind_id
+JOIN
+    HR_HCF_ORGANISATION M ON M.ID = b.ORG_ID
+JOIN
+    vw_position_location_v3 r ON r.emp_id = b.id
+JOIN
+    JOBLETTERREPORT g ON g.emp_id = b.id
+
+WHERE
+    b.id = $P{EMP_NO}]]>
+	</queryString>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_COMPANY_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="EXT_LETTER_HEAD_LOGO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="EXT_LETTER_HEAD_LOGO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EXT_LETTER_HEAD_LOGO"/>
+	</field>
+	<field name="REPORT_SIGNATURE" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_SIGNATURE"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_SIGNATURE"/>
+	</field>
+	<field name="ADDRESS_TO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS_TO"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS_TO"/>
+	</field>
+	<field name="SALUTATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALUTATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALUTATION"/>
+	</field>
+	<field name="ADDRESS_TO2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS_TO2"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS_TO2"/>
+	</field>
+	<field name="ADDRESS_TO3" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS_TO3"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS_TO3"/>
+	</field>
+	<field name="LINE1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LINE1"/>
+		<property name="com.jaspersoft.studio.field.label" value="LINE1"/>
+	</field>
+	<field name="LINE_2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LINE_2"/>
+		<property name="com.jaspersoft.studio.field.label" value="LINE_2"/>
+	</field>
+	<field name="BASIC_PAY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="BASIC_PAY"/>
+		<property name="com.jaspersoft.studio.field.label" value="BASIC_PAY"/>
+	</field>
+	<field name="TOTAL_PAY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_PAY"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_PAY"/>
+	</field>
+	<field name="SIG1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SIG1"/>
+		<property name="com.jaspersoft.studio.field.label" value="SIG1"/>
+	</field>
+	<field name="SIG2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SIG2"/>
+		<property name="com.jaspersoft.studio.field.label" value="SIG2"/>
+	</field>
+	<field name="LINE4" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LINE4"/>
+		<property name="com.jaspersoft.studio.field.label" value="LINE4"/>
+	</field>
+	<field name="LINE5" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LINE5"/>
+		<property name="com.jaspersoft.studio.field.label" value="LINE5"/>
+	</field>
+	<group name="Employee" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{EMP_COMPANY_NO}]]></groupExpression>
+		<groupHeader>
+			<band height="503">
+				<textField textAdjust="StretchHeight" pattern="MMMMM dd, yyyy">
+					<reportElement x="50" y="40" width="220" height="20" isPrintWhenDetailOverflows="true" uuid="5ff8231a-1ae1-446a-828b-47a4d967e829"/>
+					<textElement>
+						<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement x="50" y="90" width="436" height="20" isPrintWhenDetailOverflows="true" uuid="2cc93086-6b5e-4c2b-8fab-e79db34e7a79"/>
+					<textElement markup="html">
+						<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>"+$F{ADDRESS_TO}+"</b><br>"+$F{ADDRESS_TO2}+$F{ADDRESS_TO3}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="230" y="160" width="100" height="20" uuid="f66b17df-95ad-4e6c-a2ac-8f995eb8b416"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+						<font fontName="SansSerif" size="12" isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Re: Job Letter"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement x="49" y="190" width="512" height="30" isPrintWhenDetailOverflows="true" uuid="43f9978b-90d9-4a23-ad7a-b97b2afdbda0"/>
+					<textElement textAlignment="Left" markup="html">
+						<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE1}]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement x="50" y="240" width="511" height="29" isPrintWhenDetailOverflows="true" uuid="abc4928e-e3e5-47f8-91e1-b73714594e81"/>
+					<textElement textAlignment="Left" markup="html">
+						<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE_2}+"<b>"+$F{TOTAL_PAY}+"</b>."]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement x="49" y="290" width="512" height="40" isPrintWhenDetailOverflows="true" uuid="cf3ed5b6-4629-4223-a0b1-6ba47026eb96"/>
+					<textElement textAlignment="Left" markup="html">
+						<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE4}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="50" y="350" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="aea673da-1e4f-466f-a920-c5f994322221"/>
+					<textElement>
+						<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[Regards, ]]></text>
+				</staticText>
+				<image hAlign="Left" onErrorType="Icon">
+					<reportElement x="50" y="380" width="150" height="60" uuid="ce9ca830-5187-4f4b-a700-51e7ffb99989"/>
+					<imageExpression><![CDATA[$F{REPORT_SIGNATURE}]]></imageExpression>
+				</image>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement x="50" y="450" width="445" height="20" isPrintWhenDetailOverflows="true" uuid="17e32d88-06c9-4500-bd92-91bf1253c4d6"/>
+					<textElement textAlignment="Justified" markup="html">
+						<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["--------------------------------"+"<br><br>"+$F{SIG1}+"<br>"+$F{SIG2}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="38"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="102" splitType="Stretch">
+			<image scaleImage="RealSize" hAlign="Center" onErrorType="Blank">
+				<reportElement x="-20" y="-20" width="612" height="120" printWhenGroupChanges="Employee" uuid="6d229887-46dd-42db-9aa7-b216669fa6bd">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<imageExpression><![CDATA[$F{EXT_LETTER_HEAD_LOGO}]]></imageExpression>
+			</image>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

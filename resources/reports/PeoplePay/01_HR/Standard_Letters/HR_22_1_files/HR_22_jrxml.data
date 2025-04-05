@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report2" language="groovy" pageWidth="612" pageHeight="792" columnWidth="468" leftMargin="72" rightMargin="72" topMargin="20" bottomMargin="20" uuid="f0bb8aa3-e9b9-47c1-a829-75cfa185fb5e">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Standard_Letters/HR_22_1"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EMP_NO" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+  'PRIVATE AND CONFIDENTIAL' para_1,
+  trim(to_char(to_date(entry_date, 'DD-MON-YY'),'Month')) ||
+  ' ' || trim(to_char(to_date(entry_date, 'DD-MON-YY'),'dd, yyyy')) para_2,
+  prefix || ' ' || first_name || ' ' || surname para_3_1,
+  position para_3_2,
+  unit_name para_3_3,
+ORG_ID,
+LEAVE_PENDING,
+  CASE WHEN unit_name =location_description THEN NULL ELSE location_description END para_3_4,
+  'Dear ' || prefix || ' ' || surname ||',' para_4,
+  upper(leave_type) || ' ' || leave_year para_5,
+  'We acknowledge receipt of your leave request and advise that approval is granted for you to proceed on ' ||
+  case floor(days_taken/7)
+      when 0 then
+        case mod(days_taken,7)
+          when 0 then
+            '0 days'
+          when 1 then
+            '1 day'
+          else
+            to_char(mod(days_taken,7)) || ' days'
+          end
+      when 1 then
+        case mod(days_taken,7)
+          when 0 then
+            '1 week'
+          when 1 then
+            '1 week, 1 day'
+          else
+            '1 week, ' || to_char(mod(days_taken,7)) || ' days'
+          end
+      else
+        case mod(days_taken,7)
+          when 0 then
+            to_char(floor(days_taken/7)) || ' weeks'
+          when 1 then
+            to_char(floor(days_taken/7)) || ' weeks, 1 day'
+          else
+            to_char(floor(days_taken/7)) || ' weeks, ' || to_char(mod(days_taken,7)) || ' days'
+          end
+      end || ' ' || lower(leave_type) || ' on ' || trim(to_char(to_date(fromdate, 'DD-MON-YY'),'Month')) ||
+  ' ' || trim(to_char(to_date(fromdate, 'DD-MON-YY'),'dd, yyyy')) || '.' para_6,
+  'Your date of resumption of duties is ' || trim(to_char(to_date(nvl(resumption_date,todate+1), 'DD-MON-YY'),'Month')) ||
+  ' ' || trim(to_char(to_date(nvl(resumption_date,todate+1), 'DD-MON-YY'),'dd, yyyy')) || '.' para_7,
+  'Please note that your remaining leave entitlement for ' || leave_year || ' is ' ||LEAVE_PENDING||'  days.'
+
+||'' para_8,
+      'Please ensure that you report to the appropriate officer(s) before proceeding and upon your return from leave.' para_9,
+
+
+  'Yours sincerely' para_10
+from (
+select lvhist.id id,lvhist.LEAVE_PENDING,
+case lower(to_char(ind.sex_code)) when 'f' then 'Ms' when 'm' then 'Mr' end prefix,
+  trim(initcap(ind.first_name)) first_name,
+  trim(initcap(ind.surname)) surname,
+ORG_ID,
+  pos.position_name position,
+  lvhist.leave_type leave_type,
+  lvhist.fromdate fromdate,
+  lvhist.todate todate,
+  lvhist.days_taken days_taken,
+  lvhist.entry_date entry_date,
+  lvhist.resumption_date resumption_date,
+  extract(year from lvhist.fromdate) leave_year,
+  lvtrack.pending remaining_entitlement,
+  emp.employment_status,
+  orgdtl.unit_name,
+  workloc.location_description
+from hr_lv_leavehistory lvhist
+join hr_rcm_employee emp on emp.id=lvhist.emp_id
+join hr_rcm_individual ind on emp.ind_id=ind.id
+join hr_hcf_worklocationposition worklocpos on emp.position_location_id=worklocpos.id
+join hr_hcf_worklocation workloc on workloc.id=worklocpos.wklocation_id
+join hr_hcf_position pos on pos.id=worklocpos.position_id
+join hr_rcm_empleaveentitle lvent on lvent.id=lvhist.emplvent_id
+join hr_lv_leavetrack lvtrack on lvtrack.emplvent_id=lvent.id
+join hr_hcf_orgstructuredtl orgdtl on orgdtl.id=pos.orgdtl_id
+where lvtrack.entry_date=(select max(lvtrack2.entry_date)
+                          from hr_lv_leavehistory lvhist2
+                          join hr_rcm_empleaveentitle lvent2 on lvent2.id=lvhist2.emplvent_id
+                          join hr_lv_leavetrack lvtrack2 on lvtrack2.emplvent_id=lvent2.id
+                          where lvhist2.id=lvhist.id)
+and  emp_id =case when $P{EMP_NO} is null then emp_id else $P{EMP_NO} end
+and lvhist.id=case when $P{ID} is null then lvhist.id else $P{ID} end
+)]]>
+	</queryString>
+	<field name="PARA_1" class="java.lang.String"/>
+	<field name="PARA_2" class="java.lang.String"/>
+	<field name="PARA_3_1" class="java.lang.String"/>
+	<field name="PARA_3_2" class="java.lang.String"/>
+	<field name="PARA_3_3" class="java.lang.String"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="LEAVE_PENDING" class="java.math.BigDecimal"/>
+	<field name="PARA_3_4" class="java.lang.String"/>
+	<field name="PARA_4" class="java.lang.String"/>
+	<field name="PARA_5" class="java.lang.String"/>
+	<field name="PARA_6" class="java.lang.String"/>
+	<field name="PARA_7" class="java.lang.String"/>
+	<field name="PARA_8" class="java.lang.String"/>
+	<field name="PARA_9" class="java.lang.String"/>
+	<field name="PARA_10" class="java.lang.String"/>
+	<group name="leave_group" isStartNewPage="true">
+		<groupExpression><![CDATA[$P{ID}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+	</group>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="175" splitType="Stretch"/>
+	</title>
+	<detail>
+		<band height="479" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="13" width="468" height="20" uuid="216bf567-c2d5-47bb-bf6f-2b03e7cb0707"/>
+				<textElement>
+					<font fontName="Tahoma" size="11" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_1}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="47" width="468" height="20" uuid="287cfffa-9c61-4c04-9374-f4511123b536"/>
+				<textElement>
+					<font fontName="Tahoma" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_2}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="80" width="468" height="15" uuid="d7b0a940-7f59-4a1d-91b5-5f56a598c0bb"/>
+				<textElement>
+					<font fontName="Tahoma" size="11" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_3_1}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="95" width="468" height="15" uuid="fa7b9696-41dd-43a8-bf93-6190fa84aa9f"/>
+				<textElement>
+					<font fontName="Tahoma" size="11" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_3_2}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="110" width="468" height="15" uuid="79083bc1-d241-430c-94e8-7ada2ed3308b"/>
+				<textElement>
+					<font fontName="Tahoma" size="11" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_3_3}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="125" width="468" height="15" uuid="65e0d4b3-4274-4e9f-a40e-fd0b2eff3356"/>
+				<textElement>
+					<font fontName="Tahoma" size="11" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_3_4}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="164" width="468" height="20" uuid="785fdca0-cdd0-4f74-8c0a-3a18c7dd8931"/>
+				<textElement>
+					<font fontName="Tahoma" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_4}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="197" width="468" height="20" uuid="c334fa7a-32ea-4008-9381-2effb8c68dba"/>
+				<textElement>
+					<font fontName="Tahoma" size="11" isBold="true" isItalic="true" isUnderline="true" pdfFontName="Helvetica-BoldOblique" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_5}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="232" width="468" height="34" uuid="ff55fbdd-d415-40e2-9568-6373e7c84057"/>
+				<textElement>
+					<font fontName="Arial" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_6}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="272" width="468" height="23" uuid="e2a92a30-52eb-44ec-85bb-cf97954b418a"/>
+				<textElement>
+					<font fontName="Arial" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_7}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="302" width="468" height="23" uuid="c645d4ac-e03f-45c0-9f78-c3fa569307cc"/>
+				<textElement>
+					<font fontName="Arial" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_8}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="337" width="468" height="20" uuid="aa381bbb-3694-485b-b58e-6ec2cf0cb16b"/>
+				<textElement>
+					<font fontName="Arial" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_9}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="440" width="468" height="15" uuid="018d48fb-a373-4fd0-a15d-54083ba4806c"/>
+				<textElement>
+					<font fontName="Tahoma" size="11" isBold="true" isItalic="true" pdfFontName="Helvetica-BoldOblique" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[HUGH WATSON (MR)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="455" width="468" height="15" uuid="eb424331-f8d8-4167-bd81-2b79844af9c5"/>
+				<textElement>
+					<font fontName="Tahoma" size="11" isBold="true" isItalic="true" pdfFontName="Helvetica-BoldOblique" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[MANAGER-HUMAN RESOURCES ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="388" width="468" height="20" forecolor="#000000" uuid="0770270c-500d-4e2b-a273-343b6c850723"/>
+				<textElement>
+					<font fontName="Arial" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARA_10}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="4" y="413" width="95" height="27" uuid="80a8577e-55bd-4f57-885a-753068ee8253"/>
+				<imageExpression><![CDATA["repo:/images/T"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+</jasperReport>

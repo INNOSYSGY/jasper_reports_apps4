@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="No Longer Employed Letter Reminder" pageWidth="612" pageHeight="1008" columnWidth="542" leftMargin="35" rightMargin="35" topMargin="28" bottomMargin="12" isFloatColumnFooter="true" uuid="b05d4c4c-4f8c-42a3-b68f-601e5e97b92e">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ICOM"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="aheadley"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/INT_COMM/ICOM_REPORTS/No_Longer_Employed_Letter_v3_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/INT_COMM/ICOM_REPORTS/No_Longer_Employed_Letter_v3"/>
+	<property name="com.jaspersoft.studio.report.description" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<parameter name="ADDR_TYPE" class="java.lang.Integer"/>
+	<parameter name="END_DATE" class="java.lang.String"/>
+	<parameter name="IND_ID" class="java.lang.Integer"/>
+	<parameter name="DECPERIOD_ID" class="java.lang.Integer"/>
+	<parameter name="OPT" class="java.lang.Integer"/>
+	<parameter name="ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="DATE_PREPARED" class="java.lang.String"/>
+	<parameter name="SESSION_ID" class="java.math.BigDecimal"/>
+	<parameter name="OPTION_NAME" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+    'The Integrity Commission of Guyana reminds you of your statutory obligation as a Specified Person in Public Life pursuant to <b>Section 13 (1) (b) of the Integrity Commission Act, No. 20 of 1997, CAP 26:01 of the Laws of Guyana</b>. This obligation requires you to file an <b>Annual Declaration</b> (as per <b>Form 2 of the Commission’s Act</b>) with the Commission in the capacity of <b>Former '|| a.position ||' at ' ||a.organisation||'</b>. This includes a Declaration of Assets and Liabilities for the relevant period as it relates to your Spouse, Children and associated person who may possess assets within and outside of Guyana.' par1, 
+    'Kindly note, the records at the Integrity Commission reflect that your Declaration of Assets and Liabilities are outstanding for the following period:<ul><li><b>'|| a.declaration_period ||'</b></li></ul>' par2,
+    'Attached is/are Declaration Form (s) corresponding to the outstanding period (s). Please submit the said declaration and any other outstanding declarations with the <b>Supporting Documentations</b> as specified in the attached <b>' || a.opt ||'</b> to the Commission, on or before <b>'|| a.submission_date ||'</b>.' par3, 
+    'Your failure to comply with this notice is contrary to <b>Sections 13 and 18 of the Integrity Commission Act, No. 20 of 1997. The Integrity Commission hereby notifies you to rectify this outstanding status of your Declaration(s) forthwith upon receipt of this correspondence</b>.' par4, 
+    'The Commission reminds you that your failure to file your declaration or furnish particulars will be subjected to <b>Section 19 of the Commission’s Act, No. 20 of 1997 which stipulates 
+    your name to be </b>published <b>in the Gazette and a daily newspaper.</b> Failure to file also constitutes an offence as per <b>Section 22 of the Commission’s Act, No. 20 of 1997. </b>
+    The offence stipulates in <b>Section 22</b> a fine of <b>twenty-five thousand Guyana Dollars (GYD $25,000) together with six (6) months nor more than one-year imprisonment term. </b>
+    Further failure constitutes a continuing offence and the person will be <b>fined ten thousand Guyana Dollars (GYD $10,000) for each day the offence continues.</b><br><br>
+    All for your information and guidance.<br><br>Yours Respectfully,<br><br><br>___________________________ <br><b>'|| a.signature ||'</b>' par5,    
+    a.*
+FROM(SELECT
+                  (SELECT distinct
+                        b.custom_field
+                    FROM
+                        intgrt_ref_lookup b
+                    where upper(b.table_value)  = upper('IC')
+                    ) org_details,
+                    a.id,
+                    case when a.sex_code = 'M' then 'Mr. ' when a.sex_code = 'F' then 'Ms. ' end || ' ' || a.first_name ||' ' || a.surname declarant_name,
+                    case when a.sex_code = 'M' then 'Mr. ' when a.sex_code = 'F' then 'Ms. ' end || a.surname salutation,
+                    case  
+                        when $P{ADDR_TYPE}  = 1 then 
+                            f.custom_field 
+                        else
+                            b.lot || ' ' || 
+                            nvl(b.street ||case when b.street is not null then '<br>' else null end, null) || 
+                            nvl(b.village_ward || case when b.village_ward is not null then'<br>' else null end,null) || 
+                            nvl(b.town || case when b.town is not null then '<br>' else null end, null) || 
+                            nvl(b.county, null)
+                    end as address,
+                    to_char(d.income_state_start, 'fmMonth dd,yyyy') || ' to the last date worked' declaration_period,
+                    e.position_held || ' of the ' || e.organisation position,
+                    to_char(to_date($P{DATE_PREPARED} , 'dd-MON-yyyy'), 'fmMonth fmDD, YYYY') date_prepared,
+                    to_char(to_date($P{END_DATE} , 'dd-MON-yyyy'), 'fmMonth fmDD, YYYY') submission_date,
+                    e.position_held,
+                    e.organisation,
+                    (select replace(replace(option_value, '[', ' <br>['), '(', ' <br>(') from rpt_parameter where option_name = $P{OPTION_NAME} and session_id =  $P{SESSION_ID} ) signature,
+                    case 
+                        when $P{OPT} = 1 then 'Brochure'
+                        else 'Checklist'
+                    end as opt
+                FROM
+                         intgrt_ref_individual a
+                    JOIN intgrt_ref_address       b ON a.id = b.ind_id
+                    JOIN intgrt_dyn_declarehd     c ON a.id = c.ind_id
+                    JOIN intgrt_ref_decperiod     d ON c.decperiod_id = d.id
+                    JOIN intgrt_ref_indemphistory e ON a.id = e.ind_id
+                    JOIN intgrt_ref_lookup f  on e.org_id = f.id
+                WHERE
+                    (b.end_date is null or b.end_date > trunc(sysdate))
+                    AND e.to_date IS NOT NULL
+                    AND a.id = $P{IND_ID} 
+                    AND c.date_submitted IS NULL
+                    AND c.decperiod_id = $P{DECPERIOD_ID} 
+                    AND e.org_id = $P{ORG_ID} 
+                ORDER BY
+                    1) a]]>
+	</queryString>
+	<field name="PAR1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR1"/>
+	</field>
+	<field name="PAR2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR2"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR2"/>
+	</field>
+	<field name="PAR3" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR3"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR3"/>
+	</field>
+	<field name="PAR4" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR4"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR4"/>
+	</field>
+	<field name="PAR5" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR5"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR5"/>
+	</field>
+	<field name="ORG_DETAILS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_DETAILS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_DETAILS"/>
+	</field>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="DECLARANT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DECLARANT_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="DECLARANT_NAME"/>
+	</field>
+	<field name="SALUTATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALUTATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALUTATION"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="DECLARATION_PERIOD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DECLARATION_PERIOD"/>
+		<property name="com.jaspersoft.studio.field.label" value="DECLARATION_PERIOD"/>
+	</field>
+	<field name="POSITION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION"/>
+	</field>
+	<field name="DATE_PREPARED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_PREPARED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_PREPARED"/>
+	</field>
+	<field name="SUBMISSION_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUBMISSION_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUBMISSION_DATE"/>
+	</field>
+	<field name="POSITION_HELD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_HELD"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_HELD"/>
+	</field>
+	<field name="ORGANISATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION"/>
+	</field>
+	<field name="SIGNATURE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SIGNATURE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SIGNATURE"/>
+	</field>
+	<field name="OPT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="OPT"/>
+		<property name="com.jaspersoft.studio.field.label" value="OPT"/>
+	</field>
+	<detail>
+		<band height="487">
+			<image>
+				<reportElement x="0" y="0" width="310" height="100" uuid="4ff3691a-ee91-4174-a324-edd1184eba85"/>
+				<imageExpression><![CDATA["repo:icom_logo.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="322" y="0" width="220" height="110" uuid="d38058d1-8313-4d19-b3c1-4e7cb2a2d7fd"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true" isItalic="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_DETAILS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="120" width="542" height="30" forecolor="#FF0905" uuid="ea3a3da2-84ab-437a-8c13-65c0caef815e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[PRIVATE & CONFIDENTIAL]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="153" width="542" height="20" isRemoveLineWhenBlank="true" uuid="6845a2cc-f8dc-475e-a463-dca424a8a3a5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DECLARANT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="178" width="542" height="20" isRemoveLineWhenBlank="true" uuid="44dc75e7-5af2-459e-ae5e-2bead4e0e208">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="228" width="542" height="20" isRemoveLineWhenBlank="true" uuid="6aace0b3-66fc-4833-bc00-ec4736f8a1bd"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dear "+$F{SALUTATION}+","]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="253" width="542" height="127" isRemoveLineWhenBlank="true" uuid="6ce7a414-142e-4ef5-b3e9-95ad963c5400">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.tabStopWidth" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Justified" markup="html">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+					<paragraph lineSpacingSize="1.0" tabStopWidth="0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR1}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="0" y="385" width="542" height="20" isRemoveLineWhenBlank="true" uuid="e984c3cf-cf2e-418b-9ca4-cdb7bb19730c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" markup="html">
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR2}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="417" width="542" height="20" isRemoveLineWhenBlank="true" uuid="d0cd1c1d-ddef-48fa-8042-2cac69744012">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR3}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="442" width="542" height="20" isRemoveLineWhenBlank="true" uuid="0ca4d631-410d-4af3-a493-bce0ab458230">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR4}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="467" width="542" height="20" isRemoveLineWhenBlank="true" uuid="29cd9137-f885-40be-a355-7a63a93be9f4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR5}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="MMMMM dd, yyyy" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="203" width="542" height="20" isRemoveLineWhenBlank="true" uuid="9eb77b25-f28d-40d7-a87d-eedc959ff143"/>
+				<textElement>
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_PREPARED}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="40">
+			<image>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="541" height="40" uuid="a1fc9620-b6c9-4fa4-adf9-3668d3fd1c0f"/>
+				<imageExpression><![CDATA["repo:icom_footer.png"]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+</jasperReport>

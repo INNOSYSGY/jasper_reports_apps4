@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll Analysis Department Summary" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="77b7e9ef-3881-487f-8f44-9b112a2fd355">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/1"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/02_PAYROLL/1_files/DEPARTMENT_INCOME"/>
+	<property name="com.jaspersoft.studio.report.description" value="Department Income Summary"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="P_EARNINGS_PERIOD" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_DEPARTMENT_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="allEmployees" class="java.math.BigDecimal"/>
+	<parameter name="SESSION_ID" class="java.lang.String"/>
+	<parameter name="SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="P_PERIOD_MONTH_YEAR" class="java.lang.String"/>
+	<parameter name="SALARY_CURRENCY" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select 
+CASE WHEN trim(ic.USE_STANDARD_HOURS) = 'Y' THEN
+        Initcap(ic.Description)||'('||sum(quantity)||' HR)'
+        ELSE Initcap(ic.Description) END Description,
+sum(case when (SALARY_CURRENCY='GYD' or SALARY_CURRENCY is null) then round(c.INCOME_AMOUNT,2) else round(pkg_global_fnts.fn_curr_convert(pa.org_id, c.INCOME_AMOUNT, 'NO_TO_BASE', 'GYD', SALARY_CURRENCY),2) end) INCOME_AMOUNT
+from PA_PMG_PAYROLLINCOME c
+join pa_pmg_payrolldtl pa on c.pay_slipno=pa.id
+JOIN PA_PCF_INCOMECODE IC ON c.INCOME_CODE = IC.INCOME_CODE
+join hr_rcm_employee ep on pa.emp_id=ep.id
+join HR_RCM_INDIVIDUAL r on ep.ind_id=r.id
+join hr_hcf_position w on w.id=ep.position_id
+left join hr_rcm_salary s on s.id=pa.salary_id
+left outer join vw_organisation_structure v on pa.orgdtl_id=v.id
+WHERE 
+((upper(pa.PAYMENT_TYPE_HIST) = case   when  $P{P_EARNINGS_PERIOD} =-25 then to_char(upper(pa.PAYMENT_TYPE_HIST))	                               
+                                    when $P{P_EARNINGS_PERIOD}=-15  then 'MONTHLY'
+                                    when $P{P_EARNINGS_PERIOD}=-5    then 'WEEKLY'
+                                    end
+and extract(year from pa.period_end)||extract(month from pa.period_end)= $P{P_PERIOD_MONTH_YEAR}
+and ic.org_id=$P{P_ORG_ID}
+)
+or 
+pa.EARNINGS_PERIOD_ID= $P{P_EARNINGS_PERIOD}
+) 
+and ic.org_id=$P{P_ORG_ID}
+and 
+(      $P{allEmployees}  = 1 or 
+exists (select 1
+                        from RPT_PARAMETER w1
+                        WHERE 
+                        W1.SESSION_ID=  $P{SESSION_ID} 
+                         and
+                         option_value=case when option_name = $P{SEARCH_OPTION}    and option_name ='EMPLOYEE' then to_char(ep.id) 
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='GRADE_SCALE' then to_char(w.grade_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='ORG_STRUCT_LEVEL' then to_char(w.orgdtl_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='POSITION' then to_char(ep.position_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='WORK_LOCATION' then to_char(ep.wklocation_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='UNION' then to_char(ep.union_code_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYMENT_TYPE' then to_char(ep.EMPLOYMENT_TYPE_ID)
+                                                end
+                        )
+
+)
+AND NVL(V.ID,0)=CASE WHEN NVL($P{P_DEPARTMENT_ID},0)=9999 THEN NVL(V.ID,0) ELSE NVL($P{P_DEPARTMENT_ID},0) END
+group by Initcap(ic.Description), ic.USE_STANDARD_HOURS
+order by Initcap(ic.Description)]]>
+	</queryString>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="INCOME_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="INCOME_AMOUNT"/>
+	</field>
+	<variable name="Total Income" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{INCOME_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="INCOME_AMOUNT_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{INCOME_AMOUNT}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="70" height="15" uuid="451db553-2c79-4faf-99b6-11ed5baa11ce">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="70" y="0" width="64" height="15" uuid="80aff1e4-dcc9-4fb8-b76d-31aabfdcb50b">
+					<printWhenExpression><![CDATA[$P{SALARY_CURRENCY}.equals("GYD")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INCOME_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="70" y="0" width="64" height="15" uuid="70bea3cd-3e14-4193-ade0-950657722f14">
+					<printWhenExpression><![CDATA[!$P{SALARY_CURRENCY}.equals("GYD")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INCOME_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="15" splitType="Stretch">
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="69" y="0" width="64" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="d83b5fdb-2fbd-45cb-b01d-41dd5043e884">
+					<printWhenExpression><![CDATA[$P{SALARY_CURRENCY}.equals("GYD")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{INCOME_AMOUNT_1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="70" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="0bb6d50f-29df-4e6f-8edd-29cebae28b55">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Total Income]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="69" y="0" width="64" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="aa50a95d-4a1e-491f-a9ff-25809ef0aa6c">
+					<printWhenExpression><![CDATA[!$P{SALARY_CURRENCY}.equals("GYD")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{INCOME_AMOUNT_1}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

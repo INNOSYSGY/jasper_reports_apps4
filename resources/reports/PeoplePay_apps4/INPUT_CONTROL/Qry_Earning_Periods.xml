@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query exportedWithPermissions="true">
+    <folder>/reports/PeoplePay_apps4/INPUT_CONTROL</folder>
+    <name>Qry_Earning_Periods</name>
+    <version>0</version>
+    <label>Qry_Earning_Periods</label>
+    <description>List of Organisation Period</description>
+    <creationDate>2021-11-17T14:43:20.358-04:00</creationDate>
+    <updateDate>2013-04-15T15:04:29.248-04:00</updateDate>
+    <language>sql</language>
+    <queryString>SELECT 
+E.ID EARNING_ID,
+E.ORG_ID,
+H.ORGANISATION_NAME,
+(
+      SELECT VALUE_DESCRIPTION
+      FROM HR_HCF_LOOKUP
+      WHERE ID=E.EMPLOYMENT_CLASS_ID)EMPLOYMENT_CLASS,
+Y.COMPANY_YEAR,
+
+trunc(E.START_DATE) START_DATE,E.END_DATE,E.PAYROLL_CUTOFF,E.START_PAID_FOR,E.END_PAID_FOR,E.PAYMENT_PERIOD_NO,E.PAYMENT_TYPE,E.PAY_STATUS,
+E.EPAYROLL_STATUS,
+E.ENTERED_BY,E.ENTRY_DATE,E.VERIFIED_BY,E.VERIFIED_DATE,
+H.Telnum,H.Faxnum, H.Address
+FROM  PA_PCF_EARNINGPERIOD E JOIN
+HR_HCF_COMPANYYEAR Y ON E.COMPANY_YEAR_ID=Y.ID
+JOIN HR_HCF_ORGANISATION H ON E.ORG_ID=H.ID
+order by E.ORG_ID,Y.COMPANY_YEAR</queryString>
+    <dataSource>
+        <uri>/themes/datasources/PeoplePay</uri>
+    </dataSource>
+</query>

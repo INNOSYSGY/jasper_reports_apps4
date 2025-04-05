@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Employee Job Letter" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85bcab7d-a21c-457c-8b26-54349766927e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Standard_Letters/HR_03"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<subDataset name="Entitlements" uuid="ce931d9d-6809-4e53-9222-75c45c358c3b">
+		<parameter name="P_EMP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT EMP_COMPANY_NO,initcap(income_type) income_type,to_char(sum(amount),'$999,999') amount
+FROM VW_EMPENTITLE
+WHERE
+TRUNC(SYSDATE) BETWEEN TRUNC(DATE_EFFECTIVE) AND TRUNC(NVL(DATE_EFFECTIVE_END,SYSDATE))
+and emp_id=$P{P_EMP_ID}
+group by EMP_COMPANY_NO,initcap(income_type)]]>
+		</queryString>
+		<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+		<field name="INCOME_TYPE" class="java.lang.String"/>
+		<field name="AMOUNT" class="java.lang.String"/>
+		<variable name="Seq" class="java.math.BigDecimal" calculation="Count">
+			<variableExpression><![CDATA[1.0]]></variableExpression>
+			<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EMP_NO" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+b.id Emp_id,
+B.EMP_COMPANY_NO,
+
+  'Please be informed that '||(case when a.sex_code='F' then 'Ms. ' when a.sex_code='M' then 'Mr. ' end)||
+    initcap(nvl(first_name,'')||' '||nvl(surname,'')) ||' of '||nvl(initcap(trim(
+PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',a.ID,'LOT',SYSDATE)||' '||
+pkg_global_fnts.fn_address('HOME',a.id,'STREET',sysdate)||' '||
+PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',a.ID,'VILLAGE_WARD',SYSDATE)||' '||
+pkg_global_fnts.fn_address('HOME',a.id,'COUNTY',sysdate)
+)),'No given Address')||
+    ' is employed as a ' ||initcap(B.POSITION_NAME)||' at ' ||NVL(M.ORGANISATION_NAME,'')|| '.' LINE1
+    , case when a.sex_code='F' then 'Ms. ' when a.sex_code='M' then 'Mr. ' end
+      ||  initcap(nvl(first_name,'')||' '||nvl(surname,'')) ||' commenced working with '||nvl(m.organisation_name,'') ||' since '||trim(to_char(b.date_employed,'dd-Month-yyyy'))
+    || ' and is presently in receipt of a '||lower(b.Payment_Type)||' salary of '||trim(to_char(pkg_global_fnts.fn_personalrate(b.id,sysdate),'$999,999,999'))||'.' line3
+
+    ,'Any assistance render to '||case when a.sex_code='F' then 'Ms.' when a.sex_code='M' then 'Mr.' end
+    || Initcap(trim(nvl(First_Name,'')||' '||nvl(Surname,'')))|| ' will be highly appreciated.' line4
+
+    ,'Thank You.' line5,
+(SELECT count(1)
+from vw_empentitle
+WHERE TRUNC(SYSDATE) BETWEEN TRUNC(DATE_EFFECTIVE) AND TRUNC(NVL(DATE_EFFECTIVE_END,SYSDATE))
+and emp_id=b.id
+) Has_entitlement
+      , m.organisation_name, m.telnum,nvl(m.faxnum,' ') faxnum, m.address,m.photo org_photo
+
+	from hr_rcm_individual a join hr_rcm_employee b on a.id=b.ind_id
+        JOIN HR_HCF_ORGANISATION M ON M.ID = B.ORG_ID
+where b.emp_company_no=$P{EMP_NO}]]>
+	</queryString>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+	<field name="LINE1" class="java.lang.String"/>
+	<field name="LINE3" class="java.lang.String"/>
+	<field name="LINE4" class="java.lang.String"/>
+	<field name="LINE5" class="java.lang.String"/>
+	<field name="HAS_ENTITLEMENT" class="java.math.BigDecimal"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="ORG_PHOTO" class="java.io.InputStream"/>
+	<group name="Employee" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{EMP_COMPANY_NO}]]></groupExpression>
+		<groupHeader>
+			<band height="119">
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
+					<reportElement mode="Transparent" x="14" y="96" width="530" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="d3d275de-9ad2-4a52-82b2-63017a0b9192"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE1}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="14" y="39" width="530" height="20" uuid="339cd43e-f3bd-4316-9493-8598451d8101"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="12" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[To Whom It May Concern]]></text>
+				</staticText>
+			</band>
+			<band height="55">
+				<textField isStretchWithOverflow="true">
+					<reportElement x="14" y="11" width="530" height="20" uuid="cda8da23-c51d-4921-b422-7a2de7a8a775"/>
+					<textElement>
+						<font fontName="Arial"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE3}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band/>
+			<band height="61">
+				<printWhenExpression><![CDATA[$F{HAS_ENTITLEMENT}==0 ? false:true]]></printWhenExpression>
+				<staticText>
+					<reportElement x="14" y="9" width="226" height="20" uuid="e98e5de1-7698-4249-8c75-c09448ee8715"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Additional fixed and variable entitlements]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement key="table" x="274" y="9" width="270" height="20" uuid="29412af7-53d8-4efc-afb7-ad9c3c397252"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Entitlements" uuid="09b60b94-ebd3-47ac-a23a-b74e38e9c166">
+							<datasetParameter name="P_EMP_ID">
+								<datasetParameterExpression><![CDATA[$F{EMP_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="41" uuid="811597ef-617d-47ef-9836-654f7c92b277">
+							<jr:detailCell height="15" rowSpan="1">
+								<textField pattern="###0">
+									<reportElement x="0" y="0" width="41" height="15" uuid="00d34b36-4b7f-4811-8a5c-be93492d6419"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+										<paragraph leftIndent="2" rightIndent="4"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{Seq}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="90" uuid="f98424cd-cb6d-4dab-b86b-391a4c141825">
+							<jr:detailCell height="15" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="90" height="15" uuid="dc21ada8-1ab0-46f7-9151-4db5ee4aa065"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{INCOME_TYPE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="90" uuid="e65fcdc9-4d42-4461-a2a7-843e05a4bb53">
+							<jr:detailCell height="15" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="73" height="15" uuid="050ab95c-99c6-422c-96b3-0e41ce52af4e"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="149">
+				<textField isStretchWithOverflow="true">
+					<reportElement x="14" y="8" width="530" height="20" uuid="53fe8394-3627-4e6b-b99f-6f46aaeac576"/>
+					<textElement>
+						<font fontName="Arial"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE4}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="14" y="95" width="100" height="20" uuid="3949c091-68d9-428b-a58f-3f7bb81bf1a3"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Thank You]]></text>
+				</staticText>
+				<line>
+					<reportElement x="14" y="129" width="145" height="1" uuid="6dc46360-30fc-4938-a791-416675e264b0"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="25" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="70" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="70" uuid="8217f37e-7a6c-4501-bdfd-62255fb8834c"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[1626.0]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

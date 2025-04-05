@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Procurement &amp; Materials Managment Unit" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f27a2ead-9399-4210-9006-8d39a3301cd6">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/PQO_1"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<subDataset name="Quotation Request Lines" uuid="83357ade-4529-4ffa-b4f9-995de7dbb925">
+		<parameter name="P_RFQ_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT
+QL.LINE_ID,
+QL.DESCRIPTION,
+QL.DRUG_STRENGTH,
+DECODE(QL.DRUG_STRENGTH,NULL,QL.DESCRIPTION,QL.DESCRIPTION||' '||QL.DRUG_STRENGTH) ITEM_DESCRIPTION,
+ql.UOM,
+ql.PRICE_QUOTED,
+ql.market_price,
+ql.tax_amount,
+ql.quantity_requested,
+ql.TOTAL_COST,
+ql.line_items_cost,
+q.valid_until,
+q.eta
+FROM TBLQUOTATIONLINES QL
+join TBLQUOTATION q on ql.quotation_id=q.quotation_id
+where ql.quotation_id=$P{P_RFQ_ID}
+order by QL.LINE_ID]]>
+		</queryString>
+		<field name="LINE_ID" class="java.math.BigDecimal"/>
+		<field name="DESCRIPTION" class="java.lang.String"/>
+		<field name="DRUG_STRENGTH" class="java.lang.String"/>
+		<field name="ITEM_DESCRIPTION" class="java.lang.String"/>
+		<field name="UOM" class="java.lang.String"/>
+		<field name="PRICE_QUOTED" class="java.math.BigDecimal"/>
+		<field name="MARKET_PRICE" class="java.math.BigDecimal"/>
+		<field name="TAX_AMOUNT" class="java.math.BigDecimal"/>
+		<field name="QUANTITY_REQUESTED" class="java.math.BigDecimal"/>
+		<field name="TOTAL_COST" class="java.math.BigDecimal"/>
+		<field name="LINE_ITEMS_COST" class="java.math.BigDecimal"/>
+		<field name="VALID_UNTIL" class="java.sql.Timestamp"/>
+		<field name="ETA" class="java.sql.Timestamp"/>
+		<variable name="Total_cost" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{TOTAL_COST}]]></variableExpression>
+			<initialValueExpression><![CDATA[0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<queryString>
+		<![CDATA[select '4/5/2015' "Date",
+'15397' "Num",
+'' "UNITMEAS",
+'SA002' "Item",
+'SAVINGS CREDITS(A123)' "Item Description",
+'5,000' "Qty",
+'11,049.40' "Amount",
+'Diamond' "Branch"
+from dual]]>
+	</queryString>
+	<field name="Date" class="java.lang.String"/>
+	<field name="Num" class="java.lang.String"/>
+	<field name="UNITMEAS" class="java.lang.String"/>
+	<field name="Item" class="java.lang.String"/>
+	<field name="Item Description" class="java.lang.String"/>
+	<field name="Qty" class="java.lang.String"/>
+	<field name="Amount" class="java.lang.String"/>
+	<field name="Branch" class="java.lang.String"/>
+	<sortField name="Branch"/>
+	<variable name="Branch Total" class="java.lang.String" resetType="Group" resetGroup="Branch" calculation="Sum">
+		<variableExpression><![CDATA[$F{Amount}]]></variableExpression>
+	</variable>
+	<group name="Quotation" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{QUOTATION_ID}]]></groupExpression>
+		<groupFooter>
+			<band height="33"/>
+		</groupFooter>
+	</group>
+	<group name="Branch">
+		<groupExpression><![CDATA[$F{Branch}]]></groupExpression>
+		<groupHeader>
+			<band height="22">
+				<textField>
+					<reportElement x="44" y="0" width="100" height="20" uuid="559a8d28-992b-4015-bb94-4776d3742aed"/>
+					<textFieldExpression><![CDATA[$F{Branch}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="44" height="20" uuid="07585547-32f2-4b3c-bfb8-456adc8a8279"/>
+					<text><![CDATA[Branch - ]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="43" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="41" uuid="3507754f-fab4-467e-a0ab-9b10878c08aa"/>
+				<subreportParameter name="P_REPORT_NAME">
+					<subreportParameterExpression><![CDATA["test"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/MedSys/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="31" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="60" height="20" uuid="87f005c6-940d-45dd-a219-1d387300bf39"/>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="60" y="0" width="70" height="20" uuid="d5f4ecf0-dc9c-4a84-8204-cb97f22eabdf"/>
+				<text><![CDATA[Num]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="130" y="0" width="57" height="20" uuid="69ab106d-d72f-47d1-a1c9-9aa3afe83fea"/>
+				<text><![CDATA[UNITMEAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="187" y="0" width="70" height="20" uuid="2aef7a95-deb2-4da3-99cc-7af21d645e08"/>
+				<text><![CDATA[Item]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="257" y="0" width="143" height="20" uuid="96540d7d-f054-4bc8-a15e-f50dbd26ae95"/>
+				<text><![CDATA[Item Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="0" width="72" height="20" uuid="47b2d246-d982-4e1b-9c0c-7b862f497c01"/>
+				<text><![CDATA[Qty]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="472" y="0" width="100" height="20" uuid="895721f7-77bf-4056-94c5-cf21ca8e68c5"/>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="60" height="20" uuid="fd486561-e3ec-4108-bfd4-48a6735dc205"/>
+				<textFieldExpression><![CDATA[$F{Date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="60" y="0" width="70" height="20" uuid="1ab97464-ff9d-42d7-bf68-3459cbafd237"/>
+				<textFieldExpression><![CDATA[$F{Num}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="0" width="57" height="20" uuid="8c13a93c-f99d-4940-87cf-8d32330b4b43"/>
+				<textFieldExpression><![CDATA[$F{UNITMEAS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="187" y="0" width="70" height="20" uuid="2737d9a5-cb2f-455f-91eb-ac69d7473a26"/>
+				<textFieldExpression><![CDATA[$F{Item}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="257" y="0" width="143" height="20" uuid="010122f0-1197-4f69-be99-5892ed6df8c3"/>
+				<textFieldExpression><![CDATA[$F{Item Description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="0" width="72" height="20" uuid="1ee78736-b23d-4b76-9317-49935bc76caa"/>
+				<textFieldExpression><![CDATA[$F{Qty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="472" y="0" width="100" height="20" uuid="9d3af94f-813e-4dcb-b596-26a2547ba1d1"/>
+				<textFieldExpression><![CDATA[$F{Amount}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="32" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="555" height="1" uuid="4746db62-5f43-4715-895e-5f0f67da0892"/>
+				<graphicElement>
+					<pen lineWidth="1.25" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="472" y="0" width="100" height="20" uuid="e834fb9f-83a8-43da-bc3c-22cf30181740"/>
+				<textFieldExpression><![CDATA[$V{Branch Total}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="44" y="1" width="100" height="20" uuid="2925329e-ce06-405f-887f-3365e37a1819"/>
+				<textFieldExpression><![CDATA[$F{Branch}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="1" width="44" height="20" uuid="997a62b8-f56f-4ecf-af5d-bf53a443e5c8"/>
+				<text><![CDATA[Branch - ]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="59" splitType="Stretch"/>
+	</summary>
+</jasperReport>

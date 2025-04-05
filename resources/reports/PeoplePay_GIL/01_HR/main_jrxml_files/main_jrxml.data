@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="General Salary Adjustment Notice" pageWidth="612" pageHeight="792" columnWidth="468" leftMargin="72" rightMargin="72" topMargin="20" bottomMargin="20" uuid="9ad1cc46-f38d-4e53-9edb-d81c3e55865f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GAFOORS_PROD_DataAdapter"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="lmorales"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/01_HR/General_Salary_Adjustment_Notice_test/main_jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="301"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="694"/>
+	<subDataset name="ENTITLEMENTS" uuid="96fa231c-ba59-432e-9ef3-f096160ef55e">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors Prod"/>
+		<parameter name="IN_EMP_ID" class="java.math.BigDecimal"/>
+		<parameter name="CURR_SAL_START_DATE" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[select * from (SELECT 
+    b.emp_id, 
+    b.entitlement, 
+    to_char(b.prev_amount, 'FML999G999G999G999G990') prev_amount, 
+    case when b.prev_amount = b.curr_amount then 'Same' else to_char(b.curr_amount, 'FML999G999G999G999G990') end curr_amount
+FROM(
+select 
+    emp_id, 
+    to_nchar('Basic Salary') entitlement,
+    (select * from (
+        select 
+            personal_rate
+         from 
+            hr_rcm_salary 
+        where 
+            emp_id = $P{IN_EMP_ID}
+            and end_date is not null 
+            and end_date != start_date
+            and personal_rate != 0
+        order by 
+            id desc) 
+    where 
+        rownum = 1) prev_amount,
+    personal_rate curr_amount
+from 
+    hr_rcm_salary 
+where 
+    emp_id =$P{IN_EMP_ID} 
+    and (end_date is null or end_date > trunc(sysdate))
+union
+select distinct 
+    ent.emp_id,
+    inc.description
+    ,(select * from (select prev_ent.amount from hr_rcm_empentitle prev_ent join pa_pcf_incomecode prev_inc on prev_ent.income_code_id = prev_inc.id
+                                    where prev_inc.id = inc.id and prev_ent.emp_id = $P{IN_EMP_ID}    and prev_ent.admin_status = 'SYS' and ((prev_ent.end_date is not null and prev_ent.end_date != prev_ent.start_date) or (prev_ent.end_date is null and prev_ent.start_date < to_date($P{CURR_SAL_START_DATE} , 'DD-MON-YYYY'))) order by prev_ent.id desc) 
+        where rownum = 1) prev_amount
+    ,(select * from (select ent_curr.amount from hr_rcm_empentitle ent_curr join pa_pcf_incomecode inc_curr on ent_curr.income_code_id = inc_curr.id
+                                    where inc_curr.id = inc.id and ent_curr.emp_id = $P{IN_EMP_ID}   and ent_curr.admin_status = 'SYS' and (ent_curr.end_date >= trunc(sysdate) or ent_curr.end_date is null))) curr_amount
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id
+where 
+    ent.emp_id = $P{IN_EMP_ID}
+    and ent.admin_status = 'SYS') B) C
+where c.curr_amount is not null]]>
+		</queryString>
+		<field name="EMP_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+		</field>
+		<field name="ENTITLEMENT" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ENTITLEMENT"/>
+			<property name="com.jaspersoft.studio.field.label" value="ENTITLEMENT"/>
+		</field>
+		<field name="PREV_AMOUNT" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="PREV_AMOUNT"/>
+			<property name="com.jaspersoft.studio.field.label" value="PREV_AMOUNT"/>
+		</field>
+		<field name="CURR_AMOUNT" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="CURR_AMOUNT"/>
+			<property name="com.jaspersoft.studio.field.label" value="CURR_AMOUNT"/>
+		</field>
+	</subDataset>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_SALARY_INCREASE_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_SESSION_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="IN_ALL_EMPLOYEES" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+EMPLOYEE_NO, 
+increase_id, 
+sig_photo
+from VW_SALARY_INCREASE_VERIFIER]]>
+	</queryString>
+	<field name="EMPLOYEE_NO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_NO"/>
+	</field>
+	<field name="INCREASE_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="INCREASE_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="INCREASE_ID"/>
+	</field>
+	<field name="SIG_PHOTO" class="oracle.jdbc.OracleBlob">
+		<property name="com.jaspersoft.studio.field.name" value="SIG_PHOTO"/>
+		<property name="com.jaspersoft.studio.field.label" value="SIG_PHOTO"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="70"/>
+	</pageHeader>
+	<detail>
+		<band height="440" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="150">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="0" y="1" width="100" height="20" uuid="466ce34b-80d2-4c2f-a1e6-29a2715eb3d7"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Regards,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="53" width="110" height="20" uuid="bc847cad-0d10-44a9-9a1e-73305f1becbd"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[...........................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="75" width="108" height="25" uuid="7a6fe7c7-1b05-4a02-84b1-11303a4e38ac">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Savita Persaud]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="99" width="218" height="25" uuid="fd9bffba-4580-46fc-8fe3-0a1bfcca30e3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Senior Human Resources Clerk]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="130" width="90" height="20" uuid="c74d2b59-a67f-410b-a775-f7260b756834"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Cc:  Payroll]]></text>
+			</staticText>
+			<image onErrorType="Blank">
+				<reportElement x="8" y="20" width="92" height="38" uuid="7335cd19-220d-4e23-aad0-72baed53b947"/>
+				<imageExpression><![CDATA[$F{SIG_PHOTO}]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+</jasperReport>

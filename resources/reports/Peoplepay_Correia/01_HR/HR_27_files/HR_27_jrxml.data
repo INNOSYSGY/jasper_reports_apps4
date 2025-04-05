@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Summary of Medicals Received" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="18c1d70d-144d-4d00-b968-84ced7d80647">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/HR_27"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.56.101:8081/jasperserver/services/repository"/>
+	<parameter name="Year" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+        COUNT(1) TOTAL,
+extract(year from date_of_occurance) year,
+        TO_CHAR(DATE_OF_OCCURANCE,'MM') MONTH_NUM,
+        TO_CHAR(DATE_OF_OCCURANCE,'Month') MED_MONTH,
+        SUM(CASE WHEN MEDICAL_TYPE='NIS' THEN 1 ELSE 0 END) NIS_MED
+	,SUM(CASE WHEN MEDICAL_TYPE='ANNUAL' THEN 1 ELSE 0 END) ANN_MED
+	,SUM(CASE WHEN MEDICAL_TYPE='EMPLOYMENT' THEN 1 ELSE 0 END) EMP_MED
+
+FROM HR_MED_MEDICALHISTORYDTL dt
+where extract(year from date_of_occurance)=$P{Year}
+and dt.org_id=$P{IN_ORG_ID}
+
+GROUP BY TO_CHAR(DATE_OF_OCCURANCE,'MM'), TO_CHAR(DATE_OF_OCCURANCE,'Month'),
+extract(year from date_of_occurance)
+]]>
+	</queryString>
+	<field name="TOTAL" class="java.math.BigDecimal"/>
+	<field name="YEAR" class="java.math.BigDecimal"/>
+	<field name="MONTH_NUM" class="java.lang.String"/>
+	<field name="MED_MONTH" class="java.lang.String"/>
+	<field name="NIS_MED" class="java.math.BigDecimal"/>
+	<field name="ANN_MED" class="java.math.BigDecimal"/>
+	<field name="EMP_MED" class="java.math.BigDecimal"/>
+	<sortField name="MONTH_NUM"/>
+	<variable name="Total" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="Total_NIS" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{NIS_MED}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="Total_Emp_Med" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMP_MED}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="Total_Ann_Med" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ANN_MED}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="82" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="64" width="572" height="15" uuid="345d20da-1b50-4a43-97e5-4f4f8acacdeb"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom" markup="none">
+					<font fontName="Arial" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Summary of Medicals Received By Month']]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="80" width="572" height="2" forecolor="#009933" uuid="ce8c2f92-2cc5-4c68-941d-7e19842db76d"/>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="493" y="64" width="72" height="15" uuid="6ce23a81-8cd3-4eee-ad2b-b28740f08f9b"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Year: '+new DecimalFormat("0").format($P{Year}).toString()]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="64" uuid="19b538b7-e47e-48d1-b63d-511f4ad5c489"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="17" splitType="Stretch">
+			<staticText>
+				<reportElement x="18" y="2" width="100" height="15" uuid="dd00188f-2ba0-4a88-b81f-0f19fd943abd"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Medical Month]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="135" y="2" width="100" height="15" uuid="dfb0547d-6bad-4135-a3ba-69f5985b7182"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Total Medicals]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="235" y="2" width="100" height="15" uuid="49eccae9-81e2-4a39-ab0d-e3e7d2c9bcb4"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[NIS Medical]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="472" y="0" width="100" height="15" uuid="bcd90a34-cc61-4b6d-b9ac-ea6959eb0f45"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Annual Medical]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="365" y="2" width="100" height="15" uuid="300dd386-b283-47ce-81e8-bb41cc9f19dc"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Employee Medical]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="571" height="1" uuid="4e81d4f5-17e3-4761-8808-c6129bba7118"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField>
+				<reportElement x="18" y="0" width="100" height="15" uuid="748c764e-ae61-4ac4-879a-c3de400ed761"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{MED_MONTH}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="135" y="0" width="100" height="15" uuid="f4768c8c-15c0-449c-8901-2aa3ab59059c"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="235" y="0" width="100" height="15" uuid="eb067d91-c1a3-4040-bbde-f60cff8192ec"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NIS_MED}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="472" y="0" width="100" height="15" uuid="55ab39ba-76d9-48d6-94c7-1fe8b8285d44"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ANN_MED}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="365" y="0" width="100" height="15" uuid="1fb545ae-bfd1-44b4-b07a-17a91b9d6d58"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_MED}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="571" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="15" width="571" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="2" y="0" width="146" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="452" y="0" width="80" height="15" uuid="236e8b14-b82b-4f23-92df-926a8155e855"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="532" y="0" width="40" height="15" uuid="4aba1297-bc96-4af6-8930-f0de74974f8e"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="18" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="571" height="1" uuid="f9bdf4f8-73c1-46f7-a121-14d55e550e4d"/>
+			</line>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="135" y="1" width="100" height="15" uuid="b07ed9bb-0983-4a41-9198-b6ae4de816ff"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="235" y="1" width="100" height="15" uuid="3c16004a-b20f-4156-af67-ef9723db1d05"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_NIS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="365" y="1" width="100" height="15" uuid="3d8e5849-5f43-475f-bbd4-30e8816f97df"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_Emp_Med}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="472" y="1" width="100" height="15" uuid="f1695638-2029-4747-8816-5dbfe19f7c8d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_Ann_Med}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="18" y="1" width="100" height="15" uuid="993c93b8-4305-4025-95d1-a6e1c21e51da"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

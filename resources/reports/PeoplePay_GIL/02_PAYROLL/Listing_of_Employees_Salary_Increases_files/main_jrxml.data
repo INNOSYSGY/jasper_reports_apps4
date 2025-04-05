@@ -1,0 +1,1586 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Employees Salary Increases" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryNewPage="true" uuid="1d96344a-0e5c-4f88-b11a-e770d087699f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors Prod"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/02_PAYROLL/Listing_of_Employees_Salary_Increases"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/02_PAYROLL/Listing_of_Employees_Salary_Increases_files/main_jrxml"/>
+	<subDataset name="SYS_ENTITLEMENTS" uuid="82395c5f-cd5c-4534-8561-52e8ffe89529">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors Prod"/>
+		<parameter name="IN_EMP_ID" class="java.math.BigDecimal"/>
+		<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+		<parameter name="IN_SALARY_INCREASE_ID" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[select 
+            inc.description, ent.amount amount
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+            join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+            join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+            join hr_apu_standardincrease std on std.id = sal.increase_id
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'CUMMALL'
+            and ent.emp_id =  $P{IN_EMP_ID}
+            and emp.org_id = $P{IN_ORG_ID}
+            and std.id = $P{IN_SALARY_INCREASE_ID}
+            and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+        union
+        select 
+                inc.description, ent.amount amount 
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+            join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+            join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+            join hr_apu_standardincrease std on std.id = sal.increase_id
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'TELALL'
+            and ent.emp_id =  $P{IN_EMP_ID}
+            and emp.org_id = $P{IN_ORG_ID}
+            and std.id = $P{IN_SALARY_INCREASE_ID}
+            and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+        union
+        select 
+                inc.description, ent.amount amount 
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+            join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+            join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+            join hr_apu_standardincrease std on std.id = sal.increase_id
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'VEHICLE'
+            and ent.emp_id = $P{IN_EMP_ID}
+            and emp.org_id = $P{IN_ORG_ID}
+            and std.id = $P{IN_SALARY_INCREASE_ID}
+            and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+        union
+        select 
+                inc.description, ent.amount amount 
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+            join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+            join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+            join hr_apu_standardincrease std on std.id = sal.increase_id
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'MEALS'
+            and ent.emp_id =  $P{IN_EMP_ID}
+            and emp.org_id = $P{IN_ORG_ID}
+            and std.id = $P{IN_SALARY_INCREASE_ID}
+            and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+        union
+        select 
+                inc.description, ent.amount amount 
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+            join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+            join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+            join hr_apu_standardincrease std on std.id = sal.increase_id
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'INCEN'
+            and ent.emp_id =  $P{IN_EMP_ID} 
+            and emp.org_id = $P{IN_ORG_ID}
+            and std.id = $P{IN_SALARY_INCREASE_ID}
+            and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+        union
+        select 
+                inc.description, ent.amount amount 
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+            join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+            join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+            join hr_apu_standardincrease std on std.id = sal.increase_id
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'ENT'
+            and ent.emp_id =  $P{IN_EMP_ID} 
+            and emp.org_id = $P{IN_ORG_ID}
+            and std.id = $P{IN_SALARY_INCREASE_ID}
+            and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+        union
+        select 
+                inc.description, ent.amount amount 
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+            join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+            join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+            join hr_apu_standardincrease std on std.id = sal.increase_id
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'TRAVEL'
+            and ent.emp_id = $P{IN_EMP_ID} 
+            and emp.org_id = $P{IN_ORG_ID}
+            and std.id = $P{IN_SALARY_INCREASE_ID}
+            and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+        union
+        select 
+                inc.description, ent.amount amount 
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+            join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+            join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+            join hr_apu_standardincrease std on std.id = sal.increase_id
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'GAS'
+            and ent.emp_id = $P{IN_EMP_ID}
+            and emp.org_id = $P{IN_ORG_ID}
+            and std.id = $P{IN_SALARY_INCREASE_ID}
+            and (ent.end_date >= trunc(sysdate) or ent.end_date is null)]]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="AMOUNT" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT"/>
+		</field>
+		<variable name="Emp_Total_Entitlements" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{AMOUNT}]]></variableExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="DEP_SYS_ENTITLEMENTS" uuid="6fbdb176-d479-4a9b-9195-0b8bdf57b831">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors Prod"/>
+		<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+		<parameter name="IN_ORGDTL_ID" class="java.math.BigDecimal"/>
+		<parameter name="IN_SALARY_INCREASE_ID" class="java.math.BigDecimal"/>
+		<parameter name="IN_ALL_EMPLOYEES" class="java.math.BigDecimal"/>
+		<parameter name="IN_SESSION_ID" class="java.math.BigDecimal"/>
+		<parameter name="IN_SEARCH_OPTION" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[select b.description, sum(b.amount) amount from (            
+select * from (
+select 
+    emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'CUMMALL'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id =  $P{IN_ORG_ID}
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id, inc.description
+union
+select 
+    emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'TELALL'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id = $P{IN_ORG_ID} 
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id, inc.description
+union
+select 
+    emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'VEHICLE'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id =  $P{IN_ORG_ID} 
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id, inc.description 
+union
+select 
+    emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'MEALS'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id =  $P{IN_ORG_ID}
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id, inc.description 
+union
+select 
+    emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'INCEN'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id =  $P{IN_ORG_ID}
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id, inc.description 
+union
+select 
+    emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'ENT'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id =  $P{IN_ORG_ID}
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id, inc.description 
+union
+select 
+    emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'TRAVEL'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id =  $P{IN_ORG_ID}
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id, inc.description 
+union
+select 
+    emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'GAS'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id =  $P{IN_ORG_ID} 
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id, inc.description ) a
+where a.orgdtl_id =  $P{IN_ORGDTL_ID}
+and ($P{IN_ALL_EMPLOYEES} = 1 or
+    	exists (SELECT 
+    					1
+    				FROM 
+    					RPT_PARAMETER W1
+    				WHERE 
+    					W1.SESSION_ID =  $P{IN_SESSION_ID}
+    				AND 
+    					option_value=case when option_name = $P{IN_SEARCH_OPTION} and option_name ='EMPLOYEE' then to_char(a.emp_id)
+						when option_name = $P{IN_SEARCH_OPTION} and option_name = 'ORG_STRUCT_LEVEL' then to_char(a.orgdtl_id)
+						when option_name = $P{IN_SEARCH_OPTION} and option_name = 'EMPLOYMENT_CLASS' then to_char(a.employment_class_id)
+                        when option_name = $P{IN_SEARCH_OPTION} and option_name = 'POSITION_LOCATION' then to_char(a.position_location_id)
+                        when option_name = $P{IN_SEARCH_OPTION} and option_name = 'WORK_LOCATION' then to_char(a.wk_id)
+						end
+    				)
+    )
+
+order by a.orgdtl_id asc, a.description asc) b group by b.description]]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="AMOUNT" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT"/>
+		</field>
+	</subDataset>
+	<subDataset name="TOTAL_SYS_ENTITLEMENTS" uuid="4ae8fce6-ee41-4961-b83c-7f63ca7cfcf3">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors Prod"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="IN_ALL_EMPLOYEES" class="java.math.BigDecimal"/>
+		<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+		<parameter name="IN_SEARCH_OPTION" class="java.lang.String"/>
+		<parameter name="IN_SESSION_ID" class="java.math.BigDecimal"/>
+		<parameter name="IN_SALARY_INCREASE_ID" class="java.math.BigDecimal"/>
+		<queryString>
+			<![CDATA[SELECT 
+    b.description, sum(b.amount) amount 
+from (
+select * from(
+select 
+    emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'CUMMALL'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id = $P{IN_ORG_ID} 
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id , emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id,inc.description
+union
+select 
+        emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount 
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'TELALL'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id =  $P{IN_ORG_ID} 
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id , emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id,inc.description
+union
+select 
+        emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount 
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'VEHICLE'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id = $P{IN_ORG_ID} 
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id , emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id,inc.description
+union
+select 
+        emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount 
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'MEALS'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id = $P{IN_ORG_ID} 
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id , emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id,inc.description
+union
+select 
+        emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount 
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'INCEN'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id = $P{IN_ORG_ID} 
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id , emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id,inc.description
+union
+select 
+        emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount 
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'ENT'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id =  $P{IN_ORG_ID} 
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id , emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id,inc.description
+union
+select 
+        emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount 
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'TRAVEL'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id = $P{IN_ORG_ID} 
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id , emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id,inc.description
+union
+select 
+        emp.id emp_id, emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id wk_id, inc.description, sum(ent.amount) amount 
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+    join hr_rcm_employee emp on (emp.id = ent.emp_id and (emp.date_separated is null or emp.date_separated >= trunc(sysdate)))
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    join hr_apu_standardincrease std on std.id = sal.increase_id
+where
+    ent.admin_status = 'SYS'
+    and inc.income_code = 'GAS'
+    and (ent.end_date >= trunc(sysdate) or ent.end_date is null)
+    and emp.org_id = $P{IN_ORG_ID} 
+    and std.id = $P{IN_SALARY_INCREASE_ID}
+group by emp.id , emp.orgdtl_id, emp.employment_class_id, emp.position_location_id, wk.id,inc.description) a
+where ($P{IN_ALL_EMPLOYEES} = 1 or
+    	exists (SELECT 
+    					1
+    				FROM 
+    					RPT_PARAMETER W1
+    				WHERE 
+    					W1.SESSION_ID =  $P{IN_SESSION_ID}
+    				AND 
+    					option_value=case when option_name = $P{IN_SEARCH_OPTION} and option_name ='EMPLOYEE' then to_char(a.emp_id)
+						when option_name = $P{IN_SEARCH_OPTION} and option_name = 'ORG_STRUCT_LEVEL' then to_char(a.orgdtl_id)
+						when option_name = $P{IN_SEARCH_OPTION} and option_name = 'EMPLOYMENT_CLASS' then to_char(a.employment_class_id)
+                        when option_name = $P{IN_SEARCH_OPTION} and option_name = 'POSITION_LOCATION' then to_char(a.position_location_id)
+                        when option_name = $P{IN_SEARCH_OPTION} and option_name = 'WORK_LOCATION' then to_char(a.wk_id)
+						end
+    				)
+    )
+order by description asc) b
+group by b.description]]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="AMOUNT" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT"/>
+		</field>
+	</subDataset>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_SALARY_INCREASE_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="IN_SESSION_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_ALL_EMPLOYEES" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+    a.*,
+    nvl(a.new_basic_pay, 0) + nvl(a.cumulative_allowance, 0) + nvl(a.telephone_allowance, 0) + 
+    nvl(a.vehicle_allowance, 0) + nvl(a.meal_allowance, 0) + nvl(a.incentive, 0) + 
+    nvl(a.entertainment_allowance, 0) + nvl(a.travel_allowance, 0) + nvl(a.gas_allowance, 0) gross_salary
+from (
+    select
+        rownum no, 
+        emp.id emp_id,
+        ind.first_name, 
+        ind.surname, 
+        emp.emp_company_no,
+        initcap(pos.position_name) position_name, 
+        emp.date_employed,
+        emp.employment_class_id, 
+        emp.orgdtl_id,
+        initcap(orgdtl.unit_name) unit_name, 
+        emp.position_location_id,
+        wk.id work_location_id,
+        emp.org_id,
+        sal.personal_rate - sal.inc_amount basic_pay,
+        sal.inc_amount, 
+        sal.personal_rate new_basic_pay,
+        (select 
+            ent.amount amount
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'CUMMALL'
+            and ent.emp_id = emp.id
+            and (ent.end_date >= trunc(sysdate) or ent.end_date is null)) cumulative_allowance,
+        (select 
+            ent.amount amount
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'TELALL'
+            and ent.emp_id = emp.id and (ent.end_date >= trunc(sysdate) or ent.end_date is null)) telephone_allowance,
+        (select 
+            ent.amount amount
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'VEHICLE'
+            and ent.emp_id = emp.id and (ent.end_date >= trunc(sysdate) or ent.end_date is null)) vehicle_allowance,
+        (select 
+            ent.amount amount
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'MEALS'
+            and ent.emp_id = emp.id and (ent.end_date >= trunc(sysdate) or ent.end_date is null)) meal_allowance,
+        (select 
+            ent.amount amount
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'INCEN'
+            and ent.emp_id = emp.id and (ent.end_date >= trunc(sysdate) or ent.end_date is null)) incentive,
+        (select 
+            ent.amount amount
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'ENT'
+            and ent.emp_id = emp.id and (ent.end_date >= trunc(sysdate) or ent.end_date is null)) entertainment_allowance,
+        (select 
+            ent.amount amount
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'TRAVEL'
+            and ent.emp_id = emp.id and (ent.end_date >= trunc(sysdate) or ent.end_date is null)) travel_allowance,
+        (select 
+            ent.amount amount
+        from
+            hr_rcm_empentitle ent
+            join pa_pcf_incomecode inc on ent.income_code_id = inc.id 
+        where
+            ent.admin_status = 'SYS'
+            and inc.income_code = 'GAS'
+            and ent.emp_id = emp.id and (ent.end_date >= trunc(sysdate) or ent.end_date is null)) gas_allowance
+    from
+        hr_rcm_individual ind
+        left join hr_rcm_employee emp on ind.id = emp.ind_id
+        left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+        left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+        left join hr_hcf_position pos on pos.id = wkpos.position_id
+        left join hr_hcf_orgstructuredtl orgdtl on orgdtl.id = pos.orgdtl_id
+        join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+        join hr_apu_standardincrease std on std.id = sal.increase_id
+        where emp.org_id = $P{IN_ORG_ID} 
+        and std.id =  $P{IN_SALARY_INCREASE_ID}
+        and (emp.date_separated is null or emp.date_separated >= trunc(sysdate))
+        and ($P{IN_ALL_EMPLOYEES} =1 or
+    	exists (SELECT 
+    					1
+    				FROM 
+    					RPT_PARAMETER W1
+    				WHERE 
+    					W1.SESSION_ID = $P{IN_SESSION_ID}
+    				AND 
+    					option_value=case when option_name = $P{IN_SEARCH_OPTION} and option_name ='EMPLOYEE' then to_char(sal.emp_id)
+						when option_name = $P{IN_SEARCH_OPTION} and option_name = 'ORG_STRUCT_LEVEL' then to_char(emp.orgdtl_id)
+						when option_name =$P{IN_SEARCH_OPTION}and option_name = 'EMPLOYMENT_CLASS' then to_char(emp.employment_class_id)
+                        when option_name = $P{IN_SEARCH_OPTION} and option_name = 'POSITION_LOCATION' then to_char(emp.position_location_id)
+                        when option_name = $P{IN_SEARCH_OPTION} and option_name = 'WORK_LOCATION' then to_char(wk.id)
+						end
+    				)
+    )
+        ) a order by a.unit_name]]>
+	</queryString>
+	<field name="NO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="NO"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FIRST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_COMPANY_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_EMPLOYED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="EMPLOYMENT_CLASS_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYMENT_CLASS_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS_ID"/>
+	</field>
+	<field name="ORGDTL_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORGDTL_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGDTL_ID"/>
+	</field>
+	<field name="UNIT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="UNIT_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="UNIT_NAME"/>
+	</field>
+	<field name="POSITION_LOCATION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_LOCATION_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_LOCATION_ID"/>
+	</field>
+	<field name="WORK_LOCATION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_LOCATION_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION_ID"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="BASIC_PAY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="BASIC_PAY"/>
+		<property name="com.jaspersoft.studio.field.label" value="BASIC_PAY"/>
+	</field>
+	<field name="INC_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="INC_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="INC_AMOUNT"/>
+	</field>
+	<field name="NEW_BASIC_PAY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NEW_BASIC_PAY"/>
+		<property name="com.jaspersoft.studio.field.label" value="NEW_BASIC_PAY"/>
+	</field>
+	<field name="CUMULATIVE_ALLOWANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CUMULATIVE_ALLOWANCE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CUMULATIVE_ALLOWANCE"/>
+	</field>
+	<field name="TELEPHONE_ALLOWANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TELEPHONE_ALLOWANCE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TELEPHONE_ALLOWANCE"/>
+	</field>
+	<field name="VEHICLE_ALLOWANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="VEHICLE_ALLOWANCE"/>
+		<property name="com.jaspersoft.studio.field.label" value="VEHICLE_ALLOWANCE"/>
+	</field>
+	<field name="MEAL_ALLOWANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="MEAL_ALLOWANCE"/>
+		<property name="com.jaspersoft.studio.field.label" value="MEAL_ALLOWANCE"/>
+	</field>
+	<field name="INCENTIVE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="INCENTIVE"/>
+		<property name="com.jaspersoft.studio.field.label" value="INCENTIVE"/>
+	</field>
+	<field name="ENTERTAINMENT_ALLOWANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ENTERTAINMENT_ALLOWANCE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ENTERTAINMENT_ALLOWANCE"/>
+	</field>
+	<field name="TRAVEL_ALLOWANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TRAVEL_ALLOWANCE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TRAVEL_ALLOWANCE"/>
+	</field>
+	<field name="GAS_ALLOWANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="GAS_ALLOWANCE"/>
+		<property name="com.jaspersoft.studio.field.label" value="GAS_ALLOWANCE"/>
+	</field>
+	<field name="GROSS_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="GROSS_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="GROSS_SALARY"/>
+	</field>
+	<variable name="Record_Count" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="Dep_Emp_Count" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Count">
+		<variableExpression><![CDATA[$F{EMP_ID}]]></variableExpression>
+	</variable>
+	<variable name="Dep_Total_Old_Basic_Pay" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{BASIC_PAY}]]></variableExpression>
+	</variable>
+	<variable name="Dep_Total_Increase" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{INC_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="Dep_Total_New_Basic_Pay" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{NEW_BASIC_PAY}]]></variableExpression>
+	</variable>
+	<variable name="Dep_Total_Gross_Salary" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{GROSS_SALARY}]]></variableExpression>
+	</variable>
+	<variable name="Total_Basic_Pay" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{BASIC_PAY}]]></variableExpression>
+	</variable>
+	<variable name="Total_Increase" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{INC_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="Total_New_Basic_Pay" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{NEW_BASIC_PAY}]]></variableExpression>
+	</variable>
+	<variable name="Total_Count" class="java.math.BigDecimal" calculation="Count">
+		<variableExpression><![CDATA[$F{EMP_ID}]]></variableExpression>
+	</variable>
+	<variable name="Total_Gross_Salary" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{GROSS_SALARY}]]></variableExpression>
+	</variable>
+	<group name="Department" keepTogether="true">
+		<groupExpression><![CDATA[$F{ORGDTL_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="20" splitType="Prevent">
+				<textField>
+					<reportElement x="0" y="0" width="968" height="20" uuid="d32e0424-4e60-44c1-8a6b-8c51d1a2e73c">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement>
+						<font size="12" isBold="true" isItalic="false" isUnderline="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Department: " + $F{UNIT_NAME}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="35">
+				<line>
+					<reportElement positionType="Float" x="0" y="30" width="968" height="1" forecolor="#ADADAD" uuid="b3784c8f-8770-4eb7-8dff-98ccbd9c4218">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<frame>
+					<reportElement x="0" y="10" width="968" height="20" uuid="25c0eac7-f6fd-46c7-8741-ad3689bd2f63"/>
+					<textField>
+						<reportElement x="0" y="0" width="300" height="20" uuid="c5da2b09-2ff9-4c96-a110-a16e168dfb38">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement>
+							<font size="12" isBold="true" isItalic="false" isUnderline="false"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Subtotal - " +$F{UNIT_NAME}]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="310" y="0" width="90" height="20" uuid="5ed4a6ac-1a95-49ce-85c7-ec348b709b00">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textElement>
+							<font size="12" isBold="true" isItalic="false" isUnderline="false"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Count: " +$V{Dep_Emp_Count}]]></textFieldExpression>
+					</textField>
+					<textField pattern="¤#,##0.##;¤-#,##0.##">
+						<reportElement x="430" y="0" width="80" height="20" uuid="358858c7-212f-49db-8a6c-b2852f4f8013">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Right">
+							<font isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{Dep_Total_Old_Basic_Pay}]]></textFieldExpression>
+					</textField>
+					<textField pattern="¤#,##0.##;¤-#,##0.##">
+						<reportElement x="510" y="0" width="80" height="20" uuid="cda6ca08-15ea-461f-b716-8114e5e75af0">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Right">
+							<font isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{Dep_Total_Increase}]]></textFieldExpression>
+					</textField>
+					<textField pattern="¤#,##0.##;¤-#,##0.##">
+						<reportElement x="590" y="0" width="80" height="20" uuid="642c83e6-cbf6-4acf-a59a-7f2bb13b0f63">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Right">
+							<font isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{Dep_Total_New_Basic_Pay}]]></textFieldExpression>
+					</textField>
+					<componentElement>
+						<reportElement x="675" y="0" width="185" height="20" uuid="12e4bb85-7843-4e67-b068-fd828d44b2bf"/>
+						<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+							<datasetRun subDataset="DEP_SYS_ENTITLEMENTS" uuid="2aa0ddd9-3cc8-45dc-b691-69ce1f6ec671">
+								<datasetParameter name="IN_ORG_ID">
+									<datasetParameterExpression><![CDATA[$P{IN_ORG_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="IN_ORGDTL_ID">
+									<datasetParameterExpression><![CDATA[$F{ORGDTL_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="IN_SALARY_INCREASE_ID">
+									<datasetParameterExpression><![CDATA[$P{IN_SALARY_INCREASE_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="IN_ALL_EMPLOYEES">
+									<datasetParameterExpression><![CDATA[$P{IN_ALL_EMPLOYEES}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="IN_SEARCH_OPTION">
+									<datasetParameterExpression><![CDATA[$P{IN_SEARCH_OPTION}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="IN_SESSION_ID">
+									<datasetParameterExpression><![CDATA[$P{IN_SESSION_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+							<jr:listContents height="20" width="185">
+								<textField textAdjust="StretchHeight">
+									<reportElement x="0" y="0" width="110" height="20" uuid="74f3516a-4e32-4caa-b88b-e8fc23f073b1">
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<textElement>
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+								</textField>
+								<textField textAdjust="StretchHeight" pattern="¤#,##0.##;¤-#,##0.##">
+									<reportElement x="110" y="0" width="75" height="20" uuid="e35a2011-02ce-4123-ae91-ee1fc6dc9903">
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									</reportElement>
+									<textElement textAlignment="Right">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+								</textField>
+							</jr:listContents>
+						</jr:list>
+					</componentElement>
+					<textField pattern="¤#,##0.##;¤-#,##0.##">
+						<reportElement x="860" y="0" width="108" height="20" uuid="4176e75c-19dd-4de6-90bf-2b6f93206f10">
+							<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<textElement textAlignment="Right">
+							<font isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{Dep_Total_Gross_Salary}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="69" splitType="Stretch">
+			<subreport>
+				<reportElement x="88" y="0" width="792" height="69" uuid="1b4848d3-b132-4578-84af-d5cd97f06011">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="30" height="20" uuid="2970fec1-05e7-40c0-a5c8-004762b7a40c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="30" y="0" width="80" height="20" uuid="3cf7ade5-0236-4704-a015-9227b7bc4ea0">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[First Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="0" width="80" height="20" uuid="927a257e-dd39-411c-b1b0-2b01a2df4b20">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Surname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="190" y="0" width="80" height="20" uuid="85ec026e-3754-4267-b1f2-c8bd5ae8b036">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="0" width="80" height="20" uuid="0a5fb6e9-d8d8-487f-aecc-fb3ebb194715">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Designation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="350" y="0" width="80" height="20" uuid="b03535e1-df51-4f5f-b6cd-2c7c036eaa39">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date Employed]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="430" y="0" width="80" height="20" uuid="f82ca451-07a0-48ce-8a20-5dd48aa92939">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Basic Pay]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="510" y="0" width="80" height="20" uuid="c4914721-c3cd-4505-a03c-877e42551d29">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Increase]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="590" y="0" width="80" height="20" uuid="697500e6-7d6b-4e74-a15c-e44c5aac229e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[New Basic Pay]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="670" y="0" width="190" height="20" uuid="90430bc0-9de6-4af8-9d5d-11f8f4cb0b40">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Entitlements]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="860" y="0" width="108" height="20" uuid="74e9ec35-01dd-407d-a92a-cc8fce5dc1fa">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Gross Salary]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<frame>
+				<reportElement x="0" y="0" width="968" height="20" uuid="f5521712-de00-4476-9978-e5d125a47931"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textField pattern="#,##0.###;(#,##0.###-)">
+					<reportElement x="0" y="0" width="30" height="20" uuid="a21d1c90-f06b-4f0a-960a-d67ea0946737">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$V{Record_Count}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="30" y="0" width="80" height="20" uuid="fc6dc8a1-f107-4490-a14a-ffb7a4f2097f">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="110" y="0" width="80" height="20" uuid="4cc1d9c4-aafd-42ad-a3c2-ece1f2b8bd68">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="190" y="0" width="80" height="20" uuid="d34f1284-21df-4add-a521-d053762d06ba">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="270" y="0" width="80" height="20" uuid="59b3315e-2faf-46f6-b66e-3a8003546c1b">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+				</textField>
+				<textField pattern="MMM d, yyyy">
+					<reportElement x="350" y="0" width="80" height="20" uuid="521ac08a-5b24-440b-9f2a-c6d0aa078cab">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$F{DATE_EMPLOYED}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤#,##0.##;¤-#,##0.##">
+					<reportElement x="430" y="0" width="80" height="20" uuid="4aae4b49-0d5d-48e2-b502-f4b24f8e9cf2">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$F{BASIC_PAY}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤#,##0.##;¤-#,##0.##">
+					<reportElement x="510" y="0" width="80" height="20" uuid="5a451090-765e-41ca-8e12-a066666a83a7">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$F{INC_AMOUNT}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤#,##0.##;¤-#,##0.##">
+					<reportElement x="590" y="0" width="80" height="20" uuid="c4eabc88-2c41-4f80-9e13-889dacd778a6">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$F{NEW_BASIC_PAY}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤#,##0.##;¤-#,##0.##">
+					<reportElement x="860" y="0" width="108" height="20" uuid="97c7565b-0184-4fab-ae0d-731da7409f1c">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$F{GROSS_SALARY}]]></textFieldExpression>
+				</textField>
+				<frame>
+					<reportElement x="670" y="0" width="190" height="20" uuid="c5c270ef-2119-40b0-bffa-acde5155c4e3"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<componentElement>
+						<reportElement x="5" y="0" width="185" height="20" uuid="6c4dbf7c-9b44-452d-936d-cbfb62d52001"/>
+						<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+							<datasetRun subDataset="SYS_ENTITLEMENTS" uuid="537c8b5a-d4c2-4184-85ef-eb98f44e9830">
+								<datasetParameter name="IN_EMP_ID">
+									<datasetParameterExpression><![CDATA[$F{EMP_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="IN_ORG_ID">
+									<datasetParameterExpression><![CDATA[$P{IN_ORG_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="IN_SALARY_INCREASE_ID">
+									<datasetParameterExpression><![CDATA[$P{IN_SALARY_INCREASE_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+							<jr:listContents height="20" width="185">
+								<textField textAdjust="StretchHeight">
+									<reportElement x="0" y="0" width="115" height="20" uuid="41a35a19-b317-40e8-af47-0f780c54ea5e"/>
+									<textElement>
+										<font size="10"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+								</textField>
+								<textField textAdjust="StretchHeight" pattern="¤#,##0.##;¤-#,##0.##">
+									<reportElement x="115" y="0" width="70" height="20" uuid="d5b46158-600f-46f8-956b-87a91f453c2f"/>
+									<textElement textAlignment="Right">
+										<font size="10"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+								</textField>
+							</jr:listContents>
+						</jr:list>
+					</componentElement>
+				</frame>
+			</frame>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="28">
+			<rectangle>
+				<reportElement x="0" y="0" width="968" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="13950fa4-55e9-4284-9c71-49449b838211"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="15" width="968" height="13" uuid="a41fd02d-17cb-4c77-a146-a4df90ee130a"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="836" y="0" width="100" height="13" uuid="506ad756-b0ad-425b-a7f3-39112ec7d48d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="162" height="13" uuid="daec2fb3-dad6-415d-8360-357863ec6652"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="939" y="0" width="29" height="13" uuid="4e7e3cb5-17fc-47bb-bb63-15fc22e829db"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="538" splitType="Stretch">
+			<frame>
+				<reportElement x="0" y="10" width="968" height="20" uuid="771137f6-1b03-48c6-aeeb-a7b2d7d76a38"/>
+				<textField pattern="¤#,##0.##;¤-#,##0.##">
+					<reportElement x="430" y="0" width="80" height="20" uuid="804f1cd3-132d-4c50-a8dd-956a7a6e55dc">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Total_Basic_Pay}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤#,##0.##;¤-#,##0.##">
+					<reportElement x="510" y="0" width="80" height="20" uuid="503e1f7a-edef-43da-8c8a-da8640cb25c5">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Total_Increase}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤#,##0.##;¤-#,##0.##">
+					<reportElement x="590" y="0" width="80" height="20" uuid="54d95550-4e94-4a23-a41d-c82498de56f0">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Total_New_Basic_Pay}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤#,##0.##;¤-#,##0.##">
+					<reportElement x="860" y="0" width="108" height="20" uuid="a9614368-e978-4280-9f2b-907dd779ac08">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce8ffb24-e7ff-4e6f-a746-ab35e66c5525"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Total_Gross_Salary}]]></textFieldExpression>
+				</textField>
+				<componentElement>
+					<reportElement x="675" y="0" width="185" height="20" uuid="c9a3e657-becc-4d46-bb93-89cd27be12d6"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="TOTAL_SYS_ENTITLEMENTS" uuid="350e8306-93c4-43e8-8c54-b1aa629ad6e9">
+							<datasetParameter name="IN_ALL_EMPLOYEES">
+								<datasetParameterExpression><![CDATA[$P{IN_ALL_EMPLOYEES}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="IN_ORG_ID">
+								<datasetParameterExpression><![CDATA[$P{IN_ORG_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="IN_SEARCH_OPTION">
+								<datasetParameterExpression><![CDATA[$P{IN_SEARCH_OPTION}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="IN_SESSION_ID">
+								<datasetParameterExpression><![CDATA[$P{IN_SESSION_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="IN_SALARY_INCREASE_ID">
+								<datasetParameterExpression><![CDATA[$P{IN_SALARY_INCREASE_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="20" width="185">
+							<textField textAdjust="StretchHeight">
+								<reportElement x="0" y="0" width="110" height="20" uuid="1877cba5-46b1-4bd4-8f14-0b53d450056a">
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+								</reportElement>
+								<textElement>
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+							<textField textAdjust="StretchHeight" pattern="¤#,##0.##;¤-#,##0.##">
+								<reportElement x="110" y="0" width="75" height="20" uuid="a1ebc4ea-1340-45c6-840b-1b5280c13fe0">
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								</reportElement>
+								<textElement textAlignment="Right">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<textField>
+					<reportElement x="0" y="0" width="100" height="20" uuid="c83115aa-ab70-4880-8230-18bb2ae06ef4">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Grand Total:"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="310" y="0" width="90" height="20" uuid="c4fb9631-de97-410a-b796-5ebcdd556693">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement>
+						<font size="12" isBold="true" isItalic="false" isUnderline="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Count: " +$V{Total_Count}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<staticText>
+				<reportElement mode="Transparent" x="5" y="472" width="65" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="e4e08334-0514-4053-b0f7-f2eaa3e77a31"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Prepared By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="5" y="499" width="65" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="2fb9dbd9-766f-4148-a64f-beed100a8e07"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Checked  By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="5" y="523" width="91" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="d6cdc888-a022-490d-b72d-57743e188b55"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Authorised  By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="96" y="472" width="229" height="15" uuid="cdd98ce3-aaf1-486c-8368-e60564293b8a"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="96" y="499" width="229" height="15" uuid="fd4dc4d7-f6b4-4b50-b7fd-3c09b1597898"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="96" y="523" width="229" height="15" uuid="19d88644-f51c-4876-995c-15fb3a7ff269"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="325" y="472" width="33" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="343b3fdb-120b-4415-b23e-8878b6ab12df"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="325" y="499" width="33" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="2661d757-125e-4ff1-b038-bf9d05074c71"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="325" y="523" width="33" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="f9a28694-59f7-455b-8f0b-9b7e7be431e8"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="358" y="472" width="177" height="15" uuid="88cdd9c3-c587-4774-8798-f8ca362eb850"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="358" y="499" width="177" height="15" uuid="f718750a-cbde-4cb4-9c68-06b27d9a0be9"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="358" y="523" width="177" height="15" uuid="26beba2c-f873-4cd0-a2cd-c69e4baa1829"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

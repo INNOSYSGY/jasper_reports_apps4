@@ -1,0 +1,1941 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payslip" language="groovy" pageWidth="612" pageHeight="1008" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f0711479-d978-4a45-8e85-91c1a07ea501">
+	<property name="ireport.zoom" value="1.331000000000001"/>
+	<property name="ireport.x" value="620"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Multi/02_PAYROLL/Standard_Payslip_v3.3"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="lmorales"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Standard Payslip"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Multi/02_PAYROLL/Standard_Payslip_v3.3_files/main_jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="CORREIA_PROD_DataAdapter"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="196"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="797"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="451"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="535"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Income" uuid="3f763208-05f7-4ca6-b920-c5387cdc40d3">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PROD_PAAS_PAC"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="P_PAY_SLIP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_PERIOD_START" class="java.sql.Timestamp"/>
+		<parameter name="P_COMPANY_YEAR" class="java.math.BigDecimal"/>
+		<parameter name="P_EMP_ID" class="java.math.BigDecimal"/>
+		<parameter name="P_EARNINGS_TYPE" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[select pd.id pay_slipno, pd.basic_personal_rate income_amount, pd.basic_personal_rate_ytd income_amount_ytd, 'Basic Rate' description, 'NR' income_code, pd.emp_id, 1 ordering
+ from pa_pmg_payrolldtl pd
+where id = $P{P_PAY_SLIP_ID}
+and payment_type_hist  = 'MONTHLY'
+union all
+SELECT O.PAY_SLIPNO,  ROUND(O.INCOME_AMOUNT,2) INCOME_AMOUNT, INCOME_AMOUNT_YTD,
+    to_char(CASE WHEN O.INCOME_CODE IN ('OT1','OT', 'NR') THEN
+        ic.Description||' ('||quantity||'hr(s)' ||'/'||REPLACE(TO_CHAR(o.rate,'FML999G999G999G999G990D00'),' ','')||')'
+        ELSE ic.Description END)Description, to_char(o.Income_code) income_code, O.Emp_id, 2 ordering
+    FROM   PA_PMG_PAYROLLINCOME O INNER JOIN PA_PCF_INCOMECODE IC ON O.INCOME_CODE = IC.INCOME_CODE
+    where	pay_slipno=  $P{P_PAY_SLIP_ID}
+and IC.org_id= pkg_global_fnts.fn_shareRefOrg($P{P_ORG_ID})                 
+	and Income_Amount>0]]>
+		</queryString>
+		<field name="PAY_SLIPNO" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="PAY_SLIPNO"/>
+			<property name="com.jaspersoft.studio.field.label" value="PAY_SLIPNO"/>
+		</field>
+		<field name="INCOME_AMOUNT" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="INCOME_AMOUNT"/>
+			<property name="com.jaspersoft.studio.field.label" value="INCOME_AMOUNT"/>
+		</field>
+		<field name="INCOME_AMOUNT_YTD" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="INCOME_AMOUNT_YTD"/>
+			<property name="com.jaspersoft.studio.field.label" value="INCOME_AMOUNT_YTD"/>
+		</field>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="INCOME_CODE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="INCOME_CODE"/>
+			<property name="com.jaspersoft.studio.field.label" value="INCOME_CODE"/>
+		</field>
+		<field name="EMP_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+		</field>
+		<field name="ORDERING" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="ORDERING"/>
+			<property name="com.jaspersoft.studio.field.label" value="ORDERING"/>
+		</field>
+		<sortField name="ORDERING"/>
+		<sortField name="INCOME_AMOUNT" order="Descending"/>
+		<sortField name="DESCRIPTION"/>
+	</subDataset>
+	<subDataset name="Deduction" uuid="05a4cb69-8b68-495e-aa08-d2cde97def3d">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Demo Environment"/>
+		<parameter name="P_PAY_SLIP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select 'PAYE' description, tax_amount amount_deducted, tax_amount_ytd amount_deducted_ytd from pa_pmg_payrolldtl
+where id=$P{P_PAY_SLIP_ID}
+and tax_amount > 0
+union
+select (select case when upper(a.country) = 'GUYANA' then 'NIS' else 'NIB/SS' end description from pa_pcf_earningperiod a where a.id = b.earnings_period_id)  description, nis_employee amount_deducted, nis_employee_ytd amount_deducted_ytd
+from pa_pmg_payrolldtl b
+where id=$P{P_PAY_SLIP_ID}
+and nis_employee > 0
+union
+select to_char(ded.description) description, pd.amount_deducted amount_deducted, pd.amount_deducted_ytd
+from PA_PMG_PAYROLLDEDUCTION pd join PA_PCF_ADMINDEDUCTION adm ON adm.id = pd.adm_deduction_id
+join PA_PCF_DEDUCTIONCODE ded ON adm.expense_id = ded.id
+where
+(upper(ded.Who_Pays) ='EMPLOYEE' or upper(adm.Deduction_Type)='EMPLOYEE')
+and amount_deducted>0
+and ded.org_id=pkg_global_fnts.fn_shareRefOrg($P{P_ORG_ID})  
+        and pd.pay_slipno=$P{P_PAY_SLIP_ID}]]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED_YTD" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED_YTD"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED_YTD"/>
+		</field>
+	</subDataset>
+	<subDataset name="Deduction_Emplr" uuid="2650c89c-28ed-4ec3-b0a0-1b5af114ae55">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Demo Environment"/>
+		<parameter name="P_PAY_SLIP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select to_char(ded.description) description, pd.amount_deducted amount_deducted, pd.amount_deducted_ytd
+from PA_PMG_PAYROLLDEDUCTION pd join PA_PCF_ADMINDEDUCTION adm ON adm.id = pd.adm_deduction_id
+join PA_PCF_DEDUCTIONCODE ded ON adm.expense_id = ded.id
+where
+(upper(ded.Who_Pays) ='EMPLOYER' or upper(adm.Deduction_Type)='EMPLOYER')
+and amount_deducted>0
+and ded.org_id=pkg_global_fnts.fn_shareRefOrg($P{P_ORG_ID})  
+        and pd.pay_slipno=$P{P_PAY_SLIP_ID}
+union
+select (select case when upper(a.country) = 'GUYANA' then 'NIS' else 'NIB/SS' end description from pa_pcf_earningperiod a where a.id = b.earnings_period_id)  description, nis_employer amount_deducted, nis_employer_ytd amount_deducted_ytd
+from pa_pmg_payrolldtl b
+where id=$P{P_PAY_SLIP_ID}
+and nis_employer > 0]]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED_YTD" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED_YTD"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED_YTD"/>
+		</field>
+	</subDataset>
+	<subDataset name="Total_Deduction" uuid="c7266456-860b-4abd-998e-1054ca7e1034">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Demo Environment"/>
+		<parameter name="P_PAY_SLIP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select 'Total Deduction' description, sum(amount_deducted) amount_deducted, sum(amount_deducted_ytd) amount_deducted_ytd
+from (
+select 'PAYE' description, tax_amount amount_deducted, tax_amount_ytd amount_deducted_ytd from pa_pmg_payrolldtl
+where id=$P{P_PAY_SLIP_ID}
+and tax_amount > 0
+union
+select (select case when upper(a.country) = 'GUYANA' then 'NIS' else 'NIB/SS' end description from pa_pcf_earningperiod a where a.id = b.earnings_period_id)  description, nis_employee amount_deducted, nis_employee_ytd amount_deducted_ytd
+from pa_pmg_payrolldtl b
+where id=$P{P_PAY_SLIP_ID}
+and nis_employee > 0
+union
+select to_char(ded.description) description, pd.amount_deducted amount_deducted, pd.amount_deducted_ytd
+from PA_PMG_PAYROLLDEDUCTION pd join PA_PCF_ADMINDEDUCTION adm ON adm.id = pd.adm_deduction_id
+join PA_PCF_DEDUCTIONCODE ded ON adm.expense_id = ded.id
+where
+(upper(ded.Who_Pays) ='EMPLOYEE' or upper(adm.Deduction_Type)='EMPLOYEE')
+and amount_deducted>0
+and ded.org_id=pkg_global_fnts.fn_shareRefOrg($P{P_ORG_ID})  
+        and pd.pay_slipno=$P{P_PAY_SLIP_ID})
+group by 'Total Deduction']]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED_YTD" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED_YTD"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED_YTD"/>
+		</field>
+	</subDataset>
+	<subDataset name="Total_Deduction_Emplr" uuid="5f8cee6b-79b8-4125-86e2-effb04b3a8cf">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Demo Environment"/>
+		<parameter name="P_PAY_SLIP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select 'Total Deduction' description, sum(amount_deducted) amount_deducted, sum(amount_deducted_ytd) amount_deducted_ytd
+from (select to_char(ded.description) description, pd.amount_deducted amount_deducted, pd.amount_deducted_ytd
+from PA_PMG_PAYROLLDEDUCTION pd join PA_PCF_ADMINDEDUCTION adm ON adm.id = pd.adm_deduction_id
+join PA_PCF_DEDUCTIONCODE ded ON adm.expense_id = ded.id
+where
+(upper(ded.Who_Pays) ='EMPLOYER' or upper(adm.Deduction_Type)='EMPLOYER')
+and amount_deducted>0
+and ded.org_id=pkg_global_fnts.fn_shareRefOrg($P{P_ORG_ID})  
+        and pd.pay_slipno=$P{P_PAY_SLIP_ID}
+union
+select (select case when upper(a.country) = 'GUYANA' then 'NIS' else 'NIB/SS' end description from pa_pcf_earningperiod a where a.id = b.earnings_period_id)  description, nis_employer amount_deducted, nis_employer_ytd amount_deducted_ytd
+from pa_pmg_payrolldtl b
+where id=$P{P_PAY_SLIP_ID}
+and nis_employer > 0)
+group by 'Total Deduction']]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED_YTD" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED_YTD"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED_YTD"/>
+		</field>
+	</subDataset>
+	<subDataset name="Disbur" uuid="c7396a96-e127-4eb6-8f79-575042d98961">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SF"/>
+		<parameter name="paslip_id" class="java.math.BigDecimal"/>
+		<queryString>
+			<![CDATA[select BANK_BRANCH_NAME, Payment_mode, amount from PA_PMG_PAY_DISBURSEMENT
+where payslip_id= $P{paslip_id}]]>
+		</queryString>
+		<field name="BANK_BRANCH_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="BANK_BRANCH_NAME"/>
+		</field>
+		<field name="PAYMENT_MODE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="PAYMENT_MODE"/>
+		</field>
+		<field name="AMOUNT" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT"/>
+		</field>
+	</subDataset>
+	<subDataset name="Income_Supplemental" uuid="514a0efc-751c-419b-b7f9-38ffef78d6ea">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PROD_PAAS_PAC"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="P_PAY_SLIP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_PERIOD_START" class="java.sql.Timestamp"/>
+		<parameter name="P_COMPANY_YEAR" class="java.math.BigDecimal"/>
+		<parameter name="P_EMP_ID" class="java.math.BigDecimal"/>
+		<parameter name="P_EARNINGS_TYPE" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[select 
+    pppi.pay_slipno, 
+    max(case when pppd.period_start < $P{P_PERIOD_START}  then 0 else ROUND(pppi.INCOME_AMOUNT,2) end) INCOME_AMOUNT, 
+   	max(INCOME_AMOUNT_YTD) INCOME_AMOUNT_YTD ,
+    to_char(
+        CASE 
+            WHEN pppi.INCOME_CODE IN ('OT1','OT', 'NR') THEN
+                ppic.Description||' ('||pppi.quantity||'hr(s)' ||'/'||REPLACE(TO_CHAR(pppi.rate,'FML999G999G999G999G990D00'),' ','')||')'
+            ELSE 
+                ppic.Description 
+        END)|| ' - ' || ppep.earnings_type Description, 
+    to_char(pppi.Income_code) income_code,
+    pppi.emp_id,
+    3 ordering
+from
+    hr_rcm_empentitle hree 
+    left join pa_pmg_payrollincome pppi on hree.id = pppi.empent_id
+    left join pa_pcf_incomecode ppic on ppic.id = hree.income_code_id
+    left join pa_pmg_payrolldtl pppd on pppd.id=pppi.pay_slipno 
+    left join pa_pcf_earningperiod ppep on ppep.id = pppd.earnings_period_id
+    left join hr_hcf_companyyear hhcy on hhcy.id = ppep.company_year_id
+where
+    hree.emp_id =  $P{P_EMP_ID} 
+    and ppic.org_id = pkg_global_fnts.fn_shareRefOrg( $P{P_ORG_ID} )
+    and ppep.earnings_type not in ($P{P_EARNINGS_TYPE}, 'RG')
+    and hhcy.company_year =  $P{P_COMPANY_YEAR} 
+    and pppd.period_start <= $P{P_PERIOD_START} 
+    and income_amount_ytd > 0
+group by 
+    pppi.pay_slipno, 
+    to_char(
+        CASE 
+            WHEN pppi.INCOME_CODE IN ('OT1','OT', 'NR') THEN
+                ppic.Description||' ('||pppi.quantity||'hr(s)' ||'/'||REPLACE(TO_CHAR(pppi.rate,'FML999G999G999G999G990D00'),' ','')||')'
+            ELSE 
+                ppic.Description 
+        END)|| ' - ' || ppep.earnings_type, 
+    to_char(pppi.Income_code),
+    pppi.emp_id, 3
+order by
+    7 asc, 2 desc, 4 asc]]>
+		</queryString>
+		<field name="PAY_SLIPNO" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="PAY_SLIPNO"/>
+			<property name="com.jaspersoft.studio.field.label" value="PAY_SLIPNO"/>
+		</field>
+		<field name="INCOME_AMOUNT" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="INCOME_AMOUNT"/>
+			<property name="com.jaspersoft.studio.field.label" value="INCOME_AMOUNT"/>
+		</field>
+		<field name="INCOME_AMOUNT_YTD" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="INCOME_AMOUNT_YTD"/>
+			<property name="com.jaspersoft.studio.field.label" value="INCOME_AMOUNT_YTD"/>
+		</field>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="INCOME_CODE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="INCOME_CODE"/>
+			<property name="com.jaspersoft.studio.field.label" value="INCOME_CODE"/>
+		</field>
+		<field name="EMP_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+		</field>
+		<field name="ORDERING" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="ORDERING"/>
+			<property name="com.jaspersoft.studio.field.label" value="ORDERING"/>
+		</field>
+		<sortField name="ORDERING"/>
+		<sortField name="INCOME_AMOUNT" order="Descending"/>
+		<sortField name="DESCRIPTION"/>
+	</subDataset>
+	<subDataset name="Deduction_Supplemental" uuid="36080950-0223-4668-8307-861b2c73ba6c">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PROD_PAAS_PAC"/>
+		<parameter name="P_PAY_SLIP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_EMP_ID" class="java.math.BigDecimal"/>
+		<parameter name="P_EARNINGS_TYPE" class="java.lang.String"/>
+		<parameter name="P_COMPANY_YEAR" class="java.math.BigDecimal"/>
+		<parameter name="P_PERIOD_START" class="java.sql.Timestamp"/>
+		<queryString>
+			<![CDATA[select 
+    max('PAYE'|| ' - ' || ppep.earnings_type) description, 
+    max(case when pppd.period_start < $P{P_PERIOD_START}  then 0 else ROUND(tax_amount,2) end) amount_deducted, 
+    max(tax_amount_ytd) amount_deducted_ytd 
+from 
+    pa_pmg_payrolldtl pppd 
+    left join pa_pcf_earningperiod ppep on ppep.id = pppd.earnings_period_id
+    left join hr_hcf_companyyear hhcy on hhcy.id = ppep.company_year_id
+where
+    pppd.emp_id=$P{P_EMP_ID}
+    and ppep.earnings_type not in ($P{P_EARNINGS_TYPE}, 'RG')
+    and hhcy.company_year =  $P{P_COMPANY_YEAR} 
+    and pppd.period_start <= $P{P_PERIOD_START} 
+    and tax_amount > 0
+union
+select 
+    max(case when upper(ppep.country) = 'GUYANA' then 'NIS' else 'NIB/SS' end|| ' - ' || ppep.earnings_type)  description, 
+    max(case when pppd.period_start < $P{P_PERIOD_START}  then 0 else ROUND(nis_employee,2) end) amount_deducted, 
+    max(nis_employee_ytd) amount_deducted_ytd
+from 
+    pa_pmg_payrolldtl pppd
+    left join pa_pcf_earningperiod ppep on ppep.id = pppd.earnings_period_id
+    left join hr_hcf_companyyear hhcy on hhcy.id = ppep.company_year_id
+where
+    pppd.emp_id=$P{P_EMP_ID}
+    and ppep.earnings_type not in ($P{P_EARNINGS_TYPE}, 'RG')
+    and hhcy.company_year =  $P{P_COMPANY_YEAR} 
+    and pppd.period_start <= $P{P_PERIOD_START} 
+    and nis_employee > 0
+union
+select 
+    max(to_char(ded.description)|| ' - ' || ppep.earnings_type) description, 
+    max(case when pppd.period_start < $P{P_PERIOD_START}  then 0 else ROUND(pd.amount_deducted,2) end) amount_deducted, 
+    max(pd.amount_deducted_ytd) amount_deducted_ytd
+from 
+    PA_PCF_ADMINDEDUCTION adm 
+    join PA_PMG_PAYROLLDEDUCTION pd ON adm.id = pd.adm_deduction_id
+    join PA_PCF_DEDUCTIONCODE ded ON adm.expense_id = ded.id
+    join pa_pmg_payrolldtl pppd on pppd.id=pd.pay_slipno 
+    left join pa_pcf_earningperiod ppep on ppep.id = pppd.earnings_period_id
+    left join hr_hcf_companyyear hhcy on hhcy.id = ppep.company_year_id
+where
+    (upper(ded.Who_Pays) ='EMPLOYEE' or upper(adm.Deduction_Type)='EMPLOYEE')
+    and ded.org_id=pkg_global_fnts.fn_shareRefOrg($P{P_ORG_ID})  
+    and pppd.emp_id=$P{P_EMP_ID}
+    and ppep.earnings_type not in ($P{P_EARNINGS_TYPE}, 'RG')
+    and hhcy.company_year =  $P{P_COMPANY_YEAR} 
+    and pppd.period_start <= $P{P_PERIOD_START}
+    and amount_deducted_ytd > 0]]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED_YTD" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED_YTD"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED_YTD"/>
+		</field>
+	</subDataset>
+	<subDataset name="Deduction_Emplr_Supplemental" uuid="ed922bef-46bc-445f-8216-4218b6510121">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PROD_PAAS_PAC"/>
+		<parameter name="P_PAY_SLIP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_EMP_ID" class="java.math.BigDecimal"/>
+		<parameter name="P_EARNINGS_TYPE" class="java.lang.String"/>
+		<parameter name="P_COMPANY_YEAR" class="java.math.BigDecimal"/>
+		<parameter name="P_PERIOD_START" class="java.sql.Timestamp"/>
+		<queryString>
+			<![CDATA[select 
+    max(case when upper(ppep.country) = 'GUYANA' then 'NIS' else 'NIB/SS' end|| ' - ' || ppep.earnings_type)  description, 
+    max(case when pppd.period_start < $P{P_PERIOD_START}  then 0 else ROUND(nis_employer,2) end) amount_deducted, 
+    max(nis_employer_ytd) amount_deducted_ytd
+from 
+    pa_pmg_payrolldtl pppd
+    left join pa_pcf_earningperiod ppep on ppep.id = pppd.earnings_period_id
+    left join hr_hcf_companyyear hhcy on hhcy.id = ppep.company_year_id
+where
+    pppd.emp_id=$P{P_EMP_ID}
+    and ppep.earnings_type not in ($P{P_EARNINGS_TYPE}, 'RG')
+    and hhcy.company_year =  $P{P_COMPANY_YEAR} 
+    and pppd.period_start <= $P{P_PERIOD_START} 
+    and nis_employer > 0
+union
+select 
+    max(to_char(ded.description)|| ' - ' || ppep.earnings_type) description, 
+    max(case when pppd.period_start < $P{P_PERIOD_START}  then 0 else ROUND(pd.amount_deducted,2) end) amount_deducted, 
+    max(pd.amount_deducted_ytd) amount_deducted_ytd
+from 
+    PA_PCF_ADMINDEDUCTION adm 
+    join PA_PMG_PAYROLLDEDUCTION pd ON adm.id = pd.adm_deduction_id
+    join PA_PCF_DEDUCTIONCODE ded ON adm.expense_id = ded.id
+    join pa_pmg_payrolldtl pppd on pppd.id=pd.pay_slipno 
+    left join pa_pcf_earningperiod ppep on ppep.id = pppd.earnings_period_id
+    left join hr_hcf_companyyear hhcy on hhcy.id = ppep.company_year_id
+where
+    (upper(ded.Who_Pays) ='EMPLOYER' or upper(adm.Deduction_Type)='EMPLOYER')
+    and ded.org_id=pkg_global_fnts.fn_shareRefOrg($P{P_ORG_ID})  
+    and pppd.emp_id=$P{P_EMP_ID}
+    and ppep.earnings_type not in ($P{P_EARNINGS_TYPE}, 'RG')
+    and hhcy.company_year =  $P{P_COMPANY_YEAR} 
+    and pppd.period_start <= $P{P_PERIOD_START}
+    and amount_deducted_ytd > 0]]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED_YTD" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED_YTD"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED_YTD"/>
+		</field>
+	</subDataset>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PAYSLIP_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[select
+pa.org_id,
+pa.pay_batch_id,
+to_char(date_employed,'yyyy-mm-dd') doe,
+pa.id pay_slip_no,pa.surname_hist,pa.first_name_hist,pa.salary_id,pa.period_start,pa.period_end,
+pa.payroll_effective,pa.department_name_hist,upper(pa.organisation_name) organisation_name,initcap(PA.PAYMENT_TYPE_HIST)PAYMENT_TYPE_HIST,
+REPLACE(TO_CHAR(pa.basic_personal_rate,'999,999,999'),' ','') basic_personal_rate,
+pa.basic_personal_rate_ytd,
+ep.emp_company_no, ep.id emp_id,pa.id pay_slip,
+NVL(PA.SURNAME_HIST,'')||', '||NVL(PA.FIRST_NAME_HIST,'')||' '||NVL(R.MIDDLE_NAME,'') EMPLOYEE_NAME,
+initcap(nvl(v.unit_name,'Unknown')) WORK_LOCATION,
+initcap(pa.POSITION_NAME_HIST) position_name_hist ,
+case when pa.org_id= 29705 then pa.total_deduction-pa.tax_amount else pa.total_deduction end total_deduction
+,pa.gross_taxable+pa.gross_nontaxable  AS gross,
+pa.time_tax_earnings,pa.nis_employee,
+case when pa.org_id= 29705 then  0 else pa.tax_amount end tax_amount,
+case when pa.org_id= 29705 then 
+        pa.net_pay + pa.tax_amount 
+        else pa.net_pay end net_pay,
+pa.gross_taxable_ytd+pa.gross_nontaxable_ytd gross_ytd,
+pa.nis_employee_ytd,
+time_tax_earnings_ytd,
+case when pa.org_id= 29705 then pa.net_pay_ytd + pa.tax_amount_ytd else pa.net_pay_ytd end net_pay_ytd,
+case when pa.org_id= 29705 then pa.total_deduction_ytd - pa.tax_amount_ytd else pa.total_deduction_ytd end total_deduction_ytd,
+case when pa.org_id= 29705 then 0 else pa.tax_amount_ytd end tax_amount_ytd,
+(case when manager_approved_by is null then 'N' else 'Y' end) approved,
+Pkg_Global_Fnts.Fn_Getcurnistaxno(r.Id , 'TIN',  pa.PERIOD_START ) Tax_no,
+case when upper(eap.country) = 'GUYANA' then 'NIS' else 'NIB/SS' end || ':   ' ||Pkg_Global_Fnts.Fn_Getcurnistaxno(r.Id , case when upper(eap.country) = 'GUYANA' then 'NIS NUMBER' else 'NIB NUMBER' end,  pa.PERIOD_START ) nis_no,
+nvl('- '||P.POSITION_NAME, '') position_name,
+eap.START_PAID_FOR, 
+eap.END_PAID_FOR,
+ho.photo org_photo,
+hhcy.company_year,
+eap.earnings_type,
+(select count(1) from pa_pcf_earningperiod a join pa_pmg_payrolldtl b on a.id = b.earnings_period_id where a.company_year_id = eap.company_year_id and a.earnings_type != 'RG' and b.emp_id = pa.emp_id and b.period_start <= pa.period_start) suppl_count
+from pa_pmg_payrolldtl pa
+join PA_PMG_PAYROLLHD ph on pa.pay_batch_id=ph.id
+join PA_PCF_EARNINGPERIOD eap on eap.id=pa.earnings_period_id
+join hr_hcf_companyyear hhcy on hhcy.id = eap.company_year_id
+join HR_RCM_EMPLOYEE ep on pa.emp_id=ep.id
+join HR_RCM_INDIVIDUAL r on ep.ind_id=r.id
+join hr_hcf_organisation ho ON PA.ORG_ID=HO.ID
+left join HR_HCF_POSITION P on P.id=ep.position_id
+left outer join vw_organisation_structure v on pa.orgdtl_id=v.id
+WHERE PAY_BATCH_ID=$P{ID}
+and pa.id=case when  $P{PAYSLIP_ID}  is null then pa.id else  $P{PAYSLIP_ID}  end
+order by nvl(v.unit_name,'Unknown'),pa.surname_hist,pa.first_name_hist]]>
+	</queryString>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="PAY_BATCH_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PAY_BATCH_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAY_BATCH_ID"/>
+	</field>
+	<field name="DOE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DOE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DOE"/>
+	</field>
+	<field name="PAY_SLIP_NO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PAY_SLIP_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAY_SLIP_NO"/>
+	</field>
+	<field name="SURNAME_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME_HIST"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME_HIST"/>
+	</field>
+	<field name="FIRST_NAME_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FIRST_NAME_HIST"/>
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME_HIST"/>
+	</field>
+	<field name="SALARY_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SALARY_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALARY_ID"/>
+	</field>
+	<field name="PERIOD_START" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="PERIOD_START"/>
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_START"/>
+	</field>
+	<field name="PERIOD_END" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="PERIOD_END"/>
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_END"/>
+	</field>
+	<field name="PAYROLL_EFFECTIVE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="PAYROLL_EFFECTIVE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAYROLL_EFFECTIVE"/>
+	</field>
+	<field name="DEPARTMENT_NAME_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT_NAME_HIST"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT_NAME_HIST"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="PAYMENT_TYPE_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAYMENT_TYPE_HIST"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_TYPE_HIST"/>
+	</field>
+	<field name="BASIC_PERSONAL_RATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="BASIC_PERSONAL_RATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="BASIC_PERSONAL_RATE"/>
+	</field>
+	<field name="BASIC_PERSONAL_RATE_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="BASIC_PERSONAL_RATE_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="BASIC_PERSONAL_RATE_YTD"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_COMPANY_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="PAY_SLIP" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PAY_SLIP"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAY_SLIP"/>
+	</field>
+	<field name="EMPLOYEE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_NAME"/>
+	</field>
+	<field name="WORK_LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_LOCATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION"/>
+	</field>
+	<field name="POSITION_NAME_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME_HIST"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME_HIST"/>
+	</field>
+	<field name="TOTAL_DEDUCTION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_DEDUCTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_DEDUCTION"/>
+	</field>
+	<field name="GROSS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="GROSS"/>
+		<property name="com.jaspersoft.studio.field.label" value="GROSS"/>
+	</field>
+	<field name="TIME_TAX_EARNINGS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TIME_TAX_EARNINGS"/>
+		<property name="com.jaspersoft.studio.field.label" value="TIME_TAX_EARNINGS"/>
+	</field>
+	<field name="NIS_EMPLOYEE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NIS_EMPLOYEE"/>
+		<property name="com.jaspersoft.studio.field.label" value="NIS_EMPLOYEE"/>
+	</field>
+	<field name="TAX_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TAX_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="TAX_AMOUNT"/>
+	</field>
+	<field name="NET_PAY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NET_PAY"/>
+		<property name="com.jaspersoft.studio.field.label" value="NET_PAY"/>
+	</field>
+	<field name="GROSS_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="GROSS_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="GROSS_YTD"/>
+	</field>
+	<field name="NIS_EMPLOYEE_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NIS_EMPLOYEE_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="NIS_EMPLOYEE_YTD"/>
+	</field>
+	<field name="TIME_TAX_EARNINGS_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TIME_TAX_EARNINGS_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="TIME_TAX_EARNINGS_YTD"/>
+	</field>
+	<field name="NET_PAY_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NET_PAY_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="NET_PAY_YTD"/>
+	</field>
+	<field name="TOTAL_DEDUCTION_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_DEDUCTION_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_DEDUCTION_YTD"/>
+	</field>
+	<field name="TAX_AMOUNT_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TAX_AMOUNT_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="TAX_AMOUNT_YTD"/>
+	</field>
+	<field name="APPROVED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="APPROVED"/>
+		<property name="com.jaspersoft.studio.field.label" value="APPROVED"/>
+	</field>
+	<field name="TAX_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TAX_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="TAX_NO"/>
+	</field>
+	<field name="NIS_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NIS_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="NIS_NO"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="START_PAID_FOR" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="START_PAID_FOR"/>
+		<property name="com.jaspersoft.studio.field.label" value="START_PAID_FOR"/>
+	</field>
+	<field name="END_PAID_FOR" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="END_PAID_FOR"/>
+		<property name="com.jaspersoft.studio.field.label" value="END_PAID_FOR"/>
+	</field>
+	<field name="ORG_PHOTO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_PHOTO"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_PHOTO"/>
+	</field>
+	<field name="COMPANY_YEAR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="COMPANY_YEAR"/>
+		<property name="com.jaspersoft.studio.field.label" value="COMPANY_YEAR"/>
+	</field>
+	<field name="EARNINGS_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EARNINGS_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="EARNINGS_TYPE"/>
+	</field>
+	<field name="SUPPL_COUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SUPPL_COUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUPPL_COUNT"/>
+	</field>
+	<sortField name="WORK_LOCATION"/>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="108" splitType="Prevent">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.layout"/>
+			<textField>
+				<reportElement x="0" y="47" width="270" height="15" uuid="bdcef565-ff4d-4ab3-ab93-d1ba85ffdc30">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+					<paragraph lineSpacingSize="1.0" leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Payslip#  '+$F{PAY_SLIP_NO} + "      "+ $F{NIS_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="130" y="0" width="320" height="15" uuid="52c22eb9-a715-488a-b63a-d7d6cb985717"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="78" width="120" height="15" uuid="014b7ce9-dbb1-4dcb-afb7-4c085fae6206"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Income]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="102" y="78" width="50" height="15" uuid="27c4b692-51c8-45da-aec9-634941e6cb74"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Curr]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="152" y="78" width="50" height="15" uuid="7371c0bb-6cbc-45f4-aa5a-5dbfc447003b"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[YTD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="225" y="78" width="90" height="15" uuid="b114667d-dc22-4dab-af61-b3632f940280">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Deductions]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="305" y="78" width="40" height="15" uuid="f0d414b4-359c-4b2c-ba6f-07406b4e87a3">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Curr]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="345" y="78" width="50" height="15" uuid="5fea8fa5-bad1-42d1-b106-2d574cbc5c24"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[YTD]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table 1" stretchType="RelativeToTallestObject" x="0" y="94" width="220" height="10" isPrintWhenDetailOverflows="true" uuid="fdd6209e-7823-4540-a3f5-41a3e6362cb4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Income" uuid="9e67d334-9e7e-4377-b0de-5528b6189587">
+						<datasetParameter name="P_PAY_SLIP_ID">
+							<datasetParameterExpression><![CDATA[$F{PAY_SLIP_NO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_ORG_ID">
+							<datasetParameterExpression><![CDATA[$F{ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_PERIOD_START">
+							<datasetParameterExpression><![CDATA[$F{PERIOD_START}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_EMP_ID">
+							<datasetParameterExpression><![CDATA[$F{EMP_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_COMPANY_YEAR">
+							<datasetParameterExpression><![CDATA[$F{COMPANY_YEAR}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_EARNINGS_TYPE">
+							<datasetParameterExpression><![CDATA[$F{EARNINGS_TYPE}]]></datasetParameterExpression>
+						</datasetParameter>
+					</datasetRun>
+					<jr:column width="110" uuid="e61d8cd4-8587-415f-a9e0-59f3f69d7914">
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="110" height="10" uuid="8f1e674d-6e58-4864-a522-7db673251d89">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle" markup="none">
+									<font fontName="SansSerif" size="7"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="5d0cc419-82dc-4393-a050-3d5bae484051">
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="10" uuid="bd41b2b0-1247-4721-aa30-9ad6ce18be9a"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="SansSerif" size="7"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{INCOME_AMOUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="50" uuid="d180d750-bf55-4f21-a551-de3e437d8765">
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="50" height="10" uuid="40cbdbbf-d366-463b-a1a5-28385ce38e9b"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="SansSerif" size="7"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{INCOME_AMOUNT_YTD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<componentElement>
+				<reportElement key="table 1" stretchType="RelativeToTallestObject" x="225" y="94" width="170" height="10" isPrintWhenDetailOverflows="true" uuid="fdd6209e-7823-4540-a3f5-41a3e6362cb4">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Deduction" uuid="cf9bff50-7380-43ff-9045-98a31e086e49">
+						<datasetParameter name="P_PAY_SLIP_ID">
+							<datasetParameterExpression><![CDATA[$F{PAY_SLIP_NO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_ORG_ID">
+							<datasetParameterExpression><![CDATA[$F{ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="80" uuid="e61d8cd4-8587-415f-a9e0-59f3f69d7914">
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="10" uuid="8f1e674d-6e58-4864-a522-7db673251d89">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="5d0cc419-82dc-4393-a050-3d5bae484051">
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="10" uuid="bd41b2b0-1247-4721-aa30-9ad6ce18be9a"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="50" uuid="d180d750-bf55-4f21-a551-de3e437d8765">
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="50" height="10" uuid="40cbdbbf-d366-463b-a1a5-28385ce38e9b"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED_YTD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<textField isBlankWhenNull="true">
+				<reportElement x="337" y="47" width="235" height="15" uuid="994faa72-f30e-473a-a359-89cf134f6f76">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENT_TYPE_HIST}+' Work Period: '+new SimpleDateFormat("MMM dd yyyy").format($F{START_PAID_FOR}) + " to "+new SimpleDateFormat("MMM dd yyyy").format($F{END_PAID_FOR})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="62" width="320" height="15" uuid="2749bd84-2103-45ec-8308-c6699e2cda3f">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO} + "   "+$F{EMPLOYEE_NAME} +  " [D.O.E: "+$F{DOE}+"]"]]></textFieldExpression>
+			</textField>
+			<image scaleImage="FillFrame">
+				<reportElement x="140" y="30" width="300" height="15" uuid="402a1857-bc95-4e38-b182-88f8ff6d00b4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{APPROVED}=="Y" ? false:true]]></printWhenExpression>
+				</reportElement>
+				<imageExpression><![CDATA["repo:NOT_APPROVED"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="140" y="15" width="300" height="14" uuid="6aaeb19d-1ace-48ef-b000-bab20549915c"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WORK_LOCATION} + ", " + $F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="344" y="62" width="228" height="15" uuid="4c781330-4d35-4689-a1e2-2877352f7d35">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Pay Period: '+new SimpleDateFormat("MMM dd yyyy").format($F{PERIOD_START}) + " to "+new SimpleDateFormat("MMM dd yyyy").format($F{PERIOD_END})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="91" width="569" height="1" uuid="59e83ef0-f323-40e8-8480-80a28723ad73"/>
+				<graphicElement>
+					<pen lineStyle="Solid" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+			<image scaleImage="RetainShape">
+				<reportElement x="0" y="0" width="130" height="45" uuid="23df4f28-76d1-45dc-b6ce-963ccb6925a8"/>
+				<imageExpression><![CDATA[$F{ORG_PHOTO}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="402" y="78" width="90" height="15" uuid="f2a27b7d-c9bd-46e2-98ca-8d4b7725d6be">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Deductions [Emplr]]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="482" y="78" width="40" height="15" uuid="860da0e0-68c2-4611-9c48-8f06c462b2cc">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Curr]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="522" y="78" width="50" height="15" uuid="fa788588-e2c6-4dbb-806f-8b256c6ce25d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[YTD]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table 1" stretchType="RelativeToTallestObject" x="402" y="94" width="170" height="10" isPrintWhenDetailOverflows="true" uuid="2d0ebbb5-9bed-44a2-81c7-7cb66a0dd7e4">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Deduction_Emplr" uuid="e8b191bf-7847-42a8-b5b3-29d0b5563d1f">
+						<datasetParameter name="P_PAY_SLIP_ID">
+							<datasetParameterExpression><![CDATA[$F{PAY_SLIP_NO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_ORG_ID">
+							<datasetParameterExpression><![CDATA[$F{ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="80" uuid="4a01e6d4-fac3-400c-a2ea-8bff42f215e3">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="10" uuid="fee421f0-7e6b-4a53-9c9a-98a93ab8f471">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="28d3a5b8-928d-43f5-9f65-7f6aed736da6">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="10" uuid="436c8f29-a62b-4049-8775-a04d5df85911"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="50" uuid="3c872b26-4fc5-4144-ad92-8856a2b8824a">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="50" height="10" uuid="bc94e6a9-e1bd-4017-a3b6-0acde8c841d9"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED_YTD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<line>
+				<reportElement positionType="Float" x="0" y="105" width="569" height="1" uuid="a7ea15fb-76bd-4594-bf81-aea7c4503d92">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineStyle="Solid" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+		</band>
+		<band height="28">
+			<staticText>
+				<reportElement x="0" y="0" width="80" height="10" uuid="245a9e5d-59dc-489b-bc84-d276fa4d73af">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Gross Pay]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="13" width="50" height="10" uuid="42e44831-bd91-4b74-8ed5-72b0433ac011">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Net Pay]]></text>
+			</staticText>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="72" y="0" width="80" height="10" uuid="b63ec9c3-57fa-490e-8d0f-dec4f32e6982">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GROSS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="102" y="13" width="50" height="10" uuid="ea211702-1993-4d2c-8780-96ffa5427aa3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7" isBold="true" isItalic="true"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NET_PAY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="152" y="0" width="50" height="10" uuid="ba6c5f1a-1c4b-4113-938d-0dfc595b3067">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GROSS_YTD}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="152" y="13" width="50" height="10" uuid="e4d3df63-7cc0-4a1a-8ea7-05cb592c03dc">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7" isBold="true" isItalic="true"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NET_PAY_YTD}]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement key="table 1" stretchType="RelativeToTallestObject" x="225" y="0" width="170" height="10" isPrintWhenDetailOverflows="true" uuid="47ca6f6d-7a45-4373-952c-0e1487b2ea97">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Total_Deduction" uuid="c0388dc4-0560-4a41-a698-da9b823d9c15">
+						<datasetParameter name="P_PAY_SLIP_ID">
+							<datasetParameterExpression><![CDATA[$F{PAY_SLIP_NO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_ORG_ID">
+							<datasetParameterExpression><![CDATA[$F{ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="80" uuid="0eaea44a-2489-4b00-bdb9-5c91674ee16e">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="10" uuid="503ae16a-a03e-43fe-801f-b23ccf6dde8a">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isBold="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="3333cec8-0691-48ee-92d1-9cd5f3ae9959">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="10" uuid="0c18ff8c-2d31-4fc8-b52a-af848a882538"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isBold="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="50" uuid="6e8315d3-1be9-4504-abb4-b1eb3f1fbc2e">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="50" height="10" uuid="0e1b55f0-c6de-408c-8fac-e0521692641b"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isBold="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED_YTD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<componentElement>
+				<reportElement key="table 1" stretchType="RelativeToTallestObject" x="402" y="0" width="170" height="10" isPrintWhenDetailOverflows="true" uuid="bca9594b-ec36-4e34-bdef-3bd0b7532c22">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Total_Deduction_Emplr" uuid="c05d6a5b-1be1-4dec-a1e4-435e3f7fdf08">
+						<datasetParameter name="P_PAY_SLIP_ID">
+							<datasetParameterExpression><![CDATA[$F{PAY_SLIP_NO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_ORG_ID">
+							<datasetParameterExpression><![CDATA[$F{ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="80" uuid="dc64b64f-1407-4531-adb2-a77b80a42401">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="10" uuid="ae08d6fd-12a4-448c-8e74-b1ddafc7e793">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isBold="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="d6922d88-d5ad-4d2a-9430-47e49a52e631">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="10" uuid="81191d0e-f455-4d40-b4c2-66ac2a13d0ff"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isBold="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="50" uuid="f080971f-32ce-4ff5-be72-657ac185c2d4">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="50" height="10" uuid="8ef7419f-55b7-4e42-a682-3d8915a2a7b8"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isBold="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED_YTD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="12">
+			<printWhenExpression><![CDATA[$F{SUPPL_COUNT} >0]]></printWhenExpression>
+			<componentElement>
+				<reportElement key="table 1" stretchType="RelativeToTallestObject" x="0" y="2" width="220" height="10" isPrintWhenDetailOverflows="true" uuid="9985113e-1981-4d0b-95cc-b4cce0caa1c3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Income_Supplemental" uuid="8292431e-2a56-479a-8efb-8873057d2c5e">
+						<datasetParameter name="P_PAY_SLIP_ID">
+							<datasetParameterExpression><![CDATA[$F{PAY_SLIP_NO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_ORG_ID">
+							<datasetParameterExpression><![CDATA[$F{ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_PERIOD_START">
+							<datasetParameterExpression><![CDATA[$F{PERIOD_START}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_EMP_ID">
+							<datasetParameterExpression><![CDATA[$F{EMP_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_COMPANY_YEAR">
+							<datasetParameterExpression><![CDATA[$F{COMPANY_YEAR}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_EARNINGS_TYPE">
+							<datasetParameterExpression><![CDATA[$F{EARNINGS_TYPE}]]></datasetParameterExpression>
+						</datasetParameter>
+					</datasetRun>
+					<jr:column width="110" uuid="d78c35b1-89e7-43a0-b347-3c248ea32eb2">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="110" height="10" uuid="956e90cf-d858-4c87-a821-d7c922aa283a">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle" markup="none">
+									<font fontName="SansSerif" size="7" isItalic="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="61f070cd-a01f-495d-9941-6f3402b077b5">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="10" uuid="dd8adc8b-91dc-4c0a-8917-d66ec4e06cac"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="SansSerif" size="7" isItalic="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{INCOME_AMOUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="50" uuid="0e3772b6-4868-491b-9766-32129d085973">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="50" height="10" uuid="293354a7-1112-4f4b-8e80-37c0adcd54c5"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="SansSerif" size="7" isItalic="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{INCOME_AMOUNT_YTD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<componentElement>
+				<reportElement key="table 1" stretchType="RelativeToTallestObject" x="225" y="2" width="170" height="10" isPrintWhenDetailOverflows="true" uuid="0b20311d-42e7-40b9-903f-caf2210ed73f">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Deduction_Supplemental" uuid="3b8668eb-941f-40d6-ace7-f1a8db7ee4de">
+						<datasetParameter name="P_PAY_SLIP_ID">
+							<datasetParameterExpression><![CDATA[$F{PAY_SLIP_NO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_ORG_ID">
+							<datasetParameterExpression><![CDATA[$F{ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_COMPANY_YEAR">
+							<datasetParameterExpression><![CDATA[$F{COMPANY_YEAR}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_EMP_ID">
+							<datasetParameterExpression><![CDATA[$F{EMP_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_EARNINGS_TYPE">
+							<datasetParameterExpression><![CDATA[$F{EARNINGS_TYPE}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_PERIOD_START">
+							<datasetParameterExpression><![CDATA[$F{PERIOD_START}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="80" uuid="60a83766-1f4c-4d4d-90fe-a2c5ac852068">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="10" uuid="ce4174b3-9488-44b7-a36a-c20466943773">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isItalic="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="532d4d37-7661-4d78-8241-76c4b8ea118e">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="10" uuid="1465ef67-ece0-477a-97a2-cc0b6e1f28cf"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isItalic="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="50" uuid="b475b11b-64c7-4b52-8742-1856635a3b55">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="50" height="10" uuid="69d4ba8b-adbb-4ca4-9402-e0fd50d3a041"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isItalic="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED_YTD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<componentElement>
+				<reportElement key="table 1" stretchType="RelativeToTallestObject" x="402" y="2" width="170" height="10" isPrintWhenDetailOverflows="true" uuid="8c0288bf-7915-4c8f-8f2b-916892404715">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Deduction_Emplr_Supplemental" uuid="b447b60e-dbbc-4895-86e3-e5a56d8f45d9">
+						<datasetParameter name="P_PAY_SLIP_ID">
+							<datasetParameterExpression><![CDATA[$F{PAY_SLIP_NO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_ORG_ID">
+							<datasetParameterExpression><![CDATA[$F{ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_COMPANY_YEAR">
+							<datasetParameterExpression><![CDATA[$F{COMPANY_YEAR}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_EARNINGS_TYPE">
+							<datasetParameterExpression><![CDATA[$F{EARNINGS_TYPE}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_EMP_ID">
+							<datasetParameterExpression><![CDATA[$F{EMP_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_PERIOD_START">
+							<datasetParameterExpression><![CDATA[$F{PERIOD_START}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="80" uuid="0e03881c-fef8-4f10-9cbb-86b12935da34">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="10" uuid="797af0bc-dab8-4578-8223-6a9b897c222f">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isItalic="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="45abdc04-bfc2-4c52-9bbd-5460f1df5c5a">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="10" uuid="1e4d4541-2ad2-4644-8248-84dfa52b34d9"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isItalic="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="50" uuid="e97b3337-fcf3-4415-9773-d9306e5995fd">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:detailCell height="10" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="50" height="10" uuid="42ec8938-61c4-4d71-a8f5-49fafa965051"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle" markup="html">
+									<font fontName="SansSerif" size="7" isItalic="true"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED_YTD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<line>
+				<reportElement x="0" y="0" width="569" height="1" uuid="e7334bd8-fac6-4be5-9279-785d8afed677"/>
+				<graphicElement>
+					<pen lineStyle="Solid" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+		</band>
+		<band height="25">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<componentElement>
+				<reportElement positionType="Float" x="0" y="0" width="490" height="22" uuid="e4a26b20-c477-4499-86f4-6c031879facf">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Disbur" uuid="508470db-e706-41a8-99ed-3821c5e3bd9e">
+						<datasetParameter name="paslip_id">
+							<datasetParameterExpression><![CDATA[$F{PAY_SLIP_NO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="180" uuid="fe806daf-5714-4fff-9794-b3bfb6983098">
+						<jr:columnHeader height="11">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="180" height="11" uuid="f8111a28-cdc9-43f8-9fdb-bc02863a17c7"/>
+								<box>
+									<pen lineColor="#CCCCCC"/>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="7" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Bank Name]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="11">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField>
+								<reportElement x="0" y="0" width="180" height="11" uuid="c1af743c-43f9-4e4e-bc81-8ca02bf09e1b"/>
+								<box>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="7"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{BANK_BRANCH_NAME}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="120" uuid="8cd8df9c-4ce9-4f31-a008-475a43362974">
+						<jr:columnHeader height="11">
+							<staticText>
+								<reportElement x="0" y="0" width="120" height="11" uuid="f48d8104-7384-4a09-9861-9be65335e945"/>
+								<box>
+									<pen lineColor="#CCCCCC"/>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="7" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Payment Mode]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="11">
+							<textField>
+								<reportElement x="0" y="0" width="120" height="11" uuid="3b0ce476-61c9-4cdb-bbd7-a00ae1f8407b"/>
+								<box>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="7"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{PAYMENT_MODE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="80" uuid="a01a1ced-a15c-46c5-9bae-501d6c35804b">
+						<jr:columnHeader height="11">
+							<staticText>
+								<reportElement x="0" y="0" width="80" height="11" uuid="d3530b07-ad6f-4d0d-b45b-1a4851c16e99"/>
+								<box>
+									<pen lineColor="#CCCCCC"/>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font size="7" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Amount]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="11">
+							<textField pattern="#,##0.00">
+								<reportElement x="0" y="0" width="80" height="11" uuid="cdea1837-f7f1-496d-a919-2b8da5ce275b"/>
+								<box>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font size="7"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="1">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<line>
+				<reportElement positionType="Float" x="0" y="0" width="569" height="1" uuid="831c3930-e583-46f8-9133-0eb8969bce25"/>
+				<graphicElement>
+					<pen lineStyle="Dashed" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report3" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0e60ec50-d6b5-4268-8d40-46066d39d155">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/HELPDESK/Client_Listing_Summary"/>
+	<property name="ireport.jasperserver.url" value="http://apps.innosysgy.com:8081/jasperserver/services/repository"/>
+	<parameter name="REPORT_NAME" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="start_date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="end_date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PERIOD" class="java.util.Date"/>
+	<parameter name="organization_name" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="client_id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT *
+FROM VW_CHANGE_HEAD
+WHERE TRUNC(REAL_DATE_RAISE) BETWEEN $P{start_date} AND $P{end_date} AND COMPANY_ID = $P{client_id}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="CHANGE_REQUEST_NUM" class="java.lang.String"/>
+	<field name="COMPANY_ID" class="java.math.BigDecimal"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="FUNCTIONAL_AREA" class="java.lang.String"/>
+	<field name="STATUS" class="java.lang.String"/>
+	<field name="INITIATED_BY" class="java.lang.String"/>
+	<field name="PRIORITY" class="java.lang.String"/>
+	<field name="DATE_RAISE" class="java.lang.String"/>
+	<field name="REAL_DATE_RAISE" class="java.sql.Timestamp"/>
+	<field name="ASSIGNED_TO" class="java.lang.String"/>
+	<field name="DATE_RESOLUTION_REQ" class="java.lang.String"/>
+	<field name="REQUEST_SUMMARY_INFO" class="java.lang.String"/>
+	<field name="COMPLETION_DATE" class="java.sql.Timestamp"/>
+	<field name="LEAD_STAFF" class="java.math.BigDecimal"/>
+	<sortField name="COMPANY_ID"/>
+	<variable name="parameters" class="java.lang.String">
+		<initialValueExpression><![CDATA[new SimpleDateFormat("dd MMMMM yyyy").format($P{start_date})+" to "+new SimpleDateFormat("dd MMMMM yyyy").format($P{end_date})]]></initialValueExpression>
+	</variable>
+	<group name="GROUP_ID" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{COMPANY_ID}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="85" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="512" y="60" width="109" height="25" backcolor="#CCCCCC" uuid="92bb4e2c-8563-4703-8610-4482b4b4d68d"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ORGANISATION NAME]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="0" y="0" width="752" height="60" uuid="58a2cd05-466b-42a5-a4c5-0815f60732dd"/>
+				<subreportParameter name="REPORT_NAME">
+					<subreportParameterExpression><![CDATA["CLIENT LISTING"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PERIOD">
+					<subreportParameterExpression><![CDATA[$V{parameters}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/HELPDESK/RESOURCES/LETTER_LANDSCAPE_HEADER"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="60" width="512" height="25" backcolor="#CCCCCC" uuid="81097c4d-109c-4d55-987c-4181fdcb745e"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="621" y="60" width="131" height="25" backcolor="#CCCCCC" uuid="de37ffe6-31f2-4e4e-a4f8-6da7ae758b3d"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Cambria" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="116" height="21" backcolor="#CCCCCC" uuid="fd7c8643-bde5-45c1-bd40-f0e4f12744a9"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CHANGE REQUEST NO.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="116" y="0" width="80" height="21" backcolor="#CCCCCC" uuid="683a665a-01f2-49e7-ba64-b5003d031d7b"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[STATUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="196" y="0" width="51" height="21" backcolor="#CCCCCC" uuid="628e3f33-a5c5-46b8-b606-8ee902a9d3fc"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[PRIORITY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="577" y="0" width="175" height="21" backcolor="#CCCCCC" uuid="ef63d2e9-2893-46c3-ae41-ce9e7ee33b36"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Cambria" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Summary Detail]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="465" y="0" width="112" height="21" backcolor="#CCCCCC" uuid="b0e2ea92-368a-4cfc-b7be-036ebd9cee78"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Initiated By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="247" y="0" width="105" height="21" backcolor="#CCCCCC" uuid="29824e1c-3584-443a-a5f7-f713cdb0d8ee"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Date Raised]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="352" y="0" width="113" height="21" backcolor="#CCCCCC" uuid="e3e8a23a-c1db-47db-9831-262bc7760636"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Date Resolution]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="752" height="21" uuid="01a0efdf-d701-4e20-83b8-2a84164b04bf"/>
+			</rectangle>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="116" height="20" uuid="00e174d9-0414-4e5d-883b-6686126a59c5"/>
+				<textElement>
+					<font fontName="Cambria"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHANGE_REQUEST_NUM}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="116" y="0" width="80" height="20" uuid="72302740-e26f-4a4c-91af-aea60cd2bc6d"/>
+				<textElement>
+					<font fontName="Cambria"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STATUS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="196" y="0" width="51" height="20" uuid="1a29c61a-a0b0-4ccb-ac22-a235fae697a7"/>
+				<textElement>
+					<font fontName="Cambria"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRIORITY}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="577" y="0" width="175" height="20" uuid="0c14a454-20de-4b68-a760-e967ac0c1259"/>
+				<textElement>
+					<font fontName="Cambria"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REQUEST_SUMMARY_INFO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="465" y="0" width="112" height="20" uuid="7f4229bd-094e-439b-8994-f309926e8cad"/>
+				<textElement>
+					<font fontName="Cambria"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INITIATED_BY}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="247" y="0" width="105" height="20" uuid="57e39c24-8ce8-45cd-9f09-05c7a9b7f313"/>
+				<textElement>
+					<font fontName="Cambria"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_RAISE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="352" y="0" width="113" height="20" uuid="755b5a43-ff3a-4874-818b-85022df92cd6"/>
+				<textElement>
+					<font fontName="Cambria"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_RESOLUTION_REQ}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="37" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="752" height="37" backcolor="#CCCCCC" uuid="be6c032b-424a-4418-927b-b285af99d85b"/>
+				<textElement textAlignment="Center">
+					<font fontName="Cambria" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[HelpDesk by InnoSyS]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="17" width="100" height="20" uuid="ffecc77f-8d0e-4461-ba66-bcf75bb4b50c"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="631" y="17" width="80" height="20" uuid="c546f104-05b1-463b-817d-6cf6280520b1"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="711" y="17" width="40" height="20" uuid="43f7b249-5e6f-429b-baee-7e299e9bd784"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

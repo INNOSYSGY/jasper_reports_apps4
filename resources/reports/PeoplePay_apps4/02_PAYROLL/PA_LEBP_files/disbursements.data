@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="file_1515758891714_subreport1" language="groovy" pageWidth="200" pageHeight="792" columnWidth="200" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="8f8b2480-ccf9-491e-ad96-6d2232d28a15">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/02_PAYROLL/PA_ECP"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="NET_PAY" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BANK_BRANCH_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select '$ ' || pkg_global_fnts.get_salary_disbursement($P{NET_PAY}, $P{EMP_ID}, $P{EARNINGS_PERIOD_ID},  a.payment_mode_dist,  a.bank_account_no_dist) disbursed_amt,
+initcap(payment_mode_dist) || case when bank_branch_id_dist is not null then ' : ' else '' end || (select o.organisation_name
+from hr_hcf_organisation o
+where organisation_type='BANK'
+and o.id=bank_branch_id_dist) details
+from hr_rcm_disbursement a
+where a.end_date is null
+and a.salary_id in (select b.id from hr_rcm_salary b where b.emp_id=$P{EMP_ID} and b.end_date is null)
+and bank_branch_id_dist=$P{BANK_BRANCH_ID}
+and upper(a.payment_mode_dist)='BANK']]>
+	</queryString>
+	<field name="DISBURSED_AMT" class="java.lang.String"/>
+	<field name="DETAILS" class="java.lang.String"/>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="$  #,##0" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="200" height="20" uuid="eacc1448-5aa9-4b52-a944-1290369e32db"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{DISBURSED_AMT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

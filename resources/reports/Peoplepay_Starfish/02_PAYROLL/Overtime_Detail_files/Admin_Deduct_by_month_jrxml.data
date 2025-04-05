@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Overtime Details" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="84eefb4c-b08e-4fe4-a91a-83b326401d1e">
+	<property name="ireport.zoom" value="1.7715610000000017"/>
+	<property name="ireport.x" value="157"/>
+	<property name="ireport.y" value="96"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Peoplepay_Correia/02_PAYROLL/Overtime_Detail"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GPL/02_PAYROLL/Overtime_Detail_files/Admin_Deduct_by_month_jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="correia"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="SUPPRESS_DETAILS" class="java.lang.String"/>
+	<parameter name="SESSION_ID" class="java.lang.String"/>
+	<parameter name="allEmployees" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select distinct
+a.DEPARTMENT_NAME_HIST "DEPT",
+a.BASIC_PERSONAL_RATE "Basic Pay",
+nvl((select c.QUANTITY from PA_PMG_PAYROLLINCOME c where c.PAY_SLIPNO=a.id and  c.INCOME_CODE='OT'),0) "Overtime 1/2Hr", 
+nvl((select c.QUANTITY from PA_PMG_PAYROLLINCOME c where c.PAY_SLIPNO=a.id and  c.INCOME_CODE='OT1'),0) "Overtime 2Hr", 
+nvl((select c.INCOME_AMOUNT from PA_PMG_PAYROLLINCOME c where c.PAY_SLIPNO=a.id and  c.INCOME_CODE='OT'),0) +
+nvl((select c.INCOME_AMOUNT from PA_PMG_PAYROLLINCOME c where c.PAY_SLIPNO=a.id and  c.INCOME_CODE='OT1'),0) "Overtime",
+(nvl((select c.INCOME_AMOUNT from PA_PMG_PAYROLLINCOME c where c.PAY_SLIPNO=a.id and  c.INCOME_CODE='OT'),0) +
+nvl((select c.INCOME_AMOUNT from PA_PMG_PAYROLLINCOME c where c.PAY_SLIPNO=a.id and  c.INCOME_CODE='OT1'),0))*100/a.BASIC_PERSONAL_RATE "% Basic Pay",
+(nvl((select c.INCOME_AMOUNT_YTD from PA_PMG_PAYROLLINCOME c where c.PAY_SLIPNO=a.id and  c.INCOME_CODE='OT'),0) +
+nvl((select c.INCOME_AMOUNT_YTD from PA_PMG_PAYROLLINCOME c where c.PAY_SLIPNO=a.id and  c.INCOME_CODE='OT1'),0))*100/a.BASIC_PERSONAL_RATE_YTD "% Basic Pay to Date",
+o.unit_name worklocation,
+e.emp_company_no, a.FIRST_NAME_HIST||' '||a.SURNAME_HIST name, 
+a.org_id, a.employment_class_hist, ep.start_paid_for period_start, ep.end_paid_for period_end, o.coa_code
+from PA_PMG_PAYROLLDTL a  
+left outer join PA_PMG_PAYROLLINCOME b on b.PAY_SLIPNO=a.id
+join hr_rcm_employee e on e.id = a.emp_id
+join hr_hcf_position w on w.id=e.position_id
+left outer join HR_HCF_ORGSTRUCTUREDTL o on a.orgdtl_id=o.id
+join PA_PCF_EARNINGPERIOD ep on ep.id = a.EARNINGS_PERIOD_ID
+where a.EARNINGS_PERIOD_ID= $P{EARNINGS_PERIOD_ID} 
+and
+( $P{allEmployees} = 1 or 
+exists (select 1
+                        from RPT_PARAMETER w1
+                        WHERE 
+                        W1.SESSION_ID= $P{SESSION_ID} 
+                         and
+                         option_value=case when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYEE' then to_char(E.id) 
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='GRADE_SCALE' then to_char(w.grade_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='ORG_STRUCT_LEVEL' then to_char(w.orgdtl_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='POSITION' then to_char(E.position_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='WORK_LOCATION' then to_char(E.wklocation_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='UNION' then to_char(E.union_code_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYMENT_TYPE' then to_char(E.EMPLOYMENT_TYPE_ID)
+                                                end
+                        )
+)]]>
+	</queryString>
+	<field name="DEPT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPT"/>
+	</field>
+	<field name="Basic Pay" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="Basic Pay"/>
+	</field>
+	<field name="Overtime 1/2Hr" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="Overtime 1/2Hr"/>
+	</field>
+	<field name="Overtime 2Hr" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="Overtime 2Hr"/>
+	</field>
+	<field name="Overtime" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="Overtime"/>
+	</field>
+	<field name="% Basic Pay" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="% Basic Pay"/>
+	</field>
+	<field name="% Basic Pay to Date" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="% Basic Pay to Date"/>
+	</field>
+	<field name="WORKLOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WORKLOCATION"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NAME"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="EMPLOYMENT_CLASS_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS_HIST"/>
+	</field>
+	<field name="PERIOD_START" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_START"/>
+	</field>
+	<field name="PERIOD_END" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_END"/>
+	</field>
+	<field name="COA_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COA_CODE"/>
+	</field>
+	<sortField name="WORKLOCATION"/>
+	<variable name="RECORD_COUNT" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="T_BASIC_PAY" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Basic Pay}]]></variableExpression>
+	</variable>
+	<variable name="T_OVERTIME_HALFT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Overtime 1/2Hr}]]></variableExpression>
+	</variable>
+	<variable name="T_OVERTIME_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Overtime 2Hr}]]></variableExpression>
+	</variable>
+	<variable name="T_OVERTIME" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Overtime}]]></variableExpression>
+	</variable>
+	<variable name="T_PERCENT_BASIC" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$F{% Basic Pay}]]></variableExpression>
+	</variable>
+	<variable name="T_PERCENT_BASIC_YTD" class="java.math.BigDecimal" calculation="Average">
+		<variableExpression><![CDATA[$F{% Basic Pay to Date}]]></variableExpression>
+	</variable>
+	<variable name="T_BASIC_PAY_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{Basic Pay}]]></variableExpression>
+	</variable>
+	<variable name="T_OVERTIME_HALFT_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{Overtime 1/2Hr}]]></variableExpression>
+	</variable>
+	<variable name="T_OVERTIME_2_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{Overtime 2Hr}]]></variableExpression>
+	</variable>
+	<variable name="T_OVERTIME_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{Overtime}]]></variableExpression>
+	</variable>
+	<variable name="T_PERCENT_BASIC_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Group1">
+		<variableExpression><![CDATA[$F{% Basic Pay}]]></variableExpression>
+	</variable>
+	<variable name="T_PERCENT_BASIC_YTD_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Group1" calculation="Average">
+		<variableExpression><![CDATA[$F{% Basic Pay to Date}]]></variableExpression>
+	</variable>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{WORKLOCATION}]]></groupExpression>
+		<groupHeader>
+			<band height="22">
+				<textField>
+					<reportElement x="0" y="3" width="610" height="15" uuid="3c3ab5d8-d7e7-4084-b2ae-d77734f8645f">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{COA_CODE} + "                           " +$F{WORKLOCATION}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<staticText>
+					<reportElement x="73" y="0" width="100" height="15" uuid="11dcecb6-3328-4db9-9b58-c22b62d114b6"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Department Total]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="256" y="0" width="76" height="15" uuid="9a5cdd75-121b-4278-80d6-ad8a98ecd4e3">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{T_BASIC_PAY_1}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="332" y="0" width="80" height="15" uuid="e2596e39-b26e-48dc-a7dc-b9e23ecbce47">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{T_OVERTIME_HALFT_1}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="412" y="0" width="80" height="15" uuid="56f18847-8691-4529-9fc1-e3186cc16e61">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{T_OVERTIME_2_1}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="493" y="0" width="81" height="15" uuid="fbc1695a-eb76-4582-8103-95991c4a30bf">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{T_OVERTIME_1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.##">
+					<reportElement x="575" y="0" width="70" height="15" uuid="892a9b36-8848-4acc-9255-fd2abe4a840a">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{T_OVERTIME_1}*100/$V{T_BASIC_PAY_1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.##">
+					<reportElement x="645" y="0" width="96" height="15" uuid="6375f34b-6ce8-4bc9-a69c-4d91795a794c">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{T_PERCENT_BASIC_YTD_1}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band height="17" splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="752" height="80" uuid="15d22840-6fb4-45aa-b030-a154690321af"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="39" splitType="Stretch">
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="0" y="2" width="751" height="15" uuid="399a7b39-3cc8-431c-be90-ddb62035bc4f"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Overtime Detail Report"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="19" width="380" height="15" uuid="5c0a37f4-d238-43cf-9f0c-c00ebb0616dd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Employment Class: "+$F{EMPLOYMENT_CLASS_HIST}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="460" y="19" width="70" height="15" uuid="6cdfabad-762e-4259-be0f-01233af4a1da">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Period Start: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="601" y="19" width="68" height="15" uuid="92064167-4131-4907-bbc2-721afc5572e4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Period End: "]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="530" y="19" width="70" height="15" uuid="a88ed474-c5f4-43dc-b8c1-1bdf0409ee0c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERIOD_START}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="671" y="19" width="78" height="15" uuid="b5090ee4-7d54-42d0-94be-6cac599b9884">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERIOD_END}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="73" height="15" uuid="ce23ae5d-2737-4fd6-9ba0-8f9d52e58cbc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Emp Code]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="752" height="1" uuid="5a8c7bca-c1c1-47e9-9752-0c151ac5eb64"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement mode="Transparent" x="74" y="0" width="181" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="a54e2de6-ca2b-4ef5-933a-8348d5d75be9"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="255" y="0" width="66" height="15" uuid="864bbced-ce9a-4861-bc13-7b9672a03d85"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Basic Pay]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="332" y="0" width="80" height="15" uuid="c93b38aa-49c2-403f-8feb-d1dcc4a55b6b">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Overt. 1/2Hr]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="413" y="0" width="80" height="15" uuid="9021c342-1131-4ec5-ab05-a4329a57e084">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Overt. 2Hr]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="494" y="0" width="80" height="15" uuid="e72d8fd0-feaf-4e1e-b525-a36262128bcb">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Overtime]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="575" y="0" width="70" height="15" uuid="e0260756-76a7-4b83-9efc-eb7e454bcc2e">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[% Basic Pay]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="645" y="0" width="96" height="15" uuid="52f1f96c-985c-4140-b794-b02ad447acfe"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[% Basic Pay YTD]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<printWhenExpression><![CDATA[$P{SUPPRESS_DETAILS}=="Y" ? false:true]]></printWhenExpression>
+			<textField>
+				<reportElement x="256" y="0" width="76" height="15" uuid="16d0a516-cb16-4a7c-967f-37a4c3317272">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="74d52cf1-892d-4ad1-9089-b1de0be7fd4c"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{Basic Pay}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="332" y="0" width="80" height="15" uuid="148065e9-af6f-4ee0-b145-74173a7ba944">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="81e27922-b1b4-408a-be7c-712b4f441ca4"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{Overtime 1/2Hr}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="413" y="0" width="80" height="15" uuid="44bf8684-ccdd-4fd3-8b7e-de68b25156f1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0e92ac12-bc81-4f47-9c98-9ccede78f3d1"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{Overtime 2Hr}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="494" y="0" width="80" height="15" uuid="862b563a-5498-46ca-8526-a255e58c2a27">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="75df3452-d0bc-41f8-beff-c5aad96abbe8"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{Overtime}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.##">
+				<reportElement x="575" y="0" width="70" height="15" uuid="98cc6cb1-30dc-40cc-8b2b-441c97ba341d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d89727f1-f506-46d5-9a4c-7f62664be7fa"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{% Basic Pay}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.##">
+				<reportElement x="645" y="0" width="96" height="15" uuid="23abeca0-bdd1-4eed-90d1-5abcff8835d1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="58853d99-6a21-4f28-bbdf-c9b6cce44d40"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{% Basic Pay to Date}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="ElementGroupHeight" x="74" y="0" width="181" height="15" uuid="38c07f8d-7412-4cc8-aa80-c26ac0828f8d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="99c418a2-8d55-4fd6-9467-42200697862b"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="74" height="15" uuid="8e5fb514-eaab-4f5a-98b0-b1e5a9571c10">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9c7d5901-1274-4b09-bfac-faf20cc283d2"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="752" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="17" width="752" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="627" y="0" width="100" height="13" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy" isBlankWhenNull="true">
+				<reportElement x="5" y="0" width="162" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" isBlankWhenNull="true">
+				<reportElement x="727" y="0" width="20" height="13" uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="55" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="15" uuid="910567c1-eaf2-4a9f-8faa-799214802463"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="0" width="752" height="1" uuid="dcaf3bda-e01e-4ef6-ae60-4cb7482e4928"/>
+			</line>
+			<textField pattern="#,##0.00#">
+				<reportElement x="256" y="1" width="76" height="15" uuid="0343b0e9-0631-47ae-bd21-7ab65044adde">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{T_BASIC_PAY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#">
+				<reportElement x="332" y="1" width="80" height="15" uuid="1a6ad6c9-34c7-41e3-bc4e-fa3c2c1e8425">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{T_OVERTIME_HALFT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#">
+				<reportElement x="412" y="1" width="80" height="15" uuid="8e676ffd-1728-4bbe-a7dc-a5711a698815">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{T_OVERTIME_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#">
+				<reportElement x="493" y="1" width="81" height="15" uuid="cb72291c-37fe-4f36-815d-710a20552d4b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{T_OVERTIME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#">
+				<reportElement x="575" y="1" width="70" height="15" uuid="3bc610c8-ad6b-4c74-b9ea-72893c7fee23">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{T_OVERTIME}*100/$V{T_BASIC_PAY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#">
+				<reportElement x="645" y="1" width="96" height="15" uuid="dec5ea01-339a-4148-ac28-e7d50a553240">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{T_PERCENT_BASIC_YTD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Account Balances" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fbe2f7f4-6f3a-4e93-8a22-0ecf850753bb">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/FORMS/ACCOUNT_BALANCES"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.18:8081/jasperserver/services/repository"/>
+	<parameter name="department" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="report_name" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE_START" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE_END" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\Steffon Assing\\Dropbox\\Mayor and City Council\\Revenue Collection System Restart\\reports\\headers\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WARD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+(case when $P{WARD_ID}=9999  OR REPLACE($P{WARD_ID},' ') is null then
+'All Wards'
+else (SELECT initcap(reference_value)||' Ward' FROM REFERENCES WHERE id= p.ward) end)
+as Report_title,
+property_number,
+initcap(pkg_property.f_get_owners(p.id,'Y')) owners,
+(SELECT initcap(reference_value) FROM REFERENCES WHERE id= p.ward) Ward,
+nvl(pkg_property.f_get_arrears_due(p.id),0) as "Arrears Demand" ,
+nvl(pkg_property.f_get_demand_due_current(p.id),0) "Current Demand",
+nvl(pkg_property.f_get_interest_due(p.id),0) "Interest Due",
+nvl(pkg_property.f_get_demand_due(p.id),0) + nvl(pkg_property.f_get_interest_due(p.id),0) "Total Due"
+from property p
+WHERE WARD=CASE WHEN ($P{WARD_ID}=9999 OR REPLACE($P{WARD_ID},' ') IS NULL) THEN WARD ELSE $P{WARD_ID} END]]>
+	</queryString>
+	<field name="REPORT_TITLE" class="java.lang.String"/>
+	<field name="PROPERTY_NUMBER" class="java.lang.String"/>
+	<field name="OWNERS" class="java.lang.String"/>
+	<field name="WARD" class="java.lang.String"/>
+	<field name="Arrears Demand" class="java.math.BigDecimal"/>
+	<field name="Current Demand" class="java.math.BigDecimal"/>
+	<field name="Interest Due" class="java.math.BigDecimal"/>
+	<field name="Total Due" class="java.math.BigDecimal"/>
+	<sortField name="WARD"/>
+	<variable name="WARD_ARREAR_TOTAL" class="java.math.BigDecimal" resetType="Group" resetGroup="Ward" calculation="Sum">
+		<variableExpression><![CDATA[$F{Arrears Demand}]]></variableExpression>
+	</variable>
+	<variable name="WARD_DEMAND_TOTAL" class="java.math.BigDecimal" resetType="Group" resetGroup="Ward" calculation="Sum">
+		<variableExpression><![CDATA[$F{Current Demand}]]></variableExpression>
+	</variable>
+	<variable name="WARD_INTEREST_TOTAL" class="java.math.BigDecimal" resetType="Group" resetGroup="Ward" calculation="Sum">
+		<variableExpression><![CDATA[$F{Interest Due}]]></variableExpression>
+	</variable>
+	<variable name="WARD _TOTAL_DUE" class="java.math.BigDecimal" resetType="Group" resetGroup="Ward" calculation="Sum">
+		<variableExpression><![CDATA[$F{Total Due}]]></variableExpression>
+	</variable>
+	<variable name="GRAND_ARREAR_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Arrears Demand}]]></variableExpression>
+	</variable>
+	<variable name="GRAND_DEMAND_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Current Demand}]]></variableExpression>
+	</variable>
+	<variable name="GRAND_INTEREST_DUE" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Interest Due}]]></variableExpression>
+	</variable>
+	<variable name="GRAND_TOTAL_DUE" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Total Due}]]></variableExpression>
+	</variable>
+	<variable name="REPORT_NAME" class="java.lang.String">
+		<variableExpression><![CDATA["Account Balance"]]></variableExpression>
+	</variable>
+	<group name="Ward">
+		<groupExpression><![CDATA[$F{WARD}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="0" width="200" height="15" uuid="411da2ed-f43f-41e8-82ab-faf303199f6b"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" isUnderline="false" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{WARD}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+					<reportElement x="352" y="0" width="100" height="15" uuid="68d66322-46f1-4e25-b113-926689027c2f"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{WARD_ARREAR_TOTAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+					<reportElement x="452" y="0" width="100" height="15" uuid="7561e5d9-df89-4b05-a342-64c86087f8b1"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{WARD_DEMAND_TOTAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+					<reportElement x="552" y="0" width="100" height="15" uuid="895b54c5-8bd3-41d7-a42f-f9db3f32e162"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{WARD_INTEREST_TOTAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+					<reportElement x="652" y="0" width="100" height="15" uuid="5e1d39ce-65da-4c75-977f-8f0924c29907"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{WARD _TOTAL_DUE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1" y="0" width="100" height="15" uuid="d518353c-b7a3-46a5-8666-3e0e6ef353ca"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{WARD} + " Total"]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="352" y="15" width="400" height="1" uuid="80182b3c-210e-4179-9096-92c5286f5217"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="100" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="752" height="100" uuid="138fa772-1f76-414a-94f6-f2e2dfd6dfb5"/>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA["Account Balances"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="period">
+					<subreportParameterExpression><![CDATA[$F{REPORT_TITLE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LANDSCAPE_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="20" y="0" width="55" height="15" uuid="976ce526-a41f-46be-b206-cf837813a91f"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Property #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="75" y="0" width="277" height="15" uuid="3dcdc6e3-416c-4e61-ac23-cc0a3cae41a8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[Owners]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="352" y="0" width="100" height="15" uuid="7b98c529-d706-4a4a-9331-a62aa9319973"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Arrears Demand]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="452" y="0" width="100" height="15" uuid="d620d7dd-8749-498a-9035-9d4c96118f1b"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Current Demand]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="552" y="0" width="100" height="15" uuid="57991182-0dbf-41e9-9922-2bf990315f9d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Interest Due]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="652" y="0" width="100" height="15" uuid="9ce9e991-a62f-4f1f-a3a8-9f241d968f7e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Total Due]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="20" height="15" uuid="717f3083-dee2-42d0-9b03-e44d36a29870"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[#]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="752" height="1" uuid="e6f8617f-ba0e-4a52-a72b-bcd89be2671b"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="$  #,##0" isBlankWhenNull="true">
+				<reportElement x="20" y="0" width="55" height="15" uuid="b7c3f618-b130-4762-8ea6-d1233e5ecd3f"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PROPERTY_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="75" y="0" width="277" height="15" uuid="43c5bbd7-cba4-4fdc-9e32-948d5c9e0f3c"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OWNERS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$  #,##0" isBlankWhenNull="true">
+				<reportElement x="352" y="0" width="100" height="15" uuid="4fda73e8-bcc2-40a2-bb30-cae0039a0b3e"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Arrears Demand}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$  #,##0" isBlankWhenNull="true">
+				<reportElement x="452" y="0" width="100" height="15" uuid="d5939cb7-aefc-4988-95ea-3c6d4b5bf4c3"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Current Demand}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$  #,##0" isBlankWhenNull="true">
+				<reportElement x="552" y="0" width="100" height="15" uuid="bfa6c0c6-5fb1-4b5b-aa60-6f79df95cd59"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Interest Due}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$  #,##0" isBlankWhenNull="true">
+				<reportElement x="652" y="0" width="100" height="15" uuid="9bdb0d96-420d-4d67-b8cb-24311c20b58d"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Total Due}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="20" height="15" uuid="fe5bc31a-485f-47ec-8dbb-69099c3915bb"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="752" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="4c6ce1e0-646b-42fe-934a-91cdd704fea9"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="752" height="15" uuid="e2e12cad-afd3-4220-b3be-849f8692eb20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="162" height="13" uuid="a7658643-d617-4daa-89f5-b621254a0413"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="632" y="0" width="80" height="13" uuid="8d4c7a1b-7a37-42ae-9fa3-0238b0a13f07"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="712" y="0" width="40" height="13" uuid="341e2711-681c-48de-8142-dae944c4b1e3"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="18" splitType="Stretch">
+			<textField pattern="$  #,##0" isBlankWhenNull="true">
+				<reportElement x="652" y="0" width="100" height="15" uuid="315d76a4-5491-4f7b-9c5c-73ca9452d16b"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_TOTAL_DUE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$  #,##0" isBlankWhenNull="true">
+				<reportElement x="552" y="0" width="100" height="15" uuid="ba9e6ad4-54c4-4486-b1f3-beb6d7b8976b"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_INTEREST_DUE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$  #,##0" isBlankWhenNull="true">
+				<reportElement x="452" y="0" width="100" height="15" uuid="9db96468-17ea-445e-ac77-0ade01b000fb"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_DEMAND_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$  #,##0" isBlankWhenNull="true">
+				<reportElement x="352" y="0" width="100" height="15" uuid="ca0817a1-0e10-4284-9662-cd7b72995cdb"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_ARREAR_TOTAL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="15" uuid="151eb70d-a546-4bfd-94e4-d2b183b3f9f5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Grand Total:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="352" y="15" width="400" height="1" uuid="a51fda62-2bc2-4451-bce0-bb2a7ca7475b"/>
+			</line>
+			<line>
+				<reportElement x="352" y="17" width="400" height="1" uuid="e19dfa2e-0a31-4411-86e9-383f6cf82a93"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="timeclock_second_report_Landscape" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d2c497fe-cb2e-4ed5-b5d0-bd0e124fa392">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors"/>
+	<parameter name="FROM " class="java.lang.String"/>
+	<parameter name="TO" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[select
+rownum
+,emp.emp_company_no AS Employee_No
+, tu.full_name Employee_Name
+,sum(case when tu.time_in is not null then 1 else 0 end) Days_Worked
+,max( fro.position_name) Designation
+, max(tu.work_location_name) Departments
+, sum(tu.payroll_hours)Total_Hours
+, sum(tu.over_time)Total_Overtime
+, sum(tu.double_time)Total_Doubletime
+,sum(tu.time_lost)Total_Absent_Hours
+from hr_att_timeclock_upload tu
+join hr_rcm_employee emp on tu.emp_id=emp.id
+join hr_hcf_worklocation wl on emp.position_location_id= wl.id
+join hr_hcf_worklocationposition F on wl.id= F.id
+join hr_hcf_position fro on F.position_id=fro.id
+--where tu.emp_id= 14562
+--where tu.full_name like '%&Username%'--(case when '&Username' is not null then tu.full_name else '&Username' end)
+--and emp.emp_company_no =(case when emp.emp_company_no is not null then  &emp_company_no. else emp.emp_company_no end)
+--and tu.work_location_name =(case when emp_company_no is null then &Department else emp_company_no end)
+group by emp.emp_company_no, rownum,
+tu.full_name
+order by rownum
+--tu.work_date--, emp.emp_company_no||'('||tu.emp_id||')', '(', tu.emp_id, ')',
+--'(', tu.emp_id, ')', '(', tu.emp_id,
+--')', '(', tu.emp_id, ')', tu.full_name,
+--fro.position_name, tu.work_location_name]]>
+	</queryString>
+	<field name="ROWNUM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+	</field>
+	<field name="EMPLOYEE_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_NO"/>
+	</field>
+	<field name="EMPLOYEE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_NAME"/>
+	</field>
+	<field name="DAYS_WORKED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DAYS_WORKED"/>
+	</field>
+	<field name="DESIGNATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DESIGNATION"/>
+	</field>
+	<field name="DEPARTMENTS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENTS"/>
+	</field>
+	<field name="TOTAL_HOURS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_HOURS"/>
+	</field>
+	<field name="TOTAL_OVERTIME" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_OVERTIME"/>
+	</field>
+	<field name="TOTAL_DOUBLETIME" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_DOUBLETIME"/>
+	</field>
+	<field name="TOTAL_ABSENT_HOURS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_ABSENT_HOURS"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="120" splitType="Stretch">
+			<staticText>
+				<reportElement x="452" y="60" width="65" height="31" uuid="9536badc-1321-44ee-873d-aa36749d0a76"/>
+				<text><![CDATA[TO:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="283" y="60" width="65" height="31" uuid="b8a78ee3-0954-4226-8c5a-d6405bf28d99"/>
+				<text><![CDATA[FROM:]]></text>
+			</staticText>
+			<textField pattern="MMM d, yyyy">
+				<reportElement x="317" y="60" width="113" height="30" uuid="96b22b74-9e45-4eeb-b537-b3594428adf7"/>
+				<textFieldExpression><![CDATA[$P{FROM }]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMM d, yyyy">
+				<reportElement x="471" y="60" width="109" height="30" uuid="4bf449eb-99e6-4671-9bbe-f3be27c46299"/>
+				<textFieldExpression><![CDATA[$P{TO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="24" width="802" height="25" uuid="a76a21ce-84fd-4aba-ac1b-12eaa5de56a2"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[EMPLOYEE SUMMARY TIME SHEET]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="5" width="802" height="25" uuid="78be5533-65be-446d-b887-5998802d5c14"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[GAFSONS INDUSTRIES LIMITED ]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="53" splitType="Stretch">
+			<staticText>
+				<reportElement x="40" y="1" width="60" height="51" uuid="fb8a47d6-4063-45e3-af76-234aa7bb5dfc">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bc45528c-932e-4238-824f-b92096e1163a"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<text><![CDATA[EMPLOYEE NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="1" width="40" height="51" uuid="7803198b-5d15-4723-9cad-0bd4f4ebd4b8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2d6e4133-735a-4eac-ac08-a86a3c1e4182"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<text><![CDATA[NO#]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="100" height="51" uuid="596e3cf5-8f9e-42dc-b146-ec9e10fb9b78">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d2d6a30b-9f49-4e4b-84f1-1e54a6185da8"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<text><![CDATA[EMPLOYEE NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="1" width="100" height="51" uuid="0ba1a31d-03bc-4fe4-baa9-5194e8186720">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="133cac0e-f1bb-432e-b428-f190412664a1"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<text><![CDATA[DESIGNATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="1" width="100" height="51" uuid="d7795eeb-c5a9-4c98-b3fa-8faf527197cf">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="37934c10-5b6e-4862-b11c-6c083dd76889"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<text><![CDATA[DAYS WORKED]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="1" width="180" height="20" uuid="f09ede2b-65fd-4768-b33d-f82d1faf58fd"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Hrs]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="452" y="21" width="60" height="31" uuid="acb02b1d-0ee7-48fd-ac20-8588f6e70cc7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7bc4d9f0-ca61-41e5-8658-2fabd2d8fbfa"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<text><![CDATA[NR*1.5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="21" width="52" height="31" uuid="021216c7-8df8-4a85-926e-3b760f13cd5a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ad194088-1f8f-4ea1-8342-db3cd9bac3e2"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<text><![CDATA[Reg.Hrs]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="512" y="22" width="68" height="30" uuid="a2f3098f-241c-4839-9f4e-6623f154d78d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="225f65ab-d8f0-4436-b907-c9dfc4b77b49"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<text><![CDATA[NR*2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="580" y="1" width="180" height="20" uuid="a6102328-06a1-4ad7-a10a-38f8fc99b3d4"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Hrs. Deducted ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="580" y="22" width="180" height="30" uuid="bbcec664-9870-4833-8439-7ea76dced4c2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3bf1c1ef-c771-473e-a3ab-74e9d05af08d"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<text><![CDATA[TOTAL TIME LOSS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="32" splitType="Stretch">
+			<textField>
+				<reportElement x="40" y="-1" width="60" height="33" uuid="b542d574-e4e3-47a3-b4d6-ec1b2a785e17">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bc45528c-932e-4238-824f-b92096e1163a"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="-1" width="40" height="33" uuid="105d5919-8239-4cc8-a199-5dcee6fb4406">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2d6e4133-735a-4eac-ac08-a86a3c1e4182"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{ROWNUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="-1" width="100" height="33" uuid="0b4b9c3b-cac8-4310-934f-7891693c9126">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d2d6a30b-9f49-4e4b-84f1-1e54a6185da8"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="0" width="100" height="32" uuid="85cc642e-5392-4fcb-9c03-446b05b17f9c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="133cac0e-f1bb-432e-b428-f190412664a1"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{DESIGNATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="300" y="0" width="100" height="32" uuid="055c4967-d286-472d-953d-119e14f31b4a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="37934c10-5b6e-4862-b11c-6c083dd76889"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{DAYS_WORKED}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="452" y="-1" width="60" height="33" uuid="775c0fe7-3b90-4c92-88de-fda3deb1e6c0">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7bc4d9f0-ca61-41e5-8658-2fabd2d8fbfa"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{TOTAL_OVERTIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="0" width="52" height="32" uuid="239eaf11-a6c7-4d2f-bcb9-8612b13e2ab6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ad194088-1f8f-4ea1-8342-db3cd9bac3e2"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{TOTAL_HOURS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="512" y="0" width="68" height="32" uuid="c0320d6e-caac-4f05-a992-e53dc8cd1ff9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="225f65ab-d8f0-4436-b907-c9dfc4b77b49"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{TOTAL_DOUBLETIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="580" y="0" width="180" height="32" uuid="4eed38ef-88f0-43a4-94a8-669956db895d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3bf1c1ef-c771-473e-a3ab-74e9d05af08d"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{TOTAL_ABSENT_HOURS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="35" splitType="Stretch">
+			<textField evaluationTime="Report">
+				<reportElement x="769" y="3" width="31" height="13" uuid="b299f739-a658-4c4f-956a-b54f720f45ab"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="720" y="2" width="50" height="13" uuid="68bd0bbd-ea1a-468b-a0c8-5bb9066030ce"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="2" width="802" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="ffb707ab-fefc-4fb1-9465-b4c18b760d09"/>
+			</rectangle>
+			<textField evaluationTime="Report">
+				<reportElement x="769" y="2" width="31" height="13" uuid="bf44cc5c-af79-4231-b041-09e52a95d75d"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="17" width="802" height="15" uuid="79944ce4-56b9-4a71-b30d-f0637ab72ab1"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="720" y="3" width="50" height="13" uuid="baf088fa-96da-4fc2-9933-e1ea17fd5c9d"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="5" y="2" width="162" height="13" uuid="6df3a484-ca84-47dd-a783-df30fd2598df"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

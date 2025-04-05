@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="asset" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="dec34f14-7437-4407-9f18-2fbab6e580b8">
+	<property name="ireport.zoom" value="0.9090909090909091"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/ASSET/ASSET_DEPRECIATION"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="Date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+c.asset_category,
+sum (a.purchase_price) Purchase_Price,
+sum (a.depreciation_acc)depreciation_acc,
+sum (a.current_value)current_value,
+--0 year_charge,
+sum (a.depreciation_current) charge_mounth,
+ b.date_transacted
+from TBLASSETMISCTRANSDETAIL a
+join TBLASSETMISCTRANS b on a.MISC_TRANS_ID=b.MISC_TRANS_ID
+join TBLASSETREGISTER c on a.ASSET_REG_ID=c.ASSET_REG_ID
+where b.date_transacted=$P{Date} and b.STATUS= 1463
+group by c.asset_category,b.date_transacted]]>
+	</queryString>
+	<field name="ASSET_CATEGORY" class="java.lang.String"/>
+	<field name="PURCHASE_PRICE" class="java.math.BigDecimal"/>
+	<field name="DEPRECIATION_ACC" class="java.math.BigDecimal"/>
+	<field name="CURRENT_VALUE" class="java.math.BigDecimal"/>
+	<field name="CHARGE_MOUNTH" class="java.math.BigDecimal"/>
+	<field name="DATE_TRANSACTED" class="java.sql.Timestamp"/>
+	<sortField name="ASSET_CATEGORY"/>
+	<variable name="Cost_Total" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PURCHASE_PRICE}]]></variableExpression>
+	</variable>
+	<variable name="Charge_Month" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CHARGE_MOUNTH}]]></variableExpression>
+	</variable>
+	<variable name="Accu.dep_Total" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEPRECIATION_ACC}]]></variableExpression>
+	</variable>
+	<variable name="Netbook_Total" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CURRENT_VALUE}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="2" y="0" width="751" height="79" uuid="9eba84af-edcb-40cf-a658-9a2c0694863f"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[1626.0]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="74" splitType="Stretch">
+			<textField pattern="dd/MMMMM/yyyy">
+				<reportElement x="415" y="42" width="237" height="20" uuid="9f28e2dc-ca35-4382-82d2-56f4be0e3db9"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_TRANSACTED}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="224" y="42" width="184" height="20" uuid="0a8b2afd-5d75-424f-9f6b-11b6e2e270d7"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Schedule of FIxed Assets as at:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="10" width="752" height="20" uuid="130efa74-1f66-49ed-aaff-b00cfaa68552"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SUMMARY OF FIXED ASSETS DEPRECIATION BY CATEGORY]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="36" y="1" width="120" height="20" uuid="9108580a-6857-40a8-a0f0-95f7572b0f80"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Asset Category ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="156" y="1" width="111" height="20" uuid="92101758-bcd6-4f92-a3c0-289e2ba57190"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cost/Valuation ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="267" y="1" width="115" height="20" uuid="39a7384f-1d06-4a80-bc41-0780b43c315a"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Charge for Year]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="382" y="1" width="135" height="20" uuid="abd850ea-8d56-4233-a799-9e21a00db823"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Charge for Month]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="517" y="1" width="135" height="20" uuid="4bbedfc8-f14f-40ac-8191-799fd2baceea"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accu. Depreciation ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="652" y="1" width="100" height="20" uuid="b3de2a24-780f-40b7-a091-8ce20f8e6738"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Net Book Value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="1" width="23" height="20" uuid="992a4d19-8061-47c7-abd7-5e90671318b7"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="17" width="752" height="1" forecolor="#999999" backcolor="#999999" uuid="faf72505-5e08-4a7a-913b-380d4fab3b10"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="31" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="21" y="0" width="135" height="20" uuid="8d3582a7-efe8-4826-80a2-e9db27e20f72"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ASSET_CATEGORY}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement x="156" y="0" width="111" height="20" uuid="0fb07ded-1183-43ff-945f-3ac944cb5ff0"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PURCHASE_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement x="517" y="0" width="135" height="20" uuid="246993d8-c8f9-4c3a-af58-3b30d8584e22"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPRECIATION_ACC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement x="652" y="0" width="100" height="20" uuid="18aa0e28-e55f-4004-9ad7-344c6ee8e58e"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CURRENT_VALUE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement x="382" y="0" width="135" height="20" uuid="dec11632-a7eb-46e7-8fac-d116f24b3cf2"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHARGE_MOUNTH}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="0" width="23" height="20" uuid="2b0ade7b-92e8-4309-99f2-211f5a228e44"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="190" splitType="Stretch">
+			<staticText>
+				<reportElement x="28" y="0" width="100" height="26" uuid="e7037251-fc35-4c00-af8f-e539ee481041"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Grand Total:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement x="148" y="0" width="127" height="26" uuid="4912d2c9-a562-4fb6-af6f-94c229f48858"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans" size="9" isBold="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Cost_Total}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement x="382" y="0" width="135" height="26" uuid="b2785221-c751-4a5b-a2de-08b8c4b896fb"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Charge_Month}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement x="517" y="0" width="135" height="26" uuid="e97b591e-f6aa-43f5-877c-9bcc103aaa4a"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Accu.dep_Total}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement x="652" y="0" width="101" height="26" uuid="5d5177cc-4148-4c22-92a9-82807d0e3e35"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Netbook_Total}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="36" y="63" width="283" height="20" uuid="9cff5720-1dba-45db-850f-e63f77c4e02b"/>
+				<textElement>
+					<font fontName="DejaVu Sans" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Checked by: ..................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="442" y="63" width="292" height="20" uuid="fcd09b56-4743-4b9f-934a-47c91c1314da"/>
+				<textElement>
+					<font fontName="DejaVu Sans" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Authorized by: ..................................................]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="707" y="170" width="40" height="13" uuid="cd0e9226-e07b-4877-bcf6-7fde04f19684"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="2" y="170" width="751" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="6321092b-d335-4601-894f-c7b8ec31673d"/>
+			</rectangle>
+			<textField>
+				<reportElement x="625" y="170" width="80" height="15" uuid="f3ae8bed-f49b-4ae6-9f2b-84bd419d75f5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="13" y="172" width="159" height="15" uuid="2f9ba46e-0f4e-4e85-9467-68937fa4380a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="707" y="172" width="40" height="11" uuid="0e895b88-8794-436b-a730-45dd1fef5e7f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="170" width="751" height="15" uuid="b3e9abce-2013-4bee-b2f2-1f8ddc23b720"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[SCMS by InnoSyS]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

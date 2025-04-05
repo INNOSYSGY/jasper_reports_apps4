@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Summary of Employees by Work Location and Employment Class" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ab156384-89b4-442b-9fb9-61a6e2986cfa">
+	<property name="ireport.zoom" value="1.2100000000000002"/>
+	<property name="ireport.x" value="146"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/HR_SEWLEC"/>
+	<property name="ireport.jasperserver.url" value="http://apps.innosysgy.com:8081/jasperserver/services/repository"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT COUNT(1) TOTAL,nvl(WORK_LOCATION,'Unknown') WORK_LOCATION ,nvl(DEPARTMENT,'Unknown') DEPARTMENT,EMPLOYment_class
+from
+(
+SELECT
+E.ID EMP_ID,
+    (Select INITCAP(trim(P.Position_name))
+     From Vw_Org_Worklocation_Position P
+     Join Hr_Hcf_Worklocation Lp On  P.Wklocation_Id=Lp.Id
+     WHERE P.ORGDTL_ID=E.ORGDTL_ID AND P.ID=E.POSITION_LOCATION_ID) POSITION_NAME,
+      (Select INITCAP(trim(LP.LOCATION_DESCRIPTION))
+     From Vw_Org_Worklocation_Position P
+     Join Hr_Hcf_Worklocation Lp On  P.Wklocation_Id=Lp.Id
+     WHERE P.ORGDTL_ID=E.ORGDTL_ID AND P.ID=E.POSITION_LOCATION_ID) WORK_LOCATION,
+            (Select Initcap(trim(Unit_Name))
+            FROM VW_ORGANISATION_STRUCTURE S WHERE S.ID=E.ORGDTL_ID) DEPARTMENT,
+    initcap(trim(E.EMPLOYMENT_CLASS)) EMPLOYMENT_CLASS
+FROM HR_RCM_INDIVIDUAL I
+INNER JOIN  HR_RCM_EMPLOYEE E ON I.ID = E.IND_ID
+JOIN HR_HCF_ORGANISATION HO on e.org_id=ho.id
+WHERE  ho.id=$P{IN_ORG_ID}
+and
+(SEPARATED_STATUS IS NULL
+OR (NVL(DATE_SEPARATED,SYSDATE+1)>SYSDATE))
+
+) B
+GROUP BY nvl(WORK_LOCATION,'Unknown'),nvl(DEPARTMENT,'Unknown'),EMPLOYment_class]]>
+	</queryString>
+	<field name="TOTAL" class="java.math.BigDecimal"/>
+	<field name="WORK_LOCATION" class="java.lang.String"/>
+	<field name="DEPARTMENT" class="java.lang.String"/>
+	<field name="EMPLOYMENT_CLASS" class="java.lang.String"/>
+	<group name="Work_Location">
+		<groupExpression><![CDATA[$F{WORK_LOCATION}]]></groupExpression>
+		<groupHeader>
+			<band height="19">
+				<staticText>
+					<reportElement x="0" y="0" width="74" height="15" uuid="a5852040-717a-45c3-af42-268a92c6fca2"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Work Location]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="74" y="4" width="216" height="15" uuid="6c17b285-67d5-4d90-a1f3-f30329bab8b3"/>
+					<textFieldExpression><![CDATA[$F{WORK_LOCATION}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="79" uuid="f6890f2b-0f85-43ea-a0ab-18df7c7aa9d3"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="137" y="0" width="301" height="15" uuid="c6cec44c-bacd-4b5b-95df-e935262c3e31"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Summary of Employees by Work Location and Employment Class]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="37" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="15" uuid="2df95863-cecb-4cca-a3f5-28740c8d7767"/>
+				<textElement>
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="479" y="1" width="93" height="15" uuid="f654e11d-780b-4fe1-81db-720449ea106a"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="572" height="1" uuid="29c0bbc0-4584-42f5-bbbb-be23053e7531"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="16" width="36" height="20" uuid="896d427b-7cb1-4b65-adbc-a82de181ec91"/>
+				<textElement>
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Level:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="36" width="572" height="1" uuid="64956306-af72-4e15-a2cf-94b19accff83"/>
+			</line>
+			<staticText>
+				<reportElement x="226" y="4" width="100" height="15" uuid="e3167bde-cae8-48c1-a722-9c2ae6b2bcbb"/>
+				<textElement>
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employment Class]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="1" width="100" height="15" uuid="50469c00-cc13-4284-a71c-e33d2f6d35db"/>
+				<textElement>
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Department]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="226" y="0" width="100" height="20" uuid="d4d78e57-d320-41e5-8add-84f35e0cd0fe"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYMENT_CLASS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="479" y="3" width="100" height="20" uuid="1ca06021-047d-4b1f-b70c-f54748a91ee2"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="0" width="100" height="20" uuid="b202c14b-db28-4212-9421-a3c6ae11812b"/>
+				<textElement markup="none"/>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="560" height="15" uuid="998b39b8-3134-4d25-96ab-19ce0a9cc156"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="572" height="15" forecolor="#999999" backcolor="#999999" uuid="f13fe85d-f610-498c-b035-5f622fa8e6fa"/>
+				<textField evaluationTime="Report">
+					<reportElement x="545" y="0" width="27" height="15" uuid="279c163e-c0a4-485a-b959-11c2a4e052c7"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="465" y="0" width="80" height="15" uuid="4781bf7f-dd9f-468a-aace-a2be830b2007"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE, MMMMM, dd  yyyy">
+					<reportElement x="0" y="0" width="279" height="15" uuid="51e7d2df-e638-4f16-9898-607169aeb2a8"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

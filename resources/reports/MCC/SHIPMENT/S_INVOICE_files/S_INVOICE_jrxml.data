@@ -1,0 +1,1516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Shipment Invoice" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="52b1f70e-6091-4894-a1fd-c346b9352793">
+	<property name="ireport.zoom" value="1.7715610000000044"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="644"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MCC/SHIPMENT/S_INVOICE"/>
+	<property name="ireport.jasperserver.url" value="http://trading.metallicacc.com:8081/jasperserver/services/repository"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/MCC/SHIPMENT/S_INVOICE_files/S_INVOICE_jrxml"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.graphics" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.wrap.text" value="true"/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.collapse.row.span" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="true"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Shipment_assay" uuid="62ae6be4-bcb8-4842-9fb0-8afd556f95c5">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Metallica Trading"/>
+		<parameter name="p_invoice_id" class="java.math.BigDecimal"/>
+		<parameter name="p_invoice_type" class="java.lang.String"/>
+		<parameter name="p_transaction_type" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[select
+Shipment_Invoice_Id,Element_Type,Element_Symbol,
+Assay,
+Element_Mmt_Unit,
+Payable_Price,
+Price_Source,
+price_unit,
+nvl(Payable_Price_Period,'  ')Payable_Price_Period
+from Vw_Shipment_Invoice_Element
+where Shipment_Invoice_Id=$P{p_invoice_id}
+order by (case when payable_price is not null then 'A' else 'B' end),payable_price,element_symbol asc]]>
+		</queryString>
+		<field name="SHIPMENT_INVOICE_ID" class="java.math.BigDecimal"/>
+		<field name="ELEMENT_TYPE" class="java.lang.String"/>
+		<field name="ELEMENT_SYMBOL" class="java.lang.String"/>
+		<field name="ASSAY" class="java.lang.String"/>
+		<field name="ELEMENT_MMT_UNIT" class="java.lang.String"/>
+		<field name="PAYABLE_PRICE" class="java.math.BigDecimal"/>
+		<field name="PRICE_SOURCE" class="java.lang.String"/>
+		<field name="PRICE_UNIT" class="java.lang.String"/>
+		<field name="PAYABLE_PRICE_PERIOD" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Payables" uuid="41f8c936-55f2-4abe-bdc4-9bcacf1b7ee4">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Metallica Trading"/>
+		<parameter name="p_invoice_id" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT SP.*,
+PC.PERCENT,LOWER(PC.CONDITION)CONDITION,PC.CONDITION_VALUE_1,PC.CONDITION_VALUE_2,PC.CONDITION_MNT_UNIT,
+(case when type='U' then
+(SELECT WORDS FROM VW_PAYABLE_CONDITION_WORDS WHERE ID=PC.CONDITION_ID)
+else ' ' end) words
+from vw_invoice_shipment_payable sp
+left outer join vw_payable_condition pc on sp.payable_condition_id=pc.condition_id
+where shipment_invoice_id=$P{p_invoice_id}
+and sp.payment is not null
+and sp.price is not null
+order by element_symbol,type,seq]]>
+		</queryString>
+		<field name="TYPE" class="java.lang.String"/>
+		<field name="SEQ" class="java.lang.String"/>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="SHIPMENT_INVOICE_ID" class="java.math.BigDecimal"/>
+		<field name="ELEMENT" class="java.lang.String"/>
+		<field name="ELEMENT_SYMBOL" class="java.lang.String"/>
+		<field name="ELEMENT_UNIT_MEASURE" class="java.lang.String"/>
+		<field name="ELEMENT_UNIT_CODE" class="java.lang.String"/>
+		<field name="ASSAY" class="java.math.BigDecimal"/>
+		<field name="PAYABLE_PERCENT" class="java.math.BigDecimal"/>
+		<field name="MINIMUM_DEDUCTION" class="java.math.BigDecimal"/>
+		<field name="PRICE" class="java.math.BigDecimal"/>
+		<field name="REFINING_CHARGE" class="java.math.BigDecimal"/>
+		<field name="PAYMENT" class="java.math.BigDecimal"/>
+		<field name="QUANTITY" class="java.math.BigDecimal"/>
+		<field name="DEDUCTION" class="java.math.BigDecimal"/>
+		<field name="PAYABLE_CONDITION_ID" class="java.math.BigDecimal"/>
+		<field name="REFINING_CHARGE_PER" class="java.math.BigDecimal"/>
+		<field name="REFINING_CHARGE_MMT_UNIT" class="java.math.BigDecimal"/>
+		<field name="PERCENT" class="java.math.BigDecimal"/>
+		<field name="CONDITION" class="java.lang.String"/>
+		<field name="CONDITION_VALUE_1" class="java.lang.String"/>
+		<field name="CONDITION_VALUE_2" class="java.lang.String"/>
+		<field name="CONDITION_MNT_UNIT" class="java.lang.String"/>
+		<field name="WORDS" class="java.lang.String"/>
+		<variable name="variable1" class="java.lang.String" calculation="Sum">
+			<variableExpression><![CDATA[$F{PAYMENT}]]></variableExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="Refining" uuid="813b03eb-ec51-4cae-ad60-266c75d59c9f">
+		<parameter name="p_invoice_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select distinct rownum,sp.element,sp.refining_charge,sp.REFINING_CHARGE_PER refining_cost,nvl(f_get_mmt_unit(sp.REFINING_CHARGE_MMT_UNIT),' ') refining_charge_unit
+From Vw_Invoice_Shipment_Payable Sp
+left outer Join Payable_Condition C On Sp.Payable_Condition_Id=C.Id
+Join Contract_Payable P On C.Payable_Id=P.Id
+where shipment_invoice_id=$P{p_invoice_id}
+and TYPE<>'Z' --Removing Overage/Underage
+and sp.refining_charge>0]]>
+		</queryString>
+		<field name="ROWNUM" class="java.math.BigDecimal"/>
+		<field name="ELEMENT" class="java.lang.String"/>
+		<field name="REFINING_CHARGE" class="java.math.BigDecimal"/>
+		<field name="REFINING_COST" class="java.math.BigDecimal"/>
+		<field name="REFINING_CHARGE_UNIT" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Shipment_Penalty" uuid="62ae6be4-bcb8-4842-9fb0-8afd556f95c5">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Metallica Trading"/>
+		<parameter name="p_invoice_id" class="java.math.BigDecimal"/>
+		<parameter name="p_transaction_type" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT
+distinct
+pkg_mcc.f_return_elements (ELEMENTS) Elements,
+PENALTY_COST_PER_UNIT,
+DEDUCT_FOR_EACH,
+DEDUCT_CONDITION_VALUE,
+nvl((case
+when QUANTITY_MNT_UNT = '%' then QUANTITY_MNT_UNT
+else ' '||QUANTITY_MNT_UNT end),'') QUANTITY_MNT_UNT,
+PENALTY_AMOUNT,transaction_type,
+condition_description
+from vw_shipment_penalty
+where shipment_invoice_id=$P{p_invoice_id}
+and transaction_type = upper($P{p_transaction_type})
+and PENALTY_AMOUNT>=0
+order by ELEMENTS,DEDUCT_CONDITION_VALUE]]>
+		</queryString>
+		<field name="ELEMENTS" class="java.lang.String"/>
+		<field name="PENALTY_COST_PER_UNIT" class="java.math.BigDecimal"/>
+		<field name="DEDUCT_FOR_EACH" class="java.math.BigDecimal"/>
+		<field name="DEDUCT_CONDITION_VALUE" class="java.math.BigDecimal"/>
+		<field name="QUANTITY_MNT_UNT" class="java.lang.String"/>
+		<field name="PENALTY_AMOUNT" class="java.math.BigDecimal"/>
+		<field name="TRANSACTION_TYPE" class="java.lang.String"/>
+		<field name="CONDITION_DESCRIPTION" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Shipment_Deductions" uuid="62ae6be4-bcb8-4842-9fb0-8afd556f95c5">
+		<parameter name="p_invoice_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="p_transaction_type" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[Select distinct
+Initcap(D.Deduction_Type) Deduction_Type,
+D.Deduction_Amount,
+/*Case When V.Transaction_Type='SALE' Then Buyer_Contract.Treatment_Charge
+Else Purchase_Contract.Treatment_Charge End Treatment_Rate,
+decode(F_Get_Mmt_Unit((Case When V.Transaction_Type='SALE' Then Buyer_Contract.Treatment_Charge_Mmt_Unit
+Else purchase_contract.treatment_charge_mmt_unit End)),null,'  ','per '||F_Get_Mmt_Unit((Case When V.Transaction_Type='SALE' Then Buyer_Contract.Treatment_Charge_Mmt_Unit
+Else purchase_contract.treatment_charge_mmt_unit End)))
+  Treatment_Charge_Mmt_Unit*/
+deduct Treatment_Rate,F_Get_Mmt_Unit(d.DEDUCT_MMT_UNIT) Treatment_Charge_Mmt_Unit
+From Shipment_Deduction D
+join shipment_invoice v on d.shipment_invoice_id=v.id
+Join Shipment S On D.Shipment_Id=S.Id
+Join Agreement A On A.Id=S.Agreement_Id
+Join Contract Buyer_Contract  On A.Sale_Contract_Id=Buyer_Contract.Id
+Join Contract Purchase_Contract  ON a.purchase_contract_id=Purchase_Contract.id
+where shipment_invoice_id=$P{p_invoice_id}
+and deduction_amount>0]]>
+		</queryString>
+		<field name="DEDUCTION_TYPE" class="java.lang.String"/>
+		<field name="DEDUCTION_AMOUNT" class="java.math.BigDecimal"/>
+		<field name="TREATMENT_RATE" class="java.math.BigDecimal"/>
+		<field name="TREATMENT_CHARGE_MMT_UNIT" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Shipment_Adjustment" uuid="405a737f-9ca2-4f6a-8c32-e4850313f98b">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MCC"/>
+		<parameter name="P_SHIPMENT_ID" class="java.math.BigDecimal">
+			<parameterDescription><![CDATA[]]></parameterDescription>
+		</parameter>
+		<parameter name="P_TRANSACTION_TYPE" class="java.lang.String"/>
+		<parameter name="P_INVOICE_TYPE" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[Select description,value
+From Shipment_Invoice_Adjust
+where shipment_id= $P{P_SHIPMENT_ID}
+ and upper(transaction_type)=upper( $P{P_TRANSACTION_TYPE} )
+ and instr(upper(Invoice_Type), upper( $P{P_INVOICE_TYPE} ))<>0]]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String"/>
+		<field name="VALUE" class="java.math.BigDecimal"/>
+		<group name="DESCRIPTION">
+			<groupExpression><![CDATA[$F{DESCRIPTION}]]></groupExpression>
+		</group>
+		<group name="VALUE">
+			<groupExpression><![CDATA[$F{VALUE}]]></groupExpression>
+		</group>
+	</subDataset>
+	<subDataset name="Payment Instruction" uuid="dab9cf36-8be4-4836-a269-586d65d51876">
+		<parameter name="P_INSTR_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT DETAIL
+FROM PAYMENT_INSTRUCTION_DTL
+WHERE PAYMENT_INSTRUCTION_ID=$P{P_INSTR_ID}
+ORDER BY ID]]>
+		</queryString>
+		<field name="DETAIL" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Goods Desc" uuid="c74e8153-f10b-42e1-9624-e164c5e7308d">
+		<parameter name="P_SHIPMENT_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT label,details
+FROM SHIPMENT_GOODS_DESC
+where shipment_id=$P{P_SHIPMENT_ID}
+and details is not null
+order by id]]>
+		</queryString>
+		<field name="LABEL" class="java.lang.String"/>
+		<field name="DETAILS" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Header Detail" uuid="7fdae5ca-e788-4b52-8bbd-166c7333158c">
+		<parameter name="P_Invoice_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select 'Date:' field_name,to_char(INVOICE_DATE,'Month DD, YYYY') field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}
+union all
+select 'Invoice:' field_name,INVOICE_REFERENCE||' '||INVOICE_TYPE as field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}
+union all
+select 'Contract:' field_name,CONTRACT_NO as field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}
+union all
+select 'L/C:' field_name,LC_NUMBER as field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}
+union all
+select 'Reference:' field_name,SHIPMENT_NUMBER as field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}
+union all
+select 'Delivery:' field_name,DELIVERY as field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}
+union all
+select 'Payment:' field_name,PAYMENT_PERCENT as field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}
+union all
+select 'QP:' field_name,upper(QUOTATION_PERIOD) as field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}
+union all
+select 'BL Date:' field_name,to_char(BL_DATE,'Month DD, YYYY') as field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}]]>
+		</queryString>
+		<field name="FIELD_NAME" class="java.lang.String"/>
+		<field name="FIELD_VALUE" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Weight" uuid="ffdef48e-2b0f-465f-abcc-7e25816cd3cf">
+		<parameter name="P_Invoice_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select  'Wet Weight' field_name,NET_WEIGHT||' '||NET_MEASURE_UNIT field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}
+union all
+select  'H2O' field_name,MOISTURE_PERCENTAGE||' %' field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}
+union all
+select  'Merma' field_name,to_char(MERMA) field_value
+from vw_shipment_invoice_header
+where upper(transaction_type)='PURCHASE'
+AND invoice_id=$P{P_Invoice_id}
+union all
+select  'Dry Metric' field_name,to_char(round(DRY_WEIGHT,3))||' dmt' field_value
+from vw_shipment_invoice_header
+where invoice_id=$P{P_Invoice_id}]]>
+		</queryString>
+		<field name="FIELD_NAME" class="java.lang.String"/>
+		<field name="FIELD_VALUE" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Over_Under" uuid="e71141aa-d6ac-403f-8c3e-8d3177895dc2">
+		<parameter name="P_SHIPMENT_INVOICE_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select
+d.name element_name,
+d.symbol element_symbol,
+a.over_under_price over_under_total,
+s.over_under_qp_start,
+s.over_under_qp_end,
+'Over/Under: '||pkg_mcc.get_qp_display(s.over_under_qp_start,s.over_under_qp_end) qp_display,
+(
+select code
+from price_source c
+where c.id=b.price_source
+) Price_Source
+from shipment_payable a
+join shipment_invoice e on a.shipment_invoice_id=e.id
+join payable_condition b on a.payable_condition_id=b.id
+join element d on a.element_id=d.id
+join shipment s on e.shipment_id=s.id
+where shipment_invoice_id=$P{P_SHIPMENT_INVOICE_ID}
+order by d.symbol asc]]>
+		</queryString>
+		<field name="ELEMENT_NAME" class="java.lang.String"/>
+		<field name="ELEMENT_SYMBOL" class="java.lang.String"/>
+		<field name="OVER_UNDER_TOTAL" class="java.math.BigDecimal"/>
+		<field name="OVER_UNDER_QP_START" class="java.sql.Timestamp"/>
+		<field name="OVER_UNDER_QP_END" class="java.sql.Timestamp"/>
+		<field name="QP_DISPLAY" class="java.lang.String"/>
+		<field name="PRICE_SOURCE" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="p_invoice_id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select h.*,
+case when upper(invoice_type)='FINAL' THEN
+DECODE(upper(h.transaction_type),'PURCHASE','Payment Made','Payment Received')
+else
+PROVISIONAL_PRECENTAGE||' Provisional Value'
+END Provisional_Label,
+(case when upper(invoice_type) in ('FINAL','PROVISIONAL') AND NVL(provisional_payment,0)<>0  then
+provisional_payment
+else
+adjusted_provisional_payment
+end) report_provisional_value,b.*,
+case when (
+select sum(abs(over_under_total))
+from shipment_payable a
+where shipment_invoice_id=h.invoice_id
+)>0 then 'Y' else 'N' end has_Over_under,
+case when upper(TRANSACTION_TYPE)='PURCHASE' and upper(invoice_type)='FINAL' AND PAYMENT_INSTRUCTION_ID is not null  THEN
+'Y'
+else 'N'
+end show_instruction
+from  vw_shipment_invoice_header h
+cross join
+(
+select u.*,b.*
+from vw_software_user u
+cross join vw_software_user_bank b
+) b
+where invoice_id=$P{p_invoice_id}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="AGREEMENT_ID" class="java.math.BigDecimal"/>
+	<field name="SHIPMENT_NUMBER" class="java.lang.String"/>
+	<field name="CONTACT_ID" class="java.math.BigDecimal"/>
+	<field name="INVOICE_TO" class="java.lang.String"/>
+	<field name="INVOICE_ADDRESS_TO" class="java.lang.String"/>
+	<field name="HEADER_CAPTION" class="java.lang.String"/>
+	<field name="BL_NUMBER" class="java.lang.String"/>
+	<field name="BL_DATE" class="java.sql.Timestamp"/>
+	<field name="LC_NUMBER" class="java.lang.String"/>
+	<field name="ARRIVAL_DATE" class="java.sql.Timestamp"/>
+	<field name="ORIGIN" class="java.lang.String"/>
+	<field name="LOADING_PORT" class="java.lang.String"/>
+	<field name="DESTINATION" class="java.lang.String"/>
+	<field name="PRODUCT" class="java.lang.String"/>
+	<field name="CONTRACT_ID" class="java.math.BigDecimal"/>
+	<field name="CONTRACT_NO" class="java.lang.String"/>
+	<field name="QUOTATION_PERIOD" class="java.lang.String"/>
+	<field name="PAYMENT_PERCENT" class="java.lang.String"/>
+	<field name="VESSEL_IDENTIFIER" class="java.lang.String"/>
+	<field name="PROVISIONAL_PRECENTAGE" class="java.lang.String"/>
+	<field name="NET_WEIGHT" class="java.math.BigDecimal"/>
+	<field name="NET_MEASURE_UNIT" class="java.lang.String"/>
+	<field name="MOISTURE_PERCENTAGE" class="java.math.BigDecimal"/>
+	<field name="DRY_WEIGHT" class="java.math.BigDecimal"/>
+	<field name="INVOICE_ID" class="java.math.BigDecimal"/>
+	<field name="INVOICE_REFERENCE" class="java.lang.String"/>
+	<field name="INVOICE_TYPE" class="java.lang.String"/>
+	<field name="TRANSACTION_TYPE" class="java.lang.String"/>
+	<field name="INVOICE_DATE" class="java.sql.Timestamp"/>
+	<field name="DEDUCTIONS" class="java.math.BigDecimal"/>
+	<field name="PAYABLES" class="java.math.BigDecimal"/>
+	<field name="PROVISIONAL_PAYMENT" class="java.math.BigDecimal"/>
+	<field name="INVOICE_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="BALANCE" class="java.math.BigDecimal"/>
+	<field name="MERMA" class="java.math.BigDecimal"/>
+	<field name="INVOICE_ADJUSTMENT" class="java.math.BigDecimal"/>
+	<field name="ADJUSTED_PROVISIONAL_PAYMENT" class="java.math.BigDecimal"/>
+	<field name="ADJUSTED_BALANCE" class="java.math.BigDecimal"/>
+	<field name="REFINING_CHARGES" class="java.math.BigDecimal"/>
+	<field name="PENALTIES" class="java.math.BigDecimal"/>
+	<field name="CONTRACT_ADMINISTRATOR" class="java.lang.String"/>
+	<field name="CONTRACT_ADMIN_INITIALS" class="java.lang.String"/>
+	<field name="ROUND_QTY" class="java.math.BigDecimal"/>
+	<field name="ROUND_PRICES" class="java.math.BigDecimal"/>
+	<field name="PRICE_TERMS" class="java.lang.String"/>
+	<field name="SHIPPING_MARKS" class="java.lang.String"/>
+	<field name="DELIVERY" class="java.lang.String"/>
+	<field name="PACKING" class="java.lang.String"/>
+	<field name="PAYMENT_INSTRUCTION_ID" class="java.math.BigDecimal"/>
+	<field name="SHOW_GOODS_DESC" class="java.lang.String"/>
+	<field name="CONTACT_TO" class="java.math.BigDecimal"/>
+	<field name="CONTACT_NAME" class="java.lang.String"/>
+	<field name="LINE_2" class="java.lang.String"/>
+	<field name="CONTACT_ADDRESS" class="java.lang.String"/>
+	<field name="CONTACT_LOGO" class="java.io.InputStream"/>
+	<field name="PROVISIONAL_LABEL" class="java.lang.String"/>
+	<field name="REPORT_PROVISIONAL_VALUE" class="java.math.BigDecimal"/>
+	<field name="NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="TELEPHONE" class="java.lang.String"/>
+	<field name="BANK" class="java.lang.String"/>
+	<field name="BANK_ADDRESS" class="java.lang.String"/>
+	<field name="ACCOUNT_NAME" class="java.lang.String"/>
+	<field name="ACCOUNT_NUMBER" class="java.lang.String"/>
+	<field name="ABA_NUMBER" class="java.lang.String"/>
+	<field name="SWIFT" class="java.lang.String"/>
+	<field name="HAS_OVER_UNDER" class="java.lang.String"/>
+	<field name="SHOW_INSTRUCTION" class="java.lang.String"/>
+	<group name="Shipment_id" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{INVOICE_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="56">
+				<printWhenExpression><![CDATA[$F{SHOW_GOODS_DESC}=="Y" ? true:false]]></printWhenExpression>
+				<frame>
+					<reportElement mode="Transparent" x="3" y="15" width="307" height="40" uuid="0c341f96-670c-4d4c-8334-537dee8bace1"/>
+					<textField isBlankWhenNull="true">
+						<reportElement x="0" y="0" width="195" height="13" uuid="cf5b475f-8688-4ed7-b9ff-45680f97c5c3"/>
+						<textElement>
+							<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{HEADER_CAPTION}]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="0" y="13" width="195" height="13" uuid="52c54f81-57dc-4938-8ef3-cdfa7dd24a9b"/>
+						<textElement>
+							<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{INVOICE_TO}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement x="0" y="26" width="195" height="13" uuid="6e1292e3-6919-47a8-98f0-242a2f75ac26"/>
+						<textElement>
+							<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{INVOICE_ADDRESS_TO}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<componentElement>
+					<reportElement key="table 1" x="329" y="15" width="243" height="20" uuid="b237c93a-8060-4cdf-bdb3-12de73d323f4"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Header Detail" uuid="caa11f7d-3be7-4fe0-a33b-7ec08db2b9a1">
+							<datasetParameter name="P_Invoice_id">
+								<datasetParameterExpression><![CDATA[$P{p_invoice_id}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="71" uuid="35933552-7713-4bd6-81de-886b66c85bb6">
+							<jr:detailCell height="13" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="71" height="13" uuid="2fb94581-a500-4554-bdf2-5c491fe78688"/>
+									<textElement>
+										<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{FIELD_NAME}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="167" uuid="c7f302ce-bcf8-49d8-a9ff-268b608e9362">
+							<jr:detailCell height="13" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="167" height="13" uuid="7044eb7b-8411-4e0d-8fad-8f01819e943e"/>
+									<textElement>
+										<font fontName="Arial"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{FIELD_VALUE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="34">
+				<printWhenExpression><![CDATA[$F{SHOW_GOODS_DESC}.toUpperCase()=="Y" ? true:false]]></printWhenExpression>
+				<componentElement>
+					<reportElement key="table 1" x="3" y="13" width="569" height="20" uuid="01e5ae6b-4b74-4eb9-8ca8-5fa862c5cbb9"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Goods Desc" uuid="da493903-b068-45d4-868c-00523f8b650e">
+							<datasetParameter name="P_SHIPMENT_ID">
+								<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:columnGroup width="568" uuid="b625dfc3-5a6b-44b7-b5a0-598fa75fbd06">
+							<jr:column width="0" uuid="52504def-c3a0-4c48-b162-7e0412910f0a">
+								<jr:detailCell height="13" rowSpan="1"/>
+							</jr:column>
+							<jr:column width="568" uuid="3eabb75b-fc1c-4d84-a342-398dbcdef7c4">
+								<jr:detailCell height="13" rowSpan="1">
+									<textField isBlankWhenNull="true">
+										<reportElement x="0" y="0" width="557" height="13" isPrintWhenDetailOverflows="true" uuid="036f7484-4310-46f0-8945-488e8ca92378"/>
+										<textElement markup="html">
+											<font fontName="Serif" size="9" isBold="false" pdfFontName="Helvetica"/>
+										</textElement>
+										<textFieldExpression><![CDATA["<b>"+$F{LABEL}+"</b> "+$F{DETAILS}]]></textFieldExpression>
+									</textField>
+								</jr:detailCell>
+							</jr:column>
+						</jr:columnGroup>
+					</jr:table>
+				</componentElement>
+				<staticText>
+					<reportElement x="3" y="0" width="260" height="13" uuid="a40bfa84-6ed0-4d04-8a5c-4c1941f8fc96"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="9" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Description of Goods:]]></text>
+				</staticText>
+			</band>
+			<band height="65">
+				<printWhenExpression><![CDATA[$F{SHOW_GOODS_DESC}.toUpperCase()=="N" ? true:false]]></printWhenExpression>
+				<staticText>
+					<reportElement x="3" y="13" width="60" height="13" uuid="f5896a23-ecdb-4128-b323-5fe71543e949"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Commodity:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="3" y="26" width="60" height="13" uuid="e2abe842-5ec5-46ab-898a-c7452ca26eae"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Price Terms:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="3" y="39" width="60" height="13" uuid="ba3d652e-6d21-4d3a-a961-611821135177"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Packing:]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="63" y="13" width="201" height="13" uuid="5700c728-ca7a-443b-9910-87b441cebc53"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PRODUCT}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="63" y="26" width="201" height="13" uuid="cc7afa3e-a404-488d-b1fa-8f680becaed4"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PRICE_TERMS}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="63" y="39" width="201" height="13" uuid="4680b638-1d95-4ad4-bfce-c358a6281e1c"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PACKING}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="3" y="52" width="60" height="13" uuid="ba3d652e-6d21-4d3a-a961-611821135177"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Origin:]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="63" y="52" width="201" height="13" uuid="4b1a13af-0e39-4e34-9908-385f71e2e462"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ORIGIN}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="3" y="0" width="261" height="13" uuid="b7b4aaf8-6027-472e-b0cd-f0e55bfd818f"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="9" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Description of Goods:]]></text>
+				</staticText>
+			</band>
+			<band height="15">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="572" height="15" uuid="c33a4bff-0d70-42b1-8060-082dbe5002ce"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{INVOICE_TYPE}.toUpperCase()+" COMMERCIAL INVOICE"]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="64">
+				<staticText>
+					<reportElement x="3" y="0" width="100" height="13" uuid="20940a56-1108-4dd5-b8a1-1df9d0b18e80"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Weight]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement key="table 1" x="135" y="0" width="232" height="63" uuid="0d809135-28f4-4fa8-a798-7a8a1d370217">
+						<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+					</reportElement>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Shipment_assay" uuid="8e94a454-fdea-44cd-b5b9-d3dccf1a83ee">
+							<datasetParameter name="p_invoice_id">
+								<datasetParameterExpression><![CDATA[$F{INVOICE_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="p_invoice_type">
+								<datasetParameterExpression><![CDATA[$F{INVOICE_TYPE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="p_transaction_type">
+								<datasetParameterExpression><![CDATA[$F{TRANSACTION_TYPE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="40" uuid="88db2803-43f7-427e-bc0c-5a2430521569">
+							<jr:columnHeader height="13" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="40" height="13" uuid="79ef2135-ce20-4f35-80df-22644c09b98e"/>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<text><![CDATA[Assays]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="13" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="40" height="13" uuid="34e083a5-82b4-458c-b8f2-36d9e3d994f0"/>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{ELEMENT_SYMBOL}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="50" uuid="423b7b58-579a-4daa-9c30-3db02237756d">
+							<jr:columnHeader height="13" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="50" height="13" uuid="5213bce1-ba3c-42d6-a54c-bc4b9d312624"/>
+									<text><![CDATA[]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="13" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="50" height="13" uuid="a5eb9f52-e6bb-4fa8-8705-f1f0fd94d8db"/>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{ASSAY}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="53" uuid="baa3277d-5fec-4cac-9648-b08f7b5249e7">
+							<jr:columnHeader height="13" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="53" height="13" uuid="79ef2135-ce20-4f35-80df-22644c09b98e"/>
+									<textElement textAlignment="Right" verticalAlignment="Middle">
+										<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<text><![CDATA[Prices:]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="13" rowSpan="1">
+								<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="53" height="13" uuid="f3500f35-9374-4060-b72d-5284a2a74d44"/>
+									<textElement textAlignment="Right" verticalAlignment="Middle">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{PAYABLE_PRICE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="180" uuid="3980e9d0-3ec4-4cd7-8566-343106fb92c1">
+							<jr:tableHeader height="0" rowSpan="1"/>
+							<jr:detailCell height="13" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="180" height="13" uuid="90bdbec2-365d-49ba-bddc-b50ec1a94c55">
+										<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+										<printWhenExpression><![CDATA[new Boolean($F{PRICE_UNIT}.length()>0)]]></printWhenExpression>
+									</reportElement>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9" isBold="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA[" "+$F{PRICE_UNIT}+" ("+$F{PRICE_SOURCE}+") "+$F{PAYABLE_PRICE_PERIOD}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+				<componentElement>
+					<reportElement key="table 1" x="3" y="13" width="15" height="50" uuid="2257c23a-23c5-4978-9e45-dc7caead52cd">
+						<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+					</reportElement>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Weight" uuid="5225f080-9101-448d-b110-f404434d2754">
+							<datasetParameter name="P_Invoice_id">
+								<datasetParameterExpression><![CDATA[$P{p_invoice_id}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="55" uuid="1ada6e44-6241-4065-a83e-64924bd61ced">
+							<jr:columnHeader height="0" rowSpan="1"/>
+							<jr:detailCell height="13" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="55" height="13" uuid="2fbcd820-d122-4fab-a510-e3ff8c2b09b5"/>
+									<textElement>
+										<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{FIELD_NAME}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="76" uuid="22b05dce-a953-4e84-8b89-e5d7d7c783c2">
+							<jr:columnHeader height="0" rowSpan="1"/>
+							<jr:detailCell height="13" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="75" height="13" uuid="3fa3647f-681b-4302-9bb4-fbfff77a6a28"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{FIELD_VALUE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+				<componentElement>
+					<reportElement key="table 1" x="458" y="0" width="91" height="63" uuid="710481aa-72c7-489f-a253-5d5b54bd3493">
+						<printWhenExpression><![CDATA[$F{HAS_OVER_UNDER}=="Y" ? true:false]]></printWhenExpression>
+					</reportElement>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Over_Under" uuid="6a0716d0-93d2-46ee-9c32-3edf26fb0f86">
+							<datasetParameter name="P_SHIPMENT_INVOICE_ID">
+								<datasetParameterExpression><![CDATA[$F{INVOICE_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:columnGroup width="123" uuid="d1a9918f-9db7-4754-91f5-9e5b64aaffef">
+							<jr:columnHeader height="13" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="123" height="13" uuid="3e6074c7-ba54-471a-8d28-636ba51ea4f2"/>
+									<textElement textAlignment="Justified">
+										<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{QP_DISPLAY}]]></textFieldExpression>
+								</textField>
+							</jr:columnHeader>
+							<jr:column width="54" uuid="c6c3125c-dec2-44ae-9dbe-14a1d1187430">
+								<jr:columnHeader height="0" rowSpan="1"/>
+								<jr:detailCell height="13" rowSpan="1">
+									<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+										<reportElement x="0" y="0" width="54" height="13" uuid="5eca81c0-aba9-401b-80ff-e2ad8b250043"/>
+										<textElement textAlignment="Right" verticalAlignment="Middle">
+											<font fontName="Arial" size="9"/>
+											<paragraph rightIndent="2"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{OVER_UNDER_TOTAL}]]></textFieldExpression>
+									</textField>
+								</jr:detailCell>
+							</jr:column>
+							<jr:column width="69" uuid="0fee77bf-bd0b-4724-b1db-903b06612c9a">
+								<jr:columnHeader height="0" rowSpan="1"/>
+								<jr:detailCell height="13" rowSpan="1"/>
+							</jr:column>
+						</jr:columnGroup>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="29">
+				<componentElement>
+					<reportElement key="table 1" x="3" y="0" width="569" height="28" uuid="68beab6d-269b-4d39-b51f-19eed7570018"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Payables" uuid="1119b044-aeb4-4752-b1da-9c3e358e1367">
+							<datasetParameter name="p_invoice_id">
+								<datasetParameterExpression><![CDATA[$F{INVOICE_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="40" uuid="27c3ce3d-ba3a-4e6e-995b-a1d88a87b24f">
+							<jr:columnHeader height="15" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="40" height="15" uuid="92956ce6-11f7-4f7c-8bad-e3e3fdc3fdb1"/>
+									<textElement>
+										<font fontName="Arial" size="9" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<text><![CDATA[Payables]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="11" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="40" height="11" uuid="27f00f8c-42a5-42fd-8dc0-0f89eab5b557">
+										<property name="local_mesure_unitheight" value="pixel"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{TYPE}=="Z" ? " ":$F{ELEMENT_SYMBOL}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="60" uuid="331472a6-d32b-4594-b3eb-bbe23318c4c2">
+							<jr:detailCell height="11" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="60" height="11" uuid="589aa27b-9d5c-4a90-a6aa-baca537db0a0">
+										<property name="local_mesure_unitheight" value="pixel"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{TYPE}=="Z" ? " ":"Pay "+$F{PAYABLE_PERCENT}+"%"]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="238" uuid="0111d72c-06ae-4008-b5dd-7f3ec1e5a976">
+							<jr:detailCell height="11" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="238" height="11" uuid="ed7efac0-61a3-4488-b729-44a9ebbe7ea5">
+										<property name="local_mesure_unitheight" value="pixel"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{WORDS}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="71" uuid="83cd3eae-afb0-451d-b250-136a15e60ec7">
+							<jr:columnHeader height="15" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="70" height="15" uuid="9dd28348-a117-49dc-81bc-a63a21a8750e"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<text><![CDATA[Payable Qty]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="11" rowSpan="1">
+								<textField pattern="#,##0.0000" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="70" height="11" uuid="ecacca92-07b6-4446-9715-c96e43f98002">
+										<property name="local_mesure_unitheight" value="pixel"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[new DecimalFormat("#,##0.000").format($F{QUANTITY})+" "+$F{ELEMENT_UNIT_CODE}.toLowerCase()]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="67" uuid="5942e8a4-8f03-4896-bc90-ad18579779ad">
+							<jr:columnHeader height="15" rowSpan="1"/>
+							<jr:detailCell height="11" rowSpan="1">
+								<textField pattern="$ #,##0.000" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="67" height="11" uuid="01c97e00-6c4a-4330-b57b-ac1036dd67a1">
+										<property name="local_mesure_unitheight" value="pixel"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+										<printWhenExpression><![CDATA[$F{TYPE}=="Z" ? true:false]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+										<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{PRICE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="78" uuid="be44028c-1ceb-4e53-9abe-629aba1cd129">
+							<jr:columnHeader height="15" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="74" height="15" uuid="b5dcbdb0-6525-47eb-adbb-a27931c0d36b"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<text><![CDATA[Value]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="11" rowSpan="1">
+								<textField pattern="$ #,##0.00;($ #,##0.00)" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="74" height="11" uuid="b9f0647b-25e5-4294-8319-7d20508258b1">
+										<property name="local_mesure_unitheight" value="pixel"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<box>
+										<topPen lineWidth="0.0"/>
+										<leftPen lineWidth="0.0"/>
+										<bottomPen lineWidth="0.0"/>
+										<rightPen lineWidth="0.0"/>
+									</box>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{PAYMENT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="28">
+				<staticText>
+					<reportElement x="3" y="15" width="100" height="13" uuid="f7709427-44fb-47e5-857f-40e9b31fe4b1"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Deductions]]></text>
+				</staticText>
+				<textField pattern="$ #,##0.00">
+					<reportElement x="443" y="0" width="109" height="15" uuid="d906a794-55fc-45b8-b103-ace13cb4777b"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" isUnderline="false" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PAYABLES}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="7">
+				<componentElement>
+					<reportElement key="table 1" x="3" y="0" width="549" height="6" uuid="0b2b84ea-f5e0-489b-9c24-b41ae7c777fc"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Shipment_Deductions" uuid="a34949e3-f294-4312-8389-105748de0509">
+							<datasetParameter name="p_invoice_id">
+								<datasetParameterExpression><![CDATA[$F{INVOICE_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="90" uuid="9f3a1d4b-c68d-4f20-bcff-f4512b1e7341">
+							<jr:detailCell height="18" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="90" height="13" uuid="73bd524f-331c-452c-ad12-a3feec616c1d"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{DEDUCTION_TYPE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="90" uuid="0f3d734b-aef8-4ed5-a66a-3a57fbf9e760">
+							<jr:detailCell height="18" rowSpan="1">
+								<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="90" height="13" uuid="3dbd1ef5-5ccd-405e-8414-1627b88ed538"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{TREATMENT_RATE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="136" uuid="1f0424a9-5149-4887-87f7-0b589b42dc0f">
+							<jr:detailCell height="18" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="136" height="13" uuid="95be5f0e-8f5b-468f-a396-d363be586c8f"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+										<paragraph leftIndent="5"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{TREATMENT_CHARGE_MMT_UNIT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="242" uuid="f1a073d1-4548-4271-aba8-507dff0e40d8">
+							<jr:detailCell height="18" rowSpan="1">
+								<textField pattern="$ #,##0.00">
+									<reportElement x="0" y="0" width="234" height="13" uuid="7cbc8367-e505-4a09-a95b-a8e40043fb83"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{DEDUCTION_AMOUNT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="10">
+				<componentElement>
+					<reportElement key="table 1" x="3" y="0" width="549" height="10" isRemoveLineWhenBlank="true" uuid="049c429d-5e5a-4e98-9e2f-c5d69d131e1a">
+						<printWhenExpression><![CDATA[new Boolean ($F{REFINING_CHARGES} != 0)]]></printWhenExpression>
+					</reportElement>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Refining" uuid="a6efe2b4-20fb-4e3b-b44c-29816ab3828f">
+							<datasetParameter name="p_invoice_id">
+								<datasetParameterExpression><![CDATA[$F{INVOICE_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="58" uuid="5f3c215f-3c52-4aca-ad70-6177402b3473">
+							<jr:detailCell height="13" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="58" height="13" uuid="d64f767a-38d1-4013-85ed-d3919796d467">
+										<printWhenExpression><![CDATA[$F{ROWNUM}==1 ? true:false]]></printWhenExpression>
+									</reportElement>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<text><![CDATA[Ref Charge:]]></text>
+								</staticText>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="49" uuid="1c2d53db-ee5f-4a8e-bdf7-3d2e50a349f5">
+							<jr:detailCell height="13" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="48" height="13" uuid="8eae3ce3-706a-4aaf-b78f-3189c8802c9c"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{ELEMENT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="69" uuid="75ad58fa-eef4-4db4-adf7-b1ae2e1aa37a">
+							<jr:detailCell height="13" rowSpan="1">
+								<textField pattern="$  #,##0.000" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="69" height="13" uuid="d127e9f7-af02-4231-a3dc-8e2b4e1a8964">
+										<property name="local_mesure_unitwidth" value="pixel"/>
+									</reportElement>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{REFINING_COST}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="131" uuid="e329db37-0d91-442f-8d2b-dba059ad2780">
+							<jr:detailCell height="13" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="131" height="13" uuid="bdeedcb9-a8ab-4974-a45c-903d96da0ff1"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+										<paragraph leftIndent="5"/>
+									</textElement>
+									<textFieldExpression><![CDATA["per payable "+$F{REFINING_CHARGE_UNIT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="242" uuid="7828f4db-e0fb-4783-a3ca-f5952b8454ff">
+							<jr:detailCell height="13" rowSpan="1">
+								<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="242" height="13" uuid="2d51a0c2-83bf-403e-b1cc-fd3bc43a9681"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{REFINING_CHARGE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="6">
+				<componentElement>
+					<reportElement key="table 1" x="3" y="0" width="549" height="5" isRemoveLineWhenBlank="true" uuid="57db0b47-e2fb-4dd4-a6ea-3bc63272642f">
+						<printWhenExpression><![CDATA[new Boolean ($F{PENALTIES} != 0)]]></printWhenExpression>
+					</reportElement>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Shipment_Penalty" uuid="4ce571dd-06d5-4b90-9501-111855f2e690">
+							<datasetParameter name="p_invoice_id">
+								<datasetParameterExpression><![CDATA[$F{INVOICE_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="p_transaction_type">
+								<datasetParameterExpression><![CDATA[$F{TRANSACTION_TYPE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="58" uuid="1b4be638-4d61-4c0b-ad00-c2fcf5dc1ff0">
+							<jr:tableHeader height="0" rowSpan="1"/>
+							<jr:columnHeader height="13" rowSpan="1">
+								<staticText>
+									<reportElement x="1" y="0" width="57" height="13" uuid="80035ec4-f19d-4d5f-b5d7-3f90a737a393"/>
+									<textElement>
+										<font fontName="Arial" size="9" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<text><![CDATA[Penalties:]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="13" rowSpan="1"/>
+						</jr:column>
+						<jr:column width="57" uuid="b12d6e6b-d19b-4667-8f4f-a76a4cf4a7d8">
+							<jr:detailCell height="13" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="57" height="13" uuid="7446dde2-8018-4770-bb89-2a1a762072db"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{ELEMENTS}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="37" uuid="103e5e02-748a-435f-9325-772ed9846aa6">
+							<jr:detailCell height="13" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="37" height="13" uuid="e3565730-4f02-4192-a26a-cdd8d941b049"/>
+									<textElement>
+										<font fontName="Arial" size="9" isBold="true"/>
+									</textElement>
+									<text><![CDATA[Deduct]]></text>
+								</staticText>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="39" uuid="d6671f9b-813d-49a2-97cb-49bcac6218bf">
+							<jr:detailCell height="13" rowSpan="1">
+								<textField pattern="$ #,##0.00">
+									<reportElement x="0" y="0" width="39" height="13" uuid="9fea4e9d-8665-4de8-97bb-e41fda4b3e14"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{PENALTY_COST_PER_UNIT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="53" uuid="05484aaf-b9e3-46f3-ab4b-1486c967b478">
+							<jr:detailCell height="13" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="52" height="13" uuid="388b7f1f-3a77-41fe-a83c-b729a618bccb"/>
+									<textElement>
+										<font fontName="Arial" size="9" isBold="true"/>
+									</textElement>
+									<text><![CDATA[For Each]]></text>
+								</staticText>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="36" uuid="cfd9f5ed-c065-4f48-8038-4dd515fd0144">
+							<jr:tableHeader height="0" rowSpan="1"/>
+							<jr:detailCell height="13" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="36" height="13" uuid="364216c9-873d-4e93-a5be-b5d27864b40d"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{DEDUCT_FOR_EACH}+$F{QUANTITY_MNT_UNT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="160" uuid="6f109e4a-4da1-4f20-9509-df65c2dc1e40">
+							<jr:tableHeader height="0" rowSpan="1"/>
+							<jr:detailCell height="13" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="160" height="13" uuid="b1d4de59-b081-4d4f-951f-11e2e19c92c1"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{CONDITION_DESCRIPTION}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="109" uuid="d1a309ee-b6bc-46d6-8512-16254da86233">
+							<jr:tableHeader height="0" rowSpan="1"/>
+							<jr:detailCell height="13" rowSpan="1">
+								<textField pattern="$ #,##0.00">
+									<reportElement x="0" y="0" width="109" height="13" uuid="f86a0821-e421-4fa6-bd73-c1b427b0f003"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{PENALTY_AMOUNT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="10">
+				<property name="local_mesure_unitheight" value="pixel"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<componentElement>
+					<reportElement x="3" y="0" width="549" height="10" uuid="36c9f1d0-7fdc-4ddf-9e73-26c4748ac108">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Shipment_Adjustment" uuid="194043b3-353f-4495-ac5f-080699c4feb5">
+							<datasetParameter name="P_SHIPMENT_ID">
+								<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="P_TRANSACTION_TYPE">
+								<datasetParameterExpression><![CDATA[$F{TRANSACTION_TYPE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="P_INVOICE_TYPE">
+								<datasetParameterExpression><![CDATA[$F{INVOICE_TYPE}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="170" uuid="66b32c3a-7c85-46e7-bb9b-22e57507f641">
+							<jr:detailCell height="13">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="170" height="13" uuid="f5b41b52-12df-4f5a-8407-0633bfcbe1dd">
+										<property name="local_mesure_unitheight" value="pixel"/>
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="379" uuid="840acc66-537e-457e-b4a5-86ca669a71e5">
+							<jr:detailCell height="13">
+								<textField pattern="$ #,##0.00;($ #,##0.00)" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="379" height="13" uuid="25c31b5d-e18f-4658-91d9-bc9fcd324b14">
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{VALUE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band/>
+			<band height="49">
+				<staticText>
+					<reportElement x="310" y="12" width="134" height="13" uuid="8f8c06ab-bdec-4cd8-b3b0-215a05e3fd5b"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Value of Shipment]]></text>
+				</staticText>
+				<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+					<reportElement x="443" y="12" width="109" height="13" uuid="34dafa6e-dc66-4020-b1fd-d15a1fe40bc3"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{INVOICE_AMOUNT}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="310" y="24" width="133" height="13" uuid="d2b5302a-29a8-4876-878c-d8cd60237905"/>
+					<textElement textAlignment="Right" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PROVISIONAL_LABEL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+					<reportElement x="443" y="24" width="109" height="13" uuid="932d31bd-d7a1-462e-a913-0761590c544c"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{REPORT_PROVISIONAL_VALUE}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="310" y="36" width="133" height="13" uuid="4bcff035-25cb-4926-ad87-d9e21255df10">
+						<printWhenExpression><![CDATA[$F{INVOICE_TYPE}.toUpperCase()=='FINAL' ? true:false]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Balance Due ]]></text>
+				</staticText>
+				<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+					<reportElement x="443" y="36" width="109" height="13" uuid="932d31bd-d7a1-462e-a913-0761590c544c">
+						<printWhenExpression><![CDATA[$F{INVOICE_TYPE}.toUpperCase()=='FINAL' ? true:false]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BALANCE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+					<reportElement x="443" y="0" width="109" height="13" uuid="1ea55349-e259-4200-a1e5-bbef9fb18bac"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DEDUCTIONS}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="25">
+				<printWhenExpression><![CDATA[false]]></printWhenExpression>
+				<staticText>
+					<reportElement x="3" y="0" width="261" height="13" uuid="f27c5779-29ad-40cd-b92c-36226149a805"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Please pay via telgraphic transfer to:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="3" y="12" width="213" height="13" uuid="3a48f10c-7e7e-4a4a-9734-8ec12ffe9d13"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BANK}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="13">
+				<printWhenExpression><![CDATA[false]]></printWhenExpression>
+				<textField isStretchWithOverflow="true">
+					<reportElement x="3" y="0" width="213" height="13" isPrintWhenDetailOverflows="true" uuid="9dbbd1e1-f1db-4f09-81bc-3ea5c8a5e7bb"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BANK_ADDRESS}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="52">
+				<printWhenExpression><![CDATA[false]]></printWhenExpression>
+				<textField>
+					<reportElement x="3" y="0" width="213" height="13" uuid="cc9c106a-1586-4ad9-86de-087fbdd220a6"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Beneficiary: "+$F{ACCOUNT_NAME}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="3" y="13" width="213" height="13" uuid="eea03f88-57aa-4ffc-9fe8-03af89106c57"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Account Number: "+$F{ACCOUNT_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="3" y="26" width="213" height="13" uuid="06e8b987-06a3-4877-85ad-45369aff9ea7"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA["ABA #: "+$F{ABA_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="3" y="39" width="213" height="13" uuid="182b8dc2-099e-4485-bf28-463ab7a68ef5"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Swift # : "+$F{SWIFT}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band/>
+			<band height="50">
+				<printWhenExpression><![CDATA[$F{SHOW_INSTRUCTION}.toUpperCase()=="N" ? false:true]]></printWhenExpression>
+				<componentElement>
+					<reportElement key="table 1" x="0" y="0" width="572" height="50" uuid="6207f2fa-5714-4a8c-ba7f-b3353e97cdc3"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Payment Instruction" uuid="2868f6ab-6d0a-4a31-81cb-e42b63b6145e">
+							<datasetParameter name="P_INSTR_ID">
+								<datasetParameterExpression><![CDATA[$F{PAYMENT_INSTRUCTION_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="413" uuid="1af19897-7e9f-4900-a63b-c9ad44daa869">
+							<jr:columnHeader height="15" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="413" height="15" uuid="7c933a5e-f873-4d6b-8957-441763f68376"/>
+									<textElement markup="none">
+										<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<textFieldExpression><![CDATA["Please pay via telegraphic transfer to: "]]></textFieldExpression>
+								</textField>
+							</jr:columnHeader>
+							<jr:columnFooter height="30" rowSpan="1"/>
+							<jr:detailCell height="13" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="413" height="13" uuid="03cce4bc-c912-4999-abd9-bb830693f756"/>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{DETAIL}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="50" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="310" y="11" width="220" height="23" uuid="04f5700c-8012-469c-9300-d7881a9fef4e"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONTACT_TO}==161 ? $F{ADDRESS}:$F{CONTACT_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="310" y="34" width="262" height="13" uuid="857fc9b4-cf44-44d6-a7a6-770f9a9dc43a"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONTACT_TO}==161 ? $F{TELEPHONE}:$F{LINE_2}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="3" y="49" width="569" height="1" uuid="36995636-113e-47a4-9733-1f8cf2cf6bd7"/>
+				<graphicElement>
+					<pen lineColor="#3366FF"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="0" y="0" width="572" height="11" uuid="b93d87b8-a7e7-40b2-9a36-c869dc5b4c23">
+					<printWhenExpression><![CDATA[$F{CONTACT_TO}==81 ? true:false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="7" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["VMF SPECIAL PURPOSE VEHICLE SPC FOR THE ACCOUNT OF THE VMF A1 SEGREGATED PORTFOLIO C/O VERMIILION ASSET MANAGEMENT, LLC"]]></textFieldExpression>
+			</textField>
+			<image scaleImage="FillFrame" onErrorType="Blank">
+				<reportElement x="0" y="11" width="264" height="37" uuid="b2440996-c1ae-4178-a835-e071c596ad81"/>
+				<imageExpression><![CDATA[$F{CONTACT_LOGO}]]></imageExpression>
+			</image>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement mode="Transparent" x="380" y="0" width="172" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="e6c46304-e045-4d62-8e62-c0cecda2b284"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONTRACT_ADMIN_INITIALS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

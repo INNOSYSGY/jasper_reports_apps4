@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="confirmationOfEmployment" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f992d362-1814-49da-b3c3-8e14e20fd07d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="164"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Multi/01_HR/confirmationOfEmployment"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Multi/01_HR/confirmationOfEmployment_files/confirmationOfEmployment_jrxml"/>
+	<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="APPLICANT_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="START_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="END_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EFFECTIVE_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="POSITION" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WORKER_ID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="JOB" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT TRIM(INITCAP(TO_CHAR(SYSDATE, 'month')))
+  || ' '
+  || TO_CHAR(SYSDATE,'dd, yyyy') CURRENT_DATE,
+  (SELECT INITCAP(LTRIM(RTRIM(X.FIRST_NAME)))
+    || ' '
+    || INITCAP(LTRIM(RTRIM(X.SURNAME)))
+  FROM HR_RCM_INDIVIDUAL X
+  WHERE X.ID=$P{APPLICANT_ID}
+  ) EMPLOYEE_NAME,
+  'Dear '
+  ||
+  CASE LOWER(TO_CHAR(B.SEX_CODE))
+    WHEN 'f'
+    THEN 'Mrs'
+    WHEN 'm'
+    THEN 'Mr'
+  END
+  || '. '
+  || INITCAP(LTRIM(RTRIM(SURNAME)))
+  || ',' EMPLOYEE_SALUTATION,
+  'Consequent to the review of your performance during ' FIRST_PARA_1,
+  TRIM(INITCAP(TO_CHAR(TO_DATE($P{START_DATE}, 'DD-MON-YY'), 'month'))) FIRST_PARA_2,
+  ' ' FIRST_PARA_3,
+  TO_CHAR(TO_DATE($P{START_DATE}, 'DD-MON-YY'),'dd, yyyy') FIRST_PARA_4,
+  ' – ' FIRST_PARA_5,
+  TRIM(INITCAP(TO_CHAR(TO_DATE($P{END_DATE}, 'DD-MON-YY'), 'month'))) FIRST_PARA_6,
+  ' ' FIRST_PARA_7,
+  TO_CHAR(TO_DATE($P{END_DATE}, 'DD-MON-YY'),'dd, yyyy') FIRST_PARA_8,
+  ' your probation period, we have the pleasure in informing you that, your services are being confirmed as ' FIRST_PARA_9,
+  $P{POSITION} FIRST_PARA_10,
+  ' effective ' FIRST_PARA_11,
+  TRIM(INITCAP(TO_CHAR(TO_DATE($P{EFFECTIVE_DATE}, 'DD-MON-YY'), 'month'))) FIRST_PARA_12,
+  ' ' FIRST_PARA_13,
+  TO_CHAR(TO_DATE($P{EFFECTIVE_DATE}, 'DD-MON-YY'),'dd, yyyy') FIRST_PARA_14,
+  '.' FIRST_PARA_15,
+  'The terms and conditions of your employment will remain the same.' SECOND_PARA,
+  'We look forward to your valuable contributions and wish you all the very best for a rewarding career with the organization.' THIRD_PARA,
+(SELECT INITCAP(LTRIM(RTRIM(X.FIRST_NAME)))
+    || ' '
+    || INITCAP(LTRIM(RTRIM(X.SURNAME)))
+  FROM HR_RCM_INDIVIDUAL X
+  WHERE X.ID=$P{WORKER_ID}
+  ) NAME,
+  $P{JOB} JOB
+FROM HR_RCM_EMPLOYEE A
+JOIN HR_RCM_INDIVIDUAL B
+ON A.IND_ID = B.ID
+WHERE B.ID = $P{APPLICANT_ID}]]>
+	</queryString>
+	<field name="CURRENT_DATE" class="java.lang.String"/>
+	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="EMPLOYEE_SALUTATION" class="java.lang.String"/>
+	<field name="FIRST_PARA_1" class="java.lang.String"/>
+	<field name="FIRST_PARA_2" class="java.lang.String"/>
+	<field name="FIRST_PARA_3" class="java.lang.String"/>
+	<field name="FIRST_PARA_4" class="java.lang.String"/>
+	<field name="FIRST_PARA_5" class="java.lang.String"/>
+	<field name="FIRST_PARA_6" class="java.lang.String"/>
+	<field name="FIRST_PARA_7" class="java.lang.String"/>
+	<field name="FIRST_PARA_8" class="java.lang.String"/>
+	<field name="FIRST_PARA_9" class="java.lang.String"/>
+	<field name="FIRST_PARA_10" class="java.lang.String"/>
+	<field name="FIRST_PARA_11" class="java.lang.String"/>
+	<field name="FIRST_PARA_12" class="java.lang.String"/>
+	<field name="FIRST_PARA_13" class="java.lang.String"/>
+	<field name="FIRST_PARA_14" class="java.lang.String"/>
+	<field name="FIRST_PARA_15" class="java.lang.String"/>
+	<field name="SECOND_PARA" class="java.lang.String"/>
+	<field name="THIRD_PARA" class="java.lang.String"/>
+	<field name="NAME" class="java.lang.String"/>
+	<field name="JOB" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="79" uuid="38dce52e-192a-4705-8848-98536cc056bc"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{P_IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="102" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="82" width="572" height="20" uuid="65a98f66-b0c3-4442-a437-21d8c4c752f6"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Sub: Confirmation]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="10" width="237" height="20" uuid="e68f3635-6994-4ed2-adda-6dedd731a235"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CURRENT_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="48" width="237" height="20" uuid="4be2d9b6-8cd0-45d9-a2b6-f7c3e57e3e84"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="306" splitType="Stretch">
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="31" width="572" height="17" uuid="b2aab323-6e83-4cad-a666-01666a7e5548"/>
+				<textElement>
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRST_PARA_1}+$F{FIRST_PARA_2}+$F{FIRST_PARA_3}+$F{FIRST_PARA_4}+$F{FIRST_PARA_5}+$F{FIRST_PARA_6}+$F{FIRST_PARA_7}+$F{FIRST_PARA_8}+$F{FIRST_PARA_9}+$F{FIRST_PARA_10}+$F{FIRST_PARA_11}+$F{FIRST_PARA_12}+$F{FIRST_PARA_13}+$F{FIRST_PARA_14}+$F{FIRST_PARA_15}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="1" width="237" height="20" uuid="3c4b791b-6af1-4ba8-b139-7f067d8bc599"/>
+				<textElement>
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_SALUTATION}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="66" width="572" height="17" uuid="617296d0-2d29-47c9-bb1d-c6b55d514373"/>
+				<textElement>
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SECOND_PARA}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="100" width="572" height="20" uuid="5cb4b989-8ba1-4c05-88a3-544c7f7386bc"/>
+				<textElement>
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{THIRD_PARA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="183" width="100" height="20" uuid="b863b048-adde-43a6-a5a5-f66d24da526d"/>
+				<textElement>
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<text><![CDATA[Yours sincerely,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="232" width="237" height="20" uuid="a83863c3-0ab1-46be-8855-63d4ecc0545f"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<text><![CDATA[...............................................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="335" y="232" width="237" height="20" uuid="5c3c6be6-177f-4dbb-a55a-e1cf792cc30c"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<text><![CDATA[...............................................................................]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="264" width="237" height="20" uuid="4571e5af-7030-421e-933b-93e6448ad9cd"/>
+				<textElement>
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="335" y="264" width="100" height="20" uuid="cb73960d-92d4-4894-8af9-c2c69c62eefb"/>
+				<textElement>
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<text><![CDATA[Employee]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="284" width="237" height="22" uuid="b5010cba-8619-4bec-9395-a72166d0605c"/>
+				<textElement>
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{JOB}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

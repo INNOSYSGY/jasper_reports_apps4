@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Liabilities per Declarant" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8e15d519-eab3-497d-b483-a5c1caac3ee0">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ICOM_PROD"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/INT_COMM/ICOM_REPORTS/Listing_of_Liabilities_per_Declarant_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/INT_COMM/ICOM_REPORTS/Listing_of_Liabilities_per_Declarant"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="Title" fontName="Arial" fontSize="26" isBold="true"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#8FAFCC">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#CFDBE6">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Liabilities" uuid="d786ed71-105c-4c7c-9b5c-ec6379eae1aa">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ICOM_PROD"/>
+		<parameter name="dechd" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT
+    initcap(pkg_global_fnts.get_lookup_col( dyn_laib.org_id,'VALUE_DESCRIPTION')) Organization,
+    initcap(pkg_global_fnts.get_lookup_col( dyn_laib.liability_type,'VALUE_DESCRIPTION')) "Type of Liability" ,
+    dyn_laib.liability_date,
+    nvl(dyn_laib.amount,0) amount,
+    dyn_laib.remarks
+FROM
+  INTGRT_DYN_DECLAREHD dechd
+  left outer join
+  INTGRT_DYN_LIAB dyn_laib
+  on dyn_laib.declarehd_id =  dechd.id
+  where dechd.id =$P{dechd}]]>
+		</queryString>
+		<field name="ORGANIZATION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="ORGANIZATION"/>
+		</field>
+		<field name="Type of Liability" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="Type of Liability"/>
+		</field>
+		<field name="LIABILITY_DATE" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.label" value="LIABILITY_DATE"/>
+		</field>
+		<field name="AMOUNT" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT"/>
+		</field>
+		<field name="REMARKS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="REMARKS"/>
+		</field>
+		<variable name="Liabiltiy Total" class="java.math.BigDecimal" resetType="Page" incrementType="Report" calculation="Sum">
+			<variableExpression><![CDATA[$F{AMOUNT}]]></variableExpression>
+		</variable>
+		<group name="Type of Liabailtiy">
+			<groupExpression><![CDATA[$F{Type of Liability}]]></groupExpression>
+		</group>
+	</subDataset>
+	<parameter name="Ind_id" class="java.math.BigDecimal"/>
+	<parameter name="DECLARATION_PER_ID" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+    ind.id,
+    surname,
+    first_name,
+    e.ORGANISATION,
+    e.POSITION_HELD,
+    decper.income_state_start,
+    decper.income_state_end,
+    e.REMARKS,
+    dechd.id dechd
+FROM
+    intgrt_ref_individual ind
+    join
+   intgrt_dyn_declarehd  dechd
+    on ind.id =dechd.ind_id
+    join
+    INTGRT_REF_DECPERIOD decper
+    on dechd.decperiod_id = decper.id
+    left join INTGRT_REF_INDEMPHISTORY e on e.ind_id=ind.id
+  where ind.id = nvl($P{Ind_id},ind.id)    
+and 
+dechd.decperiod_id= $P{DECLARATION_PER_ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="ORGANISATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION"/>
+	</field>
+	<field name="POSITION_HELD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_HELD"/>
+	</field>
+	<field name="INCOME_STATE_START" class="java.util.Date">
+		<property name="com.jaspersoft.studio.field.label" value="INCOME_STATE_START"/>
+	</field>
+	<field name="INCOME_STATE_END" class="java.util.Date">
+		<property name="com.jaspersoft.studio.field.label" value="INCOME_STATE_END"/>
+	</field>
+	<field name="REMARKS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="REMARKS"/>
+	</field>
+	<field name="DECHD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DECHD"/>
+	</field>
+	<group name="Individuals" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{ID}]]></groupExpression>
+		<groupHeader>
+			<band height="66">
+				<textField>
+					<reportElement x="8" y="5" width="540" height="20" uuid="e57c1e98-ac13-4ec9-a9b1-0296c865a914">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{FIRST_NAME} +" "+$F{SURNAME}  +"         "+" Declaration Period :"+$F{INCOME_STATE_START}+"-"+$F{INCOME_STATE_END}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="8" y="28" width="100" height="16" uuid="f856ae4c-9a28-4a47-95cb-42035945fca8"/>
+					<text><![CDATA[Place of Employment:]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="110" y="28" width="320" height="16" uuid="9e2c540f-1299-4f06-98a1-5dad69578802"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ORGANISATION}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="430" y="28" width="62" height="16" uuid="9116acce-9888-4684-89e2-61cccca9fa82"/>
+					<text><![CDATA[Designation:]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="492" y="28" width="193" height="16" uuid="14541138-e97b-45ab-95e8-a2f8fe84e3f4"/>
+					<textElement markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{POSITION_HELD}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="54" y="49" width="490" height="16" uuid="e1de1fd9-ada1-49c3-9c22-ea89820e9fea"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{REMARKS}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="8" y="49" width="52" height="16" uuid="a440070c-80a8-4df4-9cd1-6e1fad5675ff"/>
+					<text><![CDATA[Remarks:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="40"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="70" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="-20" width="206" height="50" uuid="ea5ad761-92e5-4024-9d51-efba4363bb54"/>
+				<imageExpression><![CDATA["repo:intlogo.jpg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement style="Title" x="0" y="30" width="553" height="33" uuid="91f5fe7f-a65f-46a3-81ae-30f2d82c45a2"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Listing of Liabilities per Declarant]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="35" width="555" height="1" uuid="2c4ebb21-8745-45a1-a9ad-477acaac72cb"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="150" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="15" width="555" height="1" uuid="ffde0804-90e8-496b-86fb-ee363619f187"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<componentElement>
+				<reportElement x="-2" y="15" width="687" height="135" uuid="8c971da8-bd4c-45f9-8394-c4b9a5100fa0">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Liabilities" uuid="f7e8dc60-82c6-4667-a7c8-d9d693f4781e">
+						<datasetParameter name="dechd">
+							<datasetParameterExpression><![CDATA[$F{DECHD}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="80" uuid="45deeca9-bd52-4ccd-aeb4-2f84dcc277ed">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:tableHeader height="30" rowSpan="1"/>
+						<jr:tableFooter height="30" rowSpan="1"/>
+						<jr:groupHeader groupName="Type of Liabailtiy">
+							<jr:cell height="30" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="70" height="30" uuid="f9c05cb1-4198-4b54-a917-b5224f66ba1e"/>
+									<textFieldExpression><![CDATA[$F{Type of Liability}]]></textFieldExpression>
+								</textField>
+							</jr:cell>
+						</jr:groupHeader>
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="80" height="30" uuid="a2ba48c5-4a8e-4127-a63e-a3a8e4af3276"/>
+								<text><![CDATA[Type of Liabiltiy]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter height="30" rowSpan="1"/>
+						<jr:detailCell height="30"/>
+					</jr:column>
+					<jr:column width="140" uuid="e080a012-6f93-4917-b5d5-842d072beb86">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:tableHeader height="30" rowSpan="1"/>
+						<jr:tableFooter height="30" rowSpan="1"/>
+						<jr:groupHeader groupName="Type of Liabailtiy">
+							<jr:cell height="30" rowSpan="1"/>
+						</jr:groupHeader>
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="140" height="30" uuid="7a67fc04-b7f4-4e4b-9283-c77db28c981b"/>
+								<text><![CDATA[Organization]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="140" height="30" uuid="8f2c579f-4901-4ba8-be20-26b6fb803c8d"/>
+								<textElement>
+									<font size="12" isUnderline="true"/>
+								</textElement>
+								<text><![CDATA[Total Liability]]></text>
+							</staticText>
+						</jr:columnFooter>
+						<jr:detailCell height="30">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="140" height="30" uuid="7ade4fd1-8e78-4c2e-8721-3e835e2ab443">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<textElement>
+									<paragraph leftIndent="15"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{ORGANIZATION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="200" uuid="9900442f-88fb-4f0e-b0fa-59b5c04b66fa">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:tableHeader height="30" rowSpan="1"/>
+						<jr:tableFooter height="30" rowSpan="1"/>
+						<jr:groupHeader groupName="Type of Liabailtiy">
+							<jr:cell height="30" rowSpan="1"/>
+						</jr:groupHeader>
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="200" height="30" uuid="bde02dff-ac19-49c6-9faa-bf2822f36514"/>
+								<text><![CDATA[Liability Date]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter height="30" rowSpan="1"/>
+						<jr:detailCell height="30">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="200" height="30" uuid="477f8e49-b4ab-44a2-a9ca-c93a0b3afce8"/>
+								<textFieldExpression><![CDATA[$F{LIABILITY_DATE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="80" uuid="6aca5469-f916-4e30-bd5b-f2368d6b987f">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
+						<jr:tableHeader height="30" rowSpan="1"/>
+						<jr:tableFooter height="30" rowSpan="1"/>
+						<jr:groupHeader groupName="Type of Liabailtiy">
+							<jr:cell height="30" rowSpan="1"/>
+						</jr:groupHeader>
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="80" height="30" uuid="b7521f2e-418c-44d1-a1b0-838749e67110"/>
+								<text><![CDATA[Amount]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter height="30" rowSpan="1">
+							<textField pattern="¤#,##0.##;¤-#,##0.##">
+								<reportElement x="0" y="0" width="80" height="30" uuid="6d782646-7f1b-49ac-80ea-0f23a22ff6ec"/>
+								<textElement>
+									<font size="12" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{Liabiltiy Total}]]></textFieldExpression>
+							</textField>
+						</jr:columnFooter>
+						<jr:detailCell height="30">
+							<textField pattern="¤#,##0.##;¤-#,##0.##">
+								<reportElement x="0" y="0" width="80" height="30" uuid="52f0cd7a-e20c-4cb4-a5c0-0ac3dca4ba78"/>
+								<textElement>
+									<font size="12"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="170" uuid="bf42d75c-93ea-4ae7-abe2-7568696d09a3">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
+						<jr:tableHeader height="30" rowSpan="1"/>
+						<jr:tableFooter height="30" rowSpan="1"/>
+						<jr:groupHeader groupName="Type of Liabailtiy">
+							<jr:cell height="30" rowSpan="1"/>
+						</jr:groupHeader>
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="170" height="30" uuid="b566aa33-2d1b-4dce-8134-dba03c1080fa"/>
+								<text><![CDATA[Remarks]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter height="30" rowSpan="1"/>
+						<jr:detailCell height="30">
+							<textField pattern="¤#,##0.##;¤-#,##0.##" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="170" height="30" uuid="95298b79-8c19-4448-86ff-c6813728f35f"/>
+								<textElement>
+									<font size="12"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{REMARKS}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="3" width="555" height="1" uuid="30093aa1-3dd7-4eea-9cc9-e183637af8f4"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement style="Column header" x="680" y="0" width="80" height="20" uuid="62312b3d-1084-408e-9cbb-62745239a597"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement style="Column header" x="760" y="0" width="40" height="20" uuid="d3d18f06-a64c-4797-b101-6b7ed2647396"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement style="Column header" x="0" y="0" width="197" height="20" uuid="ccaaa8e2-9c5c-4b22-9b66-7d8beb002e8c"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="339" y="0" width="125" height="20" uuid="e4341a18-5dd1-4175-aacf-adc139088a05">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["Integrity Commission MIS"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

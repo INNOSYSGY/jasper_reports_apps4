@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MARAD Special Leave" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ce775fc2-db06-4933-a1d7-f37ca4abfed8">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="35"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/01_HR/Gafoor_LEAVE_letter"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/01_HR/Gafoor_LEAVE_letter_files/MARAD_SPECIAL_LEAVE_jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoor_PASS"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT
+    l.emp_id,
+    CASE
+                    WHEN i.sex_code = 'M'  THEN 'Mr.'
+                    WHEN i.sex_code = 'F' THEN 'Mrs.'
+                 END|| ' '||t.employee_name|| ',' as  MrMrs,
+                 t.POSITION_NAME,
+                 t.DEPARTMENT_NAME,
+                 apps.pkg_global_fnts.fn_num_towords(l.DAYS_TAKEN)||   ' ('||l.DAYS_TAKEN||') ' ||
+                 CASE
+                 WHEN DAYS_TAKEN = 1 THEN 'day '
+                 ELSE 'days '
+                 END||lt.LEAVE_TYPE as daysleavetype,
+                 apps.pkg_global_fnts.fn_num_towords(lt.PENDING)||   ' ('||lt.PENDING||') '||
+                 CASE
+                  WHEN lt.pending = 1 THEN ' day '
+                  ELSE ' days of Vacation Leave '
+                 END as pending,
+                 TO_CHAR( FROMDATE, 'DDth MON YYYY') DATE_FROM,
+                 o.organisation_name,l.org_id,lt.leave_type,l.remarks,
+                 TO_CHAR( l.TODATE+1, 'DDth MON YYYY') to_date,
+                   t.location
+FROM     hr_lv_leavehistory l
+JOIN    hr_rcm_employee e ON e.id = l.emp_id
+JOIN   hr_rcm_individual i       ON  i.id = e.ind_id
+JOIN   vw_position_location_v3 t ON  t.emp_id = e.id
+JOIN   hr_lv_leavetrack lt       ON  lt.emp_id = l.emp_id
+JOIN   hr_hcf_organisation o     ON  o.id = l.org_id
+
+where  l.org_id = 208
+    and l.id = $P{EMP_ID}]]>
+	</queryString>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="MRMRS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="MRMRS"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="DEPARTMENT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT_NAME"/>
+	</field>
+	<field name="DAYSLEAVETYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DAYSLEAVETYPE"/>
+	</field>
+	<field name="PENDING" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PENDING"/>
+	</field>
+	<field name="DATE_FROM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DATE_FROM"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="LEAVE_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LEAVE_TYPE"/>
+	</field>
+	<field name="REMARKS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="REMARKS"/>
+	</field>
+	<field name="TO_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TO_DATE"/>
+	</field>
+	<field name="LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LOCATION"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="117" splitType="Stretch">
+			<image>
+				<reportElement x="3" y="0" width="548" height="110" uuid="2b1aa869-ab60-4339-ad3d-5e4987318204"/>
+				<imageExpression><![CDATA["repo:h"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="520" splitType="Stretch">
+			<textField>
+				<reportElement x="24" y="207" width="514" height="33" uuid="a7652c5b-d379-43a3-9dd0-00eb09f55436"/>
+				<textElement textAlignment="Justified" markup="html">
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["You are hereby notified that "+$F{DAYSLEAVETYPE}+" has been approved for  "+$F{DATE_FROM}+". "]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="25" y="351" width="514" height="20" uuid="ee56c93e-a865-4c02-8b22-6232e22b6b5b"/>
+				<textElement>
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<text><![CDATA[All for your information.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="24" y="274" width="514" height="70" uuid="20959ed0-165f-4ef6-835d-1e187331bdd6"/>
+				<textElement textAlignment="Justified">
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<text><![CDATA[On your return after leave, please complete the Resumption of Duty form, pass to your supervisor for his/her signature and submit same to the Human Resources Department. Failure to do so will result in you being deemed absent without permission and the necessary disciplinary action will follow.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="140" width="529" height="20" uuid="6931f9f4-8f0f-467a-8eea-5e950760c2a3"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LEAVE APPROVAL]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="24" y="174" width="514" height="20" uuid="79d1257b-a2db-4f04-8d50-bd00427ff2fa"/>
+				<textElement markup="html">
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dear "+$F{MRMRS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="24" y="9" width="514" height="20" uuid="605298db-8cd2-4f91-94d4-53ea45881092"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="24" y="43" width="514" height="20" uuid="2c406970-cd6a-4c75-a341-d7bff05433ab"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MRMRS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="24" y="59" width="514" height="20" uuid="1c3fb8e8-6b61-4431-8fee-cf5561976894"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="24" y="76" width="514" height="20" uuid="d8e90bfc-5f11-4d6d-9d9e-0b11c62e400b"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="24" y="478" width="514" height="20" uuid="8983fa3c-f9ac-4528-a614-048c55060b1b"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Savita Persaud (Ms.) ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="24" y="498" width="514" height="20" uuid="9feed57a-971d-4838-89a0-bfba804ae93d"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Senior Human Resource Clerk]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="23" y="248" width="514" height="19" uuid="d3a47b4d-f86e-4216-9fb8-bfaf20c486dc"/>
+				<textElement textAlignment="Justified" markup="html">
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["You are expected to resume duties on the "+$F{TO_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="24" y="432" width="514" height="20" uuid="2d01e9de-c562-4152-afcd-34b80b03d8d2"/>
+				<textElement>
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<text><![CDATA[Regards]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="24" y="459" width="514" height="20" uuid="173e46b1-f20f-4703-aad8-ebc91b7e3c28"/>
+				<textElement>
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<text><![CDATA[____________________________]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="24" y="93" width="514" height="20" uuid="3913fd86-22fe-4b17-abff-7a010f9d132a"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOCATION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="72" splitType="Stretch">
+			<staticText>
+				<reportElement x="22" y="7" width="514" height="20" uuid="8bf214fc-fcd9-4968-90fe-b75933ed5b4f"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Copy:   Ms. Miriam Pompey		-		Payroll Supervisor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="26" width="514" height="20" uuid="5cac89b8-18bf-4738-bb52-1b39e694ba0c"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[              Ms. Nadira Boodhoo		-		Time Clerk ]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Drug Prescription Label" language="groovy" printOrder="Horizontal" pageWidth="216" pageHeight="144" columnWidth="206" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="d131f0c2-d49f-4b22-a016-b75f96976a45">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/FORMS/PLABEL"/>
+	<property name="ireport.jasperserver.url" value="http://10.8.1.16:8181/jasperserver/services/repository"/>
+	<parameter name="p_issue_id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+INVTRANS.TRANSACTION_SOURCE_ID REQ_NO, REQLINES.LINE_ID REQ_LINE_NO,
+ITEM.SEGMENT1 ITEM_NO, ITEM.ORG_ITEM_DESCRIPTION, (ITEM.ORG_ITEM_DESCRIPTION||' '||ITEM.DRUG_STRENGTH)FULL_ORG_ITEM_DESCRIPTION,
+                        reqlines.remarks,
+                        initcap(nvl(req.description,req.remarks)) name_field,
+                        REQLINES.EXPIRY_DATE,
+                        (
+                          SELECT LOT_CONTROL_CODE
+                          FROM TBLLOTMANAGER M
+                          where m.id=REQLINES.LOT_CONTROL_ID) Batch_code,
+			ITEM.PRIMARY_UNIT_OF_MEASURE UOM,
+                        DECODE(TRANS.TRANSACTION_CODE, 'RTN ISSUE',(INVTRANS.TRANSACTION_QUANTITY)*-1, 'STORES ISSUING',
+                        abs(invtrans.transaction_quantity), invtrans.transaction_quantity   ) QTY_ISSUED,
+			INVTRANS.TRANSACTION_DATE DATE_ISSUED,
+                        NVL(ISSUER.FULL_USER_NAME,ISSUER.USER_NAME) ISSUING_OFFICER,
+                        W.DESCRIPTION ISSUING_ORGANISATION,
+                       DECODE (TRANS.TRANSACTION_CODE,'RTN ISSUE', 'RETURN', 'STORES ISSUING', 'ISSUE' ,INVTRANS.TRANSACTION_QUANTITY) TRANS_TYPE,
+                       COMPANY_NAME,VILLAGE_TOWN||', '||DISTRICT||', '||COUNTRY ADDRESS,EMAIL,
+                        'Tel# '||TELEPHONE_NOS Telphone, 'Fax # '||FAX_NOS FAX
+			from apps.tblinventorytransaction invtrans join apps.tbltransactiontype trans on invtrans.transaction_type_id=trans.transaction_type_id
+			join apps.tblinventoryitem item on invtrans.inventory_item_id = item.inventory_item_id
+			join apps.tblstoresreqlines reqlines on invtrans.stores_requisition_line_id = reqlines.stores_req_line_id
+                        join APPS.TBLSTORESREQ req on  reqlines.stores_req_no=req.stores_req_no
+                        left join APPS.VW_USER_NAME Issuer ON INVTRANS.CREATED_BY=ISSUER.USER_NAME
+			LEFT JOIN APPS.TBLSTORESREQDISTRIBUTION DISTRIB ON INVTRANS.STORES_DISTRIBUTION_ID=DISTRIB.STORES_DISTRIBUTION_ID
+                       	JOIN TBLORGANIZATION W ON W.ORGANIZATION_ID=INVTRANS.ORGANIZATION_ID
+                        cross join TBLSYSTEMCONFIGURATION
+                        where  (trans.transaction_code like '%STORES%ISSUING%'
+				  OR TRANS.TRANSACTION_CODE LIKE '%RTN ISSUE%')
+and INVTRANS.TRANSACTION_SOURCE_ID=$P{p_issue_id}]]>
+	</queryString>
+	<field name="REQ_NO" class="java.math.BigDecimal"/>
+	<field name="REQ_LINE_NO" class="java.math.BigDecimal"/>
+	<field name="ITEM_NO" class="java.lang.String"/>
+	<field name="ORG_ITEM_DESCRIPTION" class="java.lang.String"/>
+	<field name="FULL_ORG_ITEM_DESCRIPTION" class="java.lang.String"/>
+	<field name="REMARKS" class="java.lang.String"/>
+	<field name="NAME_FIELD" class="java.lang.String"/>
+	<field name="EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="BATCH_CODE" class="java.lang.String"/>
+	<field name="UOM" class="java.lang.String"/>
+	<field name="QTY_ISSUED" class="java.math.BigDecimal"/>
+	<field name="DATE_ISSUED" class="java.sql.Timestamp"/>
+	<field name="ISSUING_OFFICER" class="java.lang.String"/>
+	<field name="ISSUING_ORGANISATION" class="java.lang.String"/>
+	<field name="TRANS_TYPE" class="java.lang.String"/>
+	<field name="COMPANY_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="TELPHONE" class="java.lang.String"/>
+	<field name="FAX" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="1" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="133" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="8525bff4-c0f4-4fc6-8dc5-a82d790d506f" x="0" y="73" width="206" height="47"/>
+				<textElement markup="html">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REMARKS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="6b91d204-bcfc-4689-8d6e-9c67ee3fad63" x="0" y="0" width="206" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPANY_NAME}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="1ab294c0-1bd8-447d-a070-b402564575d2" x="-497" y="106" width="280" height="20"/>
+				<textElement/>
+				<text><![CDATA[ISSUING_OFFICER]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="98a26de8-c510-459f-bf41-a0c34baf4cf3" x="0" y="120" width="86" height="13"/>
+				<textElement>
+					<font fontName="Arial" size="7" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Issued By: '+$F{ISSUING_OFFICER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="14d44a6a-be47-47d2-98cc-f535f0d6c3e3" x="0" y="15" width="206" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ISSUING_ORGANISATION}]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement uuid="255c3c80-a19b-4191-86ef-fb320b950879" mode="Opaque" x="0" y="28" width="206" height="30" backcolor="#FFFFFF"/>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="738db0ca-3efe-4a57-9832-465eea5b3ee8" x="112" y="0" width="94" height="13"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EXPIRY_DATE}==null ? '' :'Expiry Date: '+new SimpleDateFormat('dd MMM yyyy').format($F{EXPIRY_DATE})]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="b07c0873-ab9c-4056-ad4a-c100acd4f614" x="112" y="13" width="94" height="13"/>
+					<textElement>
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BATCH_CODE}==null ? '': 'Batch Code: '+$F{BATCH_CODE}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="a918cd01-d561-4844-9090-1856784212c4" x="0" y="0" width="112" height="30"/>
+					<textElement verticalAlignment="Top" markup="html">
+						<font fontName="Arial" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{FULL_ORG_ITEM_DESCRIPTION}+'   '+'Qty: '+$F{QTY_ISSUED}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="edefe517-5c3d-42e4-bf4c-135f26e2ebec" x="112" y="120" width="94" height="13"/>
+				<textElement>
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Date of Issue: '+new SimpleDateFormat('dd-MMM-yyyy').format($F{DATE_ISSUED})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="3b2e72ee-05de-4780-bcb7-04f7501fb668" x="0" y="58" width="206" height="15"/>
+				<textElement textAlignment="Center" markup="html">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME_FIELD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

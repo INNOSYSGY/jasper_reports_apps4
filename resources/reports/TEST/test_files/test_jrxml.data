@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="IPED Suspension Letter" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="46728f3a-4733-4606-b393-7f080f0ac984">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 'Please be informed that approval has been granted for you to proceed on ' ||apps.pkg_global_fnts.fn_num_towords(DAYS_TAKEN)||   ' ('||DAYS_TAKEN||') ' ||
+CASE
+    WHEN DAYS_TAKEN = 1 THEN 'day '
+    ELSE 'days '
+END
+||LEAVE_TYPE|| ' from '||TO_CHAR(FROMDATE, 'ddth fmMonth, yyyy')|| ' to '|| TO_CHAR(TODATE, 'ddth fmMonth, fmyyyy')|| '. You are to resume duties on ' || TO_CHAR(NVL(RESUMPTION_DATE,TODATE +1),'fmDay ddth Month, yyyy')||'.' AS Resumption,
+
+(SELECT
+               CASE
+                 WHEN sex_code = 'M'  THEN 'Mr.'
+                 WHEN sex_code = 'F' THEN 'Mrs.'
+               END FROM apps.vw_position_location_v3 t where t.emp_id = a.emp_id)||
+(SELECT initcap(EMPLOYEE_NAME)  FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = a.EMP_ID)AS APPLICANT,
+(SELECT initcap(POSITION_NAME) FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = a.EMP_ID)AS APPLICANT_POSITION,
+(SELECT initcap(ORG_STRUCTURE) FROM apps.hr_rcm_employee e WHERE e.ID = a.EMP_ID)AS DEPARTMENT,
+(SELECT initcap(DEPARTMENT_NAME) FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = a.EMP_ID)AS DEPARTMENT_LEVEL_2,
+'Thru'''' Managing Director' AS REPORTING_TO,
+'Dear '|| (SELECT
+               CASE
+                 WHEN sex_code = 'M'  THEN 'Mr.'
+                 WHEN sex_code = 'F' THEN 'Mrs.'
+               END FROM apps.vw_position_location_v3 t where t.emp_id = a.emp_id)
+        ||
+ ' '||initcap(SURNAME_HIST)|| ',' as  GREETING,
+ ( select employee_name from apps.vw_position_location_v3 t where t.emp_id = b.employee_no) APPROVED_BY,
+(SELECT POSITION_NAME FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = b.EMPLOYEE_NO) POSITION_OF_APPROVER,
+a.EMP_ID,
+'Management takes this opportunity to wish you all the best.' AS MANAGEMENT_LIES,
+upper(o.organisation_name) organisation_name,
+(select t.employee_name from apps.vw_position_location_v3 t where  t.emp_id = e.REPORT_TO_FUNCTIONAL  ) CCTO,
+(SELECT t.position_name FROM apps.vw_position_location_v3 t where  t.emp_id = e.REPORT_TO_FUNCTIONAL  ) CCPOSITION_OF_Approver,
+(select t.employee_name from apps.vw_position_location_v3 t where  t.emp_id = e.REPORT_TO) CCTOt,
+(SELECT t.position_name FROM apps.vw_position_location_v3 t where  t.emp_id = e.REPORT_TO) CCPOS,
+(select t.employee_name from apps.vw_position_location_v3 t where  t.emp_id = 32682) sig,
+(SELECT t.position_name FROM apps.vw_position_location_v3 t where  t.emp_id = 32682) sig_pos,
+'Please note that you have '||nvl(fn_get_leave_annual_remdays(a.emp_id,TODATE),0)||' days Annual Leave outstanding for '||extract(year from sysdate)||'.' day_rem,
+(select t.location from apps.vw_position_location_v3 t where  t.emp_id = a.emp_id) work_location
+
+
+FROM apps.hr_lv_leavehistory a join  apps.tbluser b on b.user_name = a.verified_by
+join apps.hr_hcf_organisation o on o.id = a.org_id
+join apps.hr_rcm_employee e on e.id = a.emp_id
+WHERE LEAVE_TYPE = 'Annual Leave'
+ AND  a.id = $P{ID}]]>
+	</queryString>
+	<field name="RESUMPTION" class="java.lang.String"/>
+	<field name="APPLICANT" class="java.lang.String"/>
+	<field name="APPLICANT_POSITION" class="java.lang.String"/>
+	<field name="DEPARTMENT" class="java.lang.String"/>
+	<field name="DEPARTMENT_LEVEL_2" class="java.lang.String"/>
+	<field name="REPORTING_TO" class="java.lang.String"/>
+	<field name="GREETING" class="java.lang.String"/>
+	<field name="APPROVED_BY" class="java.lang.String"/>
+	<field name="POSITION_OF_APPROVER" class="java.lang.String"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="MANAGEMENT_LIES" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="CCTO" class="java.lang.String"/>
+	<field name="CCPOSITION_OF_APPROVER" class="java.lang.String"/>
+	<field name="CCTOT" class="java.lang.String"/>
+	<field name="CCPOS" class="java.lang.String"/>
+	<field name="SIG" class="java.lang.String"/>
+	<field name="SIG_POS" class="java.lang.String"/>
+	<field name="DAY_REM" class="java.lang.String"/>
+	<field name="WORK_LOCATION" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<detail>
+		<band height="607" splitType="Stretch">
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="26" y="5" width="510" height="20" uuid="cdc4b13e-c3a4-4cc1-a162-1b187421d89a"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="26" y="39" width="510" height="20" uuid="bfbb9fbb-d522-4406-af0e-e8e013b46a3e"/>
+				<textFieldExpression><![CDATA[$F{APPLICANT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="26" y="59" width="510" height="20" uuid="499ea1ca-8ce4-4dbf-b6b7-17189ec526d4"/>
+				<textFieldExpression><![CDATA[$F{APPLICANT_POSITION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="26" y="79" width="510" height="20" uuid="324de52e-fecb-4de1-8ca2-c1e8b7d62710"/>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="26" y="99" width="510" height="20" uuid="67e47e32-d4c7-4605-8761-b9d043d23773"/>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT_LEVEL_2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="26" y="131" width="510" height="20" uuid="ca79aab4-06c0-488d-987d-339e7b55434c"/>
+				<textFieldExpression><![CDATA[$F{GREETING}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="26" y="316" width="510" height="20" uuid="021c6988-3533-4f9a-8105-2a91ad4c555e"/>
+				<text><![CDATA[Management wishes that you take this opportunity to reflect and purpose to improve upon your return.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="350" width="100" height="20" uuid="770cd7b3-0b8a-45de-a5b8-113b1201423a"/>
+				<text><![CDATA[Kindest Regards.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="383" width="100" height="20" uuid="7f901e19-80c6-4569-8f0d-772a911d6c11"/>
+				<text><![CDATA[Yours sincerely,]]></text>
+			</staticText>
+			<line>
+				<reportElement x="29" y="439" width="148" height="1" uuid="4904e641-3a8b-4eef-8a0c-a23ac35622dc"/>
+				<graphicElement>
+					<pen lineWidth="1.5" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="26" y="440" width="510" height="20" uuid="093253d8-e4a7-4f6c-bc66-8ba414c53e1f"/>
+				<textFieldExpression><![CDATA[$F{SIG}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="26" y="460" width="510" height="20" uuid="773ba632-4594-449f-82d7-c097275b4f55"/>
+				<textFieldExpression><![CDATA[$F{SIG_POS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="91" y="523" width="445" height="20" uuid="760567db-d050-45e2-8175-3262fcc2cb92"/>
+				<textFieldExpression><![CDATA[$F{CCTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="91" y="543" width="445" height="20" uuid="822c86ac-c701-4619-81c8-8a21e6bce300"/>
+				<textFieldExpression><![CDATA[$F{CCPOSITION_OF_APPROVER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="25" y="520" width="100" height="20" uuid="9f88f02e-9a2a-4273-a9d6-3a035330c37b"/>
+				<text><![CDATA[CC:]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

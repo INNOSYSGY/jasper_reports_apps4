@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Summary of Drug On Hand " language="groovy" pageWidth="612" pageHeight="1008" whenNoDataType="NoDataSection" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4d3da2ea-d78f-48e6-a470-11ef0a9aae6a">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/LS_DRUGS_IN"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="p_organisation" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+t.organization_id,
+          (SELECT DESCRIPTION
+          from tblorganization g
+          WHERE G.ORGANIZATION_ID=t.organization_id) ORGANISATION,
+T.INVENTORY_ITEM_ID,
+T.DRUG_STRENGTH,
+T.ORG_ITEM_DESCRIPTION,
+T.GENERIC_NAME,
+T.BRAND_NAME,
+              (select value_description a
+              FROM TABLE(PKG_GLOBAL_FNTS.GET_LOOKUP_VALUE('TBLDRUGFAMILY'))
+              where id=t.drug_family)drug_family,
+          nvl(C.DRUG_INDICATION_CLASS,' Unknown') DRUG_INDICATION_CLASS,
+T.DOSAGE_FORM,
+COMPANY_NAME,VILLAGE_TOWN||', '||DISTRICT||', '||COUNTRY ADDRESS,EMAIL,
+                        'Tel# '||TELEPHONE_NOS Telphone, 'Fax # '||FAX_NOS FAX
+from tblinventoryitem t
+left join TBLINVENTORYITEMDRUGCLASS c on t.INVENTORY_ITEM_ID=c.inventory_item_id
+cross join tblsystemconfiguration
+where organization_id<>122
+and t.organization_id like (case when upper($P{p_organisation})=upper('All') then '%' else $P{p_organisation}  end)]]>
+	</queryString>
+	<field name="ORGANIZATION_ID" class="java.math.BigDecimal"/>
+	<field name="ORGANISATION" class="java.lang.String"/>
+	<field name="INVENTORY_ITEM_ID" class="java.math.BigDecimal"/>
+	<field name="DRUG_STRENGTH" class="java.lang.String"/>
+	<field name="ORG_ITEM_DESCRIPTION" class="java.lang.String"/>
+	<field name="GENERIC_NAME" class="java.lang.String"/>
+	<field name="BRAND_NAME" class="java.lang.String"/>
+	<field name="DRUG_FAMILY" class="java.lang.String"/>
+	<field name="DRUG_INDICATION_CLASS" class="java.lang.String"/>
+	<field name="DOSAGE_FORM" class="java.lang.String"/>
+	<field name="COMPANY_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="TELPHONE" class="java.lang.String"/>
+	<field name="FAX" class="java.lang.String"/>
+	<sortField name="ORGANISATION"/>
+	<sortField name="DRUG_INDICATION_CLASS"/>
+	<sortField name="ORG_ITEM_DESCRIPTION"/>
+	<sortField name="DOSAGE_FORM"/>
+	<variable name="PageReset" class="java.math.BigDecimal" resetType="Group" resetGroup="Organisation" calculation="Sum">
+		<variableExpression><![CDATA[1.0]]></variableExpression>
+		<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+	</variable>
+	<group name="Organisation" isStartNewPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{ORGANIZATION_ID}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="21"/>
+		</groupFooter>
+	</group>
+	<group name="Indication Class" isResetPageNumber="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{DRUG_INDICATION_CLASS}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="572" height="20" uuid="59fa02ee-46ab-4b19-83dc-466eac45ef00"/>
+					<box>
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="true"/>
+						<paragraph firstLineIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DRUG_INDICATION_CLASS}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="15">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="572" height="15" uuid="87422139-db13-4d07-86d8-6a8701f7c3bf"/>
+					<box>
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textFieldExpression><![CDATA[null]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="75" splitType="Stretch">
+			<printWhenExpression><![CDATA[$V{PageReset}==1 ? true :false]]></printWhenExpression>
+			<textField>
+				<reportElement x="0" y="20" width="572" height="20" uuid="5e29ab27-a7fb-4cfb-b7d9-62356c47ea9b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="572" height="20" uuid="9ac4c5a6-e0f8-442e-957e-1580759d8a9a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPANY_NAME}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="40" width="572" height="20" uuid="fd43c8cb-4d84-4ee6-a74b-4987aad891b7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="0" width="184" height="60" uuid="a19d1f27-6c04-484a-8af3-df551605bc54"/>
+				<imageExpression><![CDATA["repo:/images/coat_of_arm"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="511" y="0" width="61" height="61" uuid="7c1def02-7e53-4b4a-96f1-bfeb89b4205b"/>
+				<imageExpression><![CDATA["repo:/images/company_logo"]]></imageExpression>
+			</image>
+			<line>
+				<reportElement x="0" y="64" width="572" height="2" uuid="d1b5e2ec-6bc5-47bd-8898-40772e74499b"/>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="290" height="20" uuid="cef8765a-525f-4753-a721-9c0cbe5aecba"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="2.0"/>
+					<leftPen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+					<paragraph firstLineIndent="5" leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[Drug Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="289" y="0" width="136" height="20" uuid="9a6ab85e-dbb8-4b69-a504-5511fb340665"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="2.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="2.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+					<paragraph firstLineIndent="5" leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[Dosage Form]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="426" y="0" width="146" height="20" uuid="9fb4d914-c875-4510-867d-d325389c3f8f"/>
+				<box>
+					<pen lineWidth="2.0"/>
+					<topPen lineWidth="2.0"/>
+					<leftPen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+					<paragraph firstLineIndent="5" leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[Strength]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="289" height="15" uuid="b4427555-e65f-4ced-99f8-4b1d921efa23"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="5" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_ITEM_DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="289" y="0" width="137" height="15" uuid="168baf91-312b-4de3-b192-b9a41dd0791a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="5" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DOSAGE_FORM}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="426" y="0" width="146" height="15" uuid="7c014167-c3cc-402a-bddb-c79e9a511262"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="5" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DRUG_STRENGTH}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="16" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="0" width="572" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<textField pattern="EEEEE, MMMMM dd, yyyy h.mm a" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="154" height="15" uuid="aefd0541-a2ad-40d2-b601-cdb65e54d0b8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="16" uuid="aadc7cbd-88ea-4125-83f8-05e97fd395b8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[GPHC-SCMS By INNOSYS Inc]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="452" y="0" width="101" height="15" uuid="bf9eea5a-78f5-487e-996d-239455154046"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" isBlankWhenNull="true">
+				<reportElement x="553" y="0" width="19" height="15" uuid="a58bb629-2e78-475d-a74c-863816773480"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="50"/>
+	</noData>
+</jasperReport>

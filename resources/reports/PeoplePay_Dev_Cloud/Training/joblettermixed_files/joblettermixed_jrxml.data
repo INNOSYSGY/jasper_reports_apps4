@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="joblettermixed" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7d9e9164-c54e-41fe-bd03-2e9d895c935d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="63"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/Training/joblettermixed"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT TO_CHAR(REPORT_DATE,'fmMonth DD, YYYY')REPORT_DATE, ADDRESS_TO,
+(SELECT
+               CASE
+                 WHEN sex_code = 'M'  THEN 'Mr.'
+                 WHEN sex_code = 'F' THEN 'Mrs.'
+               END FROM apps.vw_position_location_v3 t where t.emp_id = e.id)
+               || ' ' || (SELECT EMPLOYEE_NAME  FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = e.ID) AS EMP_NAME,
+
+ (APPS.Pkg_Global_Fnts.Fn_Address('HOME',r.Id,'LOT',Sysdate)||' '||APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'STREET',SYSDATE)||' ' ||decode(APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'VILLAGE_WARD',SYSDATE),null,' ',
+  APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'VILLAGE_WARD',SYSDATE)||' ')||nvl(APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'COUNTY',SYSDATE),' ')) AS ADDRESS,
+ t.ORGANISATION_NAME  AS ORG_NAME,
+ TO_CHAR(DATE_EMPLOYED, 'ddth Month, yyyy') DAT_E,
+(SELECT POSITION_NAME FROM apps.vw_position_location_v3 t where t.emp_id = e.id) AS POSITION,
+ apps.pkg_global_fnts.fn_num_towords(apps.pkg_global_fnts.fn_personalrate(e.id, sysdate))||
+ ' ('
+ ||trim(to_char(apps.pkg_global_fnts.fn_personalrate(e.id, sysdate), '$999,999.99'))||') ' AS SALARY,
+
+ (SELECT
+               CASE
+                 WHEN sex_code = 'M'  THEN 'Mr.'
+                 WHEN sex_code = 'F' THEN 'Mrs.'
+               END FROM apps.vw_position_location_v3 t where t.emp_id = e.id)
+        || ' ' || (SELECT EMPLOYEE_NAME  FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = e.ID)  as third_line,
+ 'For and on Behalf of' as for2,
+''|| t.ORGANISATION_NAME  as org,
+(SELECT
+               CASE
+                 WHEN sex_code = 'M'  THEN 'Mr.'
+                 WHEN sex_code = 'F' THEN 'Mrs.'
+               END FROM apps.vw_position_location_v3 t where t.emp_id = e.id)
+               || ' ' || (SELECT EMPLOYEE_NAME  FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = J.SIGNITURE_ID) AS signature,
+(SELECT POSITION_NAME FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = J.SIGNITURE_ID) POSITION_OF_APPROVER,
+IND_ID,
+(select organisation_name from apps.hr_hcf_organisation o where o.id =j.organisation ) towho,
+(select address from apps.hr_hcf_organisation o  where o.id =j.organisation )
+ toaddress,
+ 'RE: Letter of Employment: '||(SELECT
+               CASE
+                 WHEN sex_code = 'M' THEN 'Mr.'
+                 WHEN sex_code = 'F' THEN 'Mrs.'
+               END FROM apps.vw_position_location_v3 t where t.emp_id = e.id)
+               || ' ' || (SELECT EMPLOYEE_NAME  FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = e.ID) AS RE_LETTER,
+ TELNUM, t.emp_id
+FROM apps.hr_rcm_employee e JOIN apps.hr_rcm_individual r ON e.ind_id = r.id
+join apps.vw_position_location_v3 t on t.emp_id = e.id
+join APPS.JOBLETTERREPORT J ON e.ID = J.EMP_ID
+JOIN apps.hr_hcf_organisation o ON o.id =e.org_id
+WHERE J.EMP_ID = $P{EMP_ID}
+
+
+
+]]>
+	</queryString>
+	<field name="REPORT_DATE" class="java.lang.String"/>
+	<field name="ADDRESS_TO" class="java.lang.String"/>
+	<field name="EMP_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="ORG_NAME" class="java.lang.String"/>
+	<field name="DAT_E" class="java.lang.String"/>
+	<field name="POSITION" class="java.lang.String"/>
+	<field name="SALARY" class="java.lang.String"/>
+	<field name="THIRD_LINE" class="java.lang.String"/>
+	<field name="FOR2" class="java.lang.String"/>
+	<field name="ORG" class="java.lang.String"/>
+	<field name="SIGNATURE" class="java.lang.String"/>
+	<field name="POSITION_OF_APPROVER" class="java.lang.String"/>
+	<field name="IND_ID" class="java.math.BigDecimal"/>
+	<field name="TOWHO" class="java.lang.String"/>
+	<field name="TOADDRESS" class="java.lang.String"/>
+	<field name="RE_LETTER" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<group name="ind_id">
+		<groupExpression><![CDATA[$F{IND_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="424">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="24" y="20" width="504" height="20" uuid="e75a3aa4-ff5f-4e64-abec-f872c58deeac"/>
+					<textElement>
+						<font fontName="Times New Roman" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ADDRESS_TO}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="24" y="58" width="504" height="20" uuid="dfaaad7f-ddc9-4414-a17e-714e5080b019"/>
+					<textElement>
+						<font fontName="Times New Roman" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TOADDRESS}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="24" y="89" width="504" height="20" uuid="09a23d08-ca1d-487d-a62b-9b3d52e63ec1"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Dear Sir/Madam,]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="24" y="132" width="504" height="20" uuid="5d590370-7674-499e-85b3-e307ba87a831"/>
+					<textElement>
+						<font fontName="Times New Roman" size="11" isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{RE_LETTER}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="24" y="164" width="504" height="79" uuid="a19011d0-1d6f-4dcb-bc45-04c47ddfc43c"/>
+					<textElement textAlignment="Justified" markup="html">
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA["This serves to inform you that "+"<b>"+$F{EMP_NAME}+"</b>"+" of "+$F{ADDRESS}+" has been continuously employed with our company; "+$F{ORG_NAME}+" since "+$F{DAT_E}+".<br><br>"+
+$F{EMP_NAME}+" currently holds the position of "+"<b>"+$F{POSITION}+"</b>"+" and earns a monthly gross salary of "+"<b>"+$F{SALARY}+"</b>"+", inclusive of an allowance.<br><br>"+
+"This information as confidential as it is has been provided at the request of "+$F{EMP_NAME}+"."]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="24" y="264" width="504" height="20" uuid="0dd257a4-3543-4d41-877a-54bafd7c8798"/>
+					<textElement>
+						<font fontName="Times New Roman" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{FOR2}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="24" y="284" width="504" height="20" uuid="a4479d03-0e47-4dc8-9430-284a1a0fd6b8"/>
+					<textElement>
+						<font fontName="Times New Roman" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ORG}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="24" y="304" width="504" height="20" uuid="8699bc3a-6128-4e53-b2f1-87a7cdbc646a"/>
+					<textElement>
+						<font fontName="Times New Roman" size="11" isBold="true"/>
+					</textElement>
+					<text><![CDATA[.....................................]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="24" y="324" width="504" height="20" uuid="6d869245-1bc2-4b7f-ae95-95d2de34150d"/>
+					<textElement>
+						<font fontName="Times New Roman" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SIGNATURE}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="24" y="344" width="504" height="20" uuid="2273640f-eebd-49cd-80c0-0c4d459baf30"/>
+					<textElement>
+						<font fontName="Times New Roman" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{POSITION_OF_APPROVER}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="24" y="382" width="504" height="20" uuid="45ec5db7-d112-4ff7-b24f-e67eb88c3751"/>
+					<textElement>
+						<font fontName="Times New Roman" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TELNUM}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="24" y="0" width="504" height="20" uuid="4a17cf43-f14a-488a-a209-cce3631459e0"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{REPORT_DATE}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="24" y="38" width="504" height="20" uuid="b12dc750-3066-4860-a3f9-294dfaf0bae3"/>
+					<textElement>
+						<font fontName="Times New Roman" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TOWHO}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="164" height="36" uuid="89593982-4929-45ed-a408-08f202459c45"/>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="36" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="113" height="22" uuid="036a13dd-19c5-4066-90cf-0ed50e576e79"/>
+			</subreport>
+		</band>
+	</pageHeader>
+</jasperReport>

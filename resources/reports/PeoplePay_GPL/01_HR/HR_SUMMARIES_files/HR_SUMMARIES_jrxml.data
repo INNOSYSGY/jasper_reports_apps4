@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Human Resources Employment Summaries" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="18c1d70d-144d-4d00-b968-84ced7d80647">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="10"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/HR_SUMMARIES"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<subDataset name="Male Female" uuid="790319a5-9159-4792-91b6-46a711fa9f37">
+		<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select count(1) Total,Initcap(work_location) work_location,
+decode(SEX_CODE,'F','Female','Male') Sex
+from (
+SELECT
+    (NVL(I.SURNAME,'') || ', ' ||NVL(I.FIRST_NAME,'')||' '||NVL(I.MIDDLE_NAME,'')) AS ENAME,
+    I.DOB,
+    I.SEX_CODE SEX_CODE,
+    E.DATE_EMPLOYED,
+    E.EMP_COMPANY_NO,
+    initcap(e.Employment_status) Employment_status ,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'NIS NUMBER',SYSDATE)) NIS_NO,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'TIN',SYSDATE)) TAX_NO,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'NATIONAL ID',SYSDATE)) NATIONAL_ID,
+    P.POSITION_NAME POSITION_NAME,
+    nvl(p.work_location,'Unknown')work_location,
+    initcap(E.EMPLOYMENT_CLASS) EMPLOYMENT_CLASS,
+    HO.ADDRESS ORG_ADDRESS, HO.FAXNUM, HO.TELNUM, NIS_REG_NO, TAX_REG_NO,
+    ho.organisation_name
+
+    FROM HR_RCM_INDIVIDUAL I
+    INNER JOIN  VW_EMPLOYEE E ON I.ID = E.IND_ID
+    JOIN HR_HCF_ORGANISATION HO ON E.ORG_ID=HO.ID
+    left outer join VW_ORG_WORKLOCATION_POSITION p on E.POSITION_LOCATION_ID=p.id
+    where E.DATE_EMPLOYED is not null and DATE_SEPARATED is null
+    and SEPARATED_STATUS IS  NULL
+     AND E.ORG_ID=$P{P_IN_ORG_ID}
+
+     ) b
+group by  work_location,SEX_CODE]]>
+		</queryString>
+		<field name="TOTAL" class="java.math.BigDecimal"/>
+		<field name="WORK_LOCATION" class="java.lang.String"/>
+		<field name="SEX" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Position By Location" uuid="658c9162-5af3-4cd0-9a67-87e3e26bf733">
+		<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select count(1) Total,work_location,
+POSITION_NAME
+from (
+SELECT
+    (NVL(I.SURNAME,'') || ', ' ||NVL(I.FIRST_NAME,'')||' '||NVL(I.MIDDLE_NAME,'')) AS ENAME,
+    I.DOB,
+    I.SEX_CODE SEX_CODE,
+    E.DATE_EMPLOYED,
+    E.EMP_COMPANY_NO,
+    initcap(e.Employment_status) Employment_status ,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'NIS NUMBER',SYSDATE)) NIS_NO,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'TIN',SYSDATE)) TAX_NO,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'NATIONAL ID',SYSDATE)) NATIONAL_ID,
+    nvl(P.POSITION_NAME,'Position') POSITION_NAME,
+    nvl(p.work_location,'Unknown')work_location,
+    initcap(E.EMPLOYMENT_CLASS) EMPLOYMENT_CLASS,
+    HO.ADDRESS ORG_ADDRESS, HO.FAXNUM, HO.TELNUM, NIS_REG_NO, TAX_REG_NO,
+    ho.organisation_name
+
+    FROM HR_RCM_INDIVIDUAL I
+    INNER JOIN  VW_EMPLOYEE E ON I.ID = E.IND_ID
+    JOIN HR_HCF_ORGANISATION HO ON E.ORG_ID=HO.ID
+    left outer join VW_ORG_WORKLOCATION_POSITION p on E.POSITION_LOCATION_ID=p.id
+    where E.DATE_EMPLOYED is not null and DATE_SEPARATED is null
+    and SEPARATED_STATUS IS  NULL
+    AND E.ORG_ID=$P{P_IN_ORG_ID}
+
+     ) b
+group by  work_location,POSITION_NAME]]>
+		</queryString>
+		<field name="TOTAL" class="java.math.BigDecimal"/>
+		<field name="WORK_LOCATION" class="java.lang.String"/>
+		<field name="POSITION_NAME" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Male Female By Emp Class" uuid="87d26f18-f49e-49cc-a1bf-d072747ca7cb">
+		<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select count(1) Total,Initcap(EMPLOYMENT_CLASS) EMPLOYMENT_CLASS,
+decode(SEX_CODE,'F','Female','Male') Sex
+
+from (
+SELECT
+    (NVL(I.SURNAME,'') || ', ' ||NVL(I.FIRST_NAME,'')||' '||NVL(I.MIDDLE_NAME,'')) AS ENAME,
+    I.DOB,
+    I.SEX_CODE SEX_CODE,
+    E.DATE_EMPLOYED,
+    E.EMP_COMPANY_NO,
+    initcap(e.Employment_status) Employment_status ,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'NIS NUMBER',SYSDATE)) NIS_NO,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'TIN',SYSDATE)) TAX_NO,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'NATIONAL ID',SYSDATE)) NATIONAL_ID,
+    P.POSITION_NAME POSITION_NAME,
+    nvl(p.work_location,'Unknown')work_location,
+    trim(E.EMPLOYMENT_CLASS) EMPLOYMENT_CLASS,
+    HO.ADDRESS ORG_ADDRESS, HO.FAXNUM, HO.TELNUM, NIS_REG_NO, TAX_REG_NO,
+    ho.organisation_name
+
+    FROM HR_RCM_INDIVIDUAL I
+    INNER JOIN  VW_EMPLOYEE E ON I.ID = E.IND_ID
+    JOIN HR_HCF_ORGANISATION HO ON E.ORG_ID=HO.ID
+    left outer join VW_ORG_WORKLOCATION_POSITION p on E.POSITION_LOCATION_ID=p.id
+    where E.DATE_EMPLOYED is not null and DATE_SEPARATED is null
+    and SEPARATED_STATUS IS NULL
+    AND E.ORG_ID=$P{P_IN_ORG_ID}
+     ) b
+group by  EMPLOYMENT_CLASS,SEX_CODE]]>
+		</queryString>
+		<field name="TOTAL" class="java.math.BigDecimal"/>
+		<field name="EMPLOYMENT_CLASS" class="java.lang.String"/>
+		<field name="SEX" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="Year" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select 1
+from dual]]>
+	</queryString>
+	<field name="1" class="java.math.BigDecimal"/>
+	<group name="Group">
+		<groupExpression><![CDATA[$F{1}]]></groupExpression>
+		<groupHeader>
+			<band height="95">
+				<crosstab>
+					<reportElement x="0" y="22" width="282" height="73" uuid="67ed010e-f2b8-4ffa-aa81-ac2f1da4888a"/>
+					<crosstabDataset>
+						<dataset>
+							<datasetRun subDataset="Male Female" uuid="39478263-37f9-437c-820c-4aa16bc877b2">
+								<datasetParameter name="P_IN_ORG_ID">
+									<datasetParameterExpression><![CDATA[$P{IN_ORG_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+					</crosstabDataset>
+					<rowGroup name="WORK_LOCATION" width="96" totalPosition="End">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{WORK_LOCATION}]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+								</box>
+								<textField>
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="96" height="15" uuid="9fcec9ff-d4b7-4b91-a6a1-9a4b0cd09b9d"/>
+									<textElement textAlignment="Left">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{WORK_LOCATION}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+								</box>
+								<staticText>
+									<reportElement x="0" y="0" width="96" height="15" uuid="ee7545ca-f34b-4aa6-87a7-8a43d2ddab8b"/>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<text><![CDATA[Total WORK_LOCATION]]></text>
+								</staticText>
+							</cellContents>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="SEX" height="15" totalPosition="End">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{SEX}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+								</box>
+								<textField>
+									<reportElement x="0" y="0" width="50" height="15" uuid="9f7eee69-301b-4486-9969-ac569d05f29d"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{SEX}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+								</box>
+								<staticText>
+									<reportElement x="0" y="0" width="50" height="15" uuid="8a068d90-9396-41b7-9dfc-24159d697c9d"/>
+									<textElement textAlignment="Right" verticalAlignment="Middle">
+										<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<text><![CDATA[Total]]></text>
+								</staticText>
+							</cellContents>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="TOTALMeasure" class="java.math.BigDecimal" calculation="Sum">
+						<measureExpression><![CDATA[$F{TOTAL}]]></measureExpression>
+					</measure>
+					<crosstabCell width="50" height="15">
+						<cellContents backcolor="#FFFFFF">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="15" uuid="ba872905-16ec-44aa-be40-0e30797a6088"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="9"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell height="25" rowTotalGroup="WORK_LOCATION">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="15" uuid="170854cc-9d75-449f-a905-29d06735fa74"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell width="50" height="15" columnTotalGroup="SEX">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="15" uuid="dc8ef2a8-2bcc-479a-a508-bdf084338775"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell height="25" rowTotalGroup="WORK_LOCATION" columnTotalGroup="SEX">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="15" uuid="81f2a9a2-32cb-4da0-a976-623bbe758aff"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+				</crosstab>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="2" width="284" height="20" uuid="60add1cb-1f43-4028-aced-5ac5a6f785d3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Summary of Males and Females By Location"]]></textFieldExpression>
+				</textField>
+				<crosstab>
+					<reportElement x="290" y="22" width="282" height="73" uuid="5fe8de11-1499-4110-8966-a8afb2c42c28"/>
+					<crosstabDataset>
+						<dataset>
+							<datasetRun subDataset="Male Female By Emp Class" uuid="66e0d50a-76ba-45be-bbf2-3dbf8c6a3e4f">
+								<datasetParameter name="P_IN_ORG_ID">
+									<datasetParameterExpression><![CDATA[$P{IN_ORG_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+					</crosstabDataset>
+					<rowGroup name="Employment Class" width="96" totalPosition="End">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{EMPLOYMENT_CLASS}]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+								</box>
+								<textField>
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="96" height="15" uuid="8c6d7104-8758-4a4c-b722-c6b69fe3f2cf"/>
+									<textElement textAlignment="Left">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[""+$V{Employment Class}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+								</box>
+								<staticText>
+									<reportElement x="0" y="0" width="96" height="15" uuid="a0902122-0151-4c52-8e62-2fd108d54ed5"/>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<text><![CDATA[Total WORK_LOCATION]]></text>
+								</staticText>
+							</cellContents>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="SEX" height="15" totalPosition="End">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{SEX}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+								</box>
+								<textField>
+									<reportElement x="0" y="0" width="50" height="15" uuid="8d87612e-a4fb-4a3b-b019-3c4f3182cb96"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{SEX}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+								</box>
+								<staticText>
+									<reportElement x="0" y="0" width="50" height="15" uuid="303434b5-bb6f-41d2-947b-a2f1fe5656a5"/>
+									<textElement textAlignment="Right" verticalAlignment="Middle">
+										<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<text><![CDATA[Total]]></text>
+								</staticText>
+							</cellContents>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="TOTALMeasure" class="java.math.BigDecimal" calculation="Sum">
+						<measureExpression><![CDATA[$F{TOTAL}]]></measureExpression>
+					</measure>
+					<crosstabCell width="50" height="15">
+						<cellContents backcolor="#FFFFFF">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="15" uuid="d4a313e6-81ee-49c8-9e71-f49ca26176f9"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="9"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell height="25" rowTotalGroup="Employment Class">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="15" uuid="69a40d90-412a-43a0-8377-135239b0ffe8"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell width="50" height="15" columnTotalGroup="SEX">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="15" uuid="11037495-e272-4e6d-b4a8-cc2f0be0c974"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell height="25" rowTotalGroup="Employment Class" columnTotalGroup="SEX">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="15" uuid="f1e9ae5e-78d3-4f91-a496-cb5efd5b9cc9"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+				</crosstab>
+				<textField isBlankWhenNull="true">
+					<reportElement x="290" y="2" width="284" height="20" uuid="0b342284-00bf-4f2e-850f-137c3f57ced1"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Summary of Males and Females By Employment Class"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="11"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="64" width="572" height="15" uuid="345d20da-1b50-4a43-97e5-4f4f8acacdeb"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom" markup="none">
+					<font fontName="Arial" size="12" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Human Resources Employment Summaries']]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="64" uuid="19b538b7-e47e-48d1-b63d-511f4ad5c489"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="571" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="15" width="571" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="2" y="0" width="146" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="452" y="0" width="80" height="15" uuid="236e8b14-b82b-4f23-92df-926a8155e855"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="532" y="0" width="40" height="15" uuid="4aba1297-bc96-4af6-8930-f0de74974f8e"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

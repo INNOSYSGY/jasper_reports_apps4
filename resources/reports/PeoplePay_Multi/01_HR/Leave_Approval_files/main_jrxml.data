@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="leave_approval" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9e3d059b-47c2-47c4-90f9-f180f1ecce53">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Multi/01_HR/Leave_Approval_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Multi/01_HR/Leave_Approval"/>
+	<parameter name="IN_MOV_ID" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select 
+    to_char(trunc(sysdate), 'fmMonth DD, YYYY') date_prepared,
+    mov.id movement_id, 
+    emp.id  emp_id, 
+    ind.id  ind_id, 
+    ind.first_name, 
+    ind.surname,
+    pos.position_name new_position_name,
+    grade.grade_code, 
+    sal.personal_rate,
+    'Notification of Termination - ' || case when ind.sex_code = 'M' then 'Mr. ' when ind.sex_code = 'F' then 'Ms. ' end || initcap(ind.first_name || ' ' || ind.surname || ', ' || pos.position_name)  subject
+    ,from_hr.from_hr
+    ,from_hr.hr_full_name
+    ,to_head.to_head
+    ,orgdtl.unit_name department
+    ,mov.remarks_payment
+from
+    hr_mov_separationbenefit mov
+    left join hr_rcm_employee emp on mov.emp_id = emp.id
+    left join hr_rcm_individual ind  on emp.ind_id = ind.id
+    left join hr_hcf_positiongrade grade on emp.emp_grade_id = grade.id
+    left join hr_hcf_position pos on pos.id = emp.position_id
+    left join hr_hcf_orgstructuredtl orgdtl on orgdtl.id = emp.orgdtl_id
+    left join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+    left join (select case when a.sex_code = 'M' then 'Mr. ' when a.sex_code = 'F' then 'Ms. ' end || initcap(a.first_name || ' ' || a.surname || ', ' || c.position_name) from_hr, initcap(a.first_name || ' ' || a.surname) hr_full_name
+        from hr_rcm_individual a 
+        left join hr_rcm_employee b on a.id = b.ind_id
+        left join hr_hcf_position c on b.position_id = c.id
+        left join hr_hcf_orgstructuredtl d on d.id = b.orgdtl_id
+        where upper(c.position_name) like upper('Head%')
+        and upper(d.unit_name) like upper('Human%Resource%')
+        and (b.date_separated is null or b.date_separated > trunc(sysdate))
+        and rownum = 1) from_hr on 1=1
+    left join (select case when a.sex_code = 'M' then 'Mr. ' when a.sex_code = 'F' then 'Ms. ' end || initcap(a.first_name || ' ' || a.surname || ', ' || c.position_name) to_head, d.id orgdtl_id
+        from hr_rcm_individual a 
+        left join hr_rcm_employee b on a.id = b.ind_id
+        left join hr_hcf_position c on b.position_id = c.id
+        left join hr_hcf_orgstructuredtl d on d.id = b.orgdtl_id
+        where upper(c.position_name) like upper('Head%')
+        and (b.date_separated is null or b.date_separated > trunc(sysdate))
+        and rownum = 1) to_head on emp.orgdtl_id = to_head.orgdtl_id
+where 
+    mov.id =  $P{IN_MOV_ID}]]>
+	</queryString>
+	<field name="DATE_PREPARED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_PREPARED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_PREPARED"/>
+	</field>
+	<field name="MOVEMENT_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="MOVEMENT_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="MOVEMENT_ID"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="IND_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="IND_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_ID"/>
+	</field>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FIRST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="NEW_POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NEW_POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="NEW_POSITION_NAME"/>
+	</field>
+	<field name="GRADE_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="GRADE_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="GRADE_CODE"/>
+	</field>
+	<field name="PERSONAL_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PERSONAL_RATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PERSONAL_RATE"/>
+	</field>
+	<field name="SUBJECT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUBJECT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUBJECT"/>
+	</field>
+	<field name="FROM_HR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FROM_HR"/>
+		<property name="com.jaspersoft.studio.field.label" value="FROM_HR"/>
+	</field>
+	<field name="HR_FULL_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="HR_FULL_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="HR_FULL_NAME"/>
+	</field>
+	<field name="TO_HEAD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TO_HEAD"/>
+		<property name="com.jaspersoft.studio.field.label" value="TO_HEAD"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="REMARKS_PAYMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REMARKS_PAYMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="REMARKS_PAYMENT"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="265" splitType="Stretch">
+			<textField textAdjust="StretchHeight">
+				<reportElement x="209" y="50" width="170" height="30" uuid="511504cc-1783-46cf-91f9-10babb10fe1c"/>
+				<textFieldExpression><![CDATA["INTERNAL MEMORANDIUM"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="90" width="150" height="20" uuid="02eaab82-9bc1-48b2-aa29-74d4dbdb995c"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA["To: " + $F{TO_HEAD}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="110" width="150" height="20" uuid="7e002e22-d93c-4e1e-b7c1-22d5c67f8b28"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA["From: " + $F{FROM_HR}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="130" width="160" height="20" uuid="00f2934d-4799-4e0a-8d3c-774dd68d14f5"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date: " + $F{DATE_PREPARED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="150" width="280" height="20" uuid="9385766e-c8b4-4399-9056-8de4bae9cfe5"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Subject: " + $F{SUBJECT}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="180" width="555" height="1" uuid="bd94e97d-2577-403b-b265-2b8b9c5d7d16">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</line>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="190" width="555" height="15" uuid="6b1b4ee0-9bf7-4374-b616-9bccb701436c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Kindly be advised that approval has been given for the service of " +$F{FIRST_NAME}+ $F{SURNAME} + $F{OLD_POSITION_NAME}+ " within the " + $F{DEPARTMENT}+ " of the Bureau of Statistics to be terminated with effect from "  +$F{FROM_DATE} +" inclusive. "]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="210" width="555" height="15" uuid="bac56a1f-84d3-422f-9991-76f3638a40a5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REMARKS_PAYMENT}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="230" width="390" height="15" uuid="8f04d123-9231-454b-963e-4e4b055f4400">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Kindly make arrangements for the necessary action to be taken."]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="250" width="100" height="15" uuid="548b6a98-23bd-4b9c-b15a-cdccd879832f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA["....................... <br> $F{FROM_HR}"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

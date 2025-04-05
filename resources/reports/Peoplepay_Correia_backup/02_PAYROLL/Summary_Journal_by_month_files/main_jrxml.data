@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Summary Journal by month" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5baf8f84-a8f1-4889-94f1-42553d1aad8b">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Correia"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Peoplepay_Correia/02_PAYROLL/Summary_Journal_by_month"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Summary Journal by month report"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/Peoplepay_Correia/02_PAYROLL/Summary_Journal_by_month_files/main_jrxml"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[---************ DEDITS ***********
+
+select
+    UNIT_NAME,
+    DESCRIPTION,
+    case when debit_credit ='DR' then
+    Income_amount
+    else
+    0
+    end as debit_amount,
+    case when debit_credit ='CR' then
+    Income_amount
+    else
+    0
+    end as credit_amount
+ ,trim(to_char( (to_date(month_year, 'yy-mm')), 'MONTH'))||'-'||trim(to_char( (to_date(month_year, 'yy-mm')), 'yyyy')) month_field
+
+from (
+select 
+COA_CODE,UNIT_NAME, DESCRIPTION, sum(income_amount) income_amount, sum(income_amount_ytd) income_amount_ytd, 'DR' Debit_Credit
+,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start) month_year
+from
+(select distinct a.id, COA_CODE,UNIT_NAME, initcap(e.DESCRIPTION) DESCRIPTION, a.income_amount income_amount, a.income_amount_ytd income_amount_ytd, 'DR' Debit_Credit
+,c.period_start
+from hr_rcm_employee b join pa_pmg_payrolldtl c on b.id = c.emp_id
+join hr_hcf_orgstructuredtl x on x.id = c.orgdtl_id
+join PA_PMG_PAYROLLINCOME a on c.id=a.pay_slipno
+join PA_PCF_INCOMECODE e on e.INCOME_CODE=a.INCOME_CODE
+join pa_pcf_earningperiod ep on ep.id  = c.earnings_period_id
+where   
+EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{EARNINGS_PERIOD_ID} 
+--and income_amount >0 
+and c.org_id=$P{IN_ORG_ID}  and e.org_id=$P{IN_ORG_ID} 
+and (c.compute_gross_hist !='BASIC_PAY' or earnings_type = 'SUPPL'   or e.id !=6004)
+)
+group by COA_CODE, UNIT_NAME, DESCRIPTION,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start)
+
+
+union 
+--personal rate
+select COA_CODE,UNIT_NAME,  cast('Basic Salary'  as nvarchar2(100)) DESCRIPTION, sum(time_tax_earnings) + sum (time_nontax_earnings) +  nvl(FN_priorsalary_month($P{EARNINGS_PERIOD_ID} ,  COA_CODE),0) time_tax_earnings
+,  max(time_tax_earnings_YTD) +max (time_nontax_earnings_ytd)
+/*-  nvl(fn_adhocPaymentsum(:P6003_PAID_EARNINGS_PERIOD,  COA_CODE),0)*/  time_tax_earnings_ytd, 'DR' Debit_Credit
+,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+join pa_pcf_earningperiod w on w.id = k.earnings_period_id
+where  EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =	$P{EARNINGS_PERIOD_ID} 
+and k.compute_gross_hist='BASIC_PAY'
+and earnings_type = 'RG'
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME,  cast('Basic Salary'  as nvarchar2(100)) ,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start)
+
+union
+--employers deductions only
+
+select COA_CODE,UNIT_NAME, DESCRIPTION , sum(amount_deducted) amount_deducted, sum(amount_deducted_ytd) amount_deducted_ytd, 'DR' Debit_Credit
+,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start) month_year
+from
+(select distinct a.id,COA_CODE,UNIT_NAME, initcap(d.DESCRIPTION||' '||DEDUCTION_TYPE) DESCRIPTION , a.amount_deducted amount_deducted, amount_deducted_ytd amount_deducted_ytd, 'DR' Debit_Credit
+,k.period_start
+from  hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join pa_pmg_payrolldeduction a on k.id=a.pay_slipno
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+join Pa_Pcf_Deductioncode d on d.EXPENSE_CODE=a.EXPENSE_CODE
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{EARNINGS_PERIOD_ID} 
+and A.DEDUCTION_TYPE='EMPLOYER'
+and k.org_id=$P{IN_ORG_ID} 
+)
+group by COA_CODE,UNIT_NAME, DESCRIPTION,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start)
+
+--NIS-ER
+union
+select COA_CODE,UNIT_NAME,  cast('NIS Employer'  as nvarchar2(100))  DESCRIPTION, sum(nis_employer) nis_employer,  sum(nis_employer_YTD) nis_employer_YTD, 'DR' Debit_Credit
+,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{EARNINGS_PERIOD_ID} 
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME,  cast('NIS Employer'  as nvarchar2(100)),EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start) 
+
+
+---************ CREDITS ***********
+union 
+
+select COA_CODE,UNIT_NAME, DESCRIPTION , sum(amount_deducted) amount_deducted, sum(amount_deducted_ytd) amount_deducted_ytd, 'CR' Debit_Credit
+,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start) month_year
+from
+(select distinct a.id, COA_CODE,UNIT_NAME, initcap(d.DESCRIPTION||' '||DEDUCTION_TYPE) DESCRIPTION , a.amount_deducted amount_deducted, a.amount_deducted_ytd amount_deducted_ytd, 'CR' Debit_Credit
+,k.period_start
+from  hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join pa_pmg_payrolldeduction a on k.id=a.pay_slipno
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+join Pa_Pcf_Deductioncode d on d.EXPENSE_CODE=a.EXPENSE_CODE
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{EARNINGS_PERIOD_ID} 
+and k.org_id=$P{IN_ORG_ID}  and d.org_id=$P{IN_ORG_ID} 
+)
+group by COA_CODE,UNIT_NAME, DESCRIPTION,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start)
+
+
+--NETPAY
+union
+
+select COA_CODE,UNIT_NAME, cast('NETPAY'  as nvarchar2(100))  DESCRIPTION, sum(net_pay) net_pay,  sum(net_pay_YTD) net_pay_TD, 'CR' Debit_Credit
+,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{EARNINGS_PERIOD_ID} 
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME, cast('NETPAY'  as nvarchar2(100)),EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start)
+
+
+--PAYE
+union
+select COA_CODE,UNIT_NAME, cast('PAYE'  as nvarchar2(100))  DESCRIPTION, sum(tax_amount) net_pay,  sum(tax_amount_YTD) net_pay_TD, 'CR' Debit_Credit
+,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{EARNINGS_PERIOD_ID} 
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME, cast('PAYE'  as nvarchar2(100)),EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start)
+
+
+--NIS
+union
+select COA_CODE,UNIT_NAME, cast('NIS Employee'  as nvarchar2(100))  DESCRIPTION, sum(nis_employee) net_pay,  sum(nis_employee_YTD) net_pay_TD, 'CR' Debit_Credit
+,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{EARNINGS_PERIOD_ID} 
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME, cast('NIS Employee'  as nvarchar2(100)),EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start)
+ 
+
+--NIS-ER
+union
+
+select COA_CODE,UNIT_NAME, cast('NIS Employer'  as nvarchar2(100))  DESCRIPTION, sum(nis_employer) net_pay,  sum(nis_employer_YTD) net_pay_TD, 'CR' Debit_Credit
+,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{EARNINGS_PERIOD_ID} 
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME, cast('NIS Employer'  as nvarchar2(100)) ,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start)
+
+)]]>
+	</queryString>
+	<field name="UNIT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="UNIT_NAME"/>
+	</field>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="DEBIT_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DEBIT_AMOUNT"/>
+	</field>
+	<field name="CREDIT_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="CREDIT_AMOUNT"/>
+	</field>
+	<field name="MONTH_FIELD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="MONTH_FIELD"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="43" splitType="Stretch">
+			<textField>
+				<reportElement x="-1" y="10" width="100" height="20" uuid="a4ee3f11-daba-48af-9cc1-7f1ac48f857a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1ec8aa74-0d71-4b2a-a5ef-dfc929e22148"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{UNIT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="10" width="100" height="20" uuid="6c4bc725-dcbb-44a6-8eb1-adb7831629f4">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="51e497bb-872b-413c-86a4-5a305b77d182"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="240" y="10" width="100" height="20" uuid="8a9a3042-8123-463a-956c-85a68eb14fb7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="042ad046-0cf5-4f1c-8b80-85845c79d9a9"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DEBIT_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="360" y="10" width="100" height="20" uuid="91641bac-257c-45b1-83ba-c00340659571">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b40df069-e0b9-42b4-989d-a04a9536c0cd"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CREDIT_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

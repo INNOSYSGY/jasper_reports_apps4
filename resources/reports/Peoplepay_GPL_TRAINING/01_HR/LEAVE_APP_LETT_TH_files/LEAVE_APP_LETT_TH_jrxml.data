@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Leave Approval Letter-T&amp;H" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="29f18e4a-78d7-4276-a0e2-a277d4331920">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="96"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/LEAVE_APP_LETT_TH"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+a.id,
+( select
+case
+   when t.sex_code = 'M' then 'Mr.'
+   when t.sex_code = 'F' then 'Ms.'
+end  from apps.vw_position_location_v3 t where t.emp_id = b.employee_no) APPROVED_BY_ARTICLE,
+CASE
+      WHEN t.sex_code = 'M'  THEN 'Mr.'
+       WHEN t.sex_code = 'F' THEN 'Mrs.'
+END || initcap(t.EMPLOYEE_NAME) AS APPLICANT,
+t.position_name,
+(SELECT t.position_name FROM apps.vw_position_location_v3 t where  t.emp_id = e.REPORT_TO_FUNCTIONAL ) AS THRU,
+ CASE
+    WHEN t.sex_code = 'M'  THEN 'Mr.'
+    WHEN t.sex_code = 'F' THEN 'Mrs.'
+ END|| ' '||initcap(SURNAME_HIST)|| ',' as  GREETING,
+
+apps.pkg_global_fnts.fn_num_towords(DAYS_TAKEN)||   ' ('||DAYS_TAKEN||') ' AS days_taken,
+CASE
+    WHEN DAYS_TAKEN = 1 THEN 'day '
+    ELSE 'days '
+END AS days,
+LEAVE_TYPE AS Leave_Type,
+TO_CHAR(FROMDATE, 'ddth fmMonth, yyyy') AS From_Date,
+TO_CHAR(TODATE, 'ddth fmMonth, fmyyyy') AS To_Date,
+( select employee_name from apps.vw_position_location_v3 t where t.emp_id = b.employee_no) APPROVED_BY,
+(SELECT POSITION_NAME FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = b.EMPLOYEE_NO) POSITION_OF_APPROVER,
+(SELECT t.position_name FROM apps.vw_position_location_v3 t where  t.emp_id = e.REPORT_TO) CCPOS
+
+
+
+FROM apps.hr_lv_leavehistory a join  apps.tbluser b on b.user_name = a.verified_by
+join apps.hr_hcf_organisation o on o.id = a.org_id
+join apps.hr_rcm_employee e on e.id = a.emp_id
+join apps.vw_position_location_v3 t on t.EMP_ID = a.EMP_ID
+WHERE LEAVE_TYPE = 'Annual Leave' AND  a.id = $P{ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="APPROVED_BY_ARTICLE" class="java.lang.String"/>
+	<field name="APPLICANT" class="java.lang.String"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="THRU" class="java.lang.String"/>
+	<field name="GREETING" class="java.lang.String"/>
+	<field name="DAYS_TAKEN" class="java.lang.String"/>
+	<field name="DAYS" class="java.lang.String"/>
+	<field name="LEAVE_TYPE" class="java.lang.String"/>
+	<field name="FROM_DATE" class="java.lang.String"/>
+	<field name="TO_DATE" class="java.lang.String"/>
+	<field name="APPROVED_BY" class="java.lang.String"/>
+	<field name="POSITION_OF_APPROVER" class="java.lang.String"/>
+	<field name="CCPOS" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<detail>
+		<band height="596" splitType="Stretch">
+			<textField>
+				<reportElement x="25" y="314" width="494" height="54" uuid="61c389d4-c003-4c09-b6ed-34c65a04e2bd"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA["Approval has been given for you to be granted "+"<b>"+$F{DAYS_TAKEN}+"</b>"+$F{DAYS}+" "+$F{LEAVE_TYPE}+" on full pay with effect from "+"<b>"+$F{FROM_DATE}+"</b>"+" to "+"<b>"+$F{TO_DATE}+"</b>"+" both days inclusive."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="25" y="383" width="494" height="20" uuid="41642bcd-b201-4046-86f7-738d9dc50ada"/>
+				<text><![CDATA[Please be guided accordingly.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="25" y="274" width="494" height="20" uuid="61154a7b-5500-4d95-a7e5-c9c103500087"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA["Dear "+$F{APPLICANT}+","]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="25" y="221" width="494" height="20" uuid="eaacb861-04ec-4da1-be37-8216dc53a42e"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="25" y="241" width="494" height="20" uuid="07ed5ce5-4844-4105-ab15-f560b8364c7d"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{THRU}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="25" y="201" width="494" height="20" uuid="42a2698c-d21a-41c5-8487-e6b3f0f37760"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{APPLICANT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="346" y="88" width="173" height="20" uuid="bf4385d7-c668-48d7-b943-b4ccb5614712"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="25" y="462" width="494" height="20" uuid="25f59d55-18dd-4b3b-a338-df10175988da"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_OF_APPROVER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="25" y="438" width="321" height="1" uuid="fa979786-fbb5-49c2-b4c3-f599b55b2c53"/>
+				<graphicElement>
+					<pen lineWidth="1.5" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="25" y="439" width="494" height="20" uuid="4b11f245-b604-4097-b6b0-7c7308c84c53"/>
+				<textElement markup="html">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>"+$F{APPROVED_BY}+"<b>"+" ( "+"<b>"+$F{APPROVED_BY_ARTICLE}+"<b>"+")"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

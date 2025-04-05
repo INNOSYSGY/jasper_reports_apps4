@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report2" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a5472256-ff90-4bc0-b32b-c0278ea544af">
+	<property name="ireport.zoom" value="1.464100000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Reference_Configuration"/>
+	<property name="ireport.jasperserver.url" value="http://apps.innosysgy.com:8081/jasperserver/services/repository"/>
+	<parameter name="CONFIG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from HR_RCM_CONFIGREF_DTLS
+where config_id = $P{CONFIG_ID}
+order by display_sequence asc]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="CONFIG_ID" class="java.math.BigDecimal"/>
+	<field name="QUESTIONS" class="java.lang.String"/>
+	<field name="INDICATORS" class="java.lang.String"/>
+	<field name="START_DATE" class="java.sql.Timestamp"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="ENTERED_BY" class="java.lang.String"/>
+	<field name="ENTRY_DATE" class="java.sql.Timestamp"/>
+	<field name="LAST_CHANGED_DATE" class="java.sql.Timestamp"/>
+	<field name="LAST_CHANGED_BY" class="java.lang.String"/>
+	<field name="QUESTION_CLASSIFICATION" class="java.lang.String"/>
+	<field name="DISPLAY_SEQUENCE" class="java.math.BigDecimal"/>
+	<sortField name="QUESTION_CLASSIFICATION"/>
+	<group name="CLASSIFICATION" keepTogether="true">
+		<groupExpression><![CDATA[$F{QUESTION_CLASSIFICATION}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<staticText>
+					<reportElement x="0" y="0" width="92" height="20" uuid="81c5f448-8aea-4b8f-8712-a820074d988c"/>
+					<textElement>
+						<font fontName="Arial" size="12" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[Classification:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="92" y="0" width="375" height="20" uuid="5a37dd40-4755-4ed1-bf95-f5b1e111a9b3"/>
+					<textElement>
+						<font fontName="Arial" size="12" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{QUESTION_CLASSIFICATION}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="27" y="0" width="65" height="20" uuid="e223e98f-27d9-4734-b709-7964c7499a4b"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<text><![CDATA[Question:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="92" y="0" width="427" height="20" uuid="95e05723-bc3e-4e06-b45b-d7b143f6821c"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QUESTIONS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

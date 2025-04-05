@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Licence_report_A4_Landscape" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e252123b-afaf-4ead-8c86-d29817ea9408">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Corriea"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Peoplepay_Correia/01_HR/Listing_of_Employee_Licences_report"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/Peoplepay_Correia/01_HR/Listing_of_Employee_Licences_report_files/main_jrxml"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="SubLevel_2" uuid="af2f9897-dea6-4e04-959c-001e0e793764">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="corriea"/>
+		<parameter name="Parent_id" class="java.math.BigDecimal"/>
+		<parameter name="Start_date" class="java.util.Date"/>
+		<queryString language="SQL">
+			<![CDATA[select  emp.emp_id,Fullname,Position_name,lookup_name,lookup_value,parent_id,licence_no,expiry_date,id
+from (
+(select hremp.id emp_id,first_name ||', '||surname fullname ,hremp.position_name
+                    from hr_rcm_individual hrind
+join hr_rcm_employee hremp
+on hrind.id = hremp.ind_id) emp
+join
+(select hr_rcm_empdocument.id id,hr_rcm_empdocument.license_level,hr_rcm_empdocument.emp_id,hr_rcm_empdocument.licence_no,
+nvl((select value_description from hr_hcf_lookup
+where id =hr_rcm_empdocument.lookup_id),lookup_value)lookup_name,
+hr_rcm_empdocument.lookup_value,hr_rcm_empdocument.parent_id,hr_rcm_empdocument.expiry_date
+from hr_rcm_empdocument
+where license_level = 2
+and parent_id = $P{Parent_id}
+) doc
+on emp.emp_id = doc.emp_id
+
+
+) group by emp.emp_id,Fullname,Position_name,lookup_name,lookup_value,parent_id,expiry_date,licence_no,id]]>
+		</queryString>
+		<field name="EMP_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+		</field>
+		<field name="FULLNAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="FULLNAME"/>
+		</field>
+		<field name="POSITION_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+		</field>
+		<field name="LOOKUP_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="LOOKUP_NAME"/>
+		</field>
+		<field name="LOOKUP_VALUE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="LOOKUP_VALUE"/>
+		</field>
+		<field name="PARENT_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="PARENT_ID"/>
+		</field>
+		<field name="LICENCE_NO" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="LICENCE_NO"/>
+		</field>
+		<field name="EXPIRY_DATE" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.label" value="EXPIRY_DATE"/>
+		</field>
+		<field name="ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="ID"/>
+		</field>
+		<group name="PARENT_ID">
+			<groupExpression><![CDATA[$F{PARENT_ID}]]></groupExpression>
+		</group>
+	</subDataset>
+	<subDataset name="Sub_lvl3" uuid="90621563-f159-4cd5-8b50-bcb914da3bbb">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="corriea"/>
+		<parameter name="Parent_id" class="java.math.BigDecimal"/>
+		<parameter name="Start_date" class="java.util.Date"/>
+		<queryString language="SQL">
+			<![CDATA[select emp.emp_id,Fullname, listagg(lookup_name,',') within group( order by expiry_date ) lookup_name ,parent_id,expiry_date
+from (
+(select hremp.id emp_id,first_name ||', '||surname fullname ,hremp.position_name
+                    from hr_rcm_individual hrind
+join hr_rcm_employee hremp
+on hrind.id = hremp.ind_id) emp
+join
+(select hr_rcm_empdocument.id id,hr_rcm_empdocument.license_level,hr_rcm_empdocument.emp_id,hr_rcm_empdocument.licence_no,
+nvl((select value_description from hr_hcf_lookup
+where id =hr_rcm_empdocument.lookup_id),lookup_value)lookup_name,
+hr_rcm_empdocument.lookup_value,hr_rcm_empdocument.parent_id,hr_rcm_empdocument.expiry_date
+from hr_rcm_empdocument
+where license_level = 3
+and parent_id =$P{Parent_id} 
+and hr_rcm_empdocument.expiry_date >= nvl(to_date($P{Start_date},'DD_MON-YYYY'),hr_rcm_empdocument.expiry_date)
+) doc
+on emp.emp_id = doc.emp_id
+
+
+) group by emp.emp_id,Fullname,expiry_date,parent_id]]>
+		</queryString>
+		<field name="EMP_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+		</field>
+		<field name="FULLNAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="FULLNAME"/>
+			<property name="com.jaspersoft.studio.field.label" value="FULLNAME"/>
+		</field>
+		<field name="LOOKUP_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="LOOKUP_NAME"/>
+			<property name="com.jaspersoft.studio.field.label" value="LOOKUP_NAME"/>
+		</field>
+		<field name="PARENT_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="PARENT_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="PARENT_ID"/>
+		</field>
+		<field name="EXPIRY_DATE" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.name" value="EXPIRY_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="EXPIRY_DATE"/>
+		</field>
+		<group name="PARENT_ID">
+			<groupExpression><![CDATA[$F{PARENT_ID}]]></groupExpression>
+		</group>
+	</subDataset>
+	<parameter name="Org_id" class="java.math.BigDecimal"/>
+	<parameter name="Start_date " class="java.util.Date" isForPrompting="false"/>
+	<parameter name="End_date" class="java.util.Date" isForPrompting="false"/>
+	<queryString language="SQL">
+		<![CDATA[select  rownum,emp.emp_id,Fullname,Position_name,lookup_name,lookup_value,parent_id,licence_no,expiry_date,id,emp.DATE_EMPLOYED,nvl(datediff ('year', emp.DATE_EMPLOYED, sysdate),0) years_of_service
+from (
+(select hremp.id emp_id,first_name ||', '||surname fullname ,hremp.position_name,DATE_EMPLOYED
+                    from hr_rcm_individual hrind
+join hr_rcm_employee hremp
+on hrind.id = hremp.ind_id
+where hremp.org_id= $P{Org_id} 
+order by Fullname) emp
+join
+(select hr_rcm_empdocument.id id,hr_rcm_empdocument.license_level,hr_rcm_empdocument.emp_id,hr_rcm_empdocument.licence_no,hr_rcm_empdocument.EFFECTIVE_DATE as date_joined,
+nvl((select value_description from hr_hcf_lookup
+where id =hr_rcm_empdocument.lookup_id),lookup_value)lookup_name,
+hr_rcm_empdocument.lookup_value,hr_rcm_empdocument.parent_id,hr_rcm_empdocument.expiry_date
+from hr_rcm_empdocument
+where license_level = 1
+and lookup_id = 8540550
+) doc
+on emp.emp_id = doc.emp_id
+
+
+) group by emp.emp_id,Fullname,Position_name,lookup_name,lookup_value,parent_id,expiry_date,licence_no,id,emp.DATE_EMPLOYED,rownum
+order by rownum]]>
+	</queryString>
+	<field name="ROWNUM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="FULLNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FULLNAME"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="LOOKUP_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LOOKUP_NAME"/>
+	</field>
+	<field name="LOOKUP_VALUE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LOOKUP_VALUE"/>
+	</field>
+	<field name="PARENT_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PARENT_ID"/>
+	</field>
+	<field name="LICENCE_NO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="LICENCE_NO"/>
+	</field>
+	<field name="EXPIRY_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="EXPIRY_DATE"/>
+	</field>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="YEARS_OF_SERVICE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="YEARS_OF_SERVICE"/>
+	</field>
+	<variable name="Emp_id_count_2" class="java.math.BigDecimal" calculation="Count">
+		<variableExpression><![CDATA[$F{FULLNAME}]]></variableExpression>
+	</variable>
+	<variable name="EMP_ID1" class="java.math.BigDecimal" resetType="Group" resetGroup="Emp_id" calculation="Count">
+		<variableExpression><![CDATA[$F{EMP_ID}]]></variableExpression>
+	</variable>
+	<group name="Emp_id">
+		<groupExpression><![CDATA[$F{EMP_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="49">
+				<textField>
+					<reportElement x="0" y="0" width="100" height="14" uuid="0c34c352-b76c-4720-ab85-60adc0735f2d"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{FULLNAME}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="30" width="240" height="17" uuid="3c8c85ea-3b81-499c-882d-dcaee90ef2bd"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="390" y="31" width="151" height="15" uuid="d10cab47-a7c0-4923-8f81-5fd483b5964b"/>
+					<textElement textAlignment="Center">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[License Category]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="240" y="0" width="80" height="15" uuid="da24fe2a-89a4-4231-aa9e-7b2c645c78ec"/>
+					<textElement textAlignment="Center">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Date Joined:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="430" y="0" width="120" height="15" uuid="29a4da3b-462a-4447-8ed3-088eb6804320"/>
+					<textElement textAlignment="Center">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Years of Service:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="110" y="0" width="80" height="15" uuid="d07fa705-a0ed-40b4-8cc0-b1545b948444"/>
+					<textElement textAlignment="Center">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Licence No. ]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="190" y="0" width="40" height="15" uuid="5332f0f7-1ee7-43a4-8b39-583024be00c8"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LICENCE_NO}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="-11" y="0" width="11" height="16" uuid="49a7c5db-f041-456e-8512-b8ea749ee909"/>
+					<textFieldExpression><![CDATA[$F{ROWNUM}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="550" y="0" width="40" height="16" uuid="53672a5b-542b-4a7c-afa4-df96b98d8193"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{YEARS_OF_SERVICE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="MMM d, yyyy">
+					<reportElement x="320" y="0" width="100" height="16" uuid="4c1ad129-f5d3-4503-9204-6954d7d57c9c"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DATE_EMPLOYED}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="88">
+			<subreport>
+				<reportElement x="0" y="5" width="523" height="40" uuid="5f889de9-9b04-4bf0-a3b8-b6962fbf644f"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{Org_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LetterHead.jrxml"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="180" y="58" width="480" height="30" uuid="45c97c3e-7701-4726-a085-49ea7a1e9fdf"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[                          Listing of Employee License]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="32" splitType="Stretch">
+			<textField>
+				<reportElement x="120" y="9" width="180" height="21" uuid="5aa16cfb-868b-4a04-8d87-7c9b26265c2f"/>
+				<textFieldExpression><![CDATA[$F{LOOKUP_NAME}]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement x="380" y="9" width="220" height="11" uuid="c4a6187d-de5c-4584-bfbe-4579bc2e6506">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="SubLevel_2" uuid="cae51073-931d-4e50-91aa-b5b5532a80a7">
+						<datasetParameter name="Parent_id">
+							<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="Start_date">
+							<datasetParameterExpression><![CDATA[$P{Start_date }]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="150" uuid="0f6ca5b1-e94c-4c7e-8650-90658885c7ea">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="150" height="30" uuid="8d78c0dc-2fc1-4d8d-ab84-0bb224a2f187"/>
+								<textElement textAlignment="Center"/>
+								<textFieldExpression><![CDATA[$F{LOOKUP_NAME}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="170" uuid="41d44b64-29d5-4cba-92c6-b763fe6282a0">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<box leftPadding="5"/>
+							<componentElement>
+								<reportElement x="0" y="0" width="165" height="30" uuid="5b1d99d3-b80c-4778-936f-e430d452a7e7">
+									<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+									<property name="com.jaspersoft.studio.table.style.table_header" value="Table 1_TH"/>
+									<property name="com.jaspersoft.studio.table.style.column_header" value="Table 1_CH"/>
+									<property name="com.jaspersoft.studio.table.style.detail" value="Table 1_TD"/>
+								</reportElement>
+								<jr:table>
+									<datasetRun subDataset="Sub_lvl3" uuid="e988cb23-4e46-4729-83ae-3fcce75634f9">
+										<datasetParameter name="Parent_id">
+											<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+										</datasetParameter>
+										<datasetParameter name="Start_date">
+											<datasetParameterExpression><![CDATA[$P{Start_date}]]></datasetParameterExpression>
+										</datasetParameter>
+										<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+									</datasetRun>
+									<jr:column width="179" uuid="27560136-84a6-42ad-938c-56e8498c4be4">
+										<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+										<jr:groupHeader groupName="PARENT_ID">
+											<jr:cell style="Table 1_CH" height="20" rowSpan="1">
+												<staticText>
+													<reportElement x="0" y="0" width="179" height="20" uuid="451ccb40-845e-4e98-9f96-34387d9f4288"/>
+													<textElement textAlignment="Center"/>
+													<text><![CDATA[Type Rating]]></text>
+												</staticText>
+											</jr:cell>
+										</jr:groupHeader>
+										<jr:detailCell style="Table 1_TD" height="30">
+											<textField>
+												<reportElement x="0" y="0" width="179" height="30" uuid="ca1af6f9-e4ce-4fd7-847c-062d818f7a39"/>
+												<textElement textAlignment="Center"/>
+												<textFieldExpression><![CDATA[$F{LOOKUP_NAME}]]></textFieldExpression>
+											</textField>
+										</jr:detailCell>
+									</jr:column>
+									<jr:column width="75" uuid="4a2a8bba-6ac8-47e4-9609-8ac1a9202e8a">
+										<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+										<jr:groupHeader groupName="PARENT_ID">
+											<jr:cell style="Table 1_CH" height="20" rowSpan="1">
+												<staticText>
+													<reportElement x="0" y="0" width="75" height="20" uuid="7dbd55f3-4da7-4f2f-afe4-ebf64a2a4f60"/>
+													<textElement textAlignment="Center"/>
+													<text><![CDATA[Expiry Date]]></text>
+												</staticText>
+											</jr:cell>
+										</jr:groupHeader>
+										<jr:detailCell style="Table 1_TD" height="30">
+											<textField pattern="MMM d, yyyy">
+												<reportElement x="0" y="0" width="75" height="30" uuid="0fa88110-87aa-4f4f-99e6-d29beb5159fd"/>
+												<textFieldExpression><![CDATA[$F{EXPIRY_DATE}]]></textFieldExpression>
+											</textField>
+										</jr:detailCell>
+									</jr:column>
+								</jr:table>
+							</componentElement>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<textField>
+				<reportElement positionType="Float" x="-20" y="30" width="842" height="1" uuid="478fe8c5-706b-4e0d-9375-e0a6d7eae309">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="34" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="15" width="800" height="15" forecolor="#999999" backcolor="#999999" uuid="2315a832-f851-494f-866f-cc09bf5c09bd"/>
+				<textField evaluationTime="Report">
+					<reportElement x="760" y="0" width="40" height="15" uuid="5d4e156b-6f7e-444d-982e-f7322eabc6d9"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="680" y="0" width="80" height="15" uuid="862945e8-0614-4fe3-8ece-4afd637dc408"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE, MMMMM, dd  yyyy">
+					<reportElement x="0" y="0" width="279" height="15" uuid="af435960-0e82-4413-8180-a5f16b88d372"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

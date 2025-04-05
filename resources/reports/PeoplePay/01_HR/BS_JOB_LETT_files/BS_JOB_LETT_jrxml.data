@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BrainStreetJobLetter" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5508ba2c-d87b-49d6-88e1-d45c59651a86">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/BS_JOB_LETT"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SIG_EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+        i.FIRST_NAME||' '||i.SURNAME AS NAME_OF_EMPLOYEE,
+               CASE
+                 WHEN i.sex_code = 'M'  THEN 'Mr.'
+                 WHEN i.sex_code = 'F' THEN 'Mrs.'
+               END
+        || ' ' || i.FIRST_NAME||' '||i.SURNAME AS SURNAME,
+        (APPS.Pkg_Global_Fnts.Fn_Address('HOME',i.Id,'LOT',Sysdate)||
+        ' '
+        ||APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'STREET',SYSDATE)||
+        ' '
+        ||decode(APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'VILLAGE_WARD',SYSDATE),null,' ',
+         APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'VILLAGE_WARD',SYSDATE)||' ')
+         ||nvl(APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'COUNTY',SYSDATE),' ')) AS ADDRESS,
+        p.POSITION_NAME,
+        TO_CHAR(e.DATE_EMPLOYED,'ddth fmMonth,yyyy') as DATE_EMPLOYED,
+CASE
+                 WHEN i.sex_code = 'M'  THEN 'His'
+                 WHEN i.sex_code = 'F' THEN 'Her'
+               END as HIS_HER,
+         TO_CHAR(apps.pkg_global_fnts.fn_personalrate(e.id, sysdate),'$999,999.99') AS NUM,
+         (select employee_name from apps.vw_position_location_v3 p where p.emp_id =$P{SIG_EMP_ID} ) AS signature,
+    (select position_name from apps.vw_position_location_v3 p WHERE p.emp_id = $P{SIG_EMP_ID})  position_of_approver,
+
+         o.telnum,
+
+
+
+               o.organisation_name,
+               o.address as address2
+FROM apps.hr_rcm_individual i
+JOIN apps.hr_rcm_employee e ON e.ind_id = i.id
+JOIN apps.vw_position_location_v3 p ON p.emp_id = e.id
+JOIN apps.hr_hcf_organisation o ON o.id = e.org_id
+WHERE e.id =$P{EMP_ID}]]>
+	</queryString>
+	<field name="NAME_OF_EMPLOYEE" class="java.lang.String"/>
+	<field name="SURNAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="DATE_EMPLOYED" class="java.lang.String"/>
+	<field name="HIS_HER" class="java.lang.String"/>
+	<field name="NUM" class="java.lang.String"/>
+	<field name="SIGNATURE" class="java.lang.String"/>
+	<field name="POSITION_OF_APPROVER" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="ADDRESS2" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="92" splitType="Stretch">
+			<image>
+				<reportElement x="11" y="0" width="544" height="92" uuid="2c02eadc-1187-4865-b4b1-c0dfd34c824f"/>
+				<imageExpression><![CDATA["repo:BSGPhoto.png"]]></imageExpression>
+			</image>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="240" splitType="Stretch">
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement x="35" y="24" width="482" height="20" uuid="ba20c6e5-6fca-483f-a86a-4ad93b8d1d71"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="35" y="47" width="482" height="20" uuid="d757fba3-875e-4be4-9745-79f59d1a9fec"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[To Whom It May Concern]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="35" y="67" width="482" height="20" uuid="19ff97aa-31d1-429b-a5e7-4fec157d1ccd"/>
+				<text><![CDATA[Dear Sir/Madam,]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="35" y="87" width="482" height="50" uuid="08d8663b-e379-4813-b0c7-1f739d3bc34c"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA["This is the advise that "+$F{SURNAME}+" of "+$F{ADDRESS}+ " has been employeed with "+$F{ORGANISATION_NAME}+" as an "+$F{POSITION_NAME}+" since "+$F{DATE_EMPLOYED}+". "+$F{HIS_HER}+" salary is G"+$F{NUM}+" per month."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="35" y="137" width="482" height="23" uuid="0119d55c-74dc-4fcb-97c9-7c9b59f3b8bd"/>
+				<text><![CDATA[If there are any questions, please do not hesitate to contact me.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="35" y="160" width="482" height="20" uuid="89db035f-bdb8-40d3-aaa4-5428842e0415"/>
+				<text><![CDATA[Best regards,]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="35" y="199" width="482" height="20" uuid="782eac2e-6834-4ce8-931a-c485cb3c22c1"/>
+				<textFieldExpression><![CDATA[$F{SIGNATURE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="35" y="219" width="482" height="20" uuid="08ffdcb9-0f40-4c19-a637-c6b2044aa9b3"/>
+				<textFieldExpression><![CDATA[$F{POSITION_OF_APPROVER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="61" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="11" y="0" width="532" height="27" uuid="a663b5e2-4a5a-4aa6-a821-836948d35bc8"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{ADDRESS2}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="11" y="27" width="532" height="20" uuid="59bb8195-2e70-4e8f-a250-b5461338d923"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TELNUM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

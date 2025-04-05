@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Workplan Charts" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="936" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="27dca291-69d2-4859-8700-c58a864c945a">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="CORREIA"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="778"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="212"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GTT_Tester/01_HR/Workplan_Charts_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GTT_Tester/01_HR/Workplan_Charts"/>
+	<parameter name="ORG_ID" class="java.lang.String"/>
+	<parameter name="START_PERIOD" class="java.util.Date"/>
+	<parameter name="END_PERIOD" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[SELECT distinct a.workplan, a.To_Attend, b.Attended
+from
+(select wp.course_desc workplan, count(1) To_Attend
+from
+(select distinct
+    id, course_desc, regexp_substr(target_group, '[^:]+', 1, level) position_id, proposed_date
+from
+    hr_att_workplan
+WHERE
+   proposed_date between  $P{START_PERIOD} and  $P{END_PERIOD} 
+connect by
+    level <= length(target_group) - length(replace(target_group, ':')) + 1) wp
+join(    
+select 
+    emp.position_id, emp.full_name
+from
+    (select 
+        a.position_id, b.surname || ', ' || b.first_name full_name
+    from 
+        hr_rcm_employee a 
+            join hr_rcm_individual b 
+                on a.ind_id = b.id
+            where a.org_id = $P{ORG_ID} 
+    ) emp
+        join 
+            (select 
+                id, position_name
+            from
+                hr_hcf_position
+            where
+                id IN (
+                    select distinct
+                        regexp_substr(target_group, '[^:]+', 1, level) target_group
+                    from
+                        hr_att_workplan
+                    WHERE
+                       proposed_date between  $P{START_PERIOD}  and  $P{END_PERIOD} 
+                    connect by
+                        level <= length(target_group) - length(replace(target_group, ':')) + 1
+                )
+            ) pos
+                on emp.position_id = pos.id) a on wp.position_id = a.position_id
+            group by 
+                wp.course_desc
+                ) a
+                
+full outer join
+
+(SELECT 
+    dt.course_desc workplan,
+    count(1)  Attended
+    
+FROM (
+SELECT 
+    wp_dt.id,
+    wp_dt.course_desc,
+    wp_dt.objectives,
+    wp_dt.facilitators,
+    listagg(p.position_name, '; ' || chr(10)) within group(order by p.position_name)   target_group,
+    wp_dt.duration,
+    wp_dt.proposed_date,
+    wp_dt.org_id,
+    emp_att.department department,
+    emp_att.department_id department_id,
+    emp_att.full_name,
+    emp_att.activity_type_id,
+    emp_att.employment_class_id,
+    emp_att.payment_type_hist
+FROM
+         (
+        SELECT DISTINCT
+            wp.id,
+            wp.course_desc,
+            wp.objectives,
+            wp.facilitators,
+            regexp_substr(wp.target_group, '[^:]+', 1, level) target_group,
+            wp.duration,
+            wp.proposed_date,
+            wp.org_id
+        FROM
+            hr_att_workplan wp
+        WHERE
+            wp.id IN (
+                SELECT
+                    id
+                FROM
+                    hr_att_workplan
+                WHERE
+                    proposed_date between  $P{START_PERIOD}  and  $P{END_PERIOD} 
+            )
+        CONNECT BY
+            level <= length(wp.target_group) - length(replace(wp.target_group, ':')) + 1
+    ) wp_dt
+    JOIN hr_hcf_position        p ON wp_dt.target_group = p.id
+     JOIN (
+        SELECT
+            listagg(aa.surname_hist
+            || ', '
+            || aa.first_name_hist, '; '|| chr(10)) within group(order by aa.surname_hist || ', ' || aa.first_name_hist) full_name,
+            wp.id id,
+            aa.emp_id,
+            a.activity_type_id,
+            aa.payment_type_hist,
+            aa.employment_class_id,
+            org_struct.unit_name department,
+            org_struct.id department_id
+            
+        FROM
+                 hr_att_workplan wp
+            JOIN hr_att_activity           a ON wp.id = a.workplan_id
+            JOIN hr_att_activityattendance aa ON a.id = aa.activity_id
+            JOIN hr_rcm_employee  e on e.id = aa.emp_id
+            JOIN hr_hcf_orgstructuredtl org_struct on org_struct.id = e.orgdtl_id
+            JOIN pa_pcf_earningperiod ep on (ep.id = a.earnings_period_id and aa.employment_class_id = ep.employment_class_id and ep.org_id = a.org_id)
+        WHERE
+            wp.id IN (
+                SELECT
+                    id
+                FROM
+                    hr_att_workplan
+                WHERE
+                    proposed_date between   $P{START_PERIOD} and  $P{END_PERIOD} 
+            )
+            GROUP BY wp.id, aa.emp_id,
+            a.activity_type_id,
+            aa.payment_type_hist,
+            aa.employment_class_id,
+            org_struct.unit_name ,
+            org_struct.id 
+    )                      emp_att ON emp_att.id = wp_dt.id 
+    GROUP BY 
+        wp_dt.id,
+    wp_dt.course_desc,
+    wp_dt.objectives,
+    wp_dt.facilitators,
+    wp_dt.duration,
+    wp_dt.proposed_date,
+    wp_dt.org_id,
+    emp_att.department ,
+    emp_att.department_id ,
+    emp_att.full_name,
+    emp_att.activity_type_id,
+    emp_att.employment_class_id,
+    emp_att.payment_type_hist
+) dt
+where 
+    dt.org_id= $P{ORG_ID} 
+GROUP BY 
+    dt.course_desc
+    ) b on a.workplan = b.workplan]]>
+	</queryString>
+	<field name="WORKPLAN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WORKPLAN"/>
+	</field>
+	<field name="TO_ATTEND" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TO_ATTEND"/>
+	</field>
+	<field name="ATTENDED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ATTENDED"/>
+	</field>
+	<sortField name="WORKPLAN"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<subreport>
+				<reportElement x="0" y="0" width="936" height="80" uuid="959b1b63-96e2-4328-8a18-51f30b5ccc7a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<subreportParameter name="ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:Header.jrxml"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<summary>
+		<band height="357">
+			<barChart>
+				<chart evaluationTime="Report" renderType="image">
+					<reportElement x="0" y="1" width="936" height="356" isPrintWhenDetailOverflows="true" uuid="6def5d94-74e2-40a6-a744-e0d2c46e288e"/>
+					<chartTitle position="Top">
+						<font size="12" isBold="true" isItalic="false"/>
+						<titleExpression><![CDATA["ACTIVITY ATTENDANCE"]]></titleExpression>
+					</chartTitle>
+					<chartSubtitle/>
+					<chartLegend position="Right">
+						<font size="10"/>
+					</chartLegend>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["TO ATTEND"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{WORKPLAN}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{TO_ATTEND}]]></valueExpression>
+						<labelExpression><![CDATA[$F{TO_ATTEND}.toString()]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["ATTENDED"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{WORKPLAN}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{ATTENDED}]]></valueExpression>
+						<labelExpression><![CDATA[$F{ATTENDED}.toString()]]></labelExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot isShowLabels="true" isShowTickLabels="true">
+					<plot labelRotation="0.0">
+						<seriesColor seriesOrder="0" color="#05B4E1"/>
+						<seriesColor seriesOrder="1" color="#E28E08"/>
+					</plot>
+					<itemLabel/>
+					<categoryAxisLabelExpression><![CDATA["WORKPLAN NAME"]]></categoryAxisLabelExpression>
+					<categoryAxisFormat labelRotation="0.0">
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000">
+							<labelFont>
+								<font size="10" isBold="true" isItalic="false"/>
+							</labelFont>
+							<tickLabelFont>
+								<font size="8"/>
+							</tickLabelFont>
+						</axisFormat>
+					</categoryAxisFormat>
+					<valueAxisLabelExpression><![CDATA["EMPLOYEE COUNT"]]></valueAxisLabelExpression>
+					<valueAxisFormat>
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" verticalTickLabels="false" axisLineColor="#000000">
+							<labelFont>
+								<font size="10" isBold="true" isItalic="false" isUnderline="false"/>
+							</labelFont>
+							<tickLabelFont>
+								<font size="8"/>
+							</tickLabelFont>
+						</axisFormat>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</summary>
+</jasperReport>

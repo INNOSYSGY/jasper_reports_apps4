@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Shipments" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="874918dd-7cf2-42a0-8689-852ced0e6010">
+	<property name="ireport.zoom" value="1.7715610000000017"/>
+	<property name="ireport.x" value="214"/>
+	<property name="ireport.y" value="4"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MCC/SHIPMENT/S_01"/>
+	<property name="ireport.jasperserver.url" value="http://190.80.71.15:8081/jasperserver/services/repository"/>
+	<parameter name="date_start" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="date_end" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="option_date" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+s.id,
+initcap(s.supplier) supplier,
+initcap(s.buyer) buyer,
+s.bl_date,s.arrival_date,
+s.shipment_number,
+st.vessel_identifier,
+st.origin,
+st.bl_number,
+st.finalization_date
+from vw_shipment s
+join shipment st on s.id=st.id
+where case when nvl($P{option_date},'BL_DATE')='BL_DATE' then
+s.bl_date
+else st.finalization_date end between $P{date_start} and $P{date_end}
+order by s.bl_date]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="SUPPLIER" class="java.lang.String"/>
+	<field name="BUYER" class="java.lang.String"/>
+	<field name="BL_DATE" class="java.sql.Timestamp"/>
+	<field name="ARRIVAL_DATE" class="java.sql.Timestamp"/>
+	<field name="SHIPMENT_NUMBER" class="java.lang.String"/>
+	<field name="VESSEL_IDENTIFIER" class="java.lang.String"/>
+	<field name="ORIGIN" class="java.lang.String"/>
+	<field name="BL_NUMBER" class="java.lang.String"/>
+	<field name="FINALIZATION_DATE" class="java.sql.Timestamp"/>
+	<variable name="Seq" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="47" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="0" width="571" height="33" uuid="c52d513b-f3f3-479b-a6c3-bb124e5c0302"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[LISTING OF SHIPMENTS]]></text>
+			</staticText>
+			<line>
+				<reportElement x="110" y="44" width="462" height="1" uuid="5b86119d-1da6-4df5-9da7-716c691ebdba"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineColor="#CC0033"/>
+				</graphicElement>
+			</line>
+			<image>
+				<reportElement x="0" y="0" width="217" height="39" uuid="50738eb0-236f-4432-9954-749aebd36ea8"/>
+				<imageExpression><![CDATA["repo:/reports/MCC/Image/logo"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="451" y="26" width="44" height="13" uuid="bdd8a6a3-9f49-43aa-9b36-f27c9b184abc"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Search By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="451" y="0" width="44" height="13" uuid="d32b4ad1-ef2b-425b-841f-e428b4661c2d"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Start Date]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="497" y="26" width="74" height="13" uuid="8d7a1ef6-bc85-48fe-a539-c0331c5749df"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{option_date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="YYYY-MM-DD">
+				<reportElement x="497" y="13" width="74" height="15" uuid="7ef040f5-11a3-41ba-9b5d-94d0aeab9278"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{date_end}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="451" y="13" width="44" height="13" uuid="ccced373-cef2-4c53-bd16-27370edb1fd4"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[End Date]]></text>
+			</staticText>
+			<textField pattern="YYYY-MM-DD" isBlankWhenNull="true">
+				<reportElement x="497" y="0" width="74" height="13" uuid="17e7542f-5bb9-403b-8b75-cb79272c5226"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{date_start}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="14" width="571" height="1" uuid="45fed678-576e-41b1-bc57-ef706ea39131"/>
+				<graphicElement>
+					<pen lineColor="#CC0000"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="426" y="0" width="73" height="13" uuid="0d5763eb-92d4-4745-b8d1-85655d78e22e"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Arrival Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="111" y="0" width="159" height="13" uuid="967a1fdf-32c0-4181-aac3-44ff35032fc0"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Supplier]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="0" width="156" height="13" uuid="74175ad0-226c-4620-9886-d266aec20e24"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Buyer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="28" y="0" width="82" height="13" uuid="743a468d-630c-4929-aa48-09402c706f86"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Shipment Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="28" height="13" uuid="3c8078a2-a2ad-43d4-ac86-5183f9789217"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Seq]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="499" y="0" width="73" height="13" uuid="423c79bc-2ba6-42f6-a3b8-c8a9d6b7c63b"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Date Finalized]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="yyyy-MM-dd" isBlankWhenNull="true">
+				<reportElement x="426" y="0" width="73" height="13" uuid="00200a8f-d757-4292-8b56-5fa7e99188a5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ARRIVAL_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="111" y="0" width="159" height="13" uuid="322cb2e5-4332-4302-80f9-667b5cad664a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUPPLIER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="270" y="0" width="156" height="13" uuid="ce41e6b2-3084-4a78-94db-9a317e38e95a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BUYER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="28" y="0" width="82" height="13" uuid="86f99626-a918-49e5-8242-3db54a049a05"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SHIPMENT_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="28" height="13" uuid="7d3ef934-7bb2-41c5-8147-36b839fa7953"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Seq}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MM-dd" isBlankWhenNull="true">
+				<reportElement x="499" y="0" width="73" height="13" uuid="b6670e15-d144-46ba-88f3-07d32f9ca5b0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FINALIZATION_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="25" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="15" forecolor="#CC0000" backcolor="#CC0033" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="15" width="572" height="10" forecolor="#000000" backcolor="#FFFFFF" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Innovative Systems Inc®]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="357" y="2" width="173" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement mode="Transparent" x="1" y="0" width="227" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="530" y="2" width="27" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="bf29d155-322a-4ed6-887e-85e4736d1c5a"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="2" width="572" height="13" uuid="29b481d0-cd24-487a-8355-91f7c26c58b5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Listing of Shipments]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

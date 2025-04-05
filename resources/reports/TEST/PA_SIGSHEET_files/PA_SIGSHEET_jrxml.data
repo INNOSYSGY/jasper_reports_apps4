@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Signature Sheet" language="groovy" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0665ee04-a745-49d1-8d1f-df212b6feed1">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/TEST/PA_SIGSHEET"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Employee Payroll Signature Sheet"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/TEST/PA_SIGSHEET_files/PA_SIGSHEET_jrxml"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SEARCH_OPTION" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUPPRESS_DETAILS" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SESSION_ID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select b.*,
+(
+select n.earning_name
+from vw_earning_period_name n
+where n.earning_id=$P{EARNINGS_PERIOD_ID}
+) earnings_name
+from table (PKG_REPORTS.SP_EMP_SIGN_SHEET($P{EARNINGS_PERIOD_ID},$P{SEARCH_OPTION},$P{SESSION_ID}))b
+ORDER BY ORG_STRUCTURE]]>
+	</queryString>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="SURNAME_HIST" class="java.lang.String"/>
+	<field name="FIRST_NAME_HIST" class="java.lang.String"/>
+	<field name="EMP_COMPANY_NO_HIST" class="java.lang.String"/>
+	<field name="ORG_STRUCTURE" class="java.lang.String"/>
+	<field name="PAYROLL_EFFECTIVE" class="java.lang.String"/>
+	<field name="NOF" class="java.math.BigDecimal"/>
+	<field name="EARNINGS_NAME" class="java.lang.String"/>
+	<sortField name="ORG_STRUCTURE"/>
+	<sortField name="SURNAME_HIST"/>
+	<sortField name="FIRST_NAME_HIST"/>
+	<variable name="Seq" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+	</variable>
+	<group name="Department">
+		<groupExpression><![CDATA[$F{ORG_STRUCTURE}]]></groupExpression>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="67" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="62" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="37" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

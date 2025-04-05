@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.0.final using JasperReports Library version 6.21.0-4f56c4f36cd19e17675219a9ac4692d5f0f13b06  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_Letter_3" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5e230215-376c-4145-b7c9-6005ed8ba523">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PROD_PAAS_PAC"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="icarter"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Multi/02_PAYROLL/Union_Report_PAC"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Multi/02_PAYROLL/Union_Report_PAC_files/main_jrxml"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Deduction" uuid="dbfbff24-13ce-404d-94da-0702119f51ae">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PROD_PAAS_PAC"/>
+		<parameter name="IN_EXPENSE_ID" class="java.math.BigDecimal"/>
+		<parameter name="IN_MONTH_YEAR" class="java.math.BigDecimal"/>
+		<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[select 
+    a.entity, 
+    a.month, 
+    a.department, 
+    a.company_deduction_no, 
+    a.name, 
+    a.description,
+    max(case when a.ded_rank = 1 then amount_deducted end) week_1, 
+    max(case when a.ded_rank = 2 then amount_deducted end) week_2, 
+    max(case when a.ded_rank = 3 then amount_deducted end) week_3, 
+    max(case when a.ded_rank = 4 then amount_deducted end) week_4, 
+    max(case when a.ded_rank = 5 then amount_deducted end) week_5,
+    max(case when a.ded_rank = 1 then period_end end) week_1_prd, 
+    max(case when a.ded_rank = 2 then period_end end) week_2_prd, 
+    max(case when a.ded_rank = 3 then period_end end) week_3_prd, 
+    max(case when a.ded_rank = 4 then period_end end) week_4_prd, 
+    max(case when a.ded_rank = 5 then period_end end) week_5_prd,
+    nvl(max(case when a.ded_rank = 1 then amount_deducted end), 0) + 
+    nvl(max(case when a.ded_rank = 2 then amount_deducted end), 0) + 
+    nvl(max(case when a.ded_rank = 3 then amount_deducted end), 0) + 
+    nvl(max(case when a.ded_rank = 4 then amount_deducted end), 0) + 
+    nvl(max(case when a.ded_rank = 5 then amount_deducted end), 0) total
+from (
+    select 
+        hho.short_name entity, 
+        to_char(pppd.period_end, 'fmMonth, YYYY') month, 
+        hhw.location_description department, 
+        ppadn.company_deduction_no, 
+        hri.first_name || ' '|| hri.surname name,
+        pppdn.amount_deducted,
+        hre.id emp_id,
+        ppdc.description,
+        ppdc.id expense_id,
+        pppd.period_end,
+        row_number() over (partition by ppdc.id, hre.id, extract(month from pppd.period_end)||extract(year from pppd.period_end) order by pppd.period_end) as ded_rank
+    from
+        pa_pmg_payrolldeduction pppdn
+        join pa_pmg_payrolldtl pppd on pppd.id = pppdn.pay_slipno
+        join pa_pcf_admindeduction ppadn on pppdn.adm_deduction_id = ppadn.id
+        join pa_pcf_deductioncode ppdc on ppdc.id = ppadn.expense_id
+        join hr_rcm_employee hre on hre.id = pppdn.emp_id 
+        join hr_rcm_individual hri on hri.id = hre.ind_id
+        join hr_hcf_organisation hho on hho.id = hre.org_id
+        join hr_hcf_worklocation hhw on hhw.id = hre.wklocation_id
+    where 
+        ppdc.id = $P{IN_EXPENSE_ID}
+        and extract(month from pppd.period_end)||extract(year from pppd.period_end) = $P{IN_MONTH_YEAR} 
+        and hre.org_id = $P{IN_ORG_ID} 
+    order by 
+        name asc, period_end asc) a
+group by
+    a.entity, 
+    a.month, 
+    a.department, 
+    a.company_deduction_no, 
+    a.name,
+    a.description
+order by 
+    a.description, a.department, a.name]]>
+		</queryString>
+		<field name="ENTITY" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ENTITY"/>
+			<property name="com.jaspersoft.studio.field.label" value="ENTITY"/>
+		</field>
+		<field name="MONTH" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="MONTH"/>
+			<property name="com.jaspersoft.studio.field.label" value="MONTH"/>
+		</field>
+		<field name="DEPARTMENT" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT"/>
+			<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+		</field>
+		<field name="COMPANY_DEDUCTION_NO" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="COMPANY_DEDUCTION_NO"/>
+			<property name="com.jaspersoft.studio.field.label" value="COMPANY_DEDUCTION_NO"/>
+		</field>
+		<field name="NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="NAME"/>
+			<property name="com.jaspersoft.studio.field.label" value="NAME"/>
+		</field>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="WEEK_1" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="WEEK_1"/>
+			<property name="com.jaspersoft.studio.field.label" value="WEEK_1"/>
+		</field>
+		<field name="WEEK_2" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="WEEK_2"/>
+			<property name="com.jaspersoft.studio.field.label" value="WEEK_2"/>
+		</field>
+		<field name="WEEK_3" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="WEEK_3"/>
+			<property name="com.jaspersoft.studio.field.label" value="WEEK_3"/>
+		</field>
+		<field name="WEEK_4" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="WEEK_4"/>
+			<property name="com.jaspersoft.studio.field.label" value="WEEK_4"/>
+		</field>
+		<field name="WEEK_5" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="WEEK_5"/>
+			<property name="com.jaspersoft.studio.field.label" value="WEEK_5"/>
+		</field>
+		<field name="WEEK_1_PRD" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.name" value="WEEK_1_PRD"/>
+			<property name="com.jaspersoft.studio.field.label" value="WEEK_1_PRD"/>
+		</field>
+		<field name="WEEK_2_PRD" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.name" value="WEEK_2_PRD"/>
+			<property name="com.jaspersoft.studio.field.label" value="WEEK_2_PRD"/>
+		</field>
+		<field name="WEEK_3_PRD" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.name" value="WEEK_3_PRD"/>
+			<property name="com.jaspersoft.studio.field.label" value="WEEK_3_PRD"/>
+		</field>
+		<field name="WEEK_4_PRD" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.name" value="WEEK_4_PRD"/>
+			<property name="com.jaspersoft.studio.field.label" value="WEEK_4_PRD"/>
+		</field>
+		<field name="WEEK_5_PRD" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.name" value="WEEK_5_PRD"/>
+			<property name="com.jaspersoft.studio.field.label" value="WEEK_5_PRD"/>
+		</field>
+		<field name="TOTAL" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="TOTAL"/>
+			<property name="com.jaspersoft.studio.field.label" value="TOTAL"/>
+		</field>
+		<group name="DESCRIPTION">
+			<groupExpression><![CDATA[$F{DESCRIPTION}]]></groupExpression>
+		</group>
+	</subDataset>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_MONTH_YEAR" class="java.math.BigDecimal"/>
+	<parameter name="IN_EXPENSE_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[select  
+	$P{IN_ORG_ID} org_id, 
+	$P{IN_MONTH_YEAR} month_year, 
+	$P{IN_EXPENSE_ID} expense_id
+from 
+	dual]]>
+	</queryString>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="MONTH_YEAR" class="java.math.BigDecimal"/>
+	<field name="EXPENSE_ID" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="80" uuid="5bc9278b-3c25-4e2f-8548-bf26ffaa7ccc"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<detail>
+		<band height="65" splitType="Stretch">
+			<componentElement>
+				<reportElement x="0" y="0" width="572" height="45" uuid="b5f06932-84f5-45f7-98a5-3fb6eeb330b8">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Deduction" uuid="898863be-4e8b-4144-ada5-f21d0d752038">
+						<datasetParameter name="IN_EXPENSE_ID">
+							<datasetParameterExpression><![CDATA[$P{IN_EXPENSE_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="IN_MONTH_YEAR">
+							<datasetParameterExpression><![CDATA[$P{IN_MONTH_YEAR}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="IN_ORG_ID">
+							<datasetParameterExpression><![CDATA[$P{IN_ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="32" uuid="ac1c91bd-bfaf-4503-9c17-d23992853974">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:columnHeader style="Table_CH" height="25" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="32" height="25" uuid="dd302014-6d02-49b9-b2e8-204ca4f7f3d9"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9" isBold="true"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<text><![CDATA[Entity]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="20">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField>
+								<reportElement x="0" y="0" width="32" height="20" uuid="ca921ace-c6ef-4515-8e17-f6eb607ef7e6"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{ENTITY}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="68" uuid="1cece089-99bb-4bff-94eb-7368623aa5a3">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:columnHeader style="Table_CH" height="25" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="68" height="25" uuid="6dd56453-ab56-48a8-aa30-4893f521bee5"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9" isBold="true"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<text><![CDATA[Month]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="68" height="20" uuid="e861d53d-f551-4f40-85c4-a4dcf6398078"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{MONTH}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="89" uuid="857d7564-51c9-4760-b735-4c82a54a8dfe">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:columnHeader style="Table_CH" height="25" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="89" height="25" uuid="2613592b-c079-4bd5-afb7-1a9fb5801d48"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9" isBold="true"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<text><![CDATA[Department]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="89" height="20" uuid="f73367d0-c0da-4e9e-817f-0f60f91fa0a8">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="41" uuid="a4af6dee-b785-4c24-a641-e4091c5c9847">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
+						<jr:columnHeader style="Table_CH" height="25" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="41" height="25" uuid="7aa97d17-9671-414e-894e-f501da179d04"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9" isBold="true"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<text><![CDATA[Number]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="20">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="41" height="20" uuid="da5cc73a-c71b-4d4b-8475-889a2d98f6a0">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+									<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font size="9"/>
+									<paragraph leftIndent="0" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{COMPANY_DEDUCTION_NO}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="97" uuid="815d852d-f25c-4ce6-8bf6-6ea32de7e9f6">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
+						<jr:columnHeader style="Table_CH" height="25" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="97" height="25" uuid="5d5afc05-ad97-4111-a3f5-8088dd45c995"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9" isBold="true"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<text><![CDATA[Name]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="20">
+							<textField>
+								<reportElement style="Table_TD" x="0" y="0" width="97" height="20" uuid="ac012510-526a-4bf6-aafc-e7dc93a77104">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="583f5d8a-f8e0-4348-9a82-94cba10d1f4d">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
+						<jr:columnHeader style="Table_CH" height="25" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="MMM d, yyyy" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="40" height="25" uuid="0e312a96-1081-414d-8c89-d44af5b2915e">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9" isBold="true"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{WEEK_1_PRD}]]></textFieldExpression>
+							</textField>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="20">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="40" height="20" uuid="18b7c6db-1bea-4f67-93e8-5712a2a26e07"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font size="9"/>
+									<paragraph rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{WEEK_1}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="41" uuid="45811619-7aff-48a1-88cc-00f8f435b939">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column7"/>
+						<jr:columnHeader style="Table_CH" height="25" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="MMM d, yyyy" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="41" height="25" uuid="42392d9a-cc8e-4ec7-a9d8-5d6e9a1ac336">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9" isBold="true"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{WEEK_2_PRD}]]></textFieldExpression>
+							</textField>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="20">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="41" height="20" uuid="a6734dd8-ebc7-4810-bcf4-f740f4a1a74d"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font size="9"/>
+									<paragraph rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{WEEK_2}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="43eb1ba2-ba33-4ffb-95ad-bb2210eca583">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column8"/>
+						<jr:columnHeader style="Table_CH" height="25" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="MMM d, yyyy" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="40" height="25" uuid="0e18989e-748c-4fef-a668-100370649d09">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9" isBold="true"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{WEEK_3_PRD}]]></textFieldExpression>
+							</textField>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="20">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="40" height="20" uuid="54aff0de-e9b9-4909-a3a6-a7f05be231ed"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font size="9"/>
+									<paragraph rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{WEEK_3}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="842ee039-1d41-4eb8-babc-22f8a561852b">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column9"/>
+						<jr:columnHeader style="Table_CH" height="25" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="MMM d, yyyy" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="40" height="25" uuid="18d91e18-eee3-477c-885a-e07a79b6241d">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9" isBold="true"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{WEEK_4_PRD}]]></textFieldExpression>
+							</textField>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="20">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="40" height="20" uuid="5eaadc56-9cfc-499f-9ffa-85dcf27165ce">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+									<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font size="9"/>
+									<paragraph rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{WEEK_4}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="42" uuid="fe324f58-cdfc-427b-9e84-d79ed6caa911">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column10"/>
+						<jr:columnHeader style="Table_CH" height="25" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField pattern="MMM d, yyyy" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="42" height="25" uuid="50bc31fc-c464-44c1-a6e5-20ff048889dc">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9" isBold="true"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{WEEK_5_PRD}]]></textFieldExpression>
+							</textField>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="20">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="42" height="20" uuid="2d3a2203-99a2-4a0c-9b5d-7ec0cf6d7ef8"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font size="9"/>
+									<paragraph rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{WEEK_5}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="42" uuid="46172e18-e732-4e3b-b452-0f5bfdfbe965">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column11"/>
+						<jr:columnHeader style="Table_CH" height="25" rowSpan="1">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<staticText>
+								<reportElement x="0" y="0" width="42" height="25" uuid="3ec9cc81-01db-4013-9f71-48704d952d1e"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement>
+									<font size="9" isBold="true"/>
+									<paragraph leftIndent="2"/>
+								</textElement>
+								<text><![CDATA[Total]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="20">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="42" height="20" uuid="c96773fb-9de1-421c-9248-ad5a7c86b838"/>
+								<box>
+									<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font size="9"/>
+									<paragraph rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:groupHeader groupName="DESCRIPTION">
+						<jr:row/>
+					</jr:groupHeader>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="List Of New And Old Employees By Period" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="84eefb4c-b08e-4fe4-a91a-83b326401d1e">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="359"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/HR_04_1_2"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="DATE_START" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE_END" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select b.*,(CASE WHEN DATE_SEPARATED IS NOT NULL THEN DATE_SEPARATED
+		       else  Action_Date end) Date_Sort
+from
+(
+SELECT
+ initcap(FIRST_NAME) FIRST_NAME,
+ initcap(SURNAME) SURNAME,
+ initcap(A.POSITION_NAME)POSITION_NAME,
+initcap(A.REMARKS)REMARKS,
+ A.DATE_EMPLOYED  AS Action_Date,
+ DATE_SEPARATED,
+initcap (SEPARATED_STATUS)SEPARATED_STATUS,PAYMENT_TYPE,
+     initcap(nvl(A.ORG_STRUCTURE,'Unknown')) DEPT,
+     'Employment' as category, initcap(A.EMPLOYMENT_STATUS) EMPLOYMENT_STATUS
+		       ,m.organisation_name
+,'Tel No. '||M.TELNUM TELNUM
+    ,'Fax No. '||M.FAXNUM FAXNUM,
+M.ADDRESS ORG_ADDRESS
+    FROM HR_RCM_INDIVIDUAL H JOIN HR_RCM_EMPLOYEE A ON H.ID=A.IND_ID
+    JOIN HR_HCF_ORGANISATION M ON M.ID = A.ORG_ID
+WHERE
+a.org_id=$P{IN_ORG_ID}
+and
+TRUNC(DATE_EMPLOYED) BETWEEN $P{DATE_START} AND $P{DATE_END}
+AND A.EMPLOYMENT_STATUS not like'IN-ACTIVE'
+AND A.EMPLOYMENT_CLASS_ID NOT LIKE 2361
+
+union all
+SELECT
+ initcap(FIRST_NAME) FIRST_NAME,
+ initcap(SURNAME) SURNAME,
+ initcap(A.POSITION_NAME)POSITION_NAME,
+initcap(A.REMARKS)REMARKS,
+ A.DATE_EMPLOYED  AS Action_Date,
+ DATE_SEPARATED,
+initcap (SEPARATED_STATUS)SEPARATED_STATUS,PAYMENT_TYPE,
+     initcap(nvl(A.ORG_STRUCTURE,'Unknown')) DEPT,
+     'Separation'
+		       category, initcap(A.EMPLOYMENT_STATUS) EMPLOYMENT_STATUS
+		       ,m.organisation_name
+,'Tel No. '||M.TELNUM TELNUM
+    ,'Fax No. '||M.FAXNUM FAXNUM,
+M.ADDRESS ORG_ADDRESS
+    FROM HR_RCM_INDIVIDUAL H JOIN HR_RCM_EMPLOYEE A ON H.ID=A.IND_ID
+    JOIN HR_HCF_ORGANISATION M ON M.ID = A.ORG_ID
+WHERE
+a.org_id=$P{IN_ORG_ID}
+AND
+trunc(DATE_SEPARATED) BETWEEN $P{DATE_START} AND $P{DATE_END}
+AND
+A.EMPLOYMENT_STATUS not like 'IN-ACTIVE'
+AND A.EMPLOYMENT_CLASS_ID NOT LIKE 2361
+) b]]>
+	</queryString>
+	<field name="FIRST_NAME" class="java.lang.String"/>
+	<field name="SURNAME" class="java.lang.String"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="REMARKS" class="java.lang.String"/>
+	<field name="ACTION_DATE" class="java.sql.Timestamp"/>
+	<field name="DATE_SEPARATED" class="java.sql.Timestamp"/>
+	<field name="SEPARATED_STATUS" class="java.lang.String"/>
+	<field name="PAYMENT_TYPE" class="java.lang.String"/>
+	<field name="DEPT" class="java.lang.String"/>
+	<field name="CATEGORY" class="java.lang.String"/>
+	<field name="EMPLOYMENT_STATUS" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="ORG_ADDRESS" class="java.lang.String"/>
+	<field name="DATE_SORT" class="java.sql.Timestamp"/>
+	<sortField name="CATEGORY"/>
+	<sortField name="EMPLOYMENT_STATUS"/>
+	<sortField name="DATE_SORT"/>
+	<variable name="RECORD_COUNT" class="java.lang.Number" resetType="Group" resetGroup="Category" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<group name="Category" keepTogether="true">
+		<groupExpression><![CDATA[$F{CATEGORY}+$F{EMPLOYMENT_STATUS}]]></groupExpression>
+		<groupHeader>
+			<band height="26">
+				<textField>
+					<reportElement x="0" y="0" width="260" height="12" uuid="6005c754-4878-4876-8d74-7212f74024a3"/>
+					<box bottomPadding="0">
+						<pen lineWidth="0.0" lineStyle="Solid"/>
+						<topPen lineWidth="0.0" lineStyle="Solid"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid"/>
+					</box>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" isItalic="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Employment Status: '+$F{EMPLOYMENT_STATUS}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="157">
+				<staticText>
+					<reportElement x="0" y="143" width="202" height="10" uuid="b168fe6c-7b72-41dc-bf07-01ee379e7b1c"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+					</textElement>
+					<text><![CDATA[Approved by:..................................................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="107" width="202" height="10" uuid="ab514ca7-d59b-474b-8604-ff022cb74e3b"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+					</textElement>
+					<text><![CDATA[Verified by:......................................................................]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="57" splitType="Stretch">
+			<subreport>
+				<reportElement x="1" y="0" width="571" height="57" uuid="5648e307-4fe8-4ce9-8604-6328b0fefcb5"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="58" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="14" width="572" height="15" uuid="4474a7ac-96d9-4079-8dfc-bc676101caa5"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Listing of Active Employees for the Period]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="186" y="29" width="100" height="15" uuid="c5c4c352-d677-4b01-bc0b-852cce0fdd80"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DATE_START}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="304" y="29" width="100" height="15" uuid="f82f12cb-993e-4a7f-a4d7-19f91c67b49a"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DATE_END}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="286" y="29" width="18" height="15" uuid="ead51716-3428-4d59-a535-c2792484e154"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[to]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="26" splitType="Stretch">
+			<staticText>
+				<reportElement x="15" y="1" width="67" height="13" uuid="1be87576-8511-4cd0-8f2e-d8193c6f830f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[  Surname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="82" y="1" width="55" height="13" uuid="5678613a-5920-4acf-a0c9-719f614ef332"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[First Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="202" y="1" width="83" height="13" uuid="ce23ae5d-2737-4fd6-9ba0-8f9d52e58cbc"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[ Department]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="284" y="1" width="71" height="13" uuid="ad9a6430-d7e0-47ef-87ee-cb617c113355"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Date Employed]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="353" y="1" width="73" height="13" uuid="721813c0-b0e5-4134-b2bc-cfbb63f511e9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Date Separated]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="12" width="572" height="1" uuid="5a8c7bca-c1c1-47e9-9752-0c151ac5eb64"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="1" width="16" height="13" uuid="9c4ea5ee-1ad3-4587-abc3-cf9016f1e465"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="479" y="1" width="93" height="13" uuid="e4f11582-487b-4cd9-9074-a92191370bc7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Remarks]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="425" y="1" width="54" height="12" uuid="75b7aa72-740f-4b02-800d-63b6b436c941"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Reason]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="1" width="67" height="12" uuid="e56dc35c-8ada-4caa-92b4-0468068d5a6a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[ Position]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="24" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="15" y="2" width="67" height="15" uuid="c05952a3-c258-4b90-9bfe-3fc5e7755634"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="82" y="2" width="55" height="15" uuid="bea31bfa-012b-44c4-8c2a-55cecfd1f2b3"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="202" y="2" width="83" height="15" uuid="0b8d4d76-2f2f-4170-b42a-8a02258b90bb"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="282" y="2" width="71" height="15" uuid="c6f4d690-3917-4912-b9cd-be34cc02483b"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACTION_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="352" y="2" width="74" height="15" uuid="f6daa601-93f3-4e66-9543-8dfe2c706171"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_SEPARATED}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement x="0" y="2" width="16" height="15" uuid="ca05da87-986e-48f7-8890-258ae49de5ba"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{RECORD_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="479" y="2" width="93" height="15" uuid="f51d1608-bd5e-4c99-8a46-51f83c1c4f51"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REMARKS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="136" y="2" width="67" height="15" uuid="ceb76ccf-5599-438a-bd11-0d886d5bec9c"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="425" y="2" width="54" height="15" uuid="a8e1c177-3856-4060-902f-291a7bb63182"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SEPARATED_STATUS}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band>
+			<line>
+				<reportElement x="1" y="-4" width="572" height="1" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="8f0d560e-b47f-4ffd-9477-ce96b8c89d3e"/>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="28" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="13" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="13" width="572" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="406" y="0" width="100" height="13" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="1" y="0" width="166" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="506" y="0" width="66" height="13" uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

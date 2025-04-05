@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Expense Listing" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ad4177f0-1b71-4257-a8a6-139dc517a0e2">
+	<property name="ireport.zoom" value="0.9075000000000003"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/BUDGET/BUDGET_EXPENSE_LISTING"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.18:8081/jasperserver/services/repository"/>
+	<parameter name="department" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="report_name" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="period" class="java.sql.Time">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select "ID",
+(select distinct CONTRACT_NUMBER||':-'||CONTRACT_NAME||' Dated:-'||d.START_DATE
+from EXPENSE_CONTRACTS d
+where d.id=CONTRACT_ID) contract,
+"OWNER_ID",
+"PROJECT_FUNDING_ID",pkg_globals.Lookup_EXPSOURCE(PROJECT_FUNDING_ID,BUDGET_YEAR,EXPENSE_SOURCE) EXPENSE_SOURCE ,
+"DATE_RECEIVED",
+"AMOUNT_RELEASED",
+"TOTAL_CONTRACT_VALUE",
+"TOTAL_RELEASED_TODATE",
+"BALANCE_OUTSTANDING",
+"EXPENSE_STATUS",
+"REMARKS",
+"LOCATION_RELEASE",
+"RELEASE_BY",
+"DATE_RELEASE",
+"DATE_CREATED",
+"CREATED_BY",
+"LAST_MODIFIED_BY",
+"DATE_LAST_MODIFIED",
+"MACHINE_CREATED",
+"MACHINE_LAST_MODIFIED",
+"VOUCHER_NO",
+"VOUCHER_BOOK_ID",REF_NO
+from expense_header]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="CONTRACT" class="java.lang.String"/>
+	<field name="OWNER_ID" class="java.math.BigDecimal"/>
+	<field name="PROJECT_FUNDING_ID" class="java.math.BigDecimal"/>
+	<field name="EXPENSE_SOURCE" class="java.lang.String"/>
+	<field name="DATE_RECEIVED" class="java.sql.Timestamp"/>
+	<field name="AMOUNT_RELEASED" class="java.math.BigDecimal"/>
+	<field name="TOTAL_CONTRACT_VALUE" class="java.math.BigDecimal"/>
+	<field name="TOTAL_RELEASED_TODATE" class="java.math.BigDecimal"/>
+	<field name="BALANCE_OUTSTANDING" class="java.math.BigDecimal"/>
+	<field name="EXPENSE_STATUS" class="java.lang.String"/>
+	<field name="REMARKS" class="java.lang.String"/>
+	<field name="LOCATION_RELEASE" class="java.lang.String"/>
+	<field name="RELEASE_BY" class="java.lang.String"/>
+	<field name="DATE_RELEASE" class="java.sql.Timestamp"/>
+	<field name="DATE_CREATED" class="java.sql.Timestamp"/>
+	<field name="CREATED_BY" class="java.lang.String"/>
+	<field name="LAST_MODIFIED_BY" class="java.lang.String"/>
+	<field name="DATE_LAST_MODIFIED" class="java.sql.Timestamp"/>
+	<field name="MACHINE_CREATED" class="java.lang.String"/>
+	<field name="MACHINE_LAST_MODIFIED" class="java.lang.String"/>
+	<field name="VOUCHER_NO" class="java.lang.String"/>
+	<field name="VOUCHER_BOOK_ID" class="java.math.BigDecimal"/>
+	<field name="REF_NO" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="72" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="968" height="72" uuid="2200ada4-a74d-4a29-9e12-f8e12586b8c8"/>
+				<subreportParameter name="department">
+					<subreportParameterExpression><![CDATA["Expense Listing"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA["For the Period"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="period">
+					<subreportParameterExpression><![CDATA[$P{period}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/Legal_Landscape_leterhead"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Transparent" x="624" y="0" width="113" height="25" backcolor="#CCCCCC" uuid="dfa90084-8698-42cc-9aba-0f31c4ab1fed"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Debit Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="173" y="0" width="183" height="25" backcolor="#CCCCCC" uuid="92924fbc-bfdd-43b5-a4f2-cbe94039dbec"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="111" height="25" backcolor="#CCCCCC" uuid="5208cc25-e83c-4179-98bc-f7276098c57c"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cheque #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="111" y="0" width="62" height="25" backcolor="#CCCCCC" uuid="40c6e8dd-98fd-4f16-99a1-f0415d2fc5d5"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Voucher]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="737" y="0" width="126" height="25" backcolor="#CCCCCC" uuid="8cd56d5e-d302-47ed-ac35-be8b877f8720"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sub Head]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="511" y="0" width="113" height="25" backcolor="#CCCCCC" uuid="0458a529-0b7c-4d5d-9565-fa8c31c0d6f5"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="863" y="0" width="105" height="25" backcolor="#CCCCCC" uuid="6b7b8320-56c1-4d10-86de-e0faa2851e7a"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="356" y="0" width="155" height="25" backcolor="#CCCCCC" uuid="1a47956b-0d2a-4845-8138-c01200e3b373"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Payee]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="968" height="25" uuid="5fd61a96-10dd-4165-aebb-1d2c669bb453"/>
+			</rectangle>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="111" y="0" width="62" height="20" uuid="185cc4a8-7c38-4eb1-bc2f-42cef54561c1"/>
+				<textFieldExpression><![CDATA[$F{VOUCHER_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="111" height="20" uuid="129e2052-8c64-43b6-aec3-dc72b3959176"/>
+				<textFieldExpression><![CDATA[$F{REF_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="356" y="0" width="155" height="20" uuid="886b887f-957e-4631-aaca-28514196755d"/>
+				<textFieldExpression><![CDATA[$F{CONTRACT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="173" y="0" width="183" height="20" uuid="4a7a2070-1ad7-4a24-8b92-ba8ccb8ac340"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{REMARKS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="511" y="0" width="113" height="20" uuid="6edeac4a-cbd2-473d-b576-728a3a918c94"/>
+				<textFieldExpression><![CDATA[$F{DATE_CREATED}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="21" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="31" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="968" height="31" backcolor="#CCCCCC" uuid="37e9994f-9a5b-40e3-b2a9-8f0ad7b838f4"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[RCFMS by Innovative Systems]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

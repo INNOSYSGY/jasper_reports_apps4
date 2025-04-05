@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Payments Received" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="874918dd-7cf2-42a0-8689-852ced0e6010">
+	<property name="ireport.zoom" value="1.771561000000001"/>
+	<property name="ireport.x" value="729"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MCC/SHIPMENT/S_02"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.56.102:8081/jasperserver/services/repository"/>
+	<parameter name="date_start" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="date_end" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="payment_option" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select sp.id,
+(select decode(short_name,null,name,initcap(name))
+from contact c
+where c.id=sp.payment_made_by) payment_made_by,
+s.shipment_number,
+s.arrival_date,
+s.sale_contract_id,
+sp.PAYMENT_DATE,
+sp.PAYMENT_AMOUNT,
+initcap(sp.INVOICE_TYPE||'-'||sp.PAYMENT_TYPE) Payment_type,
+initcap(sp.PAYMENT_METHOD) Payment_method,
+sp.PAYMENT_REFERENCE,
+Initcap(sp.action) Action
+from
+shipment_payment sp
+join vw_shipment s on sp.shipment_id=s.id
+where trunc(sp.PAYMENT_DATE) between $P{date_start} and $P{date_end}
+and upper(sp.action)= case when nvl(decode(upper($P{payment_option}),'%',upper($P{payment_option})),'ALL')='ALL' then upper(sp.action)
+else upper($P{payment_option}) end
+order by Initcap(sp.action)]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="PAYMENT_MADE_BY" class="java.lang.String"/>
+	<field name="SHIPMENT_NUMBER" class="java.lang.String"/>
+	<field name="ARRIVAL_DATE" class="java.sql.Timestamp"/>
+	<field name="SALE_CONTRACT_ID" class="java.math.BigDecimal"/>
+	<field name="PAYMENT_DATE" class="java.sql.Timestamp"/>
+	<field name="PAYMENT_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="PAYMENT_TYPE" class="java.lang.String"/>
+	<field name="PAYMENT_METHOD" class="java.lang.String"/>
+	<field name="PAYMENT_REFERENCE" class="java.lang.String"/>
+	<field name="ACTION" class="java.lang.String"/>
+	<sortField name="ACTION"/>
+	<sortField name="PAYMENT_DATE"/>
+	<variable name="Seq" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="PAYMENT_AMOUNT_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Action" calculation="Sum">
+		<variableExpression><![CDATA[$F{PAYMENT_AMOUNT}]]></variableExpression>
+	</variable>
+	<group name="Action">
+		<groupExpression><![CDATA[$F{ACTION}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="171" height="15" uuid="77e4dfe2-b6b3-4edf-b6e0-af7f329be6df"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ACTION}+" Payment"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="17">
+				<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="652" y="0" width="100" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="ee497bd4-9648-4c76-9242-920cff6169ec"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single" leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{PAYMENT_AMOUNT_1}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="171" height="15" uuid="19bd66bb-b30c-4804-b40f-82a45f642c3c"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Total "+$F{ACTION}+ " Payments"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="47" splitType="Stretch">
+			<staticText>
+				<reportElement x="171" y="0" width="275" height="33" uuid="c52d513b-f3f3-479b-a6c3-bb124e5c0302"/>
+				<textElement>
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Listing of Payments]]></text>
+			</staticText>
+			<line>
+				<reportElement x="110" y="44" width="642" height="1" uuid="5b86119d-1da6-4df5-9da7-716c691ebdba"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineColor="#CC0033"/>
+				</graphicElement>
+			</line>
+			<image>
+				<reportElement x="0" y="0" width="162" height="45" uuid="5adf30d5-6f35-4022-8f5e-fb5549e74492"/>
+				<imageExpression><![CDATA["repo:/reports/MCC/Image/logo"]]></imageExpression>
+			</image>
+			<textField pattern="YYYY-MM-DD" isBlankWhenNull="true">
+				<reportElement x="678" y="0" width="74" height="13" uuid="ba82ae3f-df32-41fa-b10c-2d89ab84a250"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{date_start}]]></textFieldExpression>
+			</textField>
+			<textField pattern="YYYY-MM-DD">
+				<reportElement x="678" y="13" width="74" height="15" uuid="8598951e-7293-4f80-8219-11dae20b04c7"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{date_end}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="678" y="26" width="74" height="13" uuid="b00f155e-0339-49c1-9a19-80ffae1f09dc"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACTION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="574" y="0" width="100" height="13" uuid="d3427e87-df89-4109-819b-f3123de2c52a"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Start Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="574" y="13" width="100" height="13" uuid="afad87ef-692f-4cce-bf28-f30e77aa77c5"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[End Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="574" y="26" width="100" height="13" uuid="b0be7d3e-7280-4377-bd6a-8962b50c1054"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Payment Action]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="15" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="14" width="752" height="1" uuid="45fed678-576e-41b1-bc57-ef706ea39131"/>
+				<graphicElement>
+					<pen lineColor="#CC0000"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="30" y="0" width="77" height="13" uuid="729011ba-4ab5-44aa-99c0-0a9b836bafad"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="3" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Payment Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="107" y="0" width="136" height="13" uuid="17570e1a-7a73-4fcf-af21-6f093d04e6ba"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Made By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="433" y="0" width="117" height="13" uuid="196553ff-2df3-4ca0-886f-e61606eb141a"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Payment Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="551" y="0" width="101" height="13" uuid="94db78fe-d0bf-45e7-ac92-f7d0d30b1657"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Payment Method]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="244" y="0" width="88" height="13" uuid="857a2ddc-1102-40db-864c-6735ee40fad2"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Shipment Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="0" width="100" height="13" uuid="86737d46-0c11-475c-b794-80cc9574b9a0"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Shipment Arrival Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="652" y="0" width="100" height="13" uuid="eae9d978-b4d2-496f-bf9a-7cd6ecfa0929"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="30" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="62b0d90e-0d14-4677-ac5c-29dc8ce1c1cf"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Seq.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField pattern="yyyy-MM-dd" isBlankWhenNull="true">
+				<reportElement x="30" y="0" width="77" height="13" uuid="0f98928e-6a7a-4fcf-b84a-02326d1545c8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="3" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENT_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="107" y="0" width="136" height="13" uuid="cee9af5d-ffe6-4ac1-9a35-83d6f802b2b2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENT_MADE_BY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="433" y="0" width="117" height="13" uuid="55831ef6-8db1-4d81-9a41-1bf1d24faef4"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENT_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="551" y="0" width="101" height="13" uuid="6cbe1ae4-ae25-4bdb-85f9-a4de129fc55a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENT_METHOD}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="244" y="0" width="88" height="13" uuid="d1e3c599-a3d9-4a2c-9e3a-bffe4bce7b1d"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SHIPMENT_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="yyyy-MM-dd" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="333" y="0" width="100" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="7fb248b3-4530-4344-bc06-9f2fd3a3cd89"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ARRIVAL_DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+				<reportElement x="652" y="0" width="100" height="13" uuid="1f53b655-1766-4a5c-b447-a2c29752f1ac"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENT_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="30" height="13" uuid="6238347e-d53c-4d44-83a5-0542a9c354a5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Seq}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="752" height="15" forecolor="#CC0000" backcolor="#CC0033" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="15" width="752" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Innovative Systems Inc®]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="487" y="1" width="234" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement mode="Transparent" x="0" y="1" width="227" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="###0" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="721" y="1" width="27" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="bf29d155-322a-4ed6-887e-85e4736d1c5a"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

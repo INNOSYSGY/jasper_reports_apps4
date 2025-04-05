@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Daily Receipt" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fbe2f7f4-6f3a-4e93-8a22-0ecf850753bb">
+	<property name="ireport.zoom" value="1.1289478601075629"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/FORMS/INDIVIDUAL_CASHIER_RECEIPTS"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.149:8081/jasperserver/services/repository"/>
+	<parameter name="department" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="report_name" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\Steffon Assing\\Dropbox\\Mayor and City Council\\Revenue Collection System Restart\\reports\\headers\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="START_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="END_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REVENUE_SOURCE_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT  SUM(pr.amount) amount, revenue_source_id, full_code
+FROM VW_PAYMENT_RECEIPT pr
+  JOIN RECEIPT_BATCH RB ON PR.RECEIPT_BATCH_ID=RB.ID
+and trunc(PR.DATE_PAID) between trunc($P{START_DATE}) and trunc($P{END_DATE}) and revenue_source_id not in (2050, 2162,2177,2173)
+GROUP BY revenue_source_id, full_code]]>
+	</queryString>
+	<field name="AMOUNT" class="java.math.BigDecimal"/>
+	<field name="REVENUE_SOURCE_ID" class="java.math.BigDecimal"/>
+	<field name="FULL_CODE" class="java.lang.String"/>
+	<variable name="TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMOUNT}]]></variableExpression>
+	</variable>
+	<group name="revenue_source_id">
+		<groupExpression><![CDATA[$F{REVENUE_SOURCE_ID}]]></groupExpression>
+	</group>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="85" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="752" height="85" uuid="138fa772-1f76-414a-94f6-f2e2dfd6dfb5"/>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA["Summary of Sundry Payments"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LANDSCAPE_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="294" height="20" uuid="2a25fc08-0965-4154-9833-f0ba17a8dce5"/>
+				<textElement textAlignment="Justified">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Full Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="294" y="0" width="57" height="20" uuid="a83dcce0-4d06-43af-9906-8bef9a0d319f"/>
+				<textElement textAlignment="Justified">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Budgeted]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="351" y="0" width="58" height="20" uuid="532950d3-9a02-4036-9bb1-7653014728d8"/>
+				<textElement textAlignment="Justified">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Previous]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="409" y="0" width="59" height="20" uuid="6b9062de-7e8f-4bf4-bf8c-96476a677895"/>
+				<textElement textAlignment="Justified">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Previous]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="468" y="0" width="60" height="20" uuid="f474a539-7236-4e65-9f30-6f03287be51d"/>
+				<textElement textAlignment="Justified">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Current]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="528" y="0" width="48" height="20" uuid="f7c79477-dc71-47dd-ab0a-c84ff77843cb"/>
+				<textElement textAlignment="Justified">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="576" y="0" width="69" height="20" uuid="ccc0e3d8-e34f-4ac0-a888-75e46afb580d"/>
+				<textElement textAlignment="Justified">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Balance]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="645" y="0" width="107" height="20" uuid="31f7d68c-a723-431f-b4dd-c6ef53f1b022"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="35" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="0" width="216" height="35" uuid="fc365b75-69f8-4015-9d80-356ea985033d"/>
+				<textFieldExpression><![CDATA[$F{FULL_CODE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0">
+				<reportElement x="645" y="0" width="107" height="35" uuid="f895e415-b020-4055-9491-29df43edb151"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="20">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="752" height="19" backcolor="#CCCCCC" uuid="d91d45ec-f76e-4b60-aa54-365f058c7008"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="0" width="100" height="20" uuid="27a448a7-7c59-440b-abd0-2fa6ddf184c3"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="612" y="0" width="80" height="20" uuid="83594661-82fd-40d8-b28f-09a4faee5bed"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="692" y="0" width="40" height="20" uuid="bd99cbb3-0711-422b-a95a-c795437215c5"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="33" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0.00">
+				<reportElement x="645" y="0" width="107" height="15" uuid="7862975c-3320-43af-8dd6-1cdab90dd8bb"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="645" y="16" width="107" height="1" uuid="f7aa4d1e-0c77-47c0-aedf-3afe958ea9f1"/>
+				<graphicElement>
+					<pen lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="659" y="-1" width="60" height="1" uuid="586aa069-7570-4ec7-b191-a153eaafd16a"/>
+			</line>
+			<line>
+				<reportElement x="645" y="20" width="107" height="1" uuid="52015b8b-7b7a-4659-a9bf-df27838209cc"/>
+				<graphicElement>
+					<pen lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="580" y="6" width="65" height="15" uuid="c49b1824-2fa7-4c19-9c0a-02324ee49958"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

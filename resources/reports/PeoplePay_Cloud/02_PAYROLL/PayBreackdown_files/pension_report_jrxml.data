@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll breakdown" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="04163a1d-126d-4099-95bb-b732c22b1feb">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/PayBreackdown"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/02_PAYROLL/PayBreackdown_files/pension_report_jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Bank" uuid="f9386447-5515-456a-b803-213d98e84516">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+		<parameter name="period_start" class="java.util.Date"/>
+		<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[select case when upper(bank_branch_id_hist) like '%REPUBLIC%' AND d.PAYMENT_MODE_hist='BANK' then 'REPUBLIC BANK GUYANA LIMITED'
+            when upper(bank_branch_id_hist) like '%SCOTIA%' AND d.PAYMENT_MODE_hist='BANK' then 'BANK OF NOVA SCOTIA'
+            when upper(bank_branch_id_hist) like '%DEMERARA%' AND d.PAYMENT_MODE_hist='BANK' then 'DEMERARA BANK'
+            when upper(bank_branch_id_hist) like '%INDUSTRIES%' AND d.PAYMENT_MODE_hist='BANK' then 'GUYANA BANK FOR TRADE AND INDUSTRIES'
+            when upper(bank_branch_id_hist) like '%CITIZENS%' AND d.PAYMENT_MODE_hist='BANK' then 'CITIZENS BANK'
+            when upper(D.PAYMENT_MODE_hist) like '%MMG%' then 'MOBILE MONEY GUYANA'
+            else cast(bank_branch_id_hist as varchar2(500)) end Bank
+,sum(net_pay- nvl(PKG_GLOBAL_FNTS.fn_getpayrollmmgrefund(d.emp_id,ep.START_DATE),0)) amount 
+from gtt.pa_pmg_payrolldtl d
+join pa_pcf_earningperiod ep on ep.id=d.EARNINGS_PERIOD_ID
+where 
+d.PAYMENT_MODE_HIST  IN ('BANK', 'MMG')
+and d.ID in (
+select pa.id
+from pa_pmg_payrolldtl pa
+join pa_pmg_payrollhd ph on ph.id=pa.PAY_BATCH_ID
+where pa.org_id in (select * from table(PKG_REPORTS.SP_ORG_ID_LIST($P{IN_ORG_ID})))
+and  trunc(period_start)=trunc($P{period_start}) 
+
+and pa.payment_type_hist='BI-MONTHLY'
+and pa.PAYMENT_MODE_HIST  IN ('BANK', 'MMG')
+)
+
+group by case when upper(bank_branch_id_hist) like '%REPUBLIC%' AND d.PAYMENT_MODE_hist='BANK' then 'REPUBLIC BANK GUYANA LIMITED'
+            when upper(bank_branch_id_hist) like '%SCOTIA%' AND d.PAYMENT_MODE_hist='BANK' then 'BANK OF NOVA SCOTIA'
+            when upper(bank_branch_id_hist) like '%DEMERARA%' AND d.PAYMENT_MODE_hist='BANK' then 'DEMERARA BANK'
+            when upper(bank_branch_id_hist) like '%INDUSTRIES%' AND d.PAYMENT_MODE_hist='BANK' then 'GUYANA BANK FOR TRADE AND INDUSTRIES'
+            when upper(bank_branch_id_hist) like '%CITIZENS%' AND d.PAYMENT_MODE_hist='BANK' then 'CITIZENS BANK'
+            when upper(D.PAYMENT_MODE_hist) like '%MMG%' then 'MOBILE MONEY GUYANA'
+            else cast(bank_branch_id_hist as varchar2(500)) end
+order by bank asc]]>
+		</queryString>
+		<field name="BANK" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="BANK"/>
+		</field>
+		<field name="AMOUNT" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT"/>
+		</field>
+		<variable name="Bank_total" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{AMOUNT}]]></variableExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="NETPAY" uuid="ed811b72-9d30-4c3e-a811-3c5f1133049a">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+		<parameter name="period_start" class="java.util.Date"/>
+		<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[select org_id, o.SHORT_NAME||' '||employment_class_hist||' '||payment_type_hist||' '|| compute_gross_hist payroll,  sum(net_pay) net_pay
+from pa_pmg_payrolldtl pa
+join gtt.hr_hcf_organisation o on pa.org_id=o.id
+where org_id in (select * from table(PKG_REPORTS.SP_ORG_ID_LIST($P{IN_ORG_ID})))
+and  trunc(period_start)=trunc($P{period_start}) 
+and payment_type_hist='BI-MONTHLY'
+and pa.PAYMENT_MODE_HIST IN ('BANK', 'MMG')
+group by org_id, o.SHORT_NAME||' '||employment_class_hist||' '||payment_type_hist||' '|| compute_gross_hist]]>
+		</queryString>
+		<field name="ORG_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+		</field>
+		<field name="PAYROLL" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="PAYROLL"/>
+		</field>
+		<field name="NET_PAY" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="NET_PAY"/>
+		</field>
+		<sortField name="PAYROLL"/>
+		<variable name="Payroll_total" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{NET_PAY}]]></variableExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="Blaze" uuid="712a43d6-7273-4817-8f8a-b16c74e3dd4d">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+		<parameter name="period_start1" class="java.util.Date"/>
+		<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[select 
+'Fibre/DSL Disbursement' blaze, sum(nvl(PKG_GLOBAL_FNTS.fn_getpayrollmmgrefund(d.emp_id,ep.START_DATE),0)) amount 
+from gtt.pa_pmg_payrolldtl d
+join pa_pcf_earningperiod ep on ep.id=d.EARNINGS_PERIOD_ID
+where 
+d.PAYMENT_MODE_hist in ('BANK', 'MMG')
+and d.ID in (
+select pa.id
+from pa_pmg_payrolldtl pa
+join pa_pmg_payrollhd ph on ph.id=pa.PAY_BATCH_ID
+where pa.org_id in (select * from table(PKG_REPORTS.SP_ORG_ID_LIST($P{IN_ORG_ID})))
+and  trunc(period_start)=trunc($P{period_start1}) 
+
+and pa.payment_type_hist='BI-MONTHLY'
+and pa.PAYMENT_MODE_HIST in ('BANK', 'MMG')
+)]]>
+		</queryString>
+		<field name="BLAZE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="BLAZE"/>
+		</field>
+		<field name="AMOUNT" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT"/>
+		</field>
+	</subDataset>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Period_start" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select case when upper(bank_branch_id_hist) like '%REPUBLIC%' then 'REPUBLIC BANK GUYANA LIMITED'
+            when upper(bank_branch_id_hist) like '%SCOTIA%' then 'BANK OF NOVA SCOTIA'
+            when upper(bank_branch_id_hist) like '%DEMERARA%' then 'DEMERARA BANK'
+            when upper(bank_branch_id_hist) like '%INDUSTRIES%' then 'GUYANA BANK FOR TRADE AND INDUSTRIES'
+            when upper(bank_branch_id_hist) like '%CITIZENS%' then 'CITIZENS BANK'
+            else cast(bank_branch_id_hist as varchar2(500)) end Bank
+,sum(net_pay- nvl(PKG_GLOBAL_FNTS.fn_getpayrollmmgrefund(d.emp_id,ep.START_DATE),0)) amount 
+from gtt.pa_pmg_payrolldtl d
+join pa_pcf_earningperiod ep on ep.id=d.EARNINGS_PERIOD_ID
+where 
+d.PAYMENT_MODE_hist IN ('BANK', 'MMG')
+and d.ID in (
+select pa.id
+from pa_pmg_payrolldtl pa
+join pa_pmg_payrollhd ph on ph.id=pa.PAY_BATCH_ID
+where pa.org_id in (select * from table(PKG_REPORTS.SP_ORG_ID_LIST($P{IN_ORG_ID})))
+and  trunc(period_start)=trunc($P{Period_start}) 
+
+and pa.payment_type_hist='BI-MONTHLY'
+and pa.PAYMENT_MODE_HIST IN ('BANK', 'MMG')
+)
+group by case when upper(bank_branch_id_hist) like '%REPUBLIC%' then 'REPUBLIC BANK GUYANA LIMITED'
+            when upper(bank_branch_id_hist) like '%SCOTIA%' then 'BANK OF NOVA SCOTIA'
+            when upper(bank_branch_id_hist) like '%DEMERARA%' then 'DEMERARA BANK'
+            when upper(bank_branch_id_hist) like '%INDUSTRIES%' then 'GUYANA BANK FOR TRADE AND INDUSTRIES'
+            when upper(bank_branch_id_hist) like '%CITIZENS%' then 'CITIZENS BANK'
+             else cast(bank_branch_id_hist as varchar2(500)) end
+union all
+select 
+'Blaze/DSL Disbursement' blaze, sum(nvl(PKG_GLOBAL_FNTS.fn_getpayrollmmgrefund(d.emp_id,ep.START_DATE),0)) amount 
+from gtt.pa_pmg_payrolldtl d
+join pa_pcf_earningperiod ep on ep.id=d.EARNINGS_PERIOD_ID
+where 
+d.PAYMENT_MODE_hist IN ('BANK', 'MMG')
+and d.ID in (
+select pa.id
+from pa_pmg_payrolldtl pa
+join pa_pmg_payrollhd ph on ph.id=pa.PAY_BATCH_ID
+where pa.org_id in (select * from table(PKG_REPORTS.SP_ORG_ID_LIST($P{IN_ORG_ID})))
+and  trunc(period_start)=trunc($P{Period_start}) 
+
+and pa.payment_type_hist='BI-MONTHLY'
+and pa.PAYMENT_MODE_HIST IN ('BANK', 'MMG')
+)]]>
+	</queryString>
+	<field name="BANK" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BANK"/>
+	</field>
+	<field name="AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT"/>
+	</field>
+	<variable name="total" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMOUNT}]]></variableExpression>
+	</variable>
+	<group name="Group1">
+		<groupHeader>
+			<band height="92">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<componentElement>
+					<reportElement x="39" y="2" width="420" height="90" uuid="172ecfa3-f87c-4db2-9cdc-0dc4c90cadd6">
+						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+						<property name="com.jaspersoft.studio.table.style.table_header" value="Table 1_TH"/>
+						<property name="com.jaspersoft.studio.table.style.column_header" value="Table 1_CH"/>
+						<property name="com.jaspersoft.studio.table.style.detail" value="Table 1_TD"/>
+					</reportElement>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="NETPAY" uuid="a8f3f4bc-9646-4cbf-9283-e4ee16c811bc">
+							<datasetParameter name="period_start">
+								<datasetParameterExpression><![CDATA[$P{Period_start}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="IN_ORG_ID">
+								<datasetParameterExpression><![CDATA[$P{IN_ORG_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="270" uuid="15583448-258c-4955-8b6a-e50fc2b1c072">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+							<jr:columnHeader style="Table 1_CH" height="30" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="270" height="30" uuid="51450622-e9f2-4658-bace-d0ccf7331d18"/>
+									<text><![CDATA[Payroll]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:columnFooter style="Table 1_CH" height="30" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="270" height="30" uuid="28e1c08a-d63e-4f38-8be8-86ebda31132a"/>
+									<textElement>
+										<font isBold="true"/>
+									</textElement>
+									<text><![CDATA[Total]]></text>
+								</staticText>
+							</jr:columnFooter>
+							<jr:detailCell style="Table 1_TD" height="30">
+								<textField>
+									<reportElement x="0" y="0" width="270" height="30" uuid="a0fddf3c-6475-410c-b5b3-ff52641a20eb"/>
+									<textFieldExpression><![CDATA[$F{PAYROLL}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="140" uuid="350aac42-06e4-456a-a0a0-230d0bcdd4d9">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+							<jr:columnHeader style="Table 1_CH" height="30" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="140" height="30" uuid="26bc4b32-a0bf-4486-89f2-d92f6ef641ad"/>
+									<textElement textAlignment="Right"/>
+									<text><![CDATA[Amount(Original)]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:columnFooter style="Table 1_CH" height="30" rowSpan="1">
+								<textField pattern="¤#,##0.00;¤-#,##0.00">
+									<reportElement x="0" y="0" width="140" height="30" uuid="346a81ac-cc77-4ada-b7b9-dcdaf4bbf282"/>
+									<textElement textAlignment="Right">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{Payroll_total}]]></textFieldExpression>
+								</textField>
+							</jr:columnFooter>
+							<jr:detailCell style="Table 1_TD" height="30">
+								<textField pattern="¤#,##0.00;¤-#,##0.00">
+									<reportElement x="0" y="0" width="140" height="30" uuid="ef30d822-3d61-439e-825a-2c70821a98ad"/>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression><![CDATA[$F{NET_PAY}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="Group2">
+		<groupHeader>
+			<band height="90">
+				<componentElement>
+					<reportElement x="39" y="0" width="420" height="90" uuid="19a64232-e34e-4183-9cc3-0ffde0cab8bc">
+						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+						<property name="com.jaspersoft.studio.table.style.table_header" value="Table 1_TH"/>
+						<property name="com.jaspersoft.studio.table.style.column_header" value="Table 1_CH"/>
+						<property name="com.jaspersoft.studio.table.style.detail" value="Table 1_TD"/>
+					</reportElement>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Bank" uuid="91ecfe76-4e34-424e-841a-53a73f5df627">
+							<datasetParameter name="period_start">
+								<datasetParameterExpression><![CDATA[$P{Period_start}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="IN_ORG_ID">
+								<datasetParameterExpression><![CDATA[$P{IN_ORG_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="270" uuid="250ca95d-a233-4ce5-bcb2-5379ed65f759">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+							<jr:columnHeader style="Table 1_CH" height="30" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="270" height="30" uuid="3d2d3735-279e-47e1-baac-639d9aa35f48"/>
+									<text><![CDATA[Bank]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:columnFooter style="Table 1_CH" height="30" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="270" height="30" uuid="e4973d9a-90c8-4c6a-9328-903c4d1dfea6"/>
+									<textElement>
+										<font isBold="true"/>
+									</textElement>
+									<text><![CDATA[Bank Total]]></text>
+								</staticText>
+							</jr:columnFooter>
+							<jr:detailCell style="Table 1_TD" height="30">
+								<textField>
+									<reportElement x="0" y="0" width="270" height="30" uuid="d439df5d-2884-4435-af73-1e2efd79627d"/>
+									<textFieldExpression><![CDATA[$F{BANK}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="140" uuid="cea9248b-01d4-453d-a49e-de671d2be32b">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+							<jr:columnHeader style="Table 1_CH" height="30" rowSpan="1"/>
+							<jr:columnFooter style="Table 1_CH" height="30" rowSpan="1">
+								<textField pattern="¤#,##0.00;¤-#,##0.00">
+									<reportElement x="0" y="0" width="140" height="30" uuid="f67582dc-aa3b-43a1-bb19-09c10f05ca9f"/>
+									<textElement textAlignment="Right">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{Bank_total}]]></textFieldExpression>
+								</textField>
+							</jr:columnFooter>
+							<jr:detailCell style="Table 1_TD" height="30">
+								<textField pattern="¤#,##0.00;¤-#,##0.00">
+									<reportElement x="0" y="0" width="140" height="30" uuid="d7c10a1e-9bdc-4d03-a4f6-256d18da04b6"/>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="Group3">
+		<groupHeader>
+			<band height="31">
+				<componentElement>
+					<reportElement x="39" y="0" width="420" height="30" uuid="d7a54b41-6ec4-44c3-9738-0c1f07a0ec0b">
+						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+						<property name="com.jaspersoft.studio.table.style.table_header" value="Table 1_TH"/>
+						<property name="com.jaspersoft.studio.table.style.column_header" value="Table 1_CH"/>
+						<property name="com.jaspersoft.studio.table.style.detail" value="Table 1_TD"/>
+					</reportElement>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Blaze" uuid="885753cc-de17-4a4e-8581-d2ffbdf7f5ad">
+							<datasetParameter name="period_start1">
+								<datasetParameterExpression><![CDATA[$P{Period_start}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="IN_ORG_ID">
+								<datasetParameterExpression><![CDATA[$P{IN_ORG_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="270" uuid="b33138dd-7725-46e4-b76a-44394393b915">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+							<jr:detailCell style="Table 1_TD" height="30">
+								<textField>
+									<reportElement x="0" y="0" width="270" height="30" uuid="71b9e239-1c08-4b36-9748-2c69bac56ccd"/>
+									<textFieldExpression><![CDATA[$F{BLAZE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="140" uuid="ea72041f-66fd-4e2e-958d-5702ae4b5cbd">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+							<jr:detailCell style="Table 1_TD" height="30">
+								<textField pattern="¤#,##0.00;¤-#,##0.00">
+									<reportElement x="0" y="0" width="140" height="30" uuid="fd0d1d75-920d-4dd5-99dd-34b08ff61f99"/>
+									<textElement textAlignment="Right"/>
+									<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="86" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="79" uuid="809b565a-14d8-4abc-90b2-16610519db16"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="43" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="9" width="572" height="20" uuid="d647d7a2-34dc-40ce-9e21-49c89a89ed1d"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="false" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Payroll Breakdown]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<pageFooter>
+		<band height="56" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="17" y="2" width="162" height="13" uuid="535d1260-f0a1-4ef1-b62e-83204a968a0e"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="460" y="2" width="102" height="13" uuid="7b134abc-cbdb-43a3-93b7-972e0c535e4d"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="d61854cc-13bb-4c08-97a9-a97e12354af5"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="15" width="572" height="15" uuid="b19ec4e7-8862-4080-a699-084338216056"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="460" y="0" width="62" height="16" uuid="56a59e4b-8293-4305-a336-542102f7e22b"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="522" y="0" width="40" height="16" uuid="ec882d0a-d88c-4061-ad6a-064a8a1df989"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="10" y="0" width="162" height="13" uuid="76bf739e-deb7-4d8c-9fa8-bf904e5f06e1"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="40" splitType="Stretch">
+			<staticText>
+				<reportElement x="39" y="0" width="270" height="30" uuid="5af2097b-b337-4bc3-afad-9c16b89d0390">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="309" y="0" width="140" height="30" uuid="55562be7-e1a2-4fab-8c15-46c2b1f84de1"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

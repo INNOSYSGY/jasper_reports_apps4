@@ -1,0 +1,725 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="main" pageWidth="612" pageHeight="792" columnWidth="468" leftMargin="72" rightMargin="72" topMargin="20" bottomMargin="20" uuid="9831c01b-6694-4273-9c03-f957a1f779e6">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Peoplepay_Correia/01_HR/New_Employee_Appointment_Letter"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/Peoplepay_Correia/01_HR/New_Employee_Appointment_Letter_files/main_jrxml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="215"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="777"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Correia Prod"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#F2F2F2">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="Table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="Table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<subDataset name="DISBURSEMENTS" uuid="1ab79b68-8b53-44c9-adf2-7a4aad37ce0f">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Correia Prod"/>
+		<parameter name="movement_id" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[select
+	'Account No: '|| m.bank_account_no_dist || ':-' || upper(o.organisation_name) acc_details
+from
+   hr_mov_disbursement m
+   join hr_hcf_organisation o on m.bank_branch_id_dist = o.id
+where m.movement_id =  $P{movement_id}]]>
+		</queryString>
+		<field name="ACC_DETAILS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ACC_DETAILS"/>
+			<property name="com.jaspersoft.studio.field.label" value="ACC_DETAILS"/>
+		</field>
+	</subDataset>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_MOV_ID" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+    a.*, 
+    'You will report to the <b>'||a.report_to_ad ||'</b>' || case when a.report_to_fu is null then ', ' else to_char(', thru’ <b>' || a.report_to_fu || ', </b>') end || 'to whom you will be responsible for the efficient and effective execution of your duties.' par2,
+    'Your Gross Salary is '||'<b>'||money_words||' ('||to_char(gross_salary,'FML999G999G999G999G990D00')||')'||'</b> '|| lower(a.payment_type)||'.' par7,
+    'Your Netpay will be paid through the following bank(s) :' par7_1,
+    'Dear '||MrMs||surname||',' salutation,
+    '<b>'||to_char(a.approved_date,'Month DD, YYYY')||'<b>' letter_date,
+    upper(staff_name||' ('||MrMS||')') emp_signature,
+    '<b>GENERAL CONDITIONS OF SERVICE</b><br><br>
+<b>1.	ANNUAL LEAVE:</b><br><br>
+
+You will be entitled to <b>'|| pkg_global_fnts.fn_num_towords(nvl(a.ann_lv_quantity, 0)) || ' (' || nvl(a.ann_lv_quantity,0) || ') days Annual Leave</b> after completing one (1) year of service. <br><br>
+
+The Company reserves the right to determine the particular time at which leave may be taken.<br><br>
+	
+If your employment is terminated for whatever reason, you will be entitled to any deferred leave standing to your credit plus current annual leave on a pro rata basis up to the last date of work.<br><br>
+
+<b>2.	ABSENCE DUE TO ILLNESS</b><br><br>
+
+Absence because of illness for more than three (3) consecutive days requires a medical certificate from a doctor certifying that you are ill and recommending the number of days sick leave.  This certificate should be forwarded as early as possible to your Manager/Supervisor and not after the resumption of duty.<br><br>
+
+<b>3.	PENSION & GROUP LIFE:</b><br><br>
+
+The cost of this scheme is being borne by the Employee and Employer and is currently being adminsitered by the Trust Company Guyana Limited.<br>The rate of contribution required by Employee is 5% of their taxable salary. The employer’s contribution is a minimum of 5% and increases as the fund requires.
+<br><br>
+
+<b>4.	MEDICAL ASSISTANCE</b><br><br>
+
+After confirmation all employees are required to join the Company’s Non-Contributory Medical Scheme, which provides in-hospital and out-of-hospital benefits for employees and their dependents.<br><br>
+
+<b>5.	TRANSFERS</b><br><br>
+
+The Company reserves the right to transfer you to another job provided that your salary is not reduced and that the other terms of service are no less favourable than those, which you previously enjoyed.' par13
+from (select 
+                (select 
+				    adr.lot || ' ' || 
+				    nvl(adr.street ||case when adr.street is not null then '<br>' else null end, null) || 
+				    nvl(adr.village_ward || case when adr.village_ward is not null then'<br>' else null end,null) || 
+				    nvl(adr.town || case when adr.town is not null then '<br>' else null end, null) || 
+				    nvl(adr.county, null)
+			    from hr_rcm_address adr
+			    where adr.ind_id = i.id
+			    and adr.address_type = 'HOME'
+			    and (adr.end_date is null or adr.end_date >= trunc(sysdate))) address, 
+                to_char(i.dob, 'fmMonth fmdd, yyyy') dob,
+                nvl(pkg_global_fnts.fn_getcurnistaxno(i.id, 'NATIONAL ID', trunc(sysdate)), nvl(pkg_global_fnts.fn_getcurnistaxno(i.id, 'PASSPORT NUMBER', trunc(sysdate)), ' ')) national_id,
+                pkg_global_fnts.fn_getcurnistaxno(i.id, 'TIN', trunc(sysdate)) tin,
+                pkg_global_fnts.fn_getcurnistaxno(i.id, 'NIS NUMBER', trunc(sysdate)) nis_number,
+                case when i.sex_code = 'M' then 'Mr. ' when i.sex_code = 'F' then 'Ms. ' end MrMS,
+                i.first_name, i.surname, 'APPOINTMENT LETTER' subject,
+                'The Management of '||'<b>'||upper(o.organisation_name)||'.'||'</b>'||' is pleased to offer you employment in the position of ' ||'<b>'||upper(p.position_name)||'</b>'||' with effect from '||'<b>'||to_char(mov.from_date,'Month DD, YYYY')||'<b>.' par1,    
+                upper((select (select position_name from hr_hcf_position where id = emp.position_id)||', '||case when ind.sex_code = 'M' then 'Mr. ' when ind.sex_code = 'F' then 'Ms. ' end ||ind.first_name||' '||ind.surname from hr_rcm_individual ind join hr_rcm_employee emp on emp.ind_id = ind.id where emp.id = mov.report_to_admin)) report_to_ad,
+                initcap((select (select position_name from hr_hcf_position where id = emp.position_id)  from hr_rcm_employee emp where emp.id = mov.report_to_admin)) report_to_ad_pos,
+                upper((select (select position_name from hr_hcf_position where id = emp.position_id)||', '||case when ind.sex_code = 'M' then 'Mr. ' when ind.sex_code = 'F' then 'Ms. ' end ||ind.first_name||' '||ind.surname from hr_rcm_individual ind join hr_rcm_employee emp on emp.ind_id = ind.id where emp.id = mov.report_to_func)) report_to_fu,
+                'This offer is subject to:' par3,
+                'Satisfactory Police Clearance and related security, personal, performance and background checks.' par4,
+                'Satisfactory completion of a probationary period of three (3) months in the position.  A formal review will be done after three (3) months depending on which you will be confirmed in the position.  However, if after three (3) months, unsatisfactory aspects of your performance are identified, which can be corrected in the short term, the probationary employment may be extended to a maximum of six (6) months.' par5,
+                'You are required to work on shift for a total of '||pkg_global_fnts.fn_num_towords(shift_hours)||' ('||shift_hours||') '||'hours per week, which may increase to meet operational needs.' par6,
+                nvl(mov.personal_rate, 0)+nvl(ent.amount, 0) gross_salary,
+                initcap(pkg_global_fnts.fn_num_towords(nvl(personal_rate, 0)+nvl(ent.amount, 0))||' Dollars') money_words,
+                'INCOME TAX REGULATIONS:' par8,
+                'The Company will deduct normal PAYE through its payroll which will be paid over to the Commissioner of the Guyana Revenue Authority. The liability for any taxes under the Income Tax regulations is entirely yours and the Company assumes no responsibility for same, except its natural responsibility to report on payments made to employees.' par9,
+                'NOTE: This does not apply to employees earning '|| (select to_char(tax_ceiling_lower,'FML999G999G999G999G990D00') from hr_hcf_taxrate where org_id = mov.org_id and upper(payment_type)=upper(mov.payment_type) and rownum = 1 and (date_effective_end >= sysdate or date_effective_end is null)) ||' or less per month.' par10,
+                'NIS REGULATIONS:' par11,
+                'The Company will deduct normal NIS through its payroll which will be paid over to the National Insurance Scheme. ' par12,
+                (select 
+                        case when inda.sex_code = 'M' then 'Mr. ' else 'Ms. ' end ||  inda.first_name ||' ' || inda.surname ||',<br> ' || posa.position_name
+                    from tblapprovalhistory apphist 
+                    join tbluser userapp on upper(userapp.user_name) = upper(apphist.created_by)
+                    join hr_rcm_employee empa on userapp.employee_no = empa.id
+                    join hr_rcm_individual inda on empa.ind_id = inda.id 
+                    join hr_hcf_position posa on empa.position_id = posa.id
+                    where apphist.table_name_key = mov.id
+                    and apphist.action = 'APPROVAL'
+                    and apphist.id = (select min(a.id) from tblapprovalhistory a where a.table_name_key = mov.id)) director_name,
+                 (select 
+                        inda.sig_photo
+                    from tblapprovalhistory apphist 
+                    join tbluser userapp on upper(userapp.user_name) = upper(apphist.created_by)
+                    join hr_rcm_employee empa on userapp.employee_no = empa.id
+                    join hr_rcm_individual inda on empa.ind_id = inda.id 
+                    join hr_hcf_position posa on empa.position_id = posa.id
+                    where apphist.table_name_key = mov.id
+                    and apphist.action = 'APPROVAL'
+                    and apphist.id = (select min(a.id) from tblapprovalhistory a where a.table_name_key = mov.id) ) director_sig,
+                 (select upper(p.position_name) from hr_rcm_employee e join hr_hcf_position p on p.id = e.position_id
+                 where p.position_name like 'Director%'
+                 and org_id =$P{IN_ORG_ID}  
+                 and rownum = 1) director_title,
+                i.first_name||' '||i.surname staff_name,
+                mov.org_id, mov.report_to_admin, mov.report_to_func,
+                mov.approved_date,
+                o.letter_head_logo,
+                o.letter_footer_logo,
+                initcap(o.organisation_name) organisation_name,
+                case 
+                    when mov.approved_by is null then'NOT APPROVED'
+                    else
+                        case when mov.verified_by is null then  'NOT VERIFIED'
+                        else ' '
+                        end
+                end as movement_status,
+            mov.emp_company_no, 
+            acc.no account_no,
+            (select mov_lv.quantity
+            from hr_mov_empleaveentitle mov_lv
+            where mov_lv.movement_id =mov.id
+            and upper(PKG_GLOBAL_FNTS.Get_Lookup_Col(mov_lv.leave_type_id, 'value_description')) like upper('Annual%')) ann_lv_quantity,
+            (select floor(empdedcode.employee_ded_per * 100)
+            from pa_pcf_deductioncode empdedcode
+            where empdedcode.expense_code = 'PENSION'
+            and empdedcode.org_id =$P{IN_ORG_ID}  
+            ) emp_pension,
+            (select floor(emplrdedcode.employer_ded_per * 100)
+            from pa_pcf_deductioncode emplrdedcode
+            where emplrdedcode.expense_code = 'PENSION'
+            and emplrdedcode.org_id =$P{IN_ORG_ID}  
+            ) emplr_pension,
+            mov.payment_type
+            from hr_rcm_individual i
+            join hr_mov_empmovement_new mov on mov.ind_id = i.id
+            join hr_hcf_organisation o on o.id = mov.org_id
+            join hr_hcf_position p on p.id = mov.position_id
+            left join (select sum(shift_hours) shift_hours,shift_rota_id
+                        from hr_att_shift_rota_detail
+                        group by shift_rota_id) rotdet on rotdet.shift_rota_id = mov.shift_id
+            left join (select sum(amount) amount, id
+                            from (select movent.amount  , movent.id ent_id, m.id
+                                            from hr_mov_empentitle movent   
+                                            join hr_mov_empmovement_new m on m.id = movent.movement_id
+                                            where movent.admin_status = 'SYS'
+                                            and movent.start_date = m.from_date
+                                            and m.id = $P{IN_MOV_ID}
+                            ) a
+                            group by id) ent on ent.id = mov.id
+            left join (select d.movement_id, listagg(d.bank_account_no_dist || CHR(10)  || '(' || upper(trim(o.short_name)) || ':-' || upper(trim(o.address)) || ')',  CHR(10)) within group (order by d.bank_account_no_dist) no from hr_mov_disbursement d left join hr_hcf_organisation o on o.id = d.BANK_BRANCH_ID_DIST where o.user_org_id =  $P{IN_ORG_ID} group by d.movement_id) acc on mov.id = acc.movement_id
+            where org_id = $P{IN_ORG_ID}  
+            and mov.id =  $P{IN_MOV_ID}
+--and executed = 1 
+) a]]>
+	</queryString>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="DOB" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DOB"/>
+		<property name="com.jaspersoft.studio.field.label" value="DOB"/>
+	</field>
+	<field name="NATIONAL_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NATIONAL_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="NATIONAL_ID"/>
+	</field>
+	<field name="TIN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TIN"/>
+		<property name="com.jaspersoft.studio.field.label" value="TIN"/>
+	</field>
+	<field name="NIS_NUMBER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NIS_NUMBER"/>
+		<property name="com.jaspersoft.studio.field.label" value="NIS_NUMBER"/>
+	</field>
+	<field name="MRMS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="MRMS"/>
+		<property name="com.jaspersoft.studio.field.label" value="MRMS"/>
+	</field>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FIRST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="SUBJECT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUBJECT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUBJECT"/>
+	</field>
+	<field name="PAR1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR1"/>
+	</field>
+	<field name="REPORT_TO_AD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_AD"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_AD"/>
+	</field>
+	<field name="REPORT_TO_AD_POS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_AD_POS"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_AD_POS"/>
+	</field>
+	<field name="REPORT_TO_FU" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_FU"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_FU"/>
+	</field>
+	<field name="PAR3" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR3"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR3"/>
+	</field>
+	<field name="PAR4" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR4"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR4"/>
+	</field>
+	<field name="PAR5" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR5"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR5"/>
+	</field>
+	<field name="PAR6" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR6"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR6"/>
+	</field>
+	<field name="GROSS_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="GROSS_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="GROSS_SALARY"/>
+	</field>
+	<field name="MONEY_WORDS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="MONEY_WORDS"/>
+		<property name="com.jaspersoft.studio.field.label" value="MONEY_WORDS"/>
+	</field>
+	<field name="PAR8" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR8"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR8"/>
+	</field>
+	<field name="PAR9" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR9"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR9"/>
+	</field>
+	<field name="PAR10" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR10"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR10"/>
+	</field>
+	<field name="PAR11" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR11"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR11"/>
+	</field>
+	<field name="PAR12" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR12"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR12"/>
+	</field>
+	<field name="DIRECTOR_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DIRECTOR_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="DIRECTOR_NAME"/>
+	</field>
+	<field name="DIRECTOR_SIG" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="DIRECTOR_SIG"/>
+		<property name="com.jaspersoft.studio.field.label" value="DIRECTOR_SIG"/>
+	</field>
+	<field name="DIRECTOR_TITLE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DIRECTOR_TITLE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DIRECTOR_TITLE"/>
+	</field>
+	<field name="STAFF_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="STAFF_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="STAFF_NAME"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="REPORT_TO_ADMIN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_ADMIN"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_ADMIN"/>
+	</field>
+	<field name="REPORT_TO_FUNC" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_FUNC"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_FUNC"/>
+	</field>
+	<field name="APPROVED_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="APPROVED_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="APPROVED_DATE"/>
+	</field>
+	<field name="LETTER_HEAD_LOGO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="LETTER_HEAD_LOGO"/>
+		<property name="com.jaspersoft.studio.field.label" value="LETTER_HEAD_LOGO"/>
+	</field>
+	<field name="LETTER_FOOTER_LOGO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="LETTER_FOOTER_LOGO"/>
+		<property name="com.jaspersoft.studio.field.label" value="LETTER_FOOTER_LOGO"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="MOVEMENT_STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="MOVEMENT_STATUS"/>
+		<property name="com.jaspersoft.studio.field.label" value="MOVEMENT_STATUS"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_COMPANY_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="ACCOUNT_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ACCOUNT_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="ACCOUNT_NO"/>
+	</field>
+	<field name="ANN_LV_QUANTITY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ANN_LV_QUANTITY"/>
+		<property name="com.jaspersoft.studio.field.label" value="ANN_LV_QUANTITY"/>
+	</field>
+	<field name="EMP_PENSION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_PENSION"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_PENSION"/>
+	</field>
+	<field name="EMPLR_PENSION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLR_PENSION"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLR_PENSION"/>
+	</field>
+	<field name="PAYMENT_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAYMENT_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_TYPE"/>
+	</field>
+	<field name="PAR2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR2"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR2"/>
+	</field>
+	<field name="PAR7" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR7"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR7"/>
+	</field>
+	<field name="PAR7_1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR7_1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR7_1"/>
+	</field>
+	<field name="SALUTATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALUTATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALUTATION"/>
+	</field>
+	<field name="LETTER_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LETTER_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="LETTER_DATE"/>
+	</field>
+	<field name="EMP_SIGNATURE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_SIGNATURE"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_SIGNATURE"/>
+	</field>
+	<field name="PAR13" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR13"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR13"/>
+	</field>
+	<group name="Employee">
+		<groupExpression><![CDATA[$F{STAFF_NAME}]]></groupExpression>
+		<groupHeader>
+			<band/>
+			<band/>
+			<band/>
+			<band/>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="752">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<printWhenExpression><![CDATA[new Boolean( $V{PAGE_NUMBER}.intValue() == 1 )]]></printWhenExpression>
+			<image scaleImage="FillFrame">
+				<reportElement x="-72" y="547" width="612" height="205" uuid="298de57f-3bb1-4227-b1e4-55779fe040af">
+					<printWhenExpression><![CDATA[IF($V{PAGE_NUMBER}.intValue()==1,TRUE( ),FALSE( ))]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<imageExpression><![CDATA[$F{LETTER_FOOTER_LOGO}]]></imageExpression>
+			</image>
+			<image scaleImage="RealHeight">
+				<reportElement positionType="Float" x="-71" y="-19" width="612" height="39" uuid="5ccd5c87-1e69-4f3a-a011-f262d9328e41"/>
+				<imageExpression><![CDATA[$F{LETTER_HEAD_LOGO}]]></imageExpression>
+			</image>
+			<textField pattern="yyyy.MM.dd" isBlankWhenNull="true">
+				<reportElement x="320" y="136" width="180" height="15" isRemoveLineWhenBlank="true" uuid="22f15902-a139-4daf-8397-58808ef6b998">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["D.O.B......: "+$F{DOB}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement isPrintRepeatedValues="false" x="0" y="241" width="468" height="15" isRemoveLineWhenBlank="true" uuid="9d2b707e-d42f-4014-9ec8-089a72717d60">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUBJECT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="163" width="250" height="21" isRemoveLineWhenBlank="true" uuid="4f9e65d0-9ac6-4c0e-90b0-f97de3ce2720"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="320" y="181" width="180" height="15" isRemoveLineWhenBlank="true" uuid="7706a63b-614b-45e7-a0ca-efa9ceb07b25">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["NIS..........: "+$F{NIS_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="226" width="179" height="15" isRemoveLineWhenBlank="true" uuid="c431df3c-abed-4431-a428-aebbd4a85cb9">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SALUTATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="148" width="208" height="15" isRemoveLineWhenBlank="true" forecolor="#000000" uuid="cf01c828-8c02-4fe3-9246-065e8799532c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STAFF_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="320" y="151" width="180" height="15" isRemoveLineWhenBlank="true" uuid="93f63ea9-5a6d-4fd6-a053-5934dd50dd26">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["ID............: "+$F{NATIONAL_ID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="320" y="166" width="180" height="15" isRemoveLineWhenBlank="true" uuid="25cabbe1-2367-487e-ae1c-a355f37f851a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["TIN..........: "+$F{TIN}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMM d, yyyy">
+				<reportElement key="" x="0" y="121" width="179" height="15" isRemoveLineWhenBlank="true" uuid="b14f54b5-2782-4501-b916-8bf99fb4a76d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA[$F{LETTER_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="122" y="126" width="226" height="25" forecolor="#CC0B08" uuid="d8011da8-da6c-4ca2-97d2-37fad4d65b76"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MOVEMENT_STATUS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="320" y="121" width="180" height="15" isRemoveLineWhenBlank="true" uuid="92f25fc5-82af-4438-a784-8f3b11a4cb1b">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["EMP NO..: "+$F{EMP_COMPANY_NO}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="1" y="596" width="468" height="15" uuid="85ff863f-73c6-418a-bf05-05b2888ee8c4">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="43d683da-a4ee-4bf4-b423-bd054f966a1e"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR10}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="425" width="468" height="15" uuid="2316ceb0-8a36-416d-a5cb-afe5679a96d0">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="43d683da-a4ee-4bf4-b423-bd054f966a1e"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR6}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="353" width="468" height="15" uuid="1ef1d67e-183d-43d7-8d19-1d040be75c2c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="59957a3b-17c4-464d-992e-faa534167e3a"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR4}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="372" width="468" height="15" uuid="f0959ed2-ed7e-49df-9ec6-481d23ca049e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6b19c649-1f4c-40a6-a510-16da50a326a0"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR5}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="293" width="468" height="15" uuid="3076b36a-0819-46c1-b1ca-d672f6bd49a8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8ec7d6a1-989a-4f2d-b741-ed4d7bf1777d"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR2}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="455" width="468" height="15" uuid="9525b4c2-251a-4470-86f7-c9dcaeaecea9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="43d683da-a4ee-4bf4-b423-bd054f966a1e"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR7}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="333" width="468" height="15" uuid="768dddd5-8b78-41a7-a8d3-3ebcbb739106">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8563cf3d-5676-4795-8afc-4fd791505fee"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR3}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="1" y="636" width="468" height="15" uuid="c27986a6-d513-4a01-bdb9-7d197dedf0c8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="43d683da-a4ee-4bf4-b423-bd054f966a1e"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR12}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="1" y="616" width="468" height="15" uuid="55ebbba3-b692-410f-9952-65a0aaa3cffc">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="43d683da-a4ee-4bf4-b423-bd054f966a1e"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR11}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="263" width="468" height="15" uuid="e0769942-6653-460f-8575-72017079f21c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a1220082-00ed-4be0-add8-bd5dade02633"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR1}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="1" y="538" width="468" height="15" uuid="100cd35a-dbdb-4004-9308-9fe01bff1f79">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="43d683da-a4ee-4bf4-b423-bd054f966a1e"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR9}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="478" width="468" height="15" uuid="af586872-fb83-4ac7-a4e5-d9c7d2b6fafe">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="43d683da-a4ee-4bf4-b423-bd054f966a1e"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR7_1}]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement x="20" y="493" width="448" height="16" uuid="7db74821-b283-4590-966d-1e260802f8ec">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 1_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 1_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table 1_TD"/>
+					<property name="com.jaspersoft.studio.components.autoresize.proportional" value="true"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="DISBURSEMENTS" uuid="db2cbe0e-15c6-4d48-9699-045806ed70aa">
+						<datasetParameter name="movement_id">
+							<datasetParameterExpression><![CDATA[$P{IN_MOV_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="448" uuid="d3cace91-6c48-4eb0-b537-2132bfc4234b">
+						<jr:detailCell style="Table 1_TD" height="15">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField>
+								<reportElement x="0" y="0" width="448" height="15" uuid="506756b2-7845-48aa-bef4-a5f47f61db3f">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<textFieldExpression><![CDATA[$F{ACC_DETAILS}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="1" y="518" width="468" height="15" uuid="91043e75-f23d-4018-95de-0f50cbb64bc9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="43d683da-a4ee-4bf4-b423-bd054f966a1e"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR8}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="264">
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="0" width="468" height="80" uuid="ec16fd07-4ea7-4475-affb-3df61bc5e3b7"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA[$F{PAR13}+"<br><br><b>6.	TERMINATION OF EMPLOYMENT</b><br><br>A Contract can be terminated by either party without notice during Probation. Both the <b>"+$F{ORGANISATION_NAME} + "</b> and yourself have the right to give the other party two (2) weeks’ notice <b>after</b> confirmation with less than one (1) years’ service and one (1) months’ notice after completing one (1) year or more service. The company reserves the right to immediately dismiss you for conduct warranting summary dismissal.<br><br><b>7.	GENERAL</b><br><br>(a) During the period of your employment, you will not be permitted to become involved in any   outside activity which is related directly or indirectly to any of the business of our holdings and which may be related to, or is in direct conflict or competition with your full time employment; be involved in maintenance activities elsewhere, whether for reward or personal gains <b>without the expressed permission of the "+$F{REPORT_TO_AD_POS}+". </b> <br><br>(b)	You may not accept a gift, entertainment or other favour from any outside company or individual.  Any such offer should be notified immediately to the <b>"+$F{REPORT_TO_AD_POS}+"</b>, who will advise how best to respond in the circumstances.  If you or any member of your family are or is likely to be involved in the supply of goods or services to the <b>Correia Group of Companies</b>, you must first obtain the written permission of the <b>Chief Executive Officer.</b>(c)	You will scrupulously exercise, carry out and comply with all such powers, duties, and orders consistent with your status and appointment as may from time to time be assigned to, vested in you by the Company, its authorized agents, or representatives and shall use all proper means in your power to maintain and improve the Company’s business and to further the reputation and interests of the Company.<br><br>(d)	You will faithfully serve the Company to the utmost of your power, skill and ability, devoting your time and effort to promoting the business interest of the Company.<br><br>(e)	You will not either during the continuance of your employment hereunder or thereafter disclose, make available for, or in any way facilitate the disclosure to any person or entity of any trade secrets or any other confidential information concerning the organization, business or finances of the <b>"+$F{ORGANISATION_NAME}+"</b> or any of its dealings, transactions or affairs or forming part of the Company’s interest which may come to your knowledge during or in the course of your employment hereunder relating to including matters pertaining to your employment.<br><br>(f)	You shall keep with complete secrecy all confidential information entrusted to you and shall not use or attempt to use any such information in any way which may injure or cause loss either directly or indirectly to the business of the <b>"+$F{ORGANISATION_NAME}+"</b> and shall take all reasonable precautions in dealing with any documents, papers or electronically stored information of a confidential or sensitive nature obtained as a result of or in the course of your employment hereunder so as to prevent any person or entity not expressly authorized by the <b>"+$F{ORGANISATION_NAME}+"</b> from having access to or knowledge of it.  This restriction shall continue to apply after the termination of this Agreement until such time as the information or knowledge comes by other means into the public domain.<br><br><b>8.       ALCOHOL AND DRUG POLICY</b><br><br>You shall be subjected to the Company’s Alcohol and Drugs Policy and related Testing procedures and regulations that governs the policy and abide with the Provisions therein. <br><br><b>Explanatory Memorandum</b><br><br>The Company’s Alcohol and Drugs Policy seeks to comply with standard best practices to facilitate employee’s safety in the Workplace."]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement positionType="Float" x="3" y="90" width="260" height="174" uuid="0ab8ea5b-7a63-4e19-81bb-252f14bcba8a"/>
+				<staticText>
+					<reportElement positionType="Float" x="0" y="84" width="260" height="15" uuid="7fee6402-858b-42a2-9c65-4a721a58e837">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<text><![CDATA[I accept the above terms and conditions.]]></text>
+				</staticText>
+				<textField>
+					<reportElement positionType="Float" x="0" y="124" width="179" height="15" uuid="e376156d-5177-432f-b57f-adb48fe25957">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EMP_SIGNATURE}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement positionType="Float" x="0" y="109" width="179" height="15" uuid="bb33cf21-7078-4be5-9056-62c45beeaa24">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<text><![CDATA[............................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="0" y="144" width="136" height="30" uuid="2fc916c7-4b79-48e2-b548-cd9d193ce32a"/>
+					<text><![CDATA[C.c. Accounts Manager
+        Personnel File]]></text>
+				</staticText>
+				<frame>
+					<reportElement positionType="Float" x="0" y="0" width="179" height="76" uuid="896dd4cd-1621-4ca2-923a-5a17208b99f1"/>
+					<image scaleImage="FillFrame">
+						<reportElement x="3" y="0" width="130" height="50" uuid="72648610-b942-4ddd-8955-524312147462">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<box>
+							<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<imageExpression><![CDATA[$F{DIRECTOR_SIG}]]></imageExpression>
+					</image>
+					<staticText>
+						<reportElement x="0" y="40" width="179" height="15" uuid="1dff756e-bdbb-466d-b4bf-804abf65f72c">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement verticalAlignment="Bottom"/>
+						<text><![CDATA[............................................]]></text>
+					</staticText>
+					<textField isBlankWhenNull="true">
+						<reportElement x="0" y="61" width="179" height="15" uuid="3dd1fc41-6891-476e-b760-5756b4639f34">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<textElement markup="html">
+							<font isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{DIRECTOR_NAME}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>

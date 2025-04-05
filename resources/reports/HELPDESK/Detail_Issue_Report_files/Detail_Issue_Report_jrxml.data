@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Detail Issue Report" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d320ba7d-09c7-4f7a-a0ba-6b83344728e6">
+	<property name="ireport.zoom" value="1.3310000000000035"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="336"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/HELPDESK/Detail_Issue_Report"/>
+	<property name="ireport.jasperserver.url" value="http://190.80.4.150:8081/jasperserver/services/repository"/>
+	<parameter name="report_name" class="java.lang.String"/>
+	<parameter name="start_date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="end_date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="client_id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT *
+FROM vw_CHANGE_DETAIL a
+join vw_change_head d on d.id = a.change_head_id
+WHERE TRUNC(REAL_date_raise) BETWEEN $P{start_date} AND $P{end_date}  AND COMPANY_ID = $P{client_id}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="FIX_MEDIUM" class="java.lang.String"/>
+	<field name="STATUS" class="java.lang.String"/>
+	<field name="DATE_COMMENCE" class="java.sql.Timestamp"/>
+	<field name="DATE_INVEST_COMPLETED" class="java.sql.Timestamp"/>
+	<field name="DATE_RESO_COMPLETED" class="java.sql.Timestamp"/>
+	<field name="TECHNICIAN" class="java.lang.String"/>
+	<field name="SUB_MODULE" class="java.lang.String"/>
+	<field name="TASK_SEQUENCE" class="java.math.BigDecimal"/>
+	<field name="CHANGE_DETAILS" class="java.lang.String"/>
+	<field name="INVESTIGATION" class="java.lang.String"/>
+	<field name="ESTIMATED_IMPACT_EFFORT" class="java.lang.String"/>
+	<field name="ESTIMATED_IMPACT_SCHEDULE" class="java.lang.String"/>
+	<field name="POSSIBLE_ACTION" class="java.lang.String"/>
+	<field name="ACTUAL_IMPACT_EFFORT" class="java.lang.String"/>
+	<field name="ACTUAL_IMPACT_SCHEDULE" class="java.lang.String"/>
+	<field name="CHANGE_HEAD_ID" class="java.math.BigDecimal"/>
+	<field name="CHANGE_REQUEST_NUM" class="java.lang.String"/>
+	<field name="COMPANY_ID" class="java.math.BigDecimal"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="FUNCTIONAL_AREA" class="java.lang.String"/>
+	<field name="INITIATED_BY" class="java.lang.String"/>
+	<field name="PRIORITY" class="java.lang.String"/>
+	<field name="DATE_RAISE" class="java.lang.String"/>
+	<field name="REAL_DATE_RAISE" class="java.sql.Timestamp"/>
+	<field name="ASSIGNED_TO" class="java.lang.String"/>
+	<field name="DATE_RESOLUTION_REQ" class="java.lang.String"/>
+	<field name="REQUEST_SUMMARY_INFO" class="java.lang.String"/>
+	<field name="COMPLETION_DATE" class="java.sql.Timestamp"/>
+	<field name="LEAD_STAFF" class="java.math.BigDecimal"/>
+	<sortField name="CHANGE_REQUEST_NUM"/>
+	<sortField name="TASK_SEQUENCE"/>
+	<variable name="parameters" class="java.lang.String">
+		<variableExpression><![CDATA[new SimpleDateFormat("dd MMMMM yyyy").format($P{start_date})+" to "+new SimpleDateFormat("dd MMMMM yyyy").format($P{end_date})]]></variableExpression>
+		<initialValueExpression><![CDATA[new SimpleDateFormat("dd MMMMM yyyy").format($P{start_date})+" to "+new SimpleDateFormat("dd MMMMM yyyy").format($P{end_date})]]></initialValueExpression>
+	</variable>
+	<group name="Request_no" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{CHANGE_REQUEST_NUM}]]></groupExpression>
+		<groupHeader>
+			<band height="23">
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+					<reportElement x="80" y="0" width="128" height="23" uuid="bf0c95f1-cdc0-4494-aec0-d41c84f21a1f"/>
+					<textElement>
+						<font fontName="Cambria"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CHANGE_REQUEST_NUM}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="80" height="23" uuid="1a833e17-e993-4df5-a5d5-4e0efc4593e7"/>
+					<textElement>
+						<font fontName="Cambria" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Ticket ID:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="TASK_SEQ_GROUP" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{TASK_SEQUENCE}]]></groupExpression>
+		<groupFooter>
+			<band height="1"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="61" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="61" uuid="724baeb5-21af-4abd-8cf1-e14a1f79b71e"/>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA["TICKET Report"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="period">
+					<subreportParameterExpression><![CDATA[$V{parameters}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/HELPDESK/RESOURCES/LEGAL_PORTRAIT_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="333" y="0" width="63" height="20" uuid="9cac309c-027f-4f02-9283-757642642c5f"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Client Name:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="396" y="0" width="176" height="20" uuid="77558ed6-cfa7-4fb1-b839-c8c183e0a145"/>
+				<textElement textAlignment="Center">
+					<font fontName="Cambria" isBold="true" isItalic="false" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="108" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="48" width="100" height="20" uuid="2e72bd60-6bd3-4214-b35e-225b91de861a"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Company ID:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="68" width="100" height="20" uuid="e22ee863-b3e7-41e8-98b3-bfd240cb4515"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Functional Area:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="88" width="100" height="20" uuid="f0945fc9-d268-45d3-8632-87b6380d7dcf"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Status:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="28" width="100" height="20" uuid="168ca1f9-a5d5-4e1f-b656-830e6a6c6206"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Priority]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="48" width="100" height="20" uuid="c4e29953-6f6d-4d5c-be1b-57e8c02b8e7d"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Date Raised]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="68" width="100" height="20" uuid="05f4377d-4f81-4357-86f7-b54f6541af20"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Logged By:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="88" width="100" height="20" uuid="f1c51c8f-1ba4-46ef-8636-acfd71f61f2b"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Date Resolution:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="28" width="100" height="20" uuid="13e54c1c-26a7-4c52-b8f8-8737088a0b44"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Job ID:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="100" y="29" width="60" height="20" uuid="5c6a9431-f7a4-4757-9a53-87c10c2db019"/>
+				<textElement>
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="100" y="48" width="88" height="20" uuid="ef403e92-4766-4c8c-a528-e732c8dae37f"/>
+				<textElement>
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPANY_ID}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="100" y="68" width="120" height="20" uuid="a4453932-77b8-4c6c-a79b-ee63c674afb7"/>
+				<textElement>
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FUNCTIONAL_AREA}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="100" y="88" width="88" height="20" uuid="a76fc0fe-9a65-46a5-9237-7918a6d0567c"/>
+				<textElement>
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STATUS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="433" y="28" width="139" height="20" forecolor="#FF0000" backcolor="#FF3300" uuid="a937fbec-e38c-41ef-a7a1-28c3763657a0"/>
+				<textElement textAlignment="Right">
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRIORITY}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="433" y="48" width="139" height="20" uuid="6f803118-b20e-49b8-bafa-8d2341b724fc"/>
+				<textElement textAlignment="Right">
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_RAISE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="433" y="68" width="139" height="20" uuid="721c9244-61d2-4055-ab23-41b7ef4d980d"/>
+				<textElement textAlignment="Right">
+					<font isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ASSIGNED_TO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="433" y="88" width="139" height="20" uuid="b59210e0-f599-478e-9dbd-b152284ef652"/>
+				<textElement textAlignment="Right">
+					<font isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_RESOLUTION_REQ}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="572" height="28" backcolor="#CCCCCC" uuid="cdd056d6-7ef7-4154-ad1d-c4f7b11db056"/>
+				<textElement textAlignment="Center">
+					<font fontName="Cambria" size="14" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[TICKET INFORMATION]]></text>
+			</staticText>
+		</band>
+		<band height="161">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="572" height="28" backcolor="#CCCCCC" uuid="dcb8bb7c-7b9d-46ca-9603-c254ed033062"/>
+				<textElement textAlignment="Center">
+					<font fontName="Cambria" size="14" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[DESCRIPTION OF PROBLEM]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="94" y="65" width="478" height="45" uuid="4649ec0f-ec77-474f-be55-eb8bdc2f53b3"/>
+				<textElement textAlignment="Justified" markup="html">
+					<font fontName="Cambria" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTIMATED_IMPACT_EFFORT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="110" width="94" height="20" uuid="f5007df9-0600-4bb0-ab16-ce400f2c95d2"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Actual Impact]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="94" y="28" width="478" height="37" uuid="822bb35b-db08-4363-a414-c8da7adcc602"/>
+				<textElement textAlignment="Justified" markup="html">
+					<font fontName="Cambria" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{CHANGE_DETAILS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="65" width="94" height="20" uuid="0dd62cdf-fc4d-40fb-a492-828e035ddecc"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Est. Impact]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="94" y="110" width="478" height="51" uuid="94697086-afb0-4d2a-8ba2-04b84ab3dee8"/>
+				<textElement textAlignment="Justified" markup="html">
+					<font fontName="Cambria" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACTUAL_IMPACT_EFFORT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" x="2" y="28" width="92" height="20" uuid="4ae049b9-3734-4107-838b-91a84ab1b39d"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Change Detail:]]></text>
+			</staticText>
+		</band>
+		<band height="196">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="572" height="28" backcolor="#CCCCCC" uuid="2e59489f-84d3-4c6a-a7b7-57cf99f315d6"/>
+				<textElement textAlignment="Center">
+					<font fontName="Cambria" size="14" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[TECHNICIAN REPSONSE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="150" width="112" height="21" uuid="908e5e6f-a6ac-482d-ab0e-2e3ccd759b9f"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Investigation:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="433" y="28" width="138" height="20" uuid="9236b8e0-b3d4-4f1d-9a47-60c7a1dff2f7"/>
+				<textElement textAlignment="Right">
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TECHNICIAN}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="112" y="104" width="460" height="46" uuid="efdbb12c-c7dc-4f2a-95c5-b39924ba6ca3"/>
+				<textElement textAlignment="Justified" markup="html">
+					<font fontName="Cambria" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INVESTIGATION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="104" width="112" height="25" uuid="35974e0d-5f52-419f-839c-c007369767c3"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Action to be taken:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="48" width="112" height="16" uuid="341875df-8bc8-48c2-a429-d5b55e32c543"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Sub Module:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="112" y="150" width="460" height="46" uuid="844065e1-ef54-4868-b78b-10ddfb32bde1"/>
+				<textElement markup="html">
+					<font fontName="Cambria" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSSIBLE_ACTION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="333" y="68" width="100" height="20" uuid="e438fe1b-d67b-46a6-bcb7-9469945ff915"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Completion Date:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="433" y="48" width="138" height="20" uuid="7e77140b-cd6f-4cc6-8aa0-0503cb22258a"/>
+				<textElement textAlignment="Right">
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIX_MEDIUM}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="112" y="64" width="115" height="20" uuid="d35aba3b-cc1a-49db-880d-e14520c640fc"/>
+				<textElement>
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_COMMENCE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="333" y="48" width="100" height="20" uuid="825652ac-2bbe-400f-bab8-0ed4114be566"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Fix Medium:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="112" y="48" width="150" height="16" uuid="05c6405a-f021-4372-a0de-32ab5b23153f"/>
+				<textElement>
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUB_MODULE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="112" y="84" width="150" height="20" uuid="4309d180-c1a2-42f9-bf2e-63f61fd0bc71"/>
+				<textElement>
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_INVEST_COMPLETED}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="433" y="68" width="138" height="20" uuid="0db6894b-d12f-432d-b81d-0d774475d2a8"/>
+				<textElement textAlignment="Right">
+					<font fontName="Cambria" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_RESO_COMPLETED}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="64" width="112" height="20" uuid="fbe8f0c3-07d9-4c6c-84af-a8ed39829fba"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Date Commenced:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="28" width="112" height="20" uuid="1a9296fb-6983-4726-95b4-fd9934f16d86"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Task Sequence]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="28" width="100" height="20" uuid="c840b848-6555-4b8f-a049-ad421979cdb9"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Technician:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="84" width="112" height="20" uuid="3c443a99-68e8-40fe-8724-3ea9878f7c30"/>
+				<textElement>
+					<font fontName="Cambria" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Date Inves. Completed:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="112" y="28" width="150" height="20" uuid="9ec093c8-ce69-4c9c-b824-e6b690d1a036"/>
+				<textFieldExpression><![CDATA[$F{TASK_SEQUENCE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="39" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="572" height="39" backcolor="#CCCCCC" uuid="8ac7eaf5-7caa-4d09-96de-699fee6c5b17"/>
+				<textElement textAlignment="Center">
+					<font fontName="Cambria" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[HelpDesk By InnoSyS]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="19" width="100" height="20" uuid="568a0307-b732-4174-bee3-6529f27ff718"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="450" y="19" width="80" height="20" uuid="f6f2667c-d2c5-4bd8-9f61-425b3d4cb619"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="530" y="19" width="40" height="20" uuid="b6bb6ec1-59e5-4bdd-9935-9e829ecf620e"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

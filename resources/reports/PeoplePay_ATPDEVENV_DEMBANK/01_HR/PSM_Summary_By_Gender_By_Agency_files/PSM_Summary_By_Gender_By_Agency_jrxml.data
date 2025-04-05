@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PSM-Summary of Gender By Agency" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="09530649-94cc-4c3c-a18a-367632741ad1">
+	<property name="ireport.zoom" value="2.3579476910000023"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="56"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/HR_09"/>
+	<property name="ireport.jasperserver.url" value="http://140.86.6.26:8081//jasperserver/services/repository"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+h.id,
+h.parent_level,
+h.Unit_name Agency,
+(
+
+        select count(1)
+        from hr_rcm_employee a
+        join Hr_Rcm_Individual b on A.Ind_Id=b.id
+        where A.Orgdtl_Id=h.id
+        and upper(sex_code)='M'
+
+) Males,
+(
+
+        select count(1)
+        from hr_rcm_employee a
+        join Hr_Rcm_Individual b on A.Ind_Id=b.id
+        where A.Orgdtl_Id=h.id
+        and upper(sex_code)='F'
+
+) Females
+from VW_ORGANISATION_STRUCTURE H
+JOIN HR_HCF_ORGANISATION HO ON H.ORG_ID=HO.ID
+where ho.id=$P{IN_ORG_ID}
+ORDER BY  nvl(h.parent_level,1)]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="PARENT_LEVEL" class="java.math.BigDecimal"/>
+	<field name="AGENCY" class="java.lang.String"/>
+	<field name="MALES" class="java.math.BigDecimal"/>
+	<field name="FEMALES" class="java.math.BigDecimal"/>
+	<variable name="Record_Count" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="MALES_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{MALES}]]></variableExpression>
+	</variable>
+	<variable name="FEMALES_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{FEMALES}]]></variableExpression>
+	</variable>
+	<variable name="Page_Detail" class="java.lang.String">
+		<variableExpression><![CDATA['Page '+$V{PAGE_NUMBER}+ ' of '+$V{PAGE_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="Total" class="java.math.BigDecimal" resetType="Column">
+		<variableExpression><![CDATA[$F{MALES}+$F{FEMALES}]]></variableExpression>
+	</variable>
+	<variable name="GrandTotal" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{FEMALES}+$F{MALES}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="95" splitType="Stretch">
+			<staticText>
+				<reportElement x="54" y="75" width="467" height="20" uuid="509a4bc5-14c6-409f-8684-9ec90d37c357"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[SUMMARY OF CENTRAL PUBLIC SERVICE GENDER BY AGENCY]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="64" uuid="2adafe13-4e31-4c40-824f-ef3776e8c67f"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="31" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="30" width="572" height="1" uuid="2c9f4d63-169b-42cb-9ba9-b1b21ed80fa8"/>
+			</line>
+			<staticText>
+				<reportElement x="263" y="15" width="79" height="15" uuid="49f17f8d-8f71-4976-9b66-e0d2f743f560"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<text><![CDATA[Males]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="342" y="15" width="79" height="15" uuid="d805cdc9-39e8-40fc-a041-ec8e17ef6b0e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" isUnderline="false" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Females]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="16" width="215" height="15" uuid="7d599bc7-6bca-4d50-aec8-cdeb82bdbeb1"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="3" rightIndent="1"/>
+				</textElement>
+				<text><![CDATA[Agency Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="421" y="15" width="79" height="15" uuid="22f11a0a-8cd4-424f-b62a-d87ff0661cf6"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" isUnderline="false" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="263" y="0" width="79" height="15" uuid="3e11c58c-4952-420f-89bd-715c7c5a8f17"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MALES}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="342" y="0" width="79" height="15" uuid="0fcba499-1338-4505-babf-d3e3061f6edf"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FEMALES}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="44" y="0" width="215" height="15" uuid="a699690c-12f1-4cd5-8f95-c591d97fe09b"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="3" rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AGENCY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="421" y="0" width="79" height="15" uuid="032accb3-9925-4dfb-b096-59c2dba472d0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="0" y="0" width="44" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="bd051965-80fe-4d65-ae16-d309ddf7ab53"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Record_Count}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="1">
+			<printWhenExpression><![CDATA[false]]></printWhenExpression>
+			<line>
+				<reportElement x="0" y="0" width="555" height="1" isPrintWhenDetailOverflows="true" uuid="fba2c8f5-677c-4850-9d22-a157d5a0a372"/>
+				<graphicElement>
+					<pen lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="17" width="572" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="4" y="2" width="162" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="449" y="2" width="100" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="554b8c63-153f-49c9-a297-223e1bc4a6bc"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Page_Detail}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="153" y="0" width="106" height="15" uuid="9daf85e6-6d07-4efc-809e-3e670eaa511f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="3" rightIndent="1"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="263" y="0" width="79" height="15" uuid="0173b1a8-b228-4761-b886-a7882d9b4ad3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{MALES_1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="342" y="0" width="79" height="15" uuid="0a5212d4-e438-404e-ad66-f5e87a072ff1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{FEMALES_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="421" y="0" width="79" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="ed136282-4693-4d35-aa90-48292034e992"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GrandTotal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report2" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d5cc89eb-f485-493b-a2ce-683ac1d84ed1">
+	<property name="ireport.zoom" value="1.6500000000000008"/>
+	<property name="ireport.x" value="135"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/PAYMENT/Void_Payment_Report"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.18:8081/jasperserver/services/repository"/>
+	<parameter name="Start_Date" class="java.util.Date"/>
+	<parameter name="End_Date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Cashier" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select sum(a.REVENUE_ALLOCATED_AMOUNT) "Amount Paid", c.RECEIPT_NUMBER "Receipt Number",
+ b.ID,
+  b.PAYMENT_HEADER_ID,
+  b.VOID_REASON,
+  b.DATE_VOID,
+ b.CREATED_BY,
+  b.DATE_CREATED,
+initcap(b.REMARKS),
+  PROCESSED,
+initcap(c.ALTERNATE_PAYEE) "Payee", d.PROPERTY_NUMBER "Property Number", u.user_name
+from payment_items a
+join receipt_void b on b.PAYMENT_HEADER_ID= a.PAYMENT_HEADER_ID
+join payment_header c on c.ID = a.payment_header_id
+join vw_property d on d.id = c.property_id
+left outer join receipt_batch e on c.receipt_batch_id=e.id
+join app_user u on e.cashier=u.id
+where b.PROCESSED = 'Y' AND TRUNC(a.date_Created) BETWEEN TRUNC($P{Start_Date}) AND TRUNC($P{End_Date}) and
+upper(u.user_name)= case when nvl($P{Cashier},'ALL')='ALL' then upper(u.user_name)
+else $P{Cashier} end
+group by c.RECEIPT_NUMBER,
+c.ALTERNATE_PAYEE, d.PROPERTY_NUMBER, u.user_name, a.date_created,
+b.ID,
+  b.PAYMENT_HEADER_ID,
+  VOID_REASON,
+  DATE_VOID,
+  b.CREATED_BY,
+  b.DATE_CREATED,
+b.remarks,
+  PROCESSED
+ORDER BY a.date_created ASC]]>
+	</queryString>
+	<field name="Amount Paid" class="java.math.BigDecimal"/>
+	<field name="Receipt Number" class="java.lang.String"/>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="PAYMENT_HEADER_ID" class="java.math.BigDecimal"/>
+	<field name="VOID_REASON" class="java.math.BigDecimal"/>
+	<field name="DATE_VOID" class="java.sql.Timestamp"/>
+	<field name="CREATED_BY" class="java.lang.String"/>
+	<field name="DATE_CREATED" class="java.sql.Timestamp"/>
+	<field name="INITCAP(B.REMARKS)" class="java.lang.String"/>
+	<field name="PROCESSED" class="java.lang.String"/>
+	<field name="Payee" class="java.lang.String"/>
+	<field name="Property Number" class="java.lang.String"/>
+	<field name="USER_NAME" class="java.lang.String"/>
+	<variable name="TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Amount Paid}]]></variableExpression>
+	</variable>
+	<variable name="period" class="java.lang.String">
+		<initialValueExpression><![CDATA[new SimpleDateFormat("dd MMMMM yyyy").format($P{Start_Date})+" to "+new SimpleDateFormat("dd MMMMM yyyy").format($P{End_Date})]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="79" uuid="9fb845d1-e538-4c90-a1ec-3ec1a8e39e78"/>
+				<subreportParameter name="department">
+					<subreportParameterExpression><![CDATA["Treasury Department"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA["Void Payments Report"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="period">
+					<subreportParameterExpression><![CDATA[$V{period}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LETTER_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="76" height="20" uuid="9bad2851-8fc2-4d84-abd5-1f72029ea9c3"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Receipt Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="76" y="0" width="77" height="20" uuid="d2b20356-c091-476a-bded-a04502422daa"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Property #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="153" y="0" width="100" height="20" uuid="2a67d525-4c74-4211-be29-e0310871868c"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Payee]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="253" y="0" width="140" height="20" uuid="fcd9a609-e97a-48d5-a675-c331f6e5ba3f"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REMARKS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="393" y="0" width="54" height="20" uuid="a2c074d5-447c-4cf0-aeb9-44f50678b433"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date Void]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="447" y="0" width="65" height="20" uuid="61bd7dbe-b2e5-438a-87b9-d3024ff0408f"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cashier]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="512" y="0" width="60" height="20" uuid="7daabb01-7067-4e85-a2e1-d753692bb07c"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amount Paid]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="19" width="572" height="1" uuid="bbc2eec1-f7f8-4464-85dc-af211c93e0b6"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="23" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="76" height="20" uuid="6fd73a46-f4e4-44a5-8708-82d5b656d174"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Receipt Number}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="77" y="0" width="77" height="20" uuid="73dc9fa5-c615-4896-bac6-1a2165b79093"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Property Number}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="153" y="0" width="100" height="20" uuid="d598466d-1e6a-4582-8972-b558920291d8"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Payee}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="253" y="0" width="140" height="20" uuid="295baad0-3a37-4936-a634-e9ca5c3d4d42"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INITCAP(B.REMARKS)}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="393" y="0" width="54" height="20" uuid="18dc3fdd-6c67-404c-a6d2-25dcfce1aa80"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_VOID}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="447" y="0" width="65" height="20" uuid="ffde02bd-e96c-4a69-aed1-2bde651be841"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{USER_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0">
+				<reportElement x="512" y="0" width="60" height="20" uuid="39333522-119a-4a3c-833f-43eb81431bb4"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Amount Paid}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="16" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH.mm.ss">
+				<reportElement x="0" y="0" width="108" height="16" uuid="d8a39904-e24a-4fc2-91d0-01eb702065fc"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" evaluationTime="Report">
+				<reportElement x="532" y="0" width="40" height="16" uuid="7fbe7a50-5aff-4100-9bf0-db6b46fd3ab0"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="247" y="0" width="100" height="16" uuid="e400c4f0-71a6-4324-8220-ac1b25f4186d"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[RCFMS by INNOSYS]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="452" y="0" width="80" height="16" uuid="3db4418d-f6ae-4f9d-a8e4-e872b8fef188"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="572" height="16" backcolor="#CCCCCC" uuid="39c6424d-e6de-4f4b-91be-d5beaa5d7b49"/>
+			</rectangle>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="23" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="19" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement x="468" y="0" width="104" height="19" uuid="a6f29e3e-6244-4836-a0b3-9e84a7597d00"/>
+				<textElement>
+					<font fontName="Arial" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="19" uuid="39f8287b-fa46-4738-b140-3ce8d9af6cc8"/>
+				<textElement>
+					<font fontName="Arial" size="12" isBold="true" isItalic="false" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Grand Total ]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

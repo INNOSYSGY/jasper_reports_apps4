@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Staff List for April 2018 debt on payroll" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f2968e6b-cec0-4284-9f54-79bffd94ff42">
+	<property name="ireport.zoom" value="1.4641000000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/Training/Staff_List_April_2018_Debt_Payroll"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="5edc3728-c540-405e-a65a-087399f6ae6a"/>
+	<subDataset name="Table Dataset 2" uuid="79ae8d12-8ca0-4c4e-a4ab-efb314f9591f"/>
+	<queryString>
+		<![CDATA[select unit_parent, unit_name, count(1), unit_level, (select unit_name from apps.hr_hcf_orgstructuredtl d where d.id =b.id
+                                                      and exists ( select 1
+                                                                  from apps.hr_hcf_orgstructuredtl u
+                                                                  where u.id = d.id and unit_parent is null)
+                                                      and unit_name is not null) head,
+                                                      (select id from apps.hr_hcf_orgstructuredtl d where d.id =b.id
+                                                      and exists ( select 1
+                                                                  from apps.hr_hcf_orgstructuredtl u
+                                                                  where u.id = d.id and unit_parent is null)
+                                                      and unit_name is not null) head2
+FROM apps.pa_pmg_payrolldtl t
+join apps.HR_HCF_WORKLOCATIONPOSITION a on a.id = t.position_location_id
+join apps.hr_hcf_position p on p.id = a.position_id
+join apps.hr_hcf_orgstructuredtl b on b.id =p.ORGDTL_ID
+WHERE t.ORG_ID = 1626 AND t.period_end = '31-MAR-18'
+and unit_name = (select unit_name from apps.hr_hcf_orgstructuredtl d where d.id =b.id
+                                                      and exists ( select 1
+                                                                  from apps.hr_hcf_orgstructuredtl u
+                                                                  where u.id = d.id and unit_parent is null)
+                                                      )
+group by unit_level,unit_name, unit_parent,b.id
+order by unit_level asc]]>
+	</queryString>
+	<field name="UNIT_PARENT" class="java.math.BigDecimal"/>
+	<field name="UNIT_NAME" class="java.lang.String"/>
+	<field name="COUNT(1)" class="java.math.BigDecimal"/>
+	<field name="UNIT_LEVEL" class="java.math.BigDecimal"/>
+	<field name="HEAD" class="java.lang.String"/>
+	<field name="HEAD2" class="java.math.BigDecimal"/>
+	<variable name="return_count" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="63" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="63" uuid="28f0a939-a4b1-483d-8fe0-86cd3a5cc22e"/>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="18" y="0" width="537" height="20" uuid="432b8a2c-3219-453a-bcf6-5e08ed7c47c6"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="12" isBold="true" isUnderline="false"/>
+					<paragraph leftIndent="115"/>
+				</textElement>
+				<text><![CDATA[List of Employees as per department (Reconciled with April 2018 Payroll)]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="64" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="18" y="0" width="250" height="20" uuid="a474f30b-186f-409c-9a41-f3f7bc905189"/>
+				<textElement>
+					<font fontName="Times New Roman" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HEAD}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="1" y="20" width="555" height="44" uuid="8182a3f0-64b9-401a-8588-5a890313b57d"/>
+				<subreportParameter name="HEAD_ID">
+					<subreportParameterExpression><![CDATA[$F{HEAD2}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="COUNT_TOTAL" toVariable="return_count"/>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/Training/Staff_List_April_2018_Debt_Payroll_files/listingbydepartmentgwi"]]></subreportExpression>
+			</subreport>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="268" y="0" width="287" height="20" uuid="4d07277f-b912-48b8-8682-b50eea512f6f"/>
+				<textElement textAlignment="Right">
+					<font fontName="Times New Roman" isBold="false"/>
+					<paragraph leftIndent="27"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COUNT(1)}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="20" splitType="Stretch">
+			<textField evaluationTime="Report">
+				<reportElement x="303" y="0" width="100" height="20" uuid="0f4313a3-786b-40f7-ba8e-232c4ba52a61"/>
+				<textFieldExpression><![CDATA[$V{return_count}+$F{COUNT(1)}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="157" height="20" uuid="43acef6f-315f-459f-b0a7-bfc2e255b625"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="10" isBold="true" isUnderline="false"/>
+					<paragraph leftIndent="115"/>
+				</textElement>
+				<text><![CDATA[Total: ]]></text>
+			</staticText>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="15" backcolor="#999999" uuid="5c82d64d-18ab-4f75-a133-b04317612148"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[PeoplePay Human Resource Management Information Systems]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="0" width="100" height="15" uuid="0a54c72b-a6d5-45dd-90f6-40b7af3fd0d6"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="436" y="0" width="80" height="15" uuid="33b12648-7653-4afe-aecf-191fb08580c8"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="516" y="0" width="40" height="15" uuid="dceab4a8-d8d0-4999-8b8b-67dd57a046c6"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

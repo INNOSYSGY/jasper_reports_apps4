@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Promotion" pageWidth="612" pageHeight="792" columnWidth="470" leftMargin="71" rightMargin="71" topMargin="21" bottomMargin="21" uuid="bac6e52e-7a6f-4c73-a8a3-f057046e0850">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Multi/01_HR/Resignation_Notification_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Multi/01_HR/Resignation_Notification"/>
+	<property name="com.jaspersoft.studio.unit." value="cm"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="cm"/>
+	<parameter name="IN_MOV_ID" class="java.lang.Integer"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+    to_char(trunc(sysdate), 'fmMonth DD, YYYY') date_prepared,
+    mov.id movement_id, 
+    emp.id  emp_id, 
+    ind.id  ind_id, 
+    ind.first_name, 
+    ind.surname,
+    pos.position_name new_position_name,
+    to_char(mov.date_separated, 'fmDdth Month, YYYY') date_separated,
+    grade.grade_code, 
+    case when ind.sex_code = 'M' then 'Mr. ' when ind.sex_code = 'F' then 'Ms. ' end salutation,
+    case when ind.sex_code = 'M' then 'Mr. ' when ind.sex_code = 'F' then 'Ms. ' end || initcap(ind.first_name || ' ' || ind.surname) full_name,
+    'Notification of Resignation - ' || case when ind.sex_code = 'M' then 'Mr. ' when ind.sex_code = 'F' then 'Ms. ' end || initcap(ind.first_name || ' ' || ind.surname || ', ' || pos.position_name)  subject
+    ,from_hr.from_hr
+    ,from_hr.position_name from_hr_position
+    ,from_hr.hr_full_name
+    ,to_head.to_head
+    ,orgdtl.unit_name department,
+    initcap(pkg_global_fnts.get_lookup_col(orgdtl.classification, 'VALUE_DESCRIPTION')) department_classification,
+    (select ho.letter_head_logo from hr_hcf_organisation ho where ho.id = emp.org_id) org_photo
+from
+    hr_mov_separationbenefit mov
+    left join hr_rcm_employee emp on mov.emp_id = emp.id
+    left join hr_rcm_individual ind  on emp.ind_id = ind.id
+    left join hr_hcf_positiongrade grade on emp.emp_grade_id = grade.id
+    left join hr_hcf_position pos on pos.id = emp.position_id
+    left join hr_hcf_orgstructuredtl orgdtl on orgdtl.id = emp.orgdtl_id
+    left join (select case when a.sex_code = 'M' then 'Mr. ' when a.sex_code = 'F' then 'Ms. ' end || initcap(a.first_name || ' ' || a.surname || ', ' || c.position_name) from_hr, initcap(a.first_name || ' ' || a.surname) hr_full_name, c.position_name
+        from hr_rcm_individual a 
+        left join hr_rcm_employee b on a.id = b.ind_id
+        left join hr_hcf_position c on b.position_id = c.id
+        left join hr_hcf_orgstructuredtl d on d.id = b.orgdtl_id
+        where upper(c.position_name) like upper('Head%')
+        and upper(d.unit_name) like upper('Human%Resource%')
+        and (b.date_separated is null or b.date_separated > trunc(sysdate))
+        and rownum = 1) from_hr on 1=1
+    left join (select case when a.sex_code = 'M' then 'Mr. ' when a.sex_code = 'F' then 'Ms. ' end || initcap(a.first_name || ' ' || a.surname || ', ' || c.position_name) to_head, d.id orgdtl_id
+        from hr_rcm_individual a 
+        left join hr_rcm_employee b on a.id = b.ind_id
+        left join hr_hcf_position c on b.position_id = c.id
+        left join hr_hcf_orgstructuredtl d on d.id = b.orgdtl_id
+        where upper(c.position_name) like upper('Head%')
+        and (b.date_separated is null or b.date_separated > trunc(sysdate))
+        and rownum = 1) to_head on emp.orgdtl_id = to_head.orgdtl_id
+where 
+    mov.id =  $P{IN_MOV_ID}]]>
+	</queryString>
+	<field name="DATE_PREPARED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_PREPARED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_PREPARED"/>
+	</field>
+	<field name="MOVEMENT_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="MOVEMENT_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="MOVEMENT_ID"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="IND_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="IND_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_ID"/>
+	</field>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FIRST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="NEW_POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NEW_POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="NEW_POSITION_NAME"/>
+	</field>
+	<field name="DATE_SEPARATED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_SEPARATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_SEPARATED"/>
+	</field>
+	<field name="GRADE_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="GRADE_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="GRADE_CODE"/>
+	</field>
+	<field name="SALUTATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALUTATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALUTATION"/>
+	</field>
+	<field name="FULL_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FULL_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="FULL_NAME"/>
+	</field>
+	<field name="SUBJECT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUBJECT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUBJECT"/>
+	</field>
+	<field name="FROM_HR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FROM_HR"/>
+		<property name="com.jaspersoft.studio.field.label" value="FROM_HR"/>
+	</field>
+	<field name="FROM_HR_POSITION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FROM_HR_POSITION"/>
+		<property name="com.jaspersoft.studio.field.label" value="FROM_HR_POSITION"/>
+	</field>
+	<field name="HR_FULL_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="HR_FULL_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="HR_FULL_NAME"/>
+	</field>
+	<field name="TO_HEAD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TO_HEAD"/>
+		<property name="com.jaspersoft.studio.field.label" value="TO_HEAD"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="DEPARTMENT_CLASSIFICATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT_CLASSIFICATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT_CLASSIFICATION"/>
+	</field>
+	<field name="ORG_PHOTO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_PHOTO"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_PHOTO"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="345" splitType="Stretch">
+			<staticText>
+				<reportElement positionType="Float" x="162" y="90" width="147" height="30" uuid="4f9c9197-fae1-4126-89c1-0c519b55acba"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[INTERNAL MEMORANDIUM]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="149" width="70" height="15" uuid="19e2453e-7b8f-47b1-8f82-ed1e4917f354">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TO: "]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="169" width="70" height="15" uuid="e060bed5-49dc-41af-a3dd-29627a15cc2a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["FROM: "]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="189" width="70" height="15" uuid="cb0870d1-83d1-4919-87b6-da4ef19fcdf6">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DATE: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="0" y="209" width="70" height="15" uuid="6cb8c18a-7590-49a2-a384-d81101ffaf20">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["SUBJECT: "]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="Float" x="0" y="240" width="470" height="1" uuid="b1865b10-cd01-44c5-aad3-10c38a9bfed7"/>
+			</line>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="249" width="470" height="15" uuid="c2004424-2c56-4826-b87c-debc16bfae43">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["Kindly be advised that approval has been given for the resignation of " + $F{FULL_NAME}+  ", "+$F{NEW_POSITION_NAME} + "  within the "+ $F{DEPARTMENT} + " " + $F{DEPARTMENT_CLASSIFICATION} + " of the Bureau of Statistics to take effect from " + $F{DATE_SEPARATED}+ " inclusive."]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="274" width="470" height="15" uuid="61a90387-bd1a-42cf-adf1-a5e0c3b9c8e6">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["Kindly make arrangements for the necessary action to be taken."]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="330" width="120" height="15" uuid="620671e5-31a5-452f-9052-808def3fc394">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA["........................ <br>"+ $F{HR_FULL_NAME} +"<br>"+$F{FROM_HR_POSITION}]]></textFieldExpression>
+			</textField>
+			<image scaleImage="RealSize" hAlign="Center">
+				<reportElement x="-71" y="-20" width="612" height="50" uuid="1c62f406-164a-44ef-b434-891bbb742692"/>
+				<imageExpression><![CDATA[$F{ORG_PHOTO}]]></imageExpression>
+			</image>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="80" y="149" width="360" height="15" uuid="870a31a9-03f5-4ee8-95e5-ebc3443048f5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{TO_HEAD}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="80" y="169" width="360" height="15" uuid="e6182146-c9f6-45bc-b630-6864e20bbf0a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FROM_HR}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="80" y="189" width="360" height="15" uuid="ae03145d-1e9c-44d3-851b-b8106002e7c2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DATE_PREPARED}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="80" y="209" width="360" height="15" uuid="bc5af33d-2e26-4f9f-9e6f-25446262dc52">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUBJECT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

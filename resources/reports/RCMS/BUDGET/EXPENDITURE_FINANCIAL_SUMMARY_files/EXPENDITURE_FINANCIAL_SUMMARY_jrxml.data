@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Expenditure Financial Summary" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bac44ab3-cdbb-4df5-a33c-ea0d0050da12">
+	<property name="ireport.zoom" value="1.0000000000000095"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/BUDGET/EXPENDITURE_FINANCIAL_SUMMARY"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.18:8081/jasperserver/services/repository"/>
+	<parameter name="department" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="report_name" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="period" class="java.sql.Time">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT HEAD_CODE, DEPARTMENT,SUB_CODE, SUB_DETAIL,get_budget_Values (coa_id , 2015) budget2015, get_budget_Values (coa_id , 2016) budget2016
+FROM VOTES_MAPPING
+ORDER BY HEAD_CODE, DEPARTMENT, SUB_CODE ASC]]>
+	</queryString>
+	<field name="HEAD_CODE" class="java.lang.String"/>
+	<field name="DEPARTMENT" class="java.lang.String"/>
+	<field name="SUB_CODE" class="java.lang.String"/>
+	<field name="SUB_DETAIL" class="java.lang.String"/>
+	<field name="BUDGET2015" class="java.math.BigDecimal"/>
+	<field name="BUDGET2016" class="java.math.BigDecimal"/>
+	<variable name="CBUDGET_SUM" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{BUDGET2016}]]></variableExpression>
+	</variable>
+	<variable name="PBUDGET_SUM" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{BUDGET2015}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="100" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="85" width="85" height="15" backcolor="#CCCCCC" uuid="2b5d9bb2-a3ac-4411-8b19-12a725613273"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Head Code:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="711" y="85" width="91" height="15" backcolor="#CCCCCC" uuid="7f558938-9a98-41d1-8439-b69ea06c50de"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Department:]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="85" y="85" width="160" height="15" backcolor="#CCCCCC" uuid="f1af4d59-a3b1-4c40-9579-f7066e33a1f9"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{HEAD_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="802" y="85" width="166" height="15" backcolor="#CCCCCC" uuid="438dd070-c9be-4cb6-bd1b-051c46175cc3"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="0" y="0" width="968" height="78" uuid="6bce3608-8665-4dd9-addf-7ba78a602401"/>
+				<subreportParameter name="department">
+					<subreportParameterExpression><![CDATA["Treasurers Department"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA["Expenditure Financial Summary"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/Legal_Landscape_leterhead"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="28" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Transparent" x="84" y="0" width="161" height="18" backcolor="#CCCCCC" uuid="f7ab89ec-73b7-419c-a08c-5b370b646311"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Sub Detail]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="591" y="0" width="124" height="18" backcolor="#CCCCCC" uuid="a556776e-7d7a-41c1-8a45-1246f0d2f8ae"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Current Expenses]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="244" y="0" width="111" height="18" backcolor="#CCCCCC" uuid="bc61e260-9c4a-4c63-b430-00a120e8f5fe"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Previous Budget]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="804" y="0" width="104" height="18" backcolor="#CCCCCC" uuid="6976a94e-0b1d-4ee7-a5b9-d8b44908e396"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Balance]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="907" y="0" width="61" height="18" backcolor="#CCCCCC" uuid="ab25ca85-17ec-411f-afcb-af5ef77c8fc6"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Percent]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="472" y="0" width="120" height="18" backcolor="#CCCCCC" uuid="f88e16d1-75bb-4823-b29c-7d854016d80f"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Previous Expenses]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="354" y="0" width="119" height="18" backcolor="#CCCCCC" uuid="2be81ef3-d416-4292-af3b-d8c82cd63578"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Current Budget]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="714" y="0" width="91" height="18" backcolor="#CCCCCC" uuid="44b75764-8f25-410f-9607-1956d38600b0"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Total Expenses]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="85" height="18" backcolor="#CCCCCC" uuid="8beef52b-6499-45fa-b1a6-f4f878bc6d53"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Sub Code]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="85" height="20" uuid="56fbc32a-6b4c-4495-9fdc-fff390b5de07"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{SUB_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="85" y="0" width="160" height="20" uuid="35922479-8574-4f3a-ad1c-ba885a879cbc"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{SUB_DETAIL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="355" y="1" width="118" height="20" uuid="70eebd5b-b5c9-4b16-bd59-5fb7ecc3c714"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{BUDGET2016}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="244" y="0" width="111" height="20" uuid="033b6770-bcc8-4714-8903-b0a09f4c10dd"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{BUDGET2015}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="31" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="32" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="968" height="32" backcolor="#CCCCCC" uuid="2677e858-7e02-4b50-8370-c45f151bc1b4"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial Black" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[RCFMS by Innovative Systems]]></text>
+			</staticText>
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="122" height="32" uuid="3b285196-c298-4a19-897e-846df81ac5c9"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="848" y="12" width="80" height="20" uuid="3e559657-5517-4323-a943-f24bbf8ca227"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="928" y="12" width="40" height="20" uuid="f2140d58-b1ed-417e-bf5d-b73fd5d23877"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="31" splitType="Stretch">
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="354" y="0" width="118" height="26" uuid="b91eb9c2-e4f7-4034-96f9-8c9207e949b9"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CBUDGET_SUM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="84" height="26" uuid="a922beac-2104-4fad-9b90-fa10ff600393"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="245" y="0" width="110" height="26" uuid="6f97257b-fade-4749-9472-e710f864b2b4"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PBUDGET_SUM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Medical Analysis" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="84eefb4c-b08e-4fe4-a91a-83b326401d1e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GPL/01_HR/Medical_Analysis"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Listing Showing Employees Recruited between specified Dates"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GPL/01_HR/Medical_Analysis_files/HR_01_jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GPL-ONPREME"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="273"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="720"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="521"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="465"/>
+	<parameter name="START_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PARENT" class="java.math.BigDecimal"/>
+	<parameter name="END_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select B.id, B.UNIT_PARENT, B.unit_name --emp_amount, Medical_Amount, Days_Amount, department_head, 
+,(select count(1) 
+from HR_HCF_ORGSTRUCTUREDTL Oa
+join HR_HCF_ORGSTRUCTUREHD OH on Oa.ORG_STRUCTURE_ID=OH.id
+join HR_RCM_EMPLOYEE E on e.orgdtl_id=Oa.id
+where Oa.CLASSIFICATION=Pkg_Global_Fnts.get_lookup_id('DEPARTMENT', 'TBLORGSTRUCTCLASS')
+and (E.DATE_SEPARATED is null or E.DATE_SEPARATED>$P{END_DATE})
+and OH.org_id=$P{IN_ORG_ID}
+
+start with Oa.ID=B.ID
+CONNECT BY PRIOR Oa.ID=case when $P{PARENT}=1 then Oa.UNIT_PARENT else -1  end
+) emp_amount
+,(select 
+nvl((select count(distinct emp_id) from HR_MED_MEDICALHISTORY MH join HR_MED_MEDICALHISTORYDTL MD on MD.MED_HIS_ID=MH.id join HR_RCM_EMPLOYEE E1 on E1.id=MH.emp_id
+where DATE_SUBMITTED between $P{START_DATE} and $P{END_DATE}
+and E1.orgdtl_id=ob.id
+),0) Medical_Amount
+from HR_HCF_ORGSTRUCTUREDTL Ob
+start with Ob.ID=B.ID
+CONNECT BY PRIOR Ob.ID=case when $P{PARENT}=1 then Ob.UNIT_PARENT else -1  end
+) Medical_Amount
+,(select 
+nvl((select sum(LH.DAYS_TAKEN - LH.HOLIDAYS-LEAVE_WEEKEND) from HR_MED_MEDICALHISTORY MH join HR_MED_MEDICALHISTORYDTL MD on MD.MED_HIS_ID=MH.id join HR_RCM_EMPLOYEE E1 on E1.id=MH.emp_id left join HR_LV_LEAVEHISTORY LH on LH.id=MD.leave_id 
+where DATE_SUBMITTED between $P{START_DATE} and $P{END_DATE}
+and E1.orgdtl_id=oc.id
+),0) Days_Amount
+from HR_HCF_ORGSTRUCTUREDTL Oc
+start with Oc.ID=B.ID
+CONNECT BY PRIOR Oc.ID=case when $P{PARENT}=1 then Oc.UNIT_PARENT else -1  end
+) Days_Amount
+
+from 
+(select o.id,o.UNIT_PARENT, o.unit_name, count(1) emp_amount,
+(select case when Q.CLASSIFICATION=Pkg_Global_Fnts.get_lookup_id('DEPARTMENT', 'TBLORGSTRUCTCLASS') then 0 else 1 end from HR_HCF_ORGSTRUCTUREDTL Q where Q.ID=o.UNIT_PARENT) department_head,
+nvl((select count(distinct emp_id) from HR_MED_MEDICALHISTORY MH join HR_MED_MEDICALHISTORYDTL MD on MD.MED_HIS_ID=MH.id join HR_RCM_EMPLOYEE E1 on E1.id=MH.emp_id
+where DATE_SUBMITTED between $P{START_DATE} and $P{END_DATE}
+and E1.orgdtl_id=o.id
+),0) Medical_Amount,
+nvl((select sum(LH.DAYS_TAKEN - LH.HOLIDAYS-LEAVE_WEEKEND) from HR_MED_MEDICALHISTORY MH join HR_MED_MEDICALHISTORYDTL MD on MD.MED_HIS_ID=MH.id join HR_RCM_EMPLOYEE E1 on E1.id=MH.emp_id left join HR_LV_LEAVEHISTORY LH on LH.id=MD.leave_id 
+where DATE_SUBMITTED between $P{START_DATE} and $P{END_DATE}
+and E1.orgdtl_id=o.id
+),0) Days_Amount
+from HR_HCF_ORGSTRUCTUREDTL O
+join HR_HCF_ORGSTRUCTUREHD OH on O.ORG_STRUCTURE_ID=OH.id
+join HR_RCM_EMPLOYEE E on e.orgdtl_id=O.id
+where O.CLASSIFICATION=Pkg_Global_Fnts.get_lookup_id('DEPARTMENT', 'TBLORGSTRUCTCLASS')
+and (E.DATE_SEPARATED is null or E.DATE_SEPARATED>$P{END_DATE})
+and OH.org_id=$P{IN_ORG_ID}
+group by o.id, o.unit_name, o.UNIT_PARENT) B
+where B.department_head=case when $P{PARENT}=1 then 1 else B.department_head  end]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="UNIT_PARENT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="UNIT_PARENT"/>
+	</field>
+	<field name="UNIT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="UNIT_NAME"/>
+	</field>
+	<field name="EMP_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_AMOUNT"/>
+	</field>
+	<field name="MEDICAL_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="MEDICAL_AMOUNT"/>
+	</field>
+	<field name="DAYS_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DAYS_AMOUNT"/>
+	</field>
+	<variable name="RECORD_COUNT" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="63" splitType="Stretch">
+			<subreport>
+				<reportElement x="-1" y="0" width="571" height="63" uuid="2adb08dc-9058-4b70-856e-28cd58229c32"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="32" splitType="Stretch">
+			<staticText>
+				<reportElement x="-1" y="0" width="572" height="15" uuid="397988af-976c-4432-96e4-4785971ff82b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Medical Analysis]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="275" y="17" width="80" height="15" uuid="442b5479-8f4a-44b1-9fda-719fcc8ca4b5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Period start: ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="428" y="17" width="80" height="15" uuid="d9a83679-7386-450e-8935-ea949361d7c8">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Period end: ]]></text>
+			</staticText>
+			<textField pattern="MMM d, yyyy">
+				<reportElement x="339" y="17" width="100" height="15" uuid="cc9ef2af-926e-48e8-a56f-86a280a2b4e6">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{START_DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMM d, yyyy">
+				<reportElement x="490" y="17" width="80" height="15" uuid="2b254c2c-0a4d-487c-b207-7e86da0dffac">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{END_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="34" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="3" width="258" height="17" uuid="8a31eaf5-acba-4b32-8364-9b5e98061707">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e0618d07-8a3a-464c-a73c-0afbedda303f"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Department]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="259" y="3" width="100" height="17" uuid="da76db5b-c0fc-4b59-a073-1eb768e79f66">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="04ecf111-2c2a-4d6e-9e16-3f7d63c25374"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No. of Employees]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="359" y="3" width="100" height="15" uuid="6a04188c-c64e-4b68-ad1d-289cba4c3ede">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="04ecf111-2c2a-4d6e-9e16-3f7d63c25374"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No. of Medical]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="459" y="3" width="100" height="15" uuid="bdd90eb0-8030-44de-a9d2-e7b0da31e13a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="04ecf111-2c2a-4d6e-9e16-3f7d63c25374"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No. of Lost Work]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="32" width="570" height="1" uuid="79dd9d90-92f6-4ece-96f3-4e5fa64832e4">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</line>
+			<staticText>
+				<reportElement x="359" y="18" width="100" height="15" uuid="0198e9e9-2df1-4b25-ad76-375764ff4d2a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="04ecf111-2c2a-4d6e-9e16-3f7d63c25374"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Submited]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="459" y="17" width="100" height="15" uuid="b0ffac13-420b-42d2-97bc-b7fad775da07">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="04ecf111-2c2a-4d6e-9e16-3f7d63c25374"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Days]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="1" width="570" height="1" uuid="a6906c8b-d755-4538-b69f-d5b652d6ef26">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="0" width="258" height="15" uuid="f54f21b2-b0ab-4a73-ae8e-8ba7b5eb8e88">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e0618d07-8a3a-464c-a73c-0afbedda303f"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{UNIT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="259" y="0" width="100" height="15" uuid="bee06570-818e-49dd-a669-02fb93af172c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="04ecf111-2c2a-4d6e-9e16-3f7d63c25374"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{EMP_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="359" y="0" width="100" height="15" uuid="a49579b3-b880-42ac-8a19-8346c52da49a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="04ecf111-2c2a-4d6e-9e16-3f7d63c25374"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{MEDICAL_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="459" y="0" width="100" height="15" uuid="d642ce79-1634-430b-b87e-20a4c325ddb6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="04ecf111-2c2a-4d6e-9e16-3f7d63c25374"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{DAYS_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="34" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="2" width="572" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="1" y="19" width="571" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="407" y="5" width="100" height="13" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="5" y="4" width="162" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="507" y="5" width="63" height="13" uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

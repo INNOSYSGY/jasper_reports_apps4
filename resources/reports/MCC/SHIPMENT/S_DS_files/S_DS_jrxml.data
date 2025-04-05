@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="VAM Deal Statistics " language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e42403f0-b5d4-48ee-b285-570a222fd9ae">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="99"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MCC/SHIPMENT/S_DS"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.125:8081/jasperserver/services/repository"/>
+	<parameter name="DATE_AS" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+pkg_mcc_statistic.get_approved_funded(to_date('1800-01-01','yyyy-mm-dd'),$P{DATE_AS}) as curr_aproved_funded,
+pkg_mcc_statistic.get_outstanding_funding(to_date('1800-01-01','yyyy-mm-dd'),$P{DATE_AS}) as curr_outstanding_amount,
+pkg_mcc_statistic.get_est_premium_not_paid(to_date('1800-01-01','yyyy-mm-dd'),$P{DATE_AS}) as est_premium_not_paid,
+pkg_mcc_statistic.get_num_settled_fund_hedge(to_date('1800-01-01','yyyy-mm-dd'),$P{DATE_AS}) as number_fund_settled,
+pkg_mcc_statistic.get_num_settledfundhedge_open(to_date('1800-01-01','yyyy-mm-dd'),$P{DATE_AS}) as number_settled_hedge_open,
+pkg_mcc_statistic.get_amount_funded_settled(to_date('1800-01-01','yyyy-mm-dd'),$P{DATE_AS}) as amount_funded_settled,
+pkg_mcc_statistic.get_Total_Premium_paid(to_date('1800-01-01','yyyy-mm-dd'),$P{DATE_AS}) as Total_Premium,
+pkg_mcc_statistic.get_Total_funding_provided(to_date('1800-01-01','yyyy-mm-dd'),$P{DATE_AS}) as Total_Funding_Provided,
+pkg_mcc_statistic.get_number_piplinedeals(to_date('1800-01-01','yyyy-mm-dd'),$P{DATE_AS}) as number_piplinedeals,
+pkg_mcc_statistic.get_est_disbursements(to_date('1800-01-01','yyyy-mm-dd'),$P{DATE_AS}) as est_disbursements
+from dual]]>
+	</queryString>
+	<field name="CURR_APROVED_FUNDED" class="java.math.BigDecimal"/>
+	<field name="CURR_OUTSTANDING_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="EST_PREMIUM_NOT_PAID" class="java.math.BigDecimal"/>
+	<field name="NUMBER_FUND_SETTLED" class="java.math.BigDecimal"/>
+	<field name="NUMBER_SETTLED_HEDGE_OPEN" class="java.math.BigDecimal"/>
+	<field name="AMOUNT_FUNDED_SETTLED" class="java.math.BigDecimal"/>
+	<field name="TOTAL_PREMIUM" class="java.math.BigDecimal"/>
+	<field name="TOTAL_FUNDING_PROVIDED" class="java.math.BigDecimal"/>
+	<field name="NUMBER_PIPLINEDEALS" class="java.math.BigDecimal"/>
+	<field name="EST_DISBURSEMENTS" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="69" splitType="Stretch">
+			<line>
+				<reportElement uuid="9b5999e7-0513-4bcd-8b92-d40e3db972df" x="0" y="65" width="572" height="1"/>
+				<graphicElement>
+					<pen lineWidth="2.5" lineColor="#990033"/>
+				</graphicElement>
+			</line>
+			<image>
+				<reportElement uuid="8fd9d80c-0068-42f3-84e7-1e0c4d26d246" x="0" y="0" width="237" height="54"/>
+				<imageExpression><![CDATA["repo:/reports/MCC/Image/logo"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="40" splitType="Stretch">
+			<textField pattern="">
+				<reportElement uuid="cf9d4d1a-ba52-445e-b87f-afa4b031fa54" x="0" y="0" width="572" height="20"/>
+				<textElement textAlignment="Center" markup="none">
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("yyyy").format($P{DATE_AS})+" VAM Deal Statistics as of "+new SimpleDateFormat("MMMMM dd, yyyy").format($P{DATE_AS})]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="290" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="224cfd6e-beae-41c5-b729-1bf98d0bd3cb" x="0" y="0" width="299" height="20"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Number of  Current Deals Approved and Funded]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1e198199-f68c-44f8-bf00-788dc88b0e16" x="0" y="20" width="299" height="20"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Current Outstanding Funded Amount ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e3a095ba-f8c9-4b8c-9155-1760a7e8029b" x="0" y="40" width="299" height="20"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Estimated Premium to be paid]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bcab3794-2892-4e8b-9edb-f263401d29b2" x="0" y="83" width="299" height="20"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Number of Settled Deals (Funding & Hedges)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dedad0d3-c61b-42f8-a747-9fc558909957" x="0" y="103" width="299" height="20"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Number of Settled Deals ( Funding & Settled - Hedge Open)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="db3c8eaf-de6e-4d6b-aa1c-33defe110c92" x="0" y="123" width="299" height="20"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Amount Funded for Settled Deals]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="89e3a2e6-09fd-43c3-b39f-67b28c724b16" x="0" y="143" width="299" height="20"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Total Premiums Paid]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="557f6a4d-2876-406c-9315-1f22b6057572" x="0" y="188" width="299" height="20"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Total Funding Provided]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="de6ea401-4636-49ed-86ae-81a92328f316" x="0" y="219" width="299" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PIPELINE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="db06341a-396f-42d8-8b67-e689cf065dfb" x="0" y="249" width="299" height="20"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Number of Deals in the Pipeline]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b21f3dae-aab1-4263-aade-3c43989b1d0e" x="0" y="269" width="299" height="20"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Estimated Disbursements]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="5a6c4d46-ac87-47ab-9932-a5b4b7b8f387" x="433" y="0" width="112" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CURR_APROVED_FUNDED}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="497cec7c-46ff-4e07-9235-c068c32de797" x="433" y="20" width="112" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CURR_OUTSTANDING_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="94556545-b8cd-42b2-af85-180fc9415146" x="433" y="40" width="112" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EST_PREMIUM_NOT_PAID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="107ae32c-cfe0-45e1-9204-f689a5757c7c" x="433" y="83" width="112" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUMBER_FUND_SETTLED}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="f07d9df0-5c5c-4b52-94df-a24420064cae" x="433" y="103" width="112" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUMBER_SETTLED_HEDGE_OPEN}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="b707c335-4f2c-4267-a82d-bb23c9718f25" x="433" y="123" width="112" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMOUNT_FUNDED_SETTLED}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="b4b9da0b-a8e0-476a-9da5-f62c0a29d1b0" x="433" y="143" width="112" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_PREMIUM}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="ff916203-6b1d-4204-8956-14bf7c26e068" x="433" y="188" width="112" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_FUNDING_PROVIDED}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="d6950bf6-1f5b-4015-9616-213884af4ca6" x="433" y="249" width="112" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUMBER_PIPLINEDEALS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="e6860e15-4030-4d4e-a402-0a6d19efe4cd" x="433" y="269" width="112" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EST_DISBURSEMENTS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf" x="0" y="2" width="572" height="15" forecolor="#CCCCCC" backcolor="#CC0033"/>
+				<graphicElement>
+					<pen lineColor="#990033"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="b2a773d7-a277-4610-901a-ea782d2775b0" x="0" y="17" width="572" height="15"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Innovative Systems Inc®]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" evaluationTime="Report" pattern="" isBlankWhenNull="true">
+				<reportElement uuid="bf29d155-322a-4ed6-887e-85e4736d1c5a" mode="Transparent" x="716" y="-1" width="0" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9" x="338" y="2" width="207" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of "]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="EEEEE dd MMMMM yyyy" isBlankWhenNull="true">
+				<reportElement uuid="d542132f-c136-4dc8-8760-3f15164318a0" x="0" y="2" width="200" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="" isBlankWhenNull="true">
+				<reportElement uuid="2051b2d2-ca1a-45ae-9787-6ad9f7ba9997" mode="Transparent" x="546" y="2" width="26" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

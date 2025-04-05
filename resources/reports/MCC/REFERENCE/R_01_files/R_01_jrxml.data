@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Element Price By Source" language="groovy" pageWidth="612" pageHeight="792" whenNoDataType="NoDataSection" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="874918dd-7cf2-42a0-8689-852ced0e6010">
+	<property name="ireport.zoom" value="1.771561000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="152"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MCC/REFERENCE/R_01"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.125:8081/jasperserver/services/repository"/>
+	<parameter name="date_start" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="date_end" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="element" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[--Listing of Commodity Prices By Source
+select p.element_id,p.element_name,symbol,initcap(p.mmt_unit)mmt_unit,initcap(p.mmt_unit_code)mmt_unit_code,
+initcap(p.source_name)source_name,p.code,p.source_code,p.year,p.price_date,p.price
+from vw_element_price p
+where upper(p.symbol) like (case when ($P{element}='All' or $P{element}='%') then
+'%' else upper($P{element}) end)
+and trunc(p.price_date) between $P{date_start} and $P{date_end}]]>
+	</queryString>
+	<field name="ELEMENT_ID" class="java.math.BigDecimal"/>
+	<field name="ELEMENT_NAME" class="java.lang.String"/>
+	<field name="SYMBOL" class="java.lang.String"/>
+	<field name="MMT_UNIT" class="java.lang.String"/>
+	<field name="MMT_UNIT_CODE" class="java.lang.String"/>
+	<field name="SOURCE_NAME" class="java.lang.String"/>
+	<field name="CODE" class="java.lang.String"/>
+	<field name="SOURCE_CODE" class="java.lang.String"/>
+	<field name="YEAR" class="java.math.BigDecimal"/>
+	<field name="PRICE_DATE" class="java.sql.Timestamp"/>
+	<field name="PRICE" class="java.math.BigDecimal"/>
+	<sortField name="SOURCE_NAME"/>
+	<sortField name="ELEMENT_NAME"/>
+	<sortField name="PRICE_DATE" order="Descending"/>
+	<variable name="Seq" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[1.0]]></variableExpression>
+		<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+	</variable>
+	<group name="Price Source" isStartNewPage="true" isReprintHeaderOnEachPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{SOURCE_NAME}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="8a555d21-315d-4065-93aa-b2ed97b1a25d" x="0" y="0" width="461" height="13"/>
+					<textElement>
+						<font isBold="true" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SOURCE_NAME}+" - "+$F{SOURCE_CODE}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="Element">
+		<groupExpression><![CDATA[$F{ELEMENT_NAME}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="763bb083-fa52-4e1b-be35-c04ba2e5dd49" x="77" y="0" width="240" height="15"/>
+					<textElement>
+						<font size="10" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ELEMENT_NAME}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement uuid="cf7eaa9e-5975-402d-8343-30a044f0e008" x="2" y="15" width="570" height="1"/>
+					<graphicElement>
+						<pen lineColor="#CCCCCC"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="6"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band height="752" splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="54" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="c52d513b-f3f3-479b-a6c3-bb124e5c0302" x="162" y="0" width="299" height="33"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Listing of Element Prices By Price Source]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="5b86119d-1da6-4df5-9da7-716c691ebdba" x="110" y="44" width="462" height="1"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineColor="#CC0033"/>
+				</graphicElement>
+			</line>
+			<image>
+				<reportElement uuid="ef9602bc-62a4-45ac-b53a-81bfef2e0539" x="2" y="2" width="160" height="52"/>
+				<imageExpression><![CDATA["repo:/reports/MCC/Image/logo"]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="2c15bc54-8240-4777-8ecf-56282188e892" x="461" y="2" width="100" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date Start: "+new SimpleDateFormat('yyyy-MM-dd').format($P{date_start})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="1c7d149d-282a-4276-8d60-0513a3ddc813" x="461" y="14" width="100" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date End: "+new SimpleDateFormat('yyyy-MM-dd').format($P{date_end})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="e4cf2b43-76b0-4b5b-9788-f078c8126912" x="461" y="27" width="100" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Element : "+$P{element}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="18" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="8a8a247f-cc48-46e9-bf3c-f611280b52c5" x="290" y="0" width="101" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Measurement Unit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bb0de135-9710-42e1-aaff-0d3b2fcdd1c3" x="177" y="0" width="100" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7085b2cc-b553-43b3-847f-c5f5c5bc0269" x="482" y="0" width="74" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="728fc3a8-1fe4-4343-9504-b9b43231c6e1" x="0" y="0" width="77" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Price Source]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c6c75b7e-1eb6-4ba6-9e63-fcd0d4833410" x="77" y="0" width="100" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Element]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="45fed678-576e-41b1-bc57-ef706ea39131" x="0" y="15" width="572" height="1"/>
+				<graphicElement>
+					<pen lineColor="#CC0000"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="8d8541a4-b636-4eb1-92a9-100323104219" mode="Transparent" x="394" y="0" width="81" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Code]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement uuid="b08cb52c-c1c3-4bda-ae3b-55abd551aeb3" x="290" y="0" width="101" height="13"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MMT_UNIT}+'/'+$F{MMT_UNIT_CODE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="yyyy-MM-dd" isBlankWhenNull="true">
+				<reportElement uuid="2de9c52c-1bdb-4f65-b445-133bf7493164" x="177" y="0" width="100" height="13"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRICE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="fda7ab2d-bcca-4b15-b378-d769d8acb65b" x="482" y="0" width="79" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRICE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement uuid="0c7d47f9-3c8a-4439-a9d7-1ce9b7aec669" mode="Transparent" x="393" y="0" width="81" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CODE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement uuid="0fa5db28-579d-4965-b147-5dcead43a096" x="0" y="0" width="18" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Seq}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<rectangle>
+				<reportElement uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf" x="0" y="0" width="572" height="15" forecolor="#CC0000" backcolor="#CC0033"/>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="b2a773d7-a277-4610-901a-ea782d2775b0" mode="Transparent" x="2" y="15" width="570" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Innovative Systems Inc®]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9" mode="Transparent" x="404" y="1" width="140" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="d542132f-c136-4dc8-8760-3f15164318a0" mode="Transparent" x="0" y="1" width="94" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement uuid="bf29d155-322a-4ed6-887e-85e4736d1c5a" mode="Transparent" x="545" y="1" width="27" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="f7fd6812-9015-4229-8c9d-3d800153af7f" x="2" y="1" width="570" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Listing of Element Prices By Price Source]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="20">
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement uuid="d23aa90b-e7ba-43f6-ae05-251ba6fff023" x="2" y="0" width="570" height="20"/>
+				<textElement markup="none">
+					<font fontName="Arial" size="12" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Report Returned No Data for parameters : Start Date :"+new SimpleDateFormat("dd MMMMM yyyy").format($P{date_start})+" End Date : "+new SimpleDateFormat("dd MMMMM yyyy").format($P{date_end})+" Element :"+$P{element}]]></textFieldExpression>
+			</textField>
+		</band>
+	</noData>
+</jasperReport>

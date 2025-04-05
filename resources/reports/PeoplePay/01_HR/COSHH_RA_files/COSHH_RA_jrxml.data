@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="COSHH Risk Assessment Record" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7228e3b2-d215-4aed-bd70-e131e5844a06">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/COSHH_RA"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8080/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.6105100000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="160"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Hazard Classification" uuid="197e095e-db19-45df-aac1-cfcf967a5cf3">
+		<parameter name="HS_DETAIL" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select
+option_description
+from HR_HS_OPT_CHECK
+where section='Hs-Hazard-Classification'
+and hs_detail_id=$P{HS_DETAIL}
+and yes_no='Y'
+order by option_description]]>
+		</queryString>
+		<field name="OPTION_DESCRIPTION" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Controls in Place" uuid="f380c185-d5b3-449d-bcd8-fdf8eaece889">
+		<parameter name="HS_DETAIL" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select
+option_description
+from HR_HS_OPT_CHECK
+where section='Hs-Controls-In-Place'
+and hs_detail_id=$P{HS_DETAIL}
+and yes_no='Y'
+order by option_description]]>
+		</queryString>
+		<field name="OPTION_DESCRIPTION" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Improvements" uuid="253259d2-ec64-47c5-b93b-ee5457bce603">
+		<parameter name="HS_DETAIL" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select
+option_description
+from HR_HS_OPT_CHECK
+where section='Hs-Improvements'
+and hs_detail_id=$P{HS_DETAIL}
+and yes_no='Y'
+order by option_description]]>
+		</queryString>
+		<field name="OPTION_DESCRIPTION" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Assessment Findings" uuid="4c732b82-3575-4fd1-8668-6ef4bfc58a19">
+		<parameter name="COSHH_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT
+   a.ID,
+   a.EMP_ID,
+   c.first_name || ' ' || c.surname employee,
+   a.DATE_SENT,
+   a.NOTES,
+   a.COSHH_ID
+FROM
+    HR_HS_ASSESSMENT_FINDINGS a
+join hr_rcm_employee b on b.id = a.emp_id
+join hr_rcm_individual c on c.id=b.ind_id
+where a.coshh_id=$P{COSHH_ID}]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="EMP_ID" class="java.math.BigDecimal"/>
+		<field name="EMPLOYEE" class="java.lang.String"/>
+		<field name="DATE_SENT" class="java.sql.Timestamp"/>
+		<field name="NOTES" class="java.lang.String"/>
+		<field name="COSHH_ID" class="java.math.BigDecimal"/>
+	</subDataset>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+  a.id,
+  a.product_name,
+  a.assessment_no,
+  a.manufacturer,
+  a.product_code,
+  a.manufacturer_cont_number,
+  a.cas_ref,
+  a.section_where_used,
+  a.description,
+  a.date_of_msds,
+  case nvl(a.msds_held,'N') when 'Y' then 'Yes' else 'No' end msds_held,
+  a.overall_risk_assessment,
+  a.how_used,
+  a.hazardous_substances,
+  a.effected_person,
+  a.precautions_protections,
+  a.first_aid_treatment,
+  a.emergency_action,
+  a.environment_implications,
+  a.st_di_tra_information,
+  1946 org_id
+from hr_hs_coshh_risk_asstment a
+where a.id=$P{ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="PRODUCT_NAME" class="java.lang.String"/>
+	<field name="ASSESSMENT_NO" class="java.math.BigDecimal"/>
+	<field name="MANUFACTURER" class="java.lang.String"/>
+	<field name="PRODUCT_CODE" class="java.lang.String"/>
+	<field name="MANUFACTURER_CONT_NUMBER" class="java.lang.String"/>
+	<field name="CAS_REF" class="java.lang.String"/>
+	<field name="SECTION_WHERE_USED" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="DATE_OF_MSDS" class="java.sql.Timestamp"/>
+	<field name="MSDS_HELD" class="java.lang.String"/>
+	<field name="OVERALL_RISK_ASSESSMENT" class="java.lang.String"/>
+	<field name="HOW_USED" class="java.lang.String"/>
+	<field name="HAZARDOUS_SUBSTANCES" class="java.lang.String"/>
+	<field name="EFFECTED_PERSON" class="java.lang.String"/>
+	<field name="PRECAUTIONS_PROTECTIONS" class="java.lang.String"/>
+	<field name="FIRST_AID_TREATMENT" class="java.lang.String"/>
+	<field name="EMERGENCY_ACTION" class="java.lang.String"/>
+	<field name="ENVIRONMENT_IMPLICATIONS" class="java.lang.String"/>
+	<field name="ST_DI_TRA_INFORMATION" class="java.lang.String"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<title>
+		<band height="99" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="79" uuid="ef592582-2eae-45ae-98b5-2bbbd862b2b8"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="0" y="79" width="572" height="20" uuid="0a5271ba-e48d-4c91-abdc-73d3869d77b3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[COSHH Risk Assessment Record]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="154" splitType="Stretch">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="875f9d89-a42a-4069-a8eb-f9d0cbf09773"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="138" height="20" uuid="8b56a37e-1949-4af0-a3d7-e2ae2fbaacf3"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[General Information]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="100" height="20" uuid="1029e5ef-21b1-4efa-87af-62147c03b556"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Product Name:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="150" y="20" width="136" height="20" uuid="ebfad861-68d7-4ed0-877d-4eda25e2f469"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PRODUCT_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="286" y="20" width="100" height="20" uuid="e89029c4-a49c-497a-b3a0-e8476dc7fd8a"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Assessment No.:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="386" y="20" width="186" height="20" uuid="efa5a882-e2ac-4f50-804d-982972f46b62"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ASSESSMENT_NO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="40" width="100" height="20" uuid="0bef5dbf-8cac-4196-8e66-09cd321cd5e8"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Manufacturer:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="150" y="40" width="136" height="20" uuid="3171cae2-680e-4d2a-b3fe-739704cad0e5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{MANUFACTURER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="60" width="187" height="20" uuid="8e5c6476-c37b-4569-a34c-9b9ee2bbe2cb"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Manufacturer Contact Number:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="150" y="60" width="136" height="20" uuid="a83e155c-1c68-4400-aae7-95b40f3757c9"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{MANUFACTURER_CONT_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="80" width="150" height="20" uuid="98170602-4d91-456f-a663-402f2bacccda"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Section Where Used:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="150" y="80" width="136" height="20" uuid="3d36318f-e07f-4897-aee0-523572777a31"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{SECTION_WHERE_USED}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="100" width="100" height="20" uuid="55ae98d7-eb7a-4e86-af13-ec6b2d3d4559"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[MSDS Held:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="40" width="100" height="20" uuid="a8cc6f61-19ce-4f05-ba96-3ebb591a58f7"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Product Code:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="386" y="40" width="186" height="20" uuid="f4dea4ee-4d93-43e2-860d-c813e68b1346"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PRODUCT_CODE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="286" y="60" width="100" height="20" uuid="98006080-5a04-40b2-a144-df6100f582b6"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CAS Ref.:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="386" y="60" width="186" height="20" uuid="f8e21d6a-f224-4177-9430-cf15cc65779a"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CAS_REF}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="286" y="80" width="100" height="20" uuid="9fd36714-2d1d-42c8-a351-59ef21ef483c"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Description:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="386" y="80" width="186" height="20" uuid="1aabbfe3-25ca-400c-b5cc-cf7a25d26284"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="286" y="100" width="100" height="20" uuid="00a7f557-bf08-4b40-ab96-7736b32a8c83"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date of MSDS:]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="386" y="100" width="186" height="20" uuid="2c1436ce-9a3a-400c-ac91-f5f715a87961"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{DATE_OF_MSDS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="150" y="100" width="136" height="20" uuid="2c5ca44c-7a7d-464b-a03d-b28eed326db7"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{MSDS_HELD}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="150" y="134" width="136" height="20" uuid="8174e24f-ed2b-4171-af42-ee59e1d861df"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{OVERALL_RISK_ASSESSMENT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="120" width="187" height="34" isPrintWhenDetailOverflows="true" uuid="6ceb8b3e-d210-4b4c-b02c-85138d00b6da"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Overall Assessment of Risk with Regard to Current Usage:]]></text>
+			</staticText>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="aae8eec0-3fa5-4d40-aeea-4d835201ceec"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="236" height="20" uuid="c5c8ecdf-cefa-491f-b567-31fe691f6569"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hazard Classification]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table 1" x="0" y="20" width="572" height="20" uuid="d81e7020-fccd-4c84-a232-00c1e8c1be78"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Hazard Classification" uuid="b8fbc4ca-2c96-440e-93d8-c7f3f9d827ae">
+						<datasetParameter name="HS_DETAIL">
+							<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="572" uuid="00ed3626-6aa7-4380-9d91-2dc5121bd243">
+						<jr:detailCell height="20" rowSpan="1">
+							<textField>
+								<reportElement x="0" y="0" width="572" height="20" uuid="5b2b4572-5b99-4dc0-b008-e95d728e4961"/>
+								<textElement verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[" - " + $F{OPTION_DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="926abfc0-ef28-4135-939d-7b4ecd30b547"/>
+			</rectangle>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="20" width="572" height="20" uuid="d2383732-48f9-4219-8545-5441597bb375"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{HOW_USED}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="138" height="20" uuid="ee39e66c-1f9e-48c5-a969-1cc3453e8c98"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[How is it Used?]]></text>
+			</staticText>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="325e17dd-f3f8-4735-86e8-595fefa0b60b"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="514" height="20" uuid="ead0b349-c5f6-44d9-8bd1-2c6385a274d3"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Are any Hazardous Substances Produced by any Process?]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="20" width="572" height="20" uuid="5e4c91c4-b4e1-45ca-8a5d-044e79ce6301"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{HAZARDOUS_SUBSTANCES}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="8d983211-f8da-4f94-aa35-d5d8a2c86a15"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="236" height="20" uuid="6a8ddce9-640d-45f1-9f8d-e1c06231e17a"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Who might it effect?]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="20" width="572" height="20" uuid="edca1f44-96c1-437c-aecb-1d8c02041336"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{EFFECTED_PERSON}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="1a3841cd-0bf1-44fb-82a8-ae83c9d36240"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="236" height="20" uuid="ed899055-7557-445f-8e37-5f176c8f3395"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[What Controls Are In Place?]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table 1" x="0" y="20" width="572" height="20" uuid="b5284d8d-cb00-4ef7-a4f7-c49e704c7d19"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Controls in Place" uuid="c027b8cd-da73-43f4-b59a-69ad7af62c86">
+						<datasetParameter name="HS_DETAIL">
+							<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="572" uuid="3083fcdc-5604-4224-a6ce-4b528ea33864">
+						<jr:detailCell height="20" rowSpan="1">
+							<textField>
+								<reportElement x="0" y="0" width="572" height="20" uuid="aaf99978-ab27-4a5d-b645-8e82b7e20817"/>
+								<textElement verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[" - " + $F{OPTION_DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="022f216b-36e0-4798-91fc-5e9499624c93"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="332" height="20" uuid="cbc684d7-3278-4a82-b0bb-3f78ee9aa49a"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[General Precautions & Personal Protection Needed]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="20" width="572" height="20" uuid="776ca813-ac4c-48f2-98e3-256cd1333f85"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PRECAUTIONS_PROTECTIONS}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="50">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="20" width="572" height="20" uuid="960408ab-3f8c-4c39-a54b-47a19f4cf988"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FIRST_AID_TREATMENT}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="b8cbe943-15f0-4a00-9bcf-8cd8d442ee32"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="332" height="20" uuid="d94dabaa-0e77-471b-bdbd-16a2330792db"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emergency First Aid Treatment]]></text>
+			</staticText>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="532e2f8a-e039-468c-8308-98431ab82a12"/>
+			</rectangle>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="20" width="572" height="20" uuid="079bf78a-477f-4861-915a-7560a7d83ac0"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{EMERGENCY_ACTION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="332" height="20" uuid="6432bb81-6a2c-4db0-8187-bb67d3931522"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Action in case of Emergency]]></text>
+			</staticText>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="14678156-b39b-439b-943a-7ce3bd1e5636"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="332" height="20" uuid="f5afd8d1-5ddc-436d-ab1c-e2fde22c249a"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Environment Implications]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="20" width="572" height="20" uuid="4a3761e0-4465-446a-a941-3897d4b7ed58"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ENVIRONMENT_IMPLICATIONS}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="a22cfe4e-12a4-4b0a-9ca8-77b2fb5610a3"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="332" height="20" uuid="38a4c8a7-6ede-435f-83d6-b32367a40858"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Storage, Disposal and Transport Information]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="20" width="572" height="20" uuid="a2f9fc53-235e-442c-8299-1af6e8ec94b4"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ST_DI_TRA_INFORMATION}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="15cce61c-fe6d-4471-8546-53d2170544ad"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="332" height="20" uuid="c9db27b8-a2ac-4740-a7a4-830a1a3e15cd"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Improvements]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table 1" x="0" y="20" width="572" height="20" uuid="8f627f67-cf72-4a68-abe8-10bb70c5906a"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Improvements" uuid="afc6f9d8-c6a0-46e7-9579-55dc0cddc0a7">
+						<datasetParameter name="HS_DETAIL">
+							<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="572" uuid="b7824b11-d285-4f01-92a3-98f391bb534a">
+						<jr:detailCell height="20" rowSpan="1">
+							<textField>
+								<reportElement x="0" y="0" width="572" height="20" uuid="f6dd456d-29f9-40b8-b327-90f0ac6922d5"/>
+								<textFieldExpression><![CDATA[" - "+$F{OPTION_DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement x="-10" y="0" width="592" height="20" uuid="4ab123b8-3e87-40c2-a1ef-aec54a5ac18b"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="332" height="20" uuid="94406e18-c10b-4558-bd0b-d7903096e4d8"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Assessment Findings]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table 1" x="0" y="20" width="572" height="20" uuid="97961234-6aeb-42d2-b1c0-a70007a197a8"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Assessment Findings" uuid="3f6aee22-c578-42e6-9134-024e318919bd">
+						<datasetParameter name="COSHH_ID">
+							<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="120" uuid="9d056963-735e-47b3-8548-a0161481a3f4">
+						<jr:columnHeader height="20" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="120" height="20" uuid="8a70cce7-a2db-473e-bc74-b6c4e775bd54"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Employee]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField>
+								<reportElement x="0" y="0" width="120" height="20" uuid="1683914d-f3bf-4dfb-8257-22398459ae0d"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{EMPLOYEE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="6ac10908-3384-44f3-b912-1d5e9b0bc9c2">
+						<jr:columnHeader height="20" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="20" uuid="bc009336-049e-445b-952a-80011fdf4e3c"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Date Sent]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField pattern="dd-MMM-yyyy">
+								<reportElement x="0" y="0" width="90" height="20" uuid="8598c6fa-e245-4d07-a352-8f1359b9ec98"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{DATE_SENT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="362" uuid="11f85f4e-1a7b-44c0-8d9d-78d90c59aac4">
+						<jr:columnHeader height="20" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="362" height="20" uuid="688aa687-8cf1-4383-9451-63f46f1036f0"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Notes]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField>
+								<reportElement x="0" y="0" width="362" height="20" uuid="d01910b3-f920-4e41-8c06-df29b28e1332"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{NOTES}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>

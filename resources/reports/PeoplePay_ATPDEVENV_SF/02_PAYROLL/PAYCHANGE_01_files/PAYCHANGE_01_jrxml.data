@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Pay Change" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0dfae0ff-43d5-4ed6-ba60-89c704818afd">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GPL/02_PAYROLL/PAYCHANGE_01"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.12.16:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Pay Change"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GPL-ONPREME"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GPL/02_PAYROLL/PAYCHANGE_01_files/PAYCHANGE_01_jrxml"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SEARCH_OPTION" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="p_Value" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUPPRESS_DETAILS" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SESSION_ID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="allEmployees" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT b.*,case when trunc(LAST_CHANGED_DATE)>=trunc(START_DATE) then 'C' else 'O' end Change,
+case when b.PAID='P' then b.AMOUNT_PAID else 0 end income_paid,
+case when b.PAID='D' then b.AMOUNT_PAID else 0 end deduction_paid, 
+nvl((
+SELECT EARNING_NAME
+FROM VW_EARNING_PERIOD_NAME P
+WHERE P.EARNING_ID=$P{EARNINGS_PERIOD_ID}
+),' ') Payroll_name
+FROM TABLE(PKG_REPORTS.SP_PAYCHANGERPT($P{EARNINGS_PERIOD_ID},$P{SEARCH_OPTION},$P{p_Value},$P{SESSION_ID},  $P{allEmployees}  )) b]]>
+	</queryString>
+	<field name="EMPLOYEE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE"/>
+	</field>
+	<field name="ACCOUNT_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ACCOUNT_CODE"/>
+	</field>
+	<field name="PAID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PAID"/>
+	</field>
+	<field name="AMOUNT_PAID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT_PAID"/>
+	</field>
+	<field name="EMP_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="PERSONAL_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PERSONAL_RATE"/>
+	</field>
+	<field name="START_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="START_DATE"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="FAXNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="LAST_CHANGED_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="LAST_CHANGED_DATE"/>
+	</field>
+	<field name="HOURLY_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="HOURLY_RATE"/>
+	</field>
+	<field name="POSITION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_ID"/>
+	</field>
+	<field name="WKLOCATION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="WKLOCATION_ID"/>
+	</field>
+	<field name="DESIGNATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DESIGNATION"/>
+	</field>
+	<field name="ORG_STRUCTURE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_STRUCTURE"/>
+	</field>
+	<field name="CHANGE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CHANGE"/>
+	</field>
+	<field name="INCOME_PAID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="INCOME_PAID"/>
+	</field>
+	<field name="DEDUCTION_PAID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DEDUCTION_PAID"/>
+	</field>
+	<field name="PAYROLL_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PAYROLL_NAME"/>
+	</field>
+	<sortField name="ORG_STRUCTURE"/>
+	<sortField name="PAID"/>
+	<variable name="Employee" class="java.lang.String"/>
+	<variable name="Total_Deduction_Employee" class="java.math.BigDecimal" resetType="Group" resetGroup="Name" calculation="Sum">
+		<variableExpression><![CDATA[$F{PAID}=='D' ? $F{AMOUNT_PAID}:0]]></variableExpression>
+	</variable>
+	<variable name="Total_Payment_Employee" class="java.math.BigDecimal" resetType="Group" resetGroup="Name" calculation="Sum">
+		<variableExpression><![CDATA[$F{PAID}=='P' ?$F{AMOUNT_PAID}:0]]></variableExpression>
+	</variable>
+	<variable name="GT_Deduction" class="java.math.BigDecimal" incrementType="Group" incrementGroup="Name" calculation="Sum">
+		<variableExpression><![CDATA[$V{Total_Deduction_Employee}]]></variableExpression>
+	</variable>
+	<variable name="Record_count" class="java.math.BigDecimal" incrementType="Group" incrementGroup="Name" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="GT_Payment" class="java.math.BigDecimal" incrementType="Group" incrementGroup="Name" calculation="Sum">
+		<variableExpression><![CDATA[$V{Total_Payment_Employee}]]></variableExpression>
+	</variable>
+	<group name="Department" isReprintHeaderOnEachPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{ORG_STRUCTURE}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<textField>
+					<reportElement x="0" y="0" width="321" height="15" uuid="27422286-a0a8-42ef-891a-e951e6f1edc4"/>
+					<textElement markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Department: "+$F{ORG_STRUCTURE}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="5"/>
+		</groupFooter>
+	</group>
+	<group name="Name">
+		<groupExpression><![CDATA[$F{EMPLOYEE}]]></groupExpression>
+		<groupHeader>
+			<band height="19">
+				<textField isBlankWhenNull="true">
+					<reportElement x="65" y="2" width="167" height="17" uuid="0f588e87-105c-471d-b8b6-9d5211d351fd"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EMPLOYEE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="23" y="2" width="42" height="17" uuid="63f82b6d-1435-4af8-aefd-b77fd68c8278"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EMP_ID}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="Name" pattern="###0" isBlankWhenNull="true">
+					<reportElement x="1" y="2" width="21" height="17" uuid="1340c009-486c-4861-ba16-ac49d8207013"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Record_count}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="315" y="2" width="51" height="17" uuid="5e7abeca-424c-4aea-9218-e9a5cfd06452">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PERSONAL_RATE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="453" y="2" width="55" height="17" uuid="f797a7e8-fa20-4dcb-b9cc-d043917457a9">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{HOURLY_RATE}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="235" y="2" width="79" height="17" uuid="731b2476-1bc3-4685-8b84-21e4195a94c7">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Basic Rate:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="373" y="2" width="79" height="17" uuid="85cedcb5-e954-4fb3-959d-1920075788fa">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Hourly Rate:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="33">
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="405" y="0" width="59" height="15" uuid="e9ff4d94-e687-49b7-a294-af35aaa257c2"/>
+					<textElement textAlignment="Right" verticalAlignment="Bottom">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Total_Payment_Employee}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="1" y="31" width="555" height="1" uuid="898874ad-8575-4411-b8fe-a9bc70af4718"/>
+				</line>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="491" y="0" width="58" height="15" uuid="94642eff-e38a-4361-a52e-ffddaef95a04"/>
+					<textElement textAlignment="Right" verticalAlignment="Bottom">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Total_Deduction_Employee}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="250" y="0" width="103" height="15" uuid="1a2e90b2-3382-469b-bbc7-f789f991918e"/>
+					<textElement textAlignment="Right" verticalAlignment="Bottom">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Total :]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="47" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="47" isPrintWhenDetailOverflows="true" uuid="ada22d41-d5ff-4699-8b43-f6ebb0825d84"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="32" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="23" y="2" width="532" height="15" uuid="c7896286-4fac-4e69-a0b1-44e8d5e27b87"/>
+				<textElement textAlignment="Center" markup="none">
+					<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Payroll Changes"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="23" y="17" width="531" height="15" uuid="49bc86cb-1400-40e4-b06b-61a411dadae3"/>
+				<textElement textAlignment="Center" markup="none">
+					<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYROLL_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="22" height="15" uuid="82dbf8f4-d289-46c9-b003-2551875063ca"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="22" y="0" width="42" height="15" uuid="7835c74b-b80d-4fd0-851e-67bb249884d8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Emp#]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="64" y="0" width="49" height="15" uuid="7fb1343b-9e8c-4fb9-a1e4-8d03eec84d4d"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Employee]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="145" y="0" width="45" height="15" uuid="99e7ccc4-6bb4-4141-9ea8-22ff014c09d2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Account]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="489" y="0" width="60" height="15" uuid="dfd9601b-da40-41f4-be2d-64990f8ccd5d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Deduction]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="386" y="0" width="79" height="15" uuid="c33f2b5d-745c-4e4e-8c69-a9681bd44ef3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Income]]></text>
+			</staticText>
+			<line>
+				<reportElement x="1" y="15" width="555" height="1" uuid="4303552c-6fd5-48ac-8fd0-33a9dd5bb016"/>
+			</line>
+			<staticText>
+				<reportElement x="113" y="0" width="32" height="15" uuid="ff7d79d1-5a4a-4ff8-b49b-d9e1c1985d7e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[P/D]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="198" y="0" width="103" height="15" uuid="3492fa4b-bce9-4d1d-a905-d0b5a987d65b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Transaction]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<printWhenExpression><![CDATA[$F{CHANGE}=="C" ? false:$P{SUPPRESS_DETAILS}=="Y" ? false:true]]></printWhenExpression>
+			<textField isBlankWhenNull="true">
+				<reportElement x="145" y="0" width="43" height="15" uuid="0d0db3ee-9eb0-4287-8b40-3aa592341de9"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACCOUNT_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="117" y="0" width="23" height="15" uuid="97c4a9e6-a11f-404e-8877-be0a91d74e82"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAID}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="201" y="0" width="153" height="15" uuid="f9111fbb-3029-4403-9713-e3f7b1466960"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="406" y="0" width="57" height="15" uuid="4982d9fb-665c-4ae7-927a-fd63734b3327"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INCOME_PAID}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="490" y="0" width="59" height="15" uuid="28f8a9d7-1c31-40e1-9767-bff99421eef5"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEDUCTION_PAID}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="20">
+			<printWhenExpression><![CDATA[$F{CHANGE}!="C" ? false:$P{SUPPRESS_DETAILS}=="Y" ? false:true]]></printWhenExpression>
+			<textField isBlankWhenNull="true">
+				<reportElement x="145" y="0" width="43" height="15" forecolor="#FF0000" uuid="6f90055b-fcc6-4b86-9290-63f7ac5b2a18"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACCOUNT_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="117" y="0" width="23" height="15" forecolor="#FF0000" uuid="eb35b1ad-63b3-4e8c-94e1-da65047b1463"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAID}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="201" y="0" width="153" height="15" forecolor="#FF0000" uuid="c72df70b-92ca-40e8-b9f6-e08f68bbcbe3"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="406" y="0" width="57" height="15" forecolor="#FF0000" uuid="33fb951c-f2e1-482e-9ee3-dbfe83c68cb6"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INCOME_PAID}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="491" y="0" width="57" height="15" forecolor="#FF0000" uuid="fb241ccd-aa1d-492b-a20d-e7fff6f2e9f7"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEDUCTION_PAID}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="32" splitType="Stretch">
+			<rectangle>
+				<reportElement x="1" y="0" width="554" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<textField evaluationTime="Report">
+				<reportElement x="530" y="0" width="25" height="15" uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="6" y="0" width="162" height="15" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="428" y="0" width="100" height="15" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="17" width="554" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="31" splitType="Stretch">
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="425" y="0" width="67" height="15" uuid="cf2b301e-999c-4a00-9d82-2dd4208ae6b8"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GT_Deduction}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="425" y="15" width="67" height="15" uuid="d535878c-66f9-4b90-ac7f-3f75d25590b9"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GT_Payment}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="259" y="0" width="165" height="15" uuid="1a2e90b2-3382-469b-bbc7-f789f991918e"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Grand Total Deductions:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="260" y="15" width="165" height="15" uuid="1a2e90b2-3382-469b-bbc7-f789f991918e"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Grand Total Payments:]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

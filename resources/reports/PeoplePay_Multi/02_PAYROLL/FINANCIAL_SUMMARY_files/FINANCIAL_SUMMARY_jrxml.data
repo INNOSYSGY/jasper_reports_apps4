@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DEPARMENTAL FINANCIAL SUMMARY" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="296f7090-395c-4271-a80b-5a1b4e98153a">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Multi/02_PAYROLL/FINANCIAL_SUMMARY"/>
+	<property name="ireport.jasperserver.url" value="http://162.251.61.138:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PROD_PAAS_WTG"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Multi/02_PAYROLL/FINANCIAL_SUMMARY_files/FINANCIAL_SUMMARY_jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUPPRESS_DETAILS" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_WORKLOCATION" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT SORT,B.type,b.account_code,b.description,sum(b.amount) amount,sum(b.ytd_amount) ytd_amount,org_id,
+(
+SELECT EARNING_NAME
+FROM VW_EARNING_PERIOD_NAME P
+WHERE P.EARNING_ID=$P{EARNINGS_PERIOD_ID}
+) Payroll_name,
+(case when nvl($P{P_WORKLOCATION},'ALL')='ALL' then to_nchar('All Departments/Locations')
+else
+(
+SELECT location_code||' - '||trim(LOCATION_DESCRIPTION)
+FROM HR_HCF_WORKLOCATION L
+WHERE TO_CHAR(L.ID)=$P{P_WORKLOCATION}
+)
+end )Department
+FROM(
+SELECT
+1 SORT,
+TO_NCHAR('EARNINGS') TYPE,
+TO_NCHAR('100') ACCOUNT_CODE,
+TO_NCHAR('Basic Earnings') DESCRIPTION,
+SUM(BASIC_PERSONAL_RATE) AMOUNT,
+ PKG_REPORTS.FN_GET_WKL_BASIC_ERN_YTD(EP.EMPLOYMENT_CLASS_ID,PD.WKLOCATION_ID,TO_DATE('2015-01-01','YYYY-MM-DD'),EP.START_DATE) YTD_AMOUNT,
+pd.org_id
+FROM PA_PMG_PAYROLLDTL PD
+JOIN PA_PCF_EARNINGPERIOD EP ON EP.ID=PD.EARNINGS_PERIOD_ID
+JOIN HR_HCF_POSITION PL ON PD.POSITION_ID=PL.ID
+WHERE EARNINGS_PERIOD_ID=$P{EARNINGS_PERIOD_ID}
+AND PD.WKLOCATION_ID=(CASE WHEN NVL($P{P_WORKLOCATION},'ALL')='ALL' THEN TO_CHAR(PD.WKLOCATION_ID)
+ELSE $P{P_WORKLOCATION} END)
+and upper(pd.compute_gross_hist)<>'HOURLY_RATE'
+GROUP BY TO_NCHAR('EARNINGS'), TO_NCHAR('100'), TO_NCHAR('Basic Earnings'),EP.EMPLOYMENT_CLASS_ID,PD.WKLOCATION_ID,EP.START_DATE, 0, pd.org_id
+union all
+SELECT
+1 SORT,
+TO_NCHAR('EARNINGS') TYPE,
+W.ACCOUNT_CODE,
+W.DESCRIPTION,
+SUM(PID.INCOME_AMOUNT) AMOUNT,
+PKG_REPORTS.FN_GET_WKL_INCOME_YTD(EP.EMPLOYMENT_CLASS_ID,PD.WKLOCATION_ID,PID.INCOME_CODE,TO_DATE('2015-01-01','YYYY-MM-DD'),EP.START_DATE) YTD_AMOUNT
+,pd.org_Id
+FROM PA_PMG_PAYROLLDTL PD JOIN PA_PMG_PAYROLLINCOME PID ON PD.ID=PID.PAY_SLIPNO
+JOIN PA_PCF_EARNINGPERIOD EP ON EP.ID=PD.EARNINGS_PERIOD_ID
+    JOIN HR_HCF_POSITION PL ON PD.POSITION_ID=PL.ID
+join hr_hcf_organisation m on m.Id=pd.org_Id
+JOIN PA_PCF_INCOMECODE W ON W.INCOME_CODE=PID.INCOME_CODE
+WHERE PD.EARNINGS_PERIOD_ID =$P{EARNINGS_PERIOD_ID}
+AND PD.WKLOCATION_ID=(CASE WHEN NVL($P{P_WORKLOCATION},'ALL')='ALL' THEN TO_CHAR(PD.WKLOCATION_ID)
+ELSE $P{P_WORKLOCATION} END)
+GROUP BY TO_NCHAR('EARNINGS'),EP.EMPLOYMENT_CLASS_ID,PD.WKLOCATION_ID, W.ACCOUNT_CODE,W.DESCRIPTION,PID.INCOME_CODE,EP.START_DATE, pd.org_Id
+UNION ALL
+SELECT
+2 SORT,
+    TO_NCHAR('DEDUCTIONS') TYPE,
+    TO_NCHAR('500') ACCOUNT_CODE,
+    TO_NCHAR('PAY AS YOU EARN') DESCRIPTION,
+    SUM(TAX_AMOUNT) AMOUNT,
+    PKG_REPORTS.FN_GET_WKL_TAX_YTD(EP.EMPLOYMENT_CLASS_ID,PD.WKLOCATION_ID,TO_DATE('2015-01-01','YYYY-MM-DD'),EP.START_DATE) YTD_AMOUNT,
+    pd.ORG_ID
+    FROM PA_PMG_PAYROLLDTL pd
+    JOIN PA_PCF_EARNINGPERIOD EP ON EP.ID=PD.EARNINGS_PERIOD_ID
+    JOIN HR_HCF_POSITION PL ON PD.POSITION_ID=PL.ID
+    WHERE TAX_AMOUNT>0
+    AND EARNINGS_PERIOD_ID=$P{EARNINGS_PERIOD_ID}
+AND PD.WKLOCATION_ID=(CASE WHEN NVL($P{P_WORKLOCATION},'ALL')='ALL' THEN TO_CHAR(PD.WKLOCATION_ID)
+ELSE $P{P_WORKLOCATION} END)
+    GROUP BY TO_NCHAR('EARNINGS'),TO_NCHAR('TAX0001'),TO_NCHAR('Tax'),EP.EMPLOYMENT_CLASS_ID,PD.WKLOCATION_ID,EP.START_DATE,pd.ORG_ID
+UNION ALL
+SELECT
+2 SORT,
+    TO_NCHAR('DEDUCTIONS') TYPE,
+    TO_NCHAR('300') ACCOUNT_CODE,
+    TO_NCHAR('Regular NIS') DESCRIPTION,
+    SUM(nis_employee) AMOUNT,
+     PKG_REPORTS.FN_GET_WKL_NIS_YTD(EP.EMPLOYMENT_CLASS_ID,PD.WKLOCATION_ID,TO_DATE('2015-01-01','YYYY-MM-DD'),EP.START_DATE) YTD_AMOUNT,
+   pd.ORG_ID
+    FROM PA_PMG_PAYROLLDTL pd
+    JOIN PA_PCF_EARNINGPERIOD EP ON EP.ID=PD.EARNINGS_PERIOD_ID
+    JOIN HR_HCF_POSITION PL ON PD.POSITION_ID=PL.ID
+    WHERE NIS_EMPLOYEE>0
+    AND EARNINGS_PERIOD_ID=$P{EARNINGS_PERIOD_ID}
+AND PD.WKLOCATION_ID=(CASE WHEN NVL($P{P_WORKLOCATION},'ALL')='ALL' THEN TO_CHAR(PD.WKLOCATION_ID)
+ELSE $P{P_WORKLOCATION} END)
+    GROUP BY     EP.EMPLOYMENT_CLASS_ID,PD.WKLOCATION_ID,TO_NCHAR('DEDUCTIONS'),TO_NCHAR('NIS0001'),TO_NCHAR('NIS'),EP.START_DATE,pd.ORG_ID
+UNION ALL
+ SELECT
+ 1 SORT,
+ TO_NCHAR('EARNINGS') TYPE,
+ J.ACCOUNT_CODE,J.DESCRIPTION||'(Employee)',
+ SUM(round(B.Amount_Deducted,0))*-1 amount,
+PKG_REPORTS.FN_GET_WKL_DEDUCTION_YTD(EP.EMPLOYMENT_CLASS_ID,A.WKLOCATION_ID,
+min(B.EXPENSE_CODE),
+TO_DATE('2015-01-01','YYYY-MM-DD'),EP.START_DATE)*-1 YTD_AMOUNT ,
+A.ORG_ID
+FROM PA_PMG_PAYROLLDEDUCTION B
+JOIN PA_PMG_PAYROLLDTL A ON A.ID=B.PAY_SLIPNO
+JOIN PA_PCF_ADMINDEDUCTION L ON L.ID=B.ADM_DEDUCTION_ID
+JOIN PA_PCF_DEDUCTIONCODE J ON J.ID=L.EXPENSE_ID
+JOIN HR_HCF_ORGANISATION H ON A.ORG_ID=H.ID
+JOIN PA_PCF_EARNINGPERIOD EP ON EP.ID=A.EARNINGS_PERIOD_ID
+JOIN HR_HCF_POSITION PL ON A.POSITION_ID=PL.ID
+WHERE A.EARNINGS_PERIOD_ID =$P{EARNINGS_PERIOD_ID}
+AND A.WKLOCATION_ID=(CASE WHEN NVL($P{P_WORKLOCATION},'ALL')='ALL' THEN TO_CHAR(A.WKLOCATION_ID)
+ELSE $P{P_WORKLOCATION} END)
+and b.deduction_type='EMPLOYEE'
+GROUP BY  EP.EMPLOYMENT_CLASS_ID,A.WKLOCATION_ID,TO_NCHAR('DEDUCTION'),J.ACCOUNT_CODE,J.DESCRIPTION||'(Employee)',EP.START_DATE,A.ORG_ID
+union all
+ SELECT
+ 1 SORT,
+ TO_NCHAR('EARNINGS') TYPE,
+ J.ACCOUNT_CODE,J.DESCRIPTION||'(Employer)',
+ SUM(round(B.Amount_Deducted,0))*-1 amount,
+PKG_REPORTS.FN_GET_WKL_DEDUCTION_YTD(EP.EMPLOYMENT_CLASS_ID,A.WKLOCATION_ID,
+min(B.EXPENSE_CODE),
+TO_DATE('2015-01-01','YYYY-MM-DD'),EP.START_DATE)*-1 YTD_AMOUNT ,
+A.ORG_ID
+FROM PA_PMG_PAYROLLDEDUCTION B
+JOIN PA_PMG_PAYROLLDTL A ON A.ID=B.PAY_SLIPNO
+JOIN PA_PCF_ADMINDEDUCTION L ON L.ID=B.ADM_DEDUCTION_ID
+JOIN PA_PCF_DEDUCTIONCODE J ON J.ID=L.EXPENSE_ID
+JOIN HR_HCF_ORGANISATION H ON A.ORG_ID=H.ID
+JOIN PA_PCF_EARNINGPERIOD EP ON EP.ID=A.EARNINGS_PERIOD_ID
+JOIN HR_HCF_POSITION PL ON A.POSITION_ID=PL.ID
+WHERE A.EARNINGS_PERIOD_ID =$P{EARNINGS_PERIOD_ID}
+AND A.WKLOCATION_ID=(CASE WHEN NVL($P{P_WORKLOCATION},'ALL')='ALL' THEN TO_CHAR(A.WKLOCATION_ID)
+ELSE $P{P_WORKLOCATION} END)
+and b.deduction_type='EMPLOYER'
+GROUP BY  EP.EMPLOYMENT_CLASS_ID,A.WKLOCATION_ID,TO_NCHAR('DEDUCTION'),J.ACCOUNT_CODE,J.DESCRIPTION||'(Employer)',EP.START_DATE,A.ORG_ID
+union all
+SELECT
+3 SORT,
+    TO_NCHAR('OTHER') TYPE,
+    TO_NCHAR('900') ACCOUNT_CODE,
+    TO_NCHAR('Employer''s Contribution') DESCRIPTION,
+    SUM(nis_employer) AMOUNT,
+ PKG_REPORTS.FN_GET_WKL_NIS_EMPR_YTD(EP.EMPLOYMENT_CLASS_ID,PD.WKLOCATION_ID,TO_DATE('2015-01-01','YYYY-MM-DD'),EP.START_DATE) YTD_AMOUNT,
+    pd.ORG_ID
+    FROM PA_PMG_PAYROLLDTL PD
+     JOIN PA_PCF_EARNINGPERIOD EP ON EP.ID=PD.EARNINGS_PERIOD_ID
+    JOIN HR_HCF_POSITION PL ON PD.POSITION_ID=PL.ID
+    WHERE NIS_EMPLOYER>0
+    AND EARNINGS_PERIOD_ID=$P{EARNINGS_PERIOD_ID}
+AND PD.WKLOCATION_ID=(CASE WHEN NVL($P{P_WORKLOCATION},'ALL')='ALL' THEN TO_CHAR(PD.WKLOCATION_ID)
+ELSE $P{P_WORKLOCATION} END)
+    GROUP BY TO_NCHAR('OTHER'), TO_NCHAR('300'), TO_NCHAR('Employer''s Contribution'),EP.EMPLOYMENT_CLASS_ID,PD.WKLOCATION_ID,EP.START_DATE, PD.ORG_ID
+) B
+GROUP BY B.type,b.account_code,b.description,ORG_ID,SORT]]>
+	</queryString>
+	<field name="SORT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SORT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SORT"/>
+	</field>
+	<field name="TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TYPE"/>
+	</field>
+	<field name="ACCOUNT_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ACCOUNT_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ACCOUNT_CODE"/>
+	</field>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT"/>
+	</field>
+	<field name="YTD_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="YTD_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="YTD_AMOUNT"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="PAYROLL_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAYROLL_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAYROLL_NAME"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<sortField name="SORT"/>
+	<sortField name="TYPE" order="Descending"/>
+	<sortField name="DESCRIPTION"/>
+	<variable name="AMOUNT_1" class="java.math.BigDecimal" resetType="Group" resetGroup="TYPE" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_DEDUCTIONS" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TYPE}=="DEDUCTIONS" ?$F{AMOUNT}:0]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{TYPE}=="DEDUCTIONS" ?$F{AMOUNT}:0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_EARNINGS" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TYPE}=="EARNINGS" ?$F{AMOUNT}:0]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{TYPE}=="EARNINGS" ?$F{AMOUNT}:0]]></initialValueExpression>
+	</variable>
+	<variable name="NET_PAY" class="java.math.BigDecimal" resetType="None">
+		<variableExpression><![CDATA[$V{TOTAL_EARNINGS}-$V{TOTAL_DEDUCTIONS}]]></variableExpression>
+		<initialValueExpression><![CDATA[$V{TOTAL_EARNINGS}-$V{TOTAL_DEDUCTIONS}]]></initialValueExpression>
+	</variable>
+	<variable name="YTD_AMOUNT_1" class="java.math.BigDecimal" resetType="Group" resetGroup="TYPE" calculation="Sum">
+		<variableExpression><![CDATA[$F{YTD_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_DEDUCTIONS_YTD" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TYPE}=="DEDUCTIONS" ? $F{YTD_AMOUNT}:0]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{TYPE}=="DEDUCTIONS" ?$F{YTD_AMOUNT}:0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_EARNINGS_YTD" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TYPE}=="EARNINGS" ?$F{YTD_AMOUNT}:0]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{TYPE}=="EARNINGS" ?$F{YTD_AMOUNT}:0]]></initialValueExpression>
+	</variable>
+	<variable name="NET_PAY_YTD" class="java.math.BigDecimal" resetType="None">
+		<variableExpression><![CDATA[$V{TOTAL_EARNINGS_YTD}-$V{TOTAL_DEDUCTIONS_YTD}]]></variableExpression>
+		<initialValueExpression><![CDATA[$V{TOTAL_EARNINGS}-$V{TOTAL_DEDUCTIONS}]]></initialValueExpression>
+	</variable>
+	<group name="TYPE">
+		<groupExpression><![CDATA[$F{TYPE}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<printWhenExpression><![CDATA[$F{TYPE}=="OTHER" ? false:true]]></printWhenExpression>
+				<textField pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="315" y="0" width="100" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="920e68ff-2fae-420e-a5d0-762c9a31218f"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{AMOUNT_1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="150" y="0" width="150" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="e15b19bd-856d-4cc4-8e27-60569805018a"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TYPE}.toUpperCase()+" :"]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="445" y="0" width="100" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="73b20a10-2769-4115-9f1b-33756ef56f5c"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{YTD_AMOUNT_1}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="15">
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="150" y="0" width="150" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="428f1436-60d0-4f2b-91c4-0f779dc311ec"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA["NET PAY :"]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="315" y="0" width="100" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="62ff9898-d4eb-4907-a516-0d8deea8ff32"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{NET_PAY}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="445" y="0" width="100" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="16f77078-0c28-48bb-a667-6b58110b5c58"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{NET_PAY_YTD}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="81" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="545" height="81" uuid="bbc47e09-51d5-4aea-a25b-c92bdf7606ba"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="56" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="150" y="0" width="319" height="20" uuid="8e7a6121-5341-4ce4-bfed-636d24c5e77d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DEPARTMENTAL FINANCIAL SUMMARY REPORT"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="25" width="572" height="15" uuid="1697f7a2-6fda-455f-9e24-d5a33cb311e9"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Payroll :"+$F{PAYROLL_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="0" y="40" width="572" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="2f576ed7-3831-47a8-aafd-937de7b2ce56"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Department :"+$F{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="17" splitType="Stretch">
+			<staticText>
+				<reportElement x="97" y="0" width="108" height="15" uuid="f12ecf36-e512-41f7-bf7b-29e0c5ec8f58"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[TRANSACTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="315" y="0" width="100" height="15" uuid="cdfc6ba7-604a-4f94-bf39-8ac1ae59fce1"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[CURRENT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="445" y="2" width="100" height="15" uuid="de494fbf-143d-404f-9886-6481e7404421"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[TODATE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="97" y="0" width="203" height="15" uuid="e87fccf7-75f3-4d06-907b-d589a0fded34"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement x="315" y="0" width="100" height="15" uuid="e44aacf8-22ad-4487-8599-f3466b3e85ac"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="87" height="15" uuid="396bcecc-f6ad-4e75-bae2-923fd66cded9"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACCOUNT_CODE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="445" y="0" width="100" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="833286cb-bbbb-4440-aaf9-3d7fd0f52852"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{YTD_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="572" height="15" uuid="408bd62f-101a-4665-9175-dfd99a0a64e8"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="15" forecolor="#FFFFFF" backcolor="#CCCCCC" uuid="70f5e1c1-3bbf-4d5c-8a11-0b3726299762"/>
+			</rectangle>
+			<textField>
+				<reportElement x="372" y="0" width="173" height="14" uuid="2638ab6f-9c50-4919-a1e6-05d270cf5cdd"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" isBlankWhenNull="true">
+				<reportElement x="545" y="0" width="25" height="14" uuid="b2487162-7fed-4a2c-b52a-49b312068297"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="150" height="14" uuid="56e7f4c8-8e78-411b-8620-d6c16f9bb54b"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

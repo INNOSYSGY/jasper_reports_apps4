@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GBTI NIS TEXT" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="1008" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="5bc0867c-5851-4270-b40d-7c7c8692a2a2">
+	<property name="net.sf.jasperreports.export.text.character.width" value="6"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/02_PAYROLL/NIS_TEXT_FILE"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="421"/>
+	<property name="ireport.y" value="0"/>
+	<property name="net.sf.jasperreports.export.text.character.height" value="11"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE_START" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE_END" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT trim(REGNO||REMMIT_YEAR||LPAD(TRIM(REMMIT_MONTH),2,0)||FREQUENCY||SSN||SURNAME||FIRST_NAME||DATE_OF_PERIOD1||DATE_OF_PERIOD2||DATE_OF_PERIOD3||DATE_OF_PERIOD4
+||DATE_OF_PERIOD5||WAGES_PERIOD1||WAGES_PERIOD2||WAGES_PERIOD3||WAGES_PERIOD4||WAGES_PERIOD5|| EMPLOYEE_CONT_AMOUNT||EMPLOYER_CONT_AMOUNT) AS TEXT
+FROM pa_pmg_NisExport a join pa_pcf_EarningPeriod b on a.Earnings_period_id=b.id
+where b.org_id=$P{IN_ORG_ID}
+and b.start_date=$P{DATE_START}
+and b.end_date=$P{DATE_END}]]>
+	</queryString>
+	<field name="TEXT" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Prevent">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="1008" height="11" isRemoveLineWhenBlank="true" uuid="0af94ba0-a6eb-4773-9571-924c5efb0345"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font fontName="Courier New" size="9" pdfFontName="Courier" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TEXT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

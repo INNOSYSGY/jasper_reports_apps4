@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="General Employee Listing" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="973" leftMargin="20" rightMargin="15" topMargin="20" bottomMargin="20" uuid="09530649-94cc-4c3c-a18a-367632741ad1">
+	<property name="ireport.zoom" value="1.81500000000002"/>
+	<property name="ireport.x" value="34"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/01_HR/HR_02"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Listing of Active Employees"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/01_HR/HR_02_files/HR_02_jrxml"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="505"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="481"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="227"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="766"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_EMPLOYMENT_CLASS" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="allEmployees" class="java.math.BigDecimal"/>
+	<parameter name="SESSION_ID" class="java.lang.String"/>
+	<parameter name="SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="SUPPRESS_DETAILS" class="java.lang.String"/>
+	<parameter name="PAYMENT_TYPE" class="java.lang.String"/>
+	<parameter name="ACTIVE" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT distinct e.DATE_SEPARATED,
+e.SEPARATED_STATUS,
+I.ID,
+    (NVL(I.SURNAME,'') || ', ' ||NVL(I.FIRST_NAME,'')||' '||NVL(I.MIDDLE_NAME,'')) AS ENAME,
+    I.DOB, I.SEX_CODE,
+    E.DATE_EMPLOYED,
+    E.EMP_COMPANY_NO,
+    initcap(e.Employment_status) Employment_status ,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.ind_id,'NIS NUMBER',SYSDATE)) NIS_NO,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.ind_id,'TIN',SYSDATE)) TAX_NO,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.ind_id,'NATIONAL ID',SYSDATE)) NATIONAL_ID,
+PKG_GLOBAL_FNTS.FN_PERSONALRATE(e.id, sysdate) as Salary,
+    initcap(E.POSITION_NAME) POSITION_NAME,
+    initcap(E.EMPLOYMENT_CLASS) EMPLOYMENT_CLASS,
+    initcap(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',I.ID,'STREET',SYSDATE)) LOT_STREET,
+    initcap(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',I.ID,'VILLAGE_WARD',SYSDATE)) VILAGE_WARD,
+    initcap(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',I.ID,'COUNTY',SYSDATE)) COUNTY,
+    HO.ADDRESS ORG_ADDRESS, HO.FAXNUM, HO.TELNUM, HO.NIS_REG_NO,
+ HO.TAX_REG_NO,
+ho.organisation_name,
+case when (extract(month from I.dob) <= extract(month from sysdate) and extract(day from I.dob) <= extract(day from sysdate))
+then (extract(year from sysdate) - extract(year from I.dob))
+else
+(extract(year from sysdate) - extract(year from I.dob) - 1)
+end age, HX.SHORT_NAME, replace(E.compute_gross, '_',' ') COMPUTE_GROSS,
+
+case when employment_type_id=1 then 'Temporary'
+                     when employment_type_id=2 then 'Permanent'
+                     else 'Other' end employment_type, nvl(GR.GRADE_CODE,'') GRADE_CODE, 
+                     case when $P{IN_ORG_ID} = 17832 then nvl(OE.UNIT_NAME,'')||' ('||nvl(oe.coa_code,'None')||')' else nvl(OE.UNIT_NAME,'') end UNIT_NAME, nvl(LOCATION_DESCRIPTION,'') LOCATION_DESCRIPTION, nvl(J.DESCRIPTION,'') JOB_DESCRIPTION,
+                     
+case when  $P{allEmployees} =1  and  $P{ACTIVE}=0 then 'Listing of Active Employees' 
+         when  $P{allEmployees} =1  and  $P{ACTIVE}=1 then 'Listing of In-Active Employees' 
+         when $P{allEmployees} =0 and  $P{ACTIVE}=1 then  'Listing of In-Active Employees by '|| replace($P{SEARCH_OPTION},'_',' ')  
+         when $P{allEmployees} =0 and  $P{ACTIVE}=0 then  'Listing of Active Employees by '|| replace($P{SEARCH_OPTION},'_',' ')
+         end title
+
+    FROM HR_RCM_INDIVIDUAL I
+    INNER JOIN  hr_rcm_employee E ON I.ID = E.IND_ID
+    --JOIN VW_AVAILEMPLOYEE e on e.av_ind_id = i.id    
+    JOIN HR_HCF_ORGANISATION HO on e.org_id=ho.id
+    left join hr_hcf_position w on w.id=e.position_id
+    left join HR_HCF_ORGSTRUCTUREDTL OE on OE.id=w.orgdtl_id
+    left join HR_HCF_POSITIONGRADE GR on GR.id=w.GRADE_ID
+    left join HR_HCF_JOB J on J.id=w.JOB_ID
+    join HR_HCF_WORKLOCATION WL on WL.id=e.wklocation_id
+    left join HR_HCF_ORGANISATION HX on HX.ID=e.union_code_id
+    WHERE e.org_id=$P{IN_ORG_ID}
+    and pkg_global_fnts.get_lookup_col(E.Employment_Class_ID,'TABLE_VALUE')  !='PEN'
+    and (( e.DATE_SEPARATED is null or (e.DATE_SEPARATED > (sysdate-4/24))  and $P{ACTIVE}  = 0) or (e.DATE_SEPARATED is not null and $P{ACTIVE}  = 1)) 
+    and e.id not in (32938, 34104, 42650, 32820,33444,33606,42950,40082,34168,33704,34458)
+    
+  
+    and 
+( $P{allEmployees} = 1 or  
+(exists (select 1
+                        from RPT_PARAMETER w1
+                        WHERE 
+                        W1.SESSION_ID= $P{SESSION_ID} 
+                         and
+                         option_value=case when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYEE' then to_char(e.id) 
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='GRADE_SCALE' then to_char(w.grade_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='ORG_STRUCTURE' then to_char(w.orgdtl_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='POSITION' then to_char(e.position_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='WORK_LOCATION' then to_char(e.wklocation_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='UNION' then to_char(e.union_code_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYMENT_TYPE' then to_char(e.EMPLOYMENT_TYPE_ID)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYMENT_CLASS' then to_char(e.EMPLOYMENT_CLASS_ID)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='COMPUTE_GROSS' then to_char(e.compute_gross)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='JOB' then to_char(J.id)
+                                                end
+                        )      and e.PAYMENT_TYPE=$P{PAYMENT_TYPE}  ) )   
+     order by (NVL(I.SURNAME,'') || ', ' ||NVL(I.FIRST_NAME,'')||' '||NVL(I.MIDDLE_NAME,''))]]>
+	</queryString>
+	<field name="DATE_SEPARATED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="DATE_SEPARATED"/>
+	</field>
+	<field name="SEPARATED_STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SEPARATED_STATUS"/>
+	</field>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="ENAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ENAME"/>
+	</field>
+	<field name="DOB" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="DOB"/>
+	</field>
+	<field name="SEX_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SEX_CODE"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="EMPLOYMENT_STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_STATUS"/>
+	</field>
+	<field name="NIS_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NIS_NO"/>
+	</field>
+	<field name="TAX_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TAX_NO"/>
+	</field>
+	<field name="NATIONAL_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NATIONAL_ID"/>
+	</field>
+	<field name="SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="SALARY"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="EMPLOYMENT_CLASS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS"/>
+	</field>
+	<field name="LOT_STREET" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LOT_STREET"/>
+	</field>
+	<field name="VILAGE_WARD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="VILAGE_WARD"/>
+	</field>
+	<field name="COUNTY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COUNTY"/>
+	</field>
+	<field name="ORG_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ADDRESS"/>
+	</field>
+	<field name="FAXNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="NIS_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NIS_REG_NO"/>
+	</field>
+	<field name="TAX_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TAX_REG_NO"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="AGE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="AGE"/>
+	</field>
+	<field name="SHORT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SHORT_NAME"/>
+	</field>
+	<field name="COMPUTE_GROSS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COMPUTE_GROSS"/>
+	</field>
+	<field name="EMPLOYMENT_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_TYPE"/>
+	</field>
+	<field name="GRADE_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="GRADE_CODE"/>
+	</field>
+	<field name="UNIT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="UNIT_NAME"/>
+	</field>
+	<field name="LOCATION_DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LOCATION_DESCRIPTION"/>
+	</field>
+	<field name="JOB_DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="JOB_DESCRIPTION"/>
+	</field>
+	<field name="TITLE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TITLE"/>
+	</field>
+	<sortField name="EMPLOYMENT_CLASS"/>
+	<sortField name="UNIT_NAME"/>
+	<sortField name="LOCATION_DESCRIPTION"/>
+	<sortField name="JOB_DESCRIPTION"/>
+	<variable name="Record_Count" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<group name="Employment_class">
+		<groupExpression><![CDATA[$F{EMPLOYMENT_CLASS}]]></groupExpression>
+		<groupHeader>
+			<band>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="UNIT_NAME">
+		<groupExpression><![CDATA[$F{UNIT_NAME}]]></groupExpression>
+		<groupHeader>
+			<band>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="LOCATION_DESCRIPTION">
+		<groupExpression><![CDATA[$F{LOCATION_DESCRIPTION}]]></groupExpression>
+		<groupHeader>
+			<band>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="JOB_DESCRIPTION">
+		<groupExpression><![CDATA[$F{JOB_DESCRIPTION}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement x="110" y="0" width="130" height="14" uuid="48076250-cd44-4af2-903e-9cdf52aa3d12">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EMPLOYMENT_CLASS}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="380" y="0" width="120" height="14" uuid="c8937a22-a3d9-4676-b5b7-630f7c75ab3a"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{UNIT_NAME}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="590" y="0" width="134" height="14" uuid="dd428e1e-f118-49e2-9e1b-b182a783a8c2"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LOCATION_DESCRIPTION}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="771" y="0" width="134" height="14" uuid="8fab1bf2-5ffa-4b62-bb0d-5ee638dc3ce1"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{JOB_DESCRIPTION}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="4" y="0" width="106" height="14" uuid="b036c05c-a02f-4539-8eb6-a5f27b977e24">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Employment class: "]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="242" y="0" width="138" height="14" uuid="f09f32c1-ef5c-495a-866b-2b4210464ea6">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Organisation Structure: "]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="503" y="0" width="87" height="14" uuid="cc5cd121-4d92-41b0-b0f4-ef799da13c48">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Work Location: "]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="743" y="0" width="27" height="14" uuid="e5f50009-28d7-469a-9031-9fe81f52bedb">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Job: "]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="60" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="973" height="60" uuid="828c6afb-3ea0-4eca-9ac7-bbb567fe3a27"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_LEGAL_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="2" width="972" height="15" uuid="e180f4f1-5c6f-4c90-a2c2-652fa0c01cd5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="26" splitType="Stretch">
+			<staticText>
+				<reportElement x="172" y="0" width="94" height="21" isPrintWhenDetailOverflows="true" uuid="ae5851b9-0012-46d2-9158-7b60720565ba"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="30" y="0" width="100" height="22" isPrintWhenDetailOverflows="true" uuid="93595ed3-00da-46a4-ae21-c7b7bc8a59da"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Position]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="0" width="31" height="22" isPrintWhenDetailOverflows="true" uuid="c59a3729-413e-4d3c-ba42-2c35d2d521f7"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Emp#]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="292" y="0" width="68" height="21" isPrintWhenDetailOverflows="true" uuid="5f1d45e8-dbf3-4e54-bc33-5b2e97aa0d6d"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[DOB]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="405" y="0" width="100" height="21" isPrintWhenDetailOverflows="true" uuid="79e44a8a-59ca-4fc6-8762-f2a0014b822b"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Lot/Street]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="510" y="0" width="92" height="21" isPrintWhenDetailOverflows="true" uuid="035e22fc-53da-4623-a4e0-0b56dea70c57"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Village/Ward]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="603" y="0" width="63" height="21" isPrintWhenDetailOverflows="true" uuid="b01a3227-351e-4873-b85d-48ce449f0ad9"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[County]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="365" y="0" width="35" height="21" isPrintWhenDetailOverflows="true" uuid="0ed9a808-7dde-46de-b389-eb3225dc0bec"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Gender]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="667" y="0" width="67" height="21" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="dedffb98-3b6c-4669-8845-a0604f3239c2"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Date Employed]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="25" height="22" forecolor="#000000" backcolor="#FFFFFF" uuid="19ed3fd7-884a-4f1c-b796-cada43a8d47b"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" rightIndent="4"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="271" y="0" width="19" height="21" isPrintWhenDetailOverflows="true" uuid="440e3281-b5d2-43bf-bacb-88b0fcf9ddcb"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Age]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="941" y="0" width="41" height="21" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="818f61c5-68db-40aa-847c-2e7adf6a362c"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Salary]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="903" y="0" width="36" height="21" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="9110f4d1-dbfa-4749-bf6f-94efd668ed6f"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Union]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="735" y="0" width="67" height="21" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="b2a94f25-9827-4a32-8eba-d6fa39a04801"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Emp. Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="804" y="0" width="67" height="21" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="0776541f-73c0-4041-81ef-85a8e016c945"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Comp. Gross]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="872" y="0" width="31" height="21" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="d9938ee5-1c87-4512-9cbe-7b5e84c1d80f"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Grade]]></text>
+			</staticText>
+			<line>
+				<reportElement x="2" y="22" width="979" height="1" uuid="0fc2c380-d80b-4cc9-b883-caed83bdcbbb"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="27" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="30" y="0" width="100" height="25" isPrintWhenDetailOverflows="true" uuid="f451dfff-eea8-4c6b-9dfc-78d9cc2259a8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="172" y="0" width="94" height="25" isPrintWhenDetailOverflows="true" uuid="bc33d4a1-447b-4616-906b-365ceefe03a2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="292" y="0" width="68" height="25" isPrintWhenDetailOverflows="true" uuid="e33a71e8-41e7-41f6-a596-8a4d948f4845"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DOB}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="405" y="0" width="100" height="25" isPrintWhenDetailOverflows="true" uuid="c74deb36-7e58-4a40-b46b-69e9b3acbc1d"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOT_STREET}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="510" y="0" width="92" height="25" isPrintWhenDetailOverflows="true" uuid="3d528054-5426-45cb-93b5-4a1b47c12331"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VILAGE_WARD}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="603" y="0" width="63" height="25" isPrintWhenDetailOverflows="true" uuid="540c803b-492c-4ffc-ac66-732e7c8b1544"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COUNTY}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="365" y="0" width="35" height="25" isPrintWhenDetailOverflows="true" uuid="abf1c743-fbaa-4ccc-8840-7c6827376d00"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SEX_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="667" y="0" width="67" height="25" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="405e0b5f-184e-49f8-9ece-bb7a198696ae"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_EMPLOYED}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="941" y="0" width="41" height="25" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="99864c54-5056-460b-85da-8869a295a05b"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALARY}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="136" y="0" width="31" height="25" isPrintWhenDetailOverflows="true" uuid="9df20d76-6497-4818-82ec-cb612f9be886"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="271" y="0" width="19" height="25" isPrintWhenDetailOverflows="true" uuid="c5eaa405-50ad-498f-91c2-dd2b8131f78f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AGE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="25" height="25" isPrintWhenDetailOverflows="true" uuid="51516974-1c39-408a-8a8c-4a2fd61a1648"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Record_Count}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="903" y="1" width="36" height="24" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="4b5ef0d2-2378-4c38-aff2-39f3f5203830"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SHORT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="735" y="0" width="67" height="25" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="bc38ecb3-a090-49b8-af2d-4ec8e1addc3f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYMENT_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="804" y="0" width="67" height="25" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="da1113c2-acd6-41db-bb1f-ca6be2004d3e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPUTE_GROSS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="872" y="0" width="31" height="25" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="09dbaa07-ae65-40b8-b629-0ba7f3ba7c7d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GRADE_CODE}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="11">
+			<line>
+				<reportElement x="0" y="10" width="973" height="1" isPrintWhenDetailOverflows="true" uuid="fba2c8f5-677c-4850-9d22-a157d5a0a372"/>
+				<graphicElement>
+					<pen lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="973" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="17" width="973" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="820" y="0" width="130" height="13" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="4" y="0" width="162" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="951" y="0" width="17" height="13" uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

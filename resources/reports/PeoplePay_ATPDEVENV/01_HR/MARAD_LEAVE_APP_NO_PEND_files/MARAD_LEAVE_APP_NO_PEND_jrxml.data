@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Maritime Leave Approval Without Pending" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="3243b7a1-1fcf-4acf-bca0-bc9fa14f332b">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/MARAD_LEAVE_APP_NO_PEND"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    l.emp_id,
+    CASE
+                    WHEN i.sex_code = 'M'  THEN 'Mr.'
+                    WHEN i.sex_code = 'F' THEN 'Mrs.'
+                 END|| ' '||t.employee_name|| ',' as  MrMrs,
+                 t.POSITION_NAME,
+                 t.DEPARTMENT_NAME,
+                 apps.pkg_global_fnts.fn_num_towords(l.DAYS_TAKEN)||   ' ('||l.DAYS_TAKEN||') ' ||
+                 CASE
+                 WHEN DAYS_TAKEN = 1 THEN 'day '
+                 ELSE 'days '
+                 END||lt.LEAVE_TYPE as daysleavetype,
+                 apps.pkg_global_fnts.fn_num_towords(lt.PENDING)||   ' ('||lt.PENDING||') '||
+                 CASE
+                  WHEN lt.pending = 1 THEN ' day '
+                  ELSE ' days of Vacation Leave '
+                 END as pending,NVL(ADJUSTED_FROMDATE,FROMDATE) DATE_FROM,
+nvl(Adjusted_ToDate,ToDate) date_to,(select employee_name from apps.vw_position_location_v3 t where t.emp_id = b.employee_no) as approver,
+                 (select position_name from apps.vw_position_location_v3 t where t.emp_id = b.employee_no) as approverpos,
+                 o.organisation_name,l.org_id,lt.leave_type
+FROM     hr_lv_leavehistory l
+JOIN    hr_rcm_employee e ON e.id = l.emp_id
+JOIN   apps.hr_rcm_individual i       ON  i.id = e.ind_id
+JOIN   apps.vw_position_location_v3 t ON  t.emp_id = e.id
+JOIN   apps.tbluser b                 ON  b.user_name = l.verified_by
+JOIN   apps.hr_lv_leavetrack lt       ON  lt.emp_id = l.emp_id
+JOIN   apps.hr_hcf_organisation o     ON  o.id = l.org_id
+
+where lt.LEAVE_TYPE = 'Annual Leave'
+     AND l.org_id = 18658
+    and l.emp_id =  $P{EMP_ID}]]>
+	</queryString>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="MRMRS" class="java.lang.String"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
+	<field name="DAYSLEAVETYPE" class="java.lang.String"/>
+	<field name="PENDING" class="java.lang.String"/>
+	<field name="DATE_FROM" class="java.util.Date"/>
+	<field name="DATE_TO" class="java.util.Date"/>
+	<field name="APPROVER" class="java.lang.String"/>
+	<field name="APPROVERPOS" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="LEAVE_TYPE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="158" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="35" uuid="513f38ac-a7c7-48cf-91b8-113e4aa1c28d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Georgia" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA["DEVELOPMENT THROUGH COLLECTIVE EFFORT"]]></text>
+			</staticText>
+			<image scaleImage="FillFrame" hAlign="Center" vAlign="Middle">
+				<reportElement x="0" y="37" width="555" height="121" uuid="d54b1fed-3957-4a84-855d-7f57c5205b47"/>
+				<imageExpression><![CDATA["repo:mariletterhead.png"]]></imageExpression>
+			</image>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="450" splitType="Stretch">
+			<textField>
+				<reportElement x="32" y="63" width="503" height="20" uuid="dd15556d-f0db-493c-803e-0fd2097d3b28"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MRMRS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="32" y="83" width="503" height="20" uuid="320721ab-4304-43ed-90ff-ef447e385299"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="32" y="103" width="503" height="20" uuid="1d0f6eaf-2b7b-4156-b503-f0220a680fe9"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="32" y="181" width="503" height="20" uuid="7e8ef34b-3ecc-4bba-a6b4-9b799e8cba1b"/>
+				<textElement>
+					<font fontName="Georgia" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Re: Leave Approval]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="32" y="220" width="503" height="43" uuid="fbfcc41e-eda1-4350-b887-e9ca3d2b3234"/>
+				<textElement markup="html">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Covering approval has been given for you to be granted "+$F{DAYSLEAVETYPE}+" on full pay with effect from"+$F{DATE_FROM}+" to "+$F{DATE_TO}+", both days inclusive."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="32" y="279" width="503" height="20" uuid="2cdf1492-b60e-45b4-b65b-7f59ba2ff4a5"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Please be guided accordingly.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="32" y="315" width="503" height="20" uuid="e0045ab2-41d8-4a5e-8bc4-cea6c01ab629"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Yours sincerely]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="32" y="348" width="503" height="20" uuid="a288fbed-d973-42fe-98c1-f6d91009d343"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{APPROVER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="32" y="368" width="503" height="20" uuid="1e5568a7-46a1-47a8-b150-d7564ce6e2bc"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{APPROVERPOS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="32" y="410" width="503" height="20" uuid="6f7d3da7-db5e-4347-bb40-bd8aafdbc49d"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Ms. D Quintyn]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="32" y="430" width="503" height="20" uuid="f2081e0e-4e5d-4966-b284-0d94ef751015"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Senior Administrative Officer]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="32" y="16" width="503" height="20" uuid="85f74a64-07c9-4373-8c49-5185a560093f"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="32" y="149" width="503" height="20" uuid="8a6c81e1-bec3-4904-8acb-526c67ac0c95"/>
+				<textElement markup="html">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dear"+$F{MRMRS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

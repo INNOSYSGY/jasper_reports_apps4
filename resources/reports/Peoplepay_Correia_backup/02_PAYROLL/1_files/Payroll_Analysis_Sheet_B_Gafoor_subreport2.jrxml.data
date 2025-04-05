@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.0.final using JasperReports Library version 6.21.0-4f56c4f36cd19e17675219a9ac4692d5f0f13b06  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll Analysis Sheet B-Gafoor_subreport2" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="0d0075d0-04a6-4bf2-8ff4-da8d7a29d8fb">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Peoplepay_Correia/02_PAYROLL/1"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="icarter"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/Peoplepay_Correia/02_PAYROLL/1_files/Payroll_Analysis_Sheet_B_Gafoor_subreport2.jrxml"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Correia"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="281"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="712"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="Emp_id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Pay_slip_id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select ded.expense_code,
+description
+|| case when upper(min(adm.Deduction_Type)) = 'EMPLOYER' then ' - ER' else null end
+||case when upper(ded.expense_code) = 'LESSDAYS' then ' ('||REPLACE(TO_CHAR(sum(adm.period),'999,999'),' ','') ||')' else '' end description,
+round(sum(pd.Amount_deducted),0) Amount_deducted
+	from PA_PMG_PAYROLLDEDUCTION pd 
+    join PA_PCF_ADMINDEDUCTION adm ON adm.id = pd.adm_deduction_id
+	join PA_PCF_DEDUCTIONCODE ded ON adm.expense_id = ded.id
+	where
+	 (upper(adm.Deduction_Type)='EMPLOYEE')
+	and Amount_deducted>0
+       and pd.pay_slipno=$P{Pay_slip_id}
+and  ded.org_id=$P{P_ORG_ID}
+	group by description,ded.expense_code]]>
+	</queryString>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="15">
+			<textField textAdjust="StretchHeight">
+				<reportElement x="4" y="0" width="90" height="15" uuid="acaa7327-9056-42f7-b150-4b62c59d7652">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="94" y="0" width="64" height="15" uuid="6e34ce01-a0ee-4e94-be6c-ddc57efe314b"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

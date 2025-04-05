@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report2" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5d3855d9-07ff-4216-acf1-2402b259f3a7">
+	<property name="ireport.zoom" value="1.0000000000000009"/>
+	<property name="ireport.x" value="23"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/ASSET/DEPRECIATION_ANALYSIS_SHEET"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="DATE" class="java.util.Date">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LOCATION" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="CATEGORY" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select rownum, asset_no, C.ORGANIZATION_ID, NVL(C.ASSET_DESCRIPTION, ORG_ITEM_DESCRIPTION), C.PURCHASE_PRICE,B.DEPRECIATION_ACC,C.CURRENT_VALUE,asset_category
+,description, trunc(A.DATE_TRANSACTED) DATE_TRANSACTED
+from TBLASSETMISCTRANS a join TBLASSETMISCTRANSDETAIL b on a.MISC_TRANS_ID=b.MISC_TRANS_ID
+join TBLASSETREGISTER c on b.ASSET_REG_ID = c.ASSET_REG_ID
+join tblorganization d on d.organization_id=c.organization_id
+join tblinventoryitem e on e.inventory_item_id = c.inventory_item_id
+WHERE TRUNC(A.DATE_TRANSACTED) = $P{DATE} AND C.ORGANIZATION_ID = $P{LOCATION}]]>
+	</queryString>
+	<field name="ROWNUM" class="java.math.BigDecimal"/>
+	<field name="ASSET_NO" class="java.lang.String"/>
+	<field name="ORGANIZATION_ID" class="java.math.BigDecimal"/>
+	<field name="NVL(C.ASSET_DESCRIPTION,ORG_ITEM_DESCRIPTION)" class="java.lang.String"/>
+	<field name="PURCHASE_PRICE" class="java.math.BigDecimal"/>
+	<field name="DEPRECIATION_ACC" class="java.math.BigDecimal"/>
+	<field name="CURRENT_VALUE" class="java.math.BigDecimal"/>
+	<field name="ASSET_CATEGORY" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="DATE_TRANSACTED" class="java.sql.Timestamp"/>
+	<sortField name="DESCRIPTION"/>
+	<sortField name="ASSET_CATEGORY"/>
+	<sortField name="COLUMN_NUMBER" type="Variable"/>
+	<sortField name="ASSET_NO"/>
+	<variable name="TOTAL_CATEGORY" class="java.math.BigDecimal" resetType="Group" resetGroup="ASSET_CATEGORY" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEPRECIATION_ACC}]]></variableExpression>
+	</variable>
+	<variable name="PURCHASE_CATE" class="java.math.BigDecimal" resetType="Group" resetGroup="ASSET_CATEGORY" calculation="Sum">
+		<variableExpression><![CDATA[$F{PURCHASE_PRICE}]]></variableExpression>
+	</variable>
+	<variable name="CURRENT_VAL_CATE" class="java.math.BigDecimal" resetType="Group" resetGroup="ASSET_CATEGORY" calculation="Sum">
+		<variableExpression><![CDATA[$F{CURRENT_VALUE}]]></variableExpression>
+	</variable>
+	<variable name="GRAND_TOTAL_P" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PURCHASE_PRICE}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="GRAND_TOTAL_D" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEPRECIATION_ACC}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="GRAND_TOTAL_C" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CURRENT_VALUE}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<group name="LOCATION_GROUP" isStartNewPage="true">
+		<groupHeader>
+			<band height="18">
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="0" width="205" height="15" uuid="2aab8c7d-d09c-4f21-8cfa-b053edb0b5dd"/>
+					<textElement>
+						<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="true" isUnderline="false" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["BRANCH: " + $F{DESCRIPTION}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="ASSET_CATEGORY" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{ASSET_CATEGORY}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField isBlankWhenNull="true">
+					<reportElement x="52" y="0" width="303" height="14" uuid="3cf76b38-15a8-4e05-aae2-671ea2bd7120"/>
+					<textElement>
+						<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="true" isUnderline="false" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["ASSET CATEGORY:" + $F{ASSET_CATEGORY}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="23">
+				<textField isStretchWithOverflow="true" pattern="¤ #,##0.0">
+					<reportElement x="543" y="7" width="145" height="15" isPrintWhenDetailOverflows="true" uuid="16ae224a-0291-4d52-9c45-da1641991c97"/>
+					<textElement textAlignment="Right">
+						<font fontName="DejaVu Sans" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_CATEGORY}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="¤ #,##0.0">
+					<reportElement x="388" y="7" width="155" height="14" isPrintWhenDetailOverflows="true" uuid="d0c3e3ae-4905-4a8b-a98e-a4be55cee1e4"/>
+					<textElement textAlignment="Right">
+						<font fontName="DejaVu Sans" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{PURCHASE_CATE}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="¤ #,##0.0">
+					<reportElement x="688" y="7" width="130" height="15" isPrintWhenDetailOverflows="true" uuid="939649b5-41b2-4926-942a-e5f023a43556"/>
+					<textElement textAlignment="Right">
+						<font fontName="DejaVu Sans" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CURRENT_VAL_CATE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="2" y="7" width="353" height="14" uuid="26206705-8808-4e2f-a6df-07b928166177"/>
+					<textElement>
+						<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="true" isUnderline="false" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["ASSET CATEGORY TOTAL:  " + $F{ASSET_CATEGORY}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="108" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="968" height="90" uuid="5853afeb-8a9d-4976-b29d-fa6a602b1a8a"/>
+				<subreportParameter name="P_REPORT_NAME">
+					<subreportParameterExpression><![CDATA["Depreciation Analysis Sheet"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_REPORT_TITLE">
+					<subreportParameterExpression><![CDATA["For " + $F{DESCRIPTION} +" Branch"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/MedSys/RESOURCE/LETTER_HEAD_LEGAL_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="22" splitType="Stretch">
+			<rectangle>
+				<reportElement x="1" y="0" width="967" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="65b5395a-cb3a-4882-837f-ebfdfd832acb"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="32" height="15" uuid="b6b9e073-ee1e-4495-b0d8-489460d30e84"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="12" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="32" y="0" width="108" height="15" uuid="d5b626d0-8d60-4883-a947-2856c2f6585d"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="12" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Asset No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="206" y="0" width="182" height="15" uuid="e9f9c0d4-ed95-4d7c-9b3c-519a9b7523e0"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="12" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Asset Description  ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="388" y="0" width="155" height="15" uuid="d887b703-10ea-44ca-a54c-3a288608b5ac"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="12" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Purchase Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="543" y="0" width="145" height="15" uuid="90bd3165-0f49-4c18-80f9-c7ab86518805"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="12" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Depreciation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="818" y="0" width="150" height="15" uuid="bf2c8602-30a0-4b1b-a7ee-9db4b5eb2d7d"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="12" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[ Depreciation  as at:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="688" y="0" width="130" height="15" uuid="eab75620-e906-4535-a8ea-aacb6d10660c"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="12" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Current Value]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="140" y="0" width="248" height="15" isPrintWhenDetailOverflows="true" uuid="c0190b42-c90b-4fad-86b6-c74a94879fc7"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NVL(C.ASSET_DESCRIPTION,ORG_ITEM_DESCRIPTION)}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0.0">
+				<reportElement x="543" y="0" width="145" height="15" isPrintWhenDetailOverflows="true" uuid="edf88b45-5247-4e5d-8ca7-6ec79be8dcaf"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPRECIATION_ACC}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="818" y="0" width="150" height="15" isPrintWhenDetailOverflows="true" uuid="2a6dbaab-e363-4c82-9d98-3e3851c190a5"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_TRANSACTED}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="52" y="0" width="88" height="15" isPrintWhenDetailOverflows="true" uuid="8ddaea9e-8780-443a-82df-0774052f277b"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ASSET_NO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0.0">
+				<reportElement x="688" y="0" width="130" height="15" isPrintWhenDetailOverflows="true" uuid="8e89289a-f626-4c8e-a640-aabc5c5973cf"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CURRENT_VALUE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0.0">
+				<reportElement x="388" y="0" width="155" height="15" isPrintWhenDetailOverflows="true" uuid="0da6eab8-bcd5-4e0a-9a08-6e45592646ae"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PURCHASE_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="0" width="50" height="15" isPrintWhenDetailOverflows="true" uuid="1cf25b10-3e2e-4f67-9e56-aa816b2bb941"/>
+				<textElement textAlignment="Center">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ASSET_CATEGORY_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Opaque" x="1" y="3" width="967" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="50417d83-e8d7-4305-9298-61c7910bbdc6"/>
+			</rectangle>
+			<textField pattern="EEEEE, MMMMM dd, yyyy h.mm a" isBlankWhenNull="true">
+				<reportElement x="2" y="3" width="172" height="15" uuid="b803dd3a-354c-4333-b01a-061106ee75cc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="928" y="7" width="40" height="13" uuid="859886b7-f3ef-4139-8def-c290e380bd40"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="826" y="7" width="102" height="13" uuid="17e4b2a4-cb27-481f-abb1-03e610f5f390"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="2" y="4" width="966" height="16" uuid="db082bec-f386-4080-9069-13029d921745"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[SCMS By INNOSYS Inc]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="34" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0.0">
+				<reportElement x="388" y="13" width="155" height="15" isPrintWhenDetailOverflows="true" uuid="914d9f0b-83a2-41b9-bc40-14a6910bbe50"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_TOTAL_P}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0.0">
+				<reportElement x="688" y="13" width="130" height="15" isPrintWhenDetailOverflows="true" uuid="103af7c9-a9fe-4302-826f-c69af5487560"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_TOTAL_C}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0.0">
+				<reportElement x="543" y="13" width="145" height="15" isPrintWhenDetailOverflows="true" uuid="81e49543-9ae7-41fc-8555-6a09aa561ea1"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_TOTAL_D}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="13" width="258" height="15" uuid="11c50d99-a277-4c39-b560-0800ea2480da"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="11" isBold="true" isItalic="true" isUnderline="false" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["BRANCH TOTAL: " + $F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

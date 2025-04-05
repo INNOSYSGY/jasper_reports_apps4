@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="detailReport" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="54ec36fb-eb06-4bdf-9232-6506a064138b">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="27"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/ASSET/LISTING_ASSET_REGISTER"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<queryString>
+		<![CDATA[select ASSET_NO "ID", ASSET_DESCRIPTION "Description", ACTIVE_EFFECT_FROM "Date Acq.", SERIAL_NO "Serial No.", PURCHASE_PRICE "Cost",
+DEPRECIATION_ACC "Cum. Dep.", CURRENT_VALUE "N.B.V", TEMP_ORG "Location",
+TEMP_ASSET_CAT "Asset Category", DEP_YEAR_TO_DATE "Year to Date", QUANTITY "Qty"
+from TBLASSETREGISTER A
+where A.ASSET_STATUS='ACTIVE']]>
+	</queryString>
+	<field name="ID" class="java.lang.String"/>
+	<field name="Description" class="java.lang.String"/>
+	<field name="Date Acq." class="java.sql.Timestamp"/>
+	<field name="Serial No." class="java.lang.String"/>
+	<field name="Cost" class="java.math.BigDecimal"/>
+	<field name="Cum. Dep." class="java.math.BigDecimal"/>
+	<field name="N.B.V" class="java.math.BigDecimal"/>
+	<field name="Location" class="java.lang.String"/>
+	<field name="Asset Category" class="java.lang.String"/>
+	<field name="Year to Date" class="java.math.BigDecimal"/>
+	<field name="Qty" class="java.math.BigDecimal"/>
+	<sortField name="Asset Category"/>
+	<variable name="subtotal_YTD" class="java.math.BigDecimal" resetType="Group" resetGroup="Category" calculation="Sum">
+		<variableExpression><![CDATA[$F{Year to Date}]]></variableExpression>
+	</variable>
+	<variable name="subtotal_Cost" class="java.math.BigDecimal" resetType="Group" resetGroup="Category" calculation="Sum">
+		<variableExpression><![CDATA[$F{Cost}]]></variableExpression>
+	</variable>
+	<variable name="subtotal_Dep" class="java.math.BigDecimal" resetType="Group" resetGroup="Category" calculation="Sum">
+		<variableExpression><![CDATA[$F{Cum. Dep.}]]></variableExpression>
+	</variable>
+	<variable name="subtotal_NBV" class="java.math.BigDecimal" resetType="Group" resetGroup="Category" calculation="Sum">
+		<variableExpression><![CDATA[$F{N.B.V}]]></variableExpression>
+	</variable>
+	<variable name="GT_YTD" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Year to Date}]]></variableExpression>
+	</variable>
+	<variable name="GT_COST" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Cost}]]></variableExpression>
+	</variable>
+	<variable name="GT_DEP" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Cum. Dep.}]]></variableExpression>
+	</variable>
+	<variable name="GT_NBV" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{N.B.V}]]></variableExpression>
+	</variable>
+	<group name="Category">
+		<groupExpression><![CDATA[$F{Asset Category}]]></groupExpression>
+		<groupHeader>
+			<band height="21">
+				<textField>
+					<reportElement x="70" y="0" width="100" height="20" uuid="d358413b-fff3-427b-a2f4-0b44fd4505d7"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Asset Category}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="70" height="20" uuid="0fa7c700-f983-4cdd-9beb-557c9a05b5f5"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Asset Category]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="21">
+				<textField pattern="¤ #,##0.00">
+					<reportElement x="219" y="0" width="72" height="20" uuid="60d773a1-3ab4-4b52-b7fe-2b4e1cee9b1b"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{subtotal_YTD}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤ #,##0.00">
+					<reportElement x="372" y="0" width="90" height="20" uuid="03d8e257-b904-4e6b-8c26-c5a880aa82e6"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{subtotal_Cost}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤ #,##0.00">
+					<reportElement x="462" y="0" width="90" height="20" uuid="eb400256-491f-4e2c-942e-85d629efd8d1"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{subtotal_Dep}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤ #,##0.00">
+					<reportElement x="552" y="0" width="90" height="20" uuid="860db78b-4e8e-46f9-ad05-baeeb6ce000a"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{subtotal_NBV}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="100" height="20" uuid="2cd87845-e3ea-45ed-a043-81e9eef51726"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Subtotal : ]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="752" height="79" uuid="88313b62-7266-4621-986d-714c5dcc8f02"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[1626.0]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="25" height="20" uuid="d860c953-5c7c-448f-bcea-0ef26c885830"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="0" width="50" height="20" uuid="816f224c-a622-4a08-8fd5-0e7873595e15"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[Date Acq.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="210" y="0" width="72" height="20" uuid="4040f7aa-895e-4739-bf41-6e8e433528ff"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[Year to Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="282" y="0" width="90" height="20" uuid="d947c5b3-b2e9-4f24-8f52-aee14f09a467"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[Serial No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="372" y="0" width="90" height="20" uuid="b44232dc-0795-4ac1-a490-3fddafa13b21"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[Cost]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="462" y="0" width="90" height="20" uuid="2691d21b-7392-45bd-8b97-e2be8fabccd9"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[Cum. Dep.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="552" y="1" width="90" height="20" uuid="8968b3b2-f63f-4892-a8f6-19203ebff9c6"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[N.B.V]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="642" y="0" width="90" height="20" uuid="a7de7d17-7c25-45e0-8635-ba485e248e5d"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="25" y="0" width="135" height="20" uuid="718d8519-4624-44d5-8684-dd9aa64a0a08"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="732" y="0" width="20" height="20" uuid="096a73d8-2cbb-44a8-9deb-3108021ed757"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<text><![CDATA[Qty]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="25" height="20" uuid="18fbeb3f-bf24-4ee1-8f1a-1f32c4e9fd4e"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yy" isBlankWhenNull="true">
+				<reportElement x="160" y="0" width="50" height="20" uuid="78d55c22-154e-41e0-a577-cc4f9cdda63f"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Date Acq.}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement x="210" y="0" width="72" height="20" uuid="f6d7326e-5f03-436d-b02a-ad3defc7a25f"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Year to Date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="282" y="0" width="90" height="20" uuid="b1ea8492-2132-4bd5-88d3-8ef0fff2e6a6"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="7"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Serial No.}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement x="372" y="0" width="90" height="20" uuid="d53e984e-cf1a-4b5b-ab03-76b2fb5c36cb"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Cost}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement x="462" y="0" width="90" height="20" uuid="b06cae09-5f31-415b-9e3c-534a8fc6da78"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Cum. Dep.}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="642" y="0" width="90" height="20" uuid="4d898596-d634-4dc2-a94b-d729c0d1276b"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Location}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="25" y="0" width="135" height="20" uuid="2cf7fa9d-2bc4-4a6d-ba17-496921e1c530"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Description}]]></textFieldExpression>
+			</textField>
+			<elementGroup/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="732" y="0" width="20" height="20" uuid="11ecb886-a96c-47b9-9d5c-1ce9bcec2c23"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Qty}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement x="552" y="0" width="90" height="20" uuid="2e150eaf-fe2b-456d-8825-1a6e2b387a53"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{N.B.V}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="3" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement x="1" y="0" width="751" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="b9e4cd86-3972-4f6c-8a4a-d557792676e0"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="1" y="15" width="751" height="15" uuid="cb0827c0-a250-4852-a447-f0127df2efbf"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="1" y="0" width="162" height="13" uuid="3cfa5827-db27-4aba-bb88-899398cd856c"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="627" y="0" width="80" height="13" uuid="82072465-3ba6-4bf7-a545-7b557e5f0e90"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="707" y="0" width="40" height="13" uuid="2e5ed021-32a4-4c41-9e2e-58f02e4cbfb3"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="0" width="100" height="20" uuid="b0e33dea-a375-48e5-9b88-b28de40e16d9"/>
+				<text><![CDATA[Grand Total : ]]></text>
+			</staticText>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="219" y="0" width="72" height="20" uuid="30a70506-89c8-4c50-b31f-63e881637e77"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GT_YTD}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="381" y="0" width="81" height="20" uuid="733b13cd-d19f-4303-9a3c-37c60a003d08"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GT_COST}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="462" y="0" width="90" height="20" uuid="b5bb2333-7d3e-4024-aaec-bc841012b46f"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GT_DEP}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="552" y="0" width="90" height="20" uuid="90db05b5-add8-4371-ac3f-f99be9718dde"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GT_NBV}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

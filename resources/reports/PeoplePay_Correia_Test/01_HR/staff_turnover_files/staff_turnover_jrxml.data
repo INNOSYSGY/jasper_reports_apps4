@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report5" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7e509524-2d8e-411d-a83e-6a444d5d7b04">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GPL/01_HR/staff_turnover"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.61:8082/jasperserver/"/>
+	<property name="ireport.zoom" value="1.6105100000000014"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="44"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Staff Turnover Report"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="TEST GPL"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="YEAR" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+    a.org_structure department,
+    (select j.description from hr_hcf_job j where j.id=a.position_id
+    ) position,
+    (select o.organisation_name from hr_hcf_organisation o where o.id=a.org_id) organisation,
+    initcap(a.employment_status) employment_status,
+    initcap(a.employment_class) employment_class,
+    case when trim(to_char(max(a.date_separated),'Month')) = 'January' then null else trim(to_char(to_date($P{YEAR}||'-01-01','yyyy-mm-dd'),'Month')) end
+    || case when trim(to_char(max(a.date_separated),'Month')) = 'January' then null else ' - '  end ||
+    trim(to_char(max(a.date_separated),'Month')) || ' ' || $P{YEAR} period,
+    count(a.id) quantity,
+    a.remarks
+from hr_rcm_employee a
+where a.date_separated is not null
+and extract(year from a.date_separated) = $P{YEAR}
+group by a.org_id, a.org_structure, a.position_id, a.employment_status_id, initcap(a.employment_status),
+employment_status, a.employment_class, initcap(a.employment_class),a.remarks
+having a.org_id=$P{IN_ORG_ID}
+order by a.org_structure, max(a.date_separated) desc]]>
+	</queryString>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="POSITION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION"/>
+	</field>
+	<field name="ORGANISATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION"/>
+	</field>
+	<field name="EMPLOYMENT_STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_STATUS"/>
+	</field>
+	<field name="EMPLOYMENT_CLASS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS"/>
+	</field>
+	<field name="PERIOD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD"/>
+	</field>
+	<field name="QUANTITY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="QUANTITY"/>
+	</field>
+	<field name="REMARKS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="REMARKS"/>
+	</field>
+	<variable name="TOTAL_QUANTITY" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{QUANTITY}]]></variableExpression>
+	</variable>
+	<variable name="DEPT_QUANTITY" class="java.math.BigDecimal" resetType="Group" resetGroup="DEPARTMENT" calculation="Sum">
+		<variableExpression><![CDATA[$F{QUANTITY}]]></variableExpression>
+	</variable>
+	<group name="DEPARTMENT">
+		<groupExpression><![CDATA[$F{DEPARTMENT}]]></groupExpression>
+		<groupHeader>
+			<band height="38">
+				<rectangle>
+					<reportElement x="0" y="10" width="973" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="2940bec7-5852-4229-854b-bb896893eac2"/>
+				</rectangle>
+				<staticText>
+					<reportElement x="71" y="10" width="71" height="20" uuid="8fa4473b-d940-45f0-88f6-67f7d2ede560"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Department : ]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="142" y="10" width="392" height="20" uuid="834a04c4-223f-4576-a4a6-9e21d3e55268"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<staticText>
+					<reportElement x="41" y="0" width="147" height="20" uuid="db53ab8e-3b67-42b3-97b6-8028d28195c3"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total Department Turnover:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="188" y="0" width="100" height="20" uuid="8e1b5499-a082-4029-b378-4e41bdcd388f"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{DEPT_QUANTITY}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="968" height="79" uuid="31b40593-ff72-486b-8eed-7236ea21d9a8"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_LEGAL_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="968" height="20" uuid="5222f240-ba59-43e6-b270-cd7885d2b33a"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Staff Turnover Report for " + $P{YEAR}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="20" uuid="8454a1d9-4ba4-40bd-ad37-0093793b495c"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Position]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="100" height="20" uuid="159475c2-a50f-4e85-9be3-d1805033e573"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Company]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="0" width="100" height="20" uuid="2cd293e4-5947-439f-9f5d-fd1b2f9c1d07"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Period]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="0" width="280" height="20" uuid="71027f6f-9983-4b1e-86d8-ad00dce7ddbf"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reason]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="580" y="0" width="100" height="20" uuid="a2a05dcd-ef85-4741-8596-26ddda26808d"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employment Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="680" y="0" width="100" height="20" uuid="722a01d7-c847-4a34-be71-d2b9320ff17e"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employment Class]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="868" y="0" width="100" height="20" uuid="d76ec1da-5a44-4518-bc0e-5340b7864d99"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Percentages]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="768" y="0" width="100" height="20" uuid="7caed8f3-326c-47b1-9a01-387b1ab94eb0"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Quantity]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="31" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="100" height="20" uuid="c124770a-e4c1-4dbe-8eb0-c2f1e52571cb"/>
+				<textFieldExpression><![CDATA[$F{POSITION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="100" y="0" width="100" height="20" uuid="d49ca4c3-487a-455e-9dc2-ff59927baa30"/>
+				<textFieldExpression><![CDATA[$F{ORGANISATION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="200" y="0" width="100" height="20" uuid="5176f2b1-0294-4fa5-a320-c053b1ab2f76"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{PERIOD}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="580" y="0" width="100" height="20" uuid="e432ff0e-ea09-495b-ac0e-18374ca6dd62"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYMENT_STATUS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="680" y="0" width="100" height="20" uuid="abf0e3ca-b730-4ce4-ae34-ac9e203a1d02"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYMENT_CLASS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="768" y="0" width="100" height="20" uuid="fe50de10-c9f6-4f68-b837-ab3f29e73ff5"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{QUANTITY}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="316" y="0" width="264" height="20" uuid="22f0505d-4c95-4fe8-871b-fd0b9bcf393f"/>
+				<textFieldExpression><![CDATA[$F{REMARKS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="32">
+			<rectangle>
+				<reportElement x="0" y="0" width="973" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="38811912-3bff-4e1d-b88d-61429f064a68"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="17" width="973" height="15" uuid="bbb5562e-af27-4645-8096-21b6bc613c2d"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="9" isItalic="true" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="820" y="0" width="130" height="13" uuid="344d1922-b4fb-4923-9fa9-2dc616161c4d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="4" y="0" width="162" height="13" uuid="32476280-c58e-42f4-b500-951cb82eed29"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="951" y="0" width="17" height="13" uuid="44e05e52-3364-4bc6-a5a0-4af67ed7a079"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="50">
+			<textField>
+				<reportElement x="188" y="14" width="100" height="20" uuid="3b24c2c5-f176-44e3-b3dd-e187843104a6"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_QUANTITY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="71" y="14" width="117" height="20" uuid="e1c48bdc-1e80-4469-be7e-07ab5bf90fd1"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Staff Turnover : ]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

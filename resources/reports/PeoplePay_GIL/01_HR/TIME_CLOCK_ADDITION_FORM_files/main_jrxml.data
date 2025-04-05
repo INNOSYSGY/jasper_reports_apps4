@@ -1,0 +1,782 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TIME_CLOCK_ADDITION_FORM" pageWidth="612" pageHeight="792" columnWidth="468" leftMargin="72" rightMargin="72" topMargin="20" bottomMargin="20" uuid="64b5a9c3-69ff-4b28-9be4-0c8a29e279b3">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors_Cloud_Development"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="inch"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/01_HR/TIME_CLOCK_ADDITION_FORM_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/01_HR/TIME_CLOCK_ADDITION_FORM"/>
+	<parameter name="IN_SIGNATURE" class="java.math.BigDecimal"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_SESSION_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="IN_ALL_EMPLOYEES" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[select
+	to_char(trunc(sysdate), 'fmMonth fmDD, YYYY') date_prepared,
+    emp.id,
+    emp.ind_id,
+    ind.sex_code,
+    ind.first_name,
+    ind.surname,
+    ind.middle_name other_names,
+    emp.emp_company_no,
+    emp.confirmed,
+    (extract(day from ind.dob)) ind_dob_day, 
+    to_char(ind.dob, 'fmMonth') ind_dob_month, 
+    (extract(year from ind.dob)) ind_dob_year, 
+    (extract(day from emp.date_employed)) emp_doe_day, 
+    to_char(emp.date_employed, 'fmMonth') emp_doe_month, 
+    (extract(year from emp.date_employed)) emp_doe_year, 
+    (select initcap(position_name) from hr_hcf_position where id = wkpos.position_id) position_name,
+    (select initcap(unit_name) from hr_hcf_position pos join hr_hcf_orgstructuredtl org on pos.orgdtl_id = org.id where pos.id = wkpos.position_id)  department,
+    (select initcap(location_description) from hr_hcf_worklocation where id = wkpos.wklocation_id) work_location,
+    emp.payment_type,
+    (select to_char(start_time,'HH:MI PM')||' to '||to_char(end_time,'HH:MI PM') 
+        from HR_ATT_SHIFT where id = emp.shift_id) normal_shift,
+    (select to_char(start_time,'HH:MI PM')||' to '||to_char(end_time,'HH:MI PM')
+        from HR_ATT_SHIFT a where is_saturday = 1 and id = emp.saturday_shift_id) saturday_shift,
+    emp.orgdtl_id orgdtl_id,
+    emp.position_location_id position_location_id,
+    wk.id work_location_id,
+    emp.org_id org_id,
+    upper(o.organisation_name) organisation_name,
+    emp.date_employed,
+    (select ind.first_name ||' ' || ind.surname 
+from 
+    HR_HCF_WORKLOCATIONPOSITION  wkp
+    left join hr_hcf_position pos on wkp.position_id = pos.id
+    left join hr_rcm_employee emp on emp.position_location_id = wkp.id
+    left join hr_rcm_individual ind on ind.id = emp.ind_id
+where 
+    emp.id =  $P{IN_SIGNATURE} 
+    and (emp.date_separated is null or emp.date_separated > trunc(sysdate))
+    and rownum = 1) signature
+from
+    hr_rcm_employee emp
+    left join hr_rcm_individual ind on emp.ind_id = ind. id
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    left join hr_att_shift shift on shift.id = emp.shift_id
+    left join hr_att_shift sat_shift on sat_shift.id = emp.saturday_shift_id
+    left join (select ho.id, ho.address org_address, ho.faxnum, ho.telnum, nis_reg_no, tax_reg_no, HO.ORGANISATION_NAME,HO.PHOTO ORG_PHOTO
+                        FROM HR_HCF_ORGANISATION HO) o on o.id = emp.org_id
+where
+    emp.org_id =  $P{IN_ORG_ID} 
+    and (emp.separated_status_id is null or emp.date_separated is null)
+    and ( $P{IN_ALL_EMPLOYEES}  = 1 or
+    	exists (SELECT 
+    					1
+    				FROM 
+    					RPT_PARAMETER W1
+    				WHERE 
+    					W1.SESSION_ID = $P{IN_SESSION_ID} 
+    				AND 
+    					option_value=case when option_name = $P{IN_SEARCH_OPTION}  and option_name ='EMPLOYEE' then to_char(emp.id)
+						when option_name = $P{IN_SEARCH_OPTION}   and option_name = 'ORG_STRUCT_LEVEL' then to_char(emp.orgdtl_id)
+						when option_name = $P{IN_SEARCH_OPTION}  and option_name = 'EMPLOYMENT_CLASS' then to_char(emp.employment_class_id)
+                        when option_name = $P{IN_SEARCH_OPTION}  and option_name = 'POSITION_LOCATION' then to_char(emp.position_location_id)
+                        when option_name = $P{IN_SEARCH_OPTION}  and option_name = 'WORK_LOCATION' then to_char(wk.id)
+						end
+    				)
+    )
+order by ind.surname asc, ind.first_name asc]]>
+	</queryString>
+	<field name="DATE_PREPARED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_PREPARED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_PREPARED"/>
+	</field>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="IND_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="IND_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_ID"/>
+	</field>
+	<field name="SEX_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SEX_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SEX_CODE"/>
+	</field>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FIRST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="OTHER_NAMES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="OTHER_NAMES"/>
+		<property name="com.jaspersoft.studio.field.label" value="OTHER_NAMES"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_COMPANY_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="CONFIRMED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRMED"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRMED"/>
+	</field>
+	<field name="IND_DOB_DAY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="IND_DOB_DAY"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_DOB_DAY"/>
+	</field>
+	<field name="IND_DOB_MONTH" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="IND_DOB_MONTH"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_DOB_MONTH"/>
+	</field>
+	<field name="IND_DOB_YEAR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="IND_DOB_YEAR"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_DOB_YEAR"/>
+	</field>
+	<field name="EMP_DOE_DAY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_DOE_DAY"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_DOE_DAY"/>
+	</field>
+	<field name="EMP_DOE_MONTH" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_DOE_MONTH"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_DOE_MONTH"/>
+	</field>
+	<field name="EMP_DOE_YEAR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_DOE_YEAR"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_DOE_YEAR"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="WORK_LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_LOCATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION"/>
+	</field>
+	<field name="PAYMENT_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAYMENT_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_TYPE"/>
+	</field>
+	<field name="NORMAL_SHIFT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NORMAL_SHIFT"/>
+		<property name="com.jaspersoft.studio.field.label" value="NORMAL_SHIFT"/>
+	</field>
+	<field name="SATURDAY_SHIFT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SATURDAY_SHIFT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SATURDAY_SHIFT"/>
+	</field>
+	<field name="ORGDTL_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORGDTL_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGDTL_ID"/>
+	</field>
+	<field name="POSITION_LOCATION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_LOCATION_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_LOCATION_ID"/>
+	</field>
+	<field name="WORK_LOCATION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_LOCATION_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION_ID"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_EMPLOYED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="SIGNATURE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SIGNATURE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SIGNATURE"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="752" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="233" y="70" width="110" height="20" uuid="6b6bce56-b1dc-4376-b93e-485b2e3f302b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Location:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="233" y="90" width="110" height="20" uuid="34e9d061-2dde-421a-86fb-8c811b735887">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Employee Temp #:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="233" y="110" width="110" height="20" uuid="cb2a2f58-43f5-4a7d-9949-cd4b8257319a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Employee No:"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="343" y="90" width="120" height="1" uuid="5b6e3804-d235-41c7-a2bc-85caffef9a05"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="343" y="109" width="120" height="1" uuid="b918c464-c4c0-429d-b8f0-a195315f4cf0"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="343" y="130" width="120" height="1" uuid="c725a279-109c-465d-b3c2-0e3c554034fb"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="343" y="70" width="120" height="20" uuid="892f76cf-304f-44bb-93e3-abfa126f315f"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WORK_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="343" y="110" width="120" height="20" uuid="51ec2127-d156-4417-9d20-dfb38d1ebc29"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="150" width="110" height="20" uuid="8a04ff9b-246c-4042-a37e-12b9b0b27c7a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Employee Name:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="150" width="98" height="20" uuid="30945fcc-832e-4e81-9e89-b67b8c021c8a"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="112" y="170" width="98" height="1" uuid="434f68b0-bcb7-44c9-9e7f-48f6794caa4d"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="170" width="98" height="20" uuid="b21ba4c8-c033-46cf-8650-edf2239a7900"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Surname"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="220" y="150" width="100" height="20" uuid="ad23ddba-9de5-4aaa-8b90-9c45aba2ab71"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="220" y="170" width="100" height="1" uuid="ced8542c-009a-4671-bdf1-96952e7f0a6e"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="220" y="170" width="100" height="20" uuid="44537871-d459-4b41-a98a-1025c9b2f11b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["First Name"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="330" y="150" width="100" height="20" uuid="37fdef58-51ac-42f3-bcdb-4a784410c9ef"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OTHER_NAMES}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="330" y="170" width="100" height="1" uuid="ebc43dae-e56d-4bdd-8f90-a90b127d4591"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="330" y="170" width="100" height="20" uuid="9fb92d90-916f-4520-b6d0-ca5d61fd2a2c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Other Names"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="200" width="110" height="20" uuid="014220a4-fe5c-4113-91cc-c4547642ac60">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date Employed:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="200" width="58" height="20" uuid="9f3066d8-6e3f-43b2-a4e5-2032dd18e70e"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_DOE_DAY}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="112" y="220" width="58" height="1" uuid="615275e5-43de-47d3-a900-ce78009534e5"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="220" width="58" height="20" uuid="dd0f0179-9d44-4cf1-b749-c565cfe321b6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Day"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="180" y="200" width="90" height="20" uuid="a4a1aa4a-c39f-4c6a-8b80-8c6dbe95e4aa"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_DOE_MONTH}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="180" y="220" width="90" height="1" uuid="4218be79-8be6-40f8-aec8-9c204da87876"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="180" y="220" width="90" height="20" uuid="c121a968-5ef3-47ad-94ab-eb2e214af34d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Month"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="280" y="200" width="70" height="20" uuid="9c2e41dd-eea4-4da8-92e9-4c7fc7699441"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_DOE_YEAR}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="280" y="220" width="70" height="1" uuid="aa589d18-5072-4aa4-92a8-c55e19031615"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="280" y="220" width="70" height="20" uuid="d50a35aa-d062-45e7-b31d-8c518fc16327"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Year"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="390" width="110" height="20" uuid="bc6f26d4-13c3-4df3-b925-5a3c8edab566">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DOB:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="390" width="58" height="20" uuid="fa92831a-734e-4f79-9d6f-f95e95ce4f02"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IND_DOB_DAY}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="112" y="410" width="58" height="1" uuid="bd113c22-b5a5-490e-951b-e448425add11"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="410" width="58" height="20" uuid="f737c42d-c23a-4ec9-88ba-b3ce6c6eee8c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Day"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="180" y="390" width="90" height="20" uuid="6ae85e4d-d1c2-4e9b-8e57-779e29b537f7"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IND_DOB_MONTH}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="180" y="410" width="90" height="1" uuid="3b875737-3c51-45b8-8730-ea4542d70ec2"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="180" y="410" width="90" height="20" uuid="88b5ceeb-6e31-4bff-921a-079b17d65cc2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Month"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="280" y="390" width="70" height="20" uuid="aa968443-82a5-409b-adf8-882515f6e1a6"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IND_DOB_YEAR}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="280" y="410" width="70" height="1" uuid="3d90a42d-5459-4f81-98da-f8b552c37539"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="280" y="410" width="70" height="20" uuid="e5f06104-3088-44f5-90b6-687ea03f2343"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Year"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="250" width="110" height="20" uuid="b3579d91-74d7-44a9-86a5-69a64823cc0c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Designation:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="250" width="238" height="20" uuid="7de5a1f7-ce5a-4bc2-ad77-f56c354f99c4"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="112" y="270" width="238" height="1" uuid="d2dc01cc-1938-418b-a377-eb88da6b85f2"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="290" width="110" height="20" uuid="37d74bdd-430f-425d-8f81-bea93e081f35">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Gender:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="120" y="290" width="60" height="20" uuid="c36487a0-6623-4dce-92ec-4c12bf2e77f3"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Male"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="120" y="320" width="60" height="20" uuid="2ef33377-9d4d-441c-b69b-8abe84349ab6"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Female"]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="190" y="290" width="20" height="20" uuid="0d0034fe-32e7-4e43-a1bb-7cd133a938e3"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="190" y="320" width="20" height="20" uuid="7adf2265-4630-4568-bea5-f2c43e038c0c"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</rectangle>
+			<line direction="BottomUp">
+				<reportElement x="190" y="290" width="20" height="20" uuid="bcb74a84-b657-4c51-a25b-4eecdf756f9e">
+					<printWhenExpression><![CDATA[( $F{SEX_CODE}.equals("M") ? true : false)]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="190" y="320" width="20" height="20" uuid="5610d3cd-4b0d-4a44-9088-4d4b7b119266">
+					<printWhenExpression><![CDATA[( $F{SEX_CODE}.equals("F") ? true : false)]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="5" y="0" width="458" height="30" uuid="c6cbf0d0-79bf-40cc-89b9-d1851e2cdcd8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="16" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="5" y="32" width="458" height="30" uuid="79168500-bcb7-466d-a498-9ba1f4885b25"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="16" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TIME CLOCK ADDITION FORM "]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="355" width="110" height="20" uuid="5d9868e6-6512-4c80-84ae-6b5fa130aa0e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Department:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="355" width="238" height="20" uuid="b1a0fb0f-2033-42a3-b470-47ee2a561895"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="112" y="375" width="238" height="1" uuid="c3bc3bfc-0cf5-4c15-82ab-f88ef2a2bff4"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="444" width="110" height="20" uuid="dcfe5932-c04d-43b1-8d4e-87137b502942">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Payment Type:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="120" y="444" width="60" height="20" uuid="0bafd818-7a7e-45f9-b46e-b8676b6dddd0"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Weekly"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="120" y="474" width="60" height="20" uuid="493c31dd-6aa0-47d6-a12e-735e21a8754a"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Monthly"]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="190" y="445" width="20" height="20" uuid="21543a7c-2f8b-43e5-9682-57c6228a33d9"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="190" y="475" width="20" height="20" uuid="dacd89fe-770c-4aae-8b20-1c899be735e1"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</rectangle>
+			<line direction="BottomUp">
+				<reportElement x="190" y="445" width="20" height="20" uuid="05bd0cfe-e75a-463f-9a05-357a09393d80">
+					<printWhenExpression><![CDATA[( $F{PAYMENT_TYPE}.equals("WEEKLY") ? true : false)]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="190" y="475" width="20" height="20" uuid="f9705cd0-bef7-4941-b7c1-cb44bdae8d38">
+					<printWhenExpression><![CDATA[( $F{PAYMENT_TYPE}.equals("MONTHLY") ? true : false)]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="290" y="445" width="60" height="20" uuid="68fb9078-b7f9-4246-9853-ba2c665815c1"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Mon - Fri"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="290" y="475" width="60" height="20" uuid="d1000b05-7c2c-4f17-a2f4-8809398a13ee"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Sat"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="244" y="445" width="46" height="20" uuid="6cfbf257-821b-4b06-b31c-ef67ae7c5a7c"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Shift:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="350" y="445" width="116" height="20" uuid="10d8bdb6-aedb-46ab-b3ab-086d8aa46ecd"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NORMAL_SHIFT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="350" y="475" width="116" height="20" uuid="ae81b23d-914b-41c3-8244-05f1da3a9585"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SATURDAY_SHIFT}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="350" y="465" width="116" height="1" uuid="ec786c1a-9730-4d67-9818-040ca117b151"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="350" y="495" width="116" height="1" uuid="3268a27d-7a0a-4fd9-8a5a-2b852ae01b61"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="3" y="520" width="463" height="1" uuid="9186f7b3-0046-437e-a725-ae9086860245"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="540" width="110" height="20" uuid="5a330d91-28c2-43ce-b8ca-3b1fee2d8952">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Prepared By:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="540" width="158" height="20" uuid="24909100-70f1-4928-9036-4afd0c2c9cf0"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SIGNATURE}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="112" y="560" width="158" height="1" uuid="a58f0e0f-bd30-4d81-b03f-292c65c808cc"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="570" width="110" height="20" uuid="81db7544-9ca6-4480-b4d4-b00f446d7b9b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="570" width="158" height="20" uuid="9fbb0d96-7167-4db3-9c3a-94fe71f54cf0"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_PREPARED}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="112" y="590" width="158" height="1" uuid="69e5da07-3f6b-476e-80bd-0555091b93e8"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<rectangle>
+				<reportElement x="10" y="610" width="449" height="120" uuid="566162c2-cf81-44bd-8a60-25a3e1fced34"/>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="610" width="448" height="20" uuid="2858ecee-f2ec-490a-981f-59bde87e0d45">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="9" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["FOR USE BY TIMEKEEPING DEPARTMENT ONLY"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="20" y="650" width="80" height="20" uuid="5ce751a0-b4be-42b1-8563-d254551be495">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="9" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date Received:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="20" y="680" width="130" height="20" uuid="cf24db7b-8fa4-45fa-9fc4-bfdd3bdeb9ac">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="9" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date Added to the Clock:"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="90" y="670" width="143" height="1" uuid="5583367e-50ba-4442-91ea-59fc4bd90287"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="130" y="700" width="103" height="1" uuid="1d5ca904-38ee-4959-8502-8277fd7ba9e9"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="350" y="670" width="100" height="1" uuid="58ff6c36-0dff-4b1b-812f-5ccf6a5800a6"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="260" y="650" width="100" height="20" uuid="37508f6d-33f8-46be-90e5-6e0c304734c1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="9" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Added to Clock By:"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

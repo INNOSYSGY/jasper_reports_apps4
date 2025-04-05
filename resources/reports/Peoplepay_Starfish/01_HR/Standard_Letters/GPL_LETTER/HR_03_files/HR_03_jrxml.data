@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="JOB LETTER REPORT GPL " pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="98d1a2ac-fe10-4640-937b-1384c119ff58">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="gpl training"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/PeoplePay/01_HR/Standard_Letters/HR_03_files/HR_03_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/PeoplePay/01_HR/Standard_Letters/HR_03"/>
+	<parameter name="Date Parameter" class="java.lang.String"/>
+	<parameter name="EMP_ID" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT DISTINCT A.FIRST_NAME, A.SURNAME, B.DATE_EMPLOYED, C.POSITION_NAME, D.PERSONAL_RATE, B.id EMP_ID,
+
+case when a.sex_code='F' then 'Dear Madam,' when a.sex_code='M' then 'Dear Sir,' end salutation,
+
+'This serves to confirm that '||(case when a.sex_code='F' then 'Ms.' when a.sex_code='M' then 'Mr.' end)||A.FIRST_NAME||' '||A.SURNAME||
+' is and has been in the employ of the Guyana Power and Light Inc., for over'||' '||ROUND((SYSDATE-B.DATE_EMPLOYED)/365.25)||
+' years having joined the Organisation on '||to_char(B.DATE_EMPLOYED,'Mon,DD,YYYY.' )||' ' Line1,
+(case when a.sex_code='F' then 'She' when a.sex_code='M' then 'He' end)||' holds the position of'||' '||(C.POSITION_NAME)||
+' attached to the '||(B.ORG_STRUCTURE)||' and is in receipt of a salary of '||(pkg_reports.spell_number(D.Personal_rate))||' dollars ($'||(D.PERSONAL_RATE)||')'|| ' per month.'  Line2,
+
+(select tax_amount from (select tax_amount from pa_pmg_payrolldtl where emp_id=B.id order by period_start desc ) where rownum=1) PAYE,
+(select nvl(max (NIS_EMPLOYEE),0) from (select NIS_EMPLOYEE from pa_pmg_payrolldtl where emp_id=B.id order by period_start desc ) where rownum=1) NIS,
+(select nvl(max(Deduction_amount),0) FROM (select deduction_amount from pa_pcf_admindeduction where expense_id=13487 and DEDUCTION_TYPE='EMPLOYEE' and emp_id=b.id and (date_close is null or date_close >=sysdate)))medical,
+(select nvl(max(Deduction_amount),0) FROM (select (deduction_amount) from pa_pcf_admindeduction where expense_id=13759 and DEDUCTION_TYPE='EMPLOYEE' and emp_id=b.id and (date_close is null or date_close >=sysdate)))pension,
+(SELECT nvl(MAX(INCOME_AMOUNT),0) FROM (SELECT(INCOME_AMOUNT) FROM PA_PMG_PAYROLLINCOME WHERE  EMPENT_ID=285113 AND INCOME_CODE='ENT' AND EMP_ID=B.ID AND (INCOME_TYPE='ALLOWANCE')))ENTERTAINMENT, 
+(SELECT nvl(MAX(INCOME_AMOUNT),0) FROM (SELECT(INCOME_AMOUNT) FROM PA_PMG_PAYROLLINCOME WHERE  EMPENT_ID=292105 AND INCOME_CODE='COMM' AND EMP_ID=B.ID AND (INCOME_TYPE='ALLOWANCE')))COMMUTED, 
+(SELECT NVL(max(ORGANISATION_NAME),0) FROM (select ORGANISATION_NAME FROM HR_HCF_ORGANISATION_PROD))BANK,
+(SELECT nvl(max(ADDRESS),0) FROM (select ADDRESS FROM HR_HCF_ORGANISATION_PROD where id=a.bank_branch_id))BANK_ADDRESS
+
+FROM HR_RCM_INDIVIDUAL A
+JOIN HR_RCM_EMPLOYEE B
+ON A.ID=B.IND_ID
+
+JOIN HR_HCF_POSITION C
+ON C.ID=B.POSITION_ID
+JOIN HR_RCM_SALARY D
+ON B.ID= D.EMP_ID
+
+
+JOIN hr_rcm_empentitle E 
+ON E.EMP_ID=B.ID
+JOIN pa_pmg_payrolldtl F
+ON F.EMP_ID=B.ID
+JOIN pa_pcf_admindeduction G
+ON G.EMP_ID=B.ID
+JOIN PA_PMG_PAYROLLINCOME H 
+ON H.EMP_ID=B.ID
+JOIN HR_HCF_ORGANISATION_PROD I
+ON A.BANK_BRANCH_ID= I.ID
+
+where 
+--A.BANK_BRANCH_ID=$P!{ID}
+--and
+b.id= $P!{EMP_ID}
+	
+	]]>
+	</queryString>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="PERSONAL_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PERSONAL_RATE"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="SALUTATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SALUTATION"/>
+	</field>
+	<field name="LINE1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LINE1"/>
+	</field>
+	<field name="LINE2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LINE2"/>
+	</field>
+	<field name="PAYE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PAYE"/>
+	</field>
+	<field name="NIS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="NIS"/>
+	</field>
+	<field name="MEDICAL" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="MEDICAL"/>
+	</field>
+	<field name="PENSION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PENSION"/>
+	</field>
+	<field name="ENTERTAINMENT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ENTERTAINMENT"/>
+	</field>
+	<field name="COMMUTED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="COMMUTED"/>
+	</field>
+	<field name="BANK" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BANK"/>
+	</field>
+	<field name="BANK_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BANK_ADDRESS"/>
+	</field>
+	<group name="FIRST_NAME">
+		<groupExpression><![CDATA[$F{FIRST_NAME}]]></groupExpression>
+	</group>
+	<group name="SURNAME">
+		<groupExpression><![CDATA[$F{SURNAME}]]></groupExpression>
+	</group>
+	<group name="DATE_EMPLOYED">
+		<groupExpression><![CDATA[$F{DATE_EMPLOYED}]]></groupExpression>
+	</group>
+	<group name="POSITION_NAME">
+		<groupExpression><![CDATA[$F{POSITION_NAME}]]></groupExpression>
+	</group>
+	<group name="PERSONAL_RATE">
+		<groupExpression><![CDATA[$F{PERSONAL_RATE}]]></groupExpression>
+	</group>
+	<group name="EMP_ID">
+		<groupExpression><![CDATA[$F{EMP_ID}]]></groupExpression>
+	</group>
+	<group name="SALUTATION">
+		<groupExpression><![CDATA[$F{SALUTATION}]]></groupExpression>
+	</group>
+	<group name="LINE1">
+		<groupExpression><![CDATA[$F{LINE1}]]></groupExpression>
+	</group>
+	<group name="LINE2">
+		<groupExpression><![CDATA[$F{LINE2}]]></groupExpression>
+	</group>
+	<group name="PAYE">
+		<groupExpression><![CDATA[$F{PAYE}]]></groupExpression>
+	</group>
+	<group name="NIS">
+		<groupExpression><![CDATA[$F{NIS}]]></groupExpression>
+	</group>
+	<group name="MEDICAL">
+		<groupExpression><![CDATA[$F{MEDICAL}]]></groupExpression>
+	</group>
+	<group name="PENSION">
+		<groupExpression><![CDATA[$F{PENSION}]]></groupExpression>
+	</group>
+	<group name="ENTERTAINMENT">
+		<groupExpression><![CDATA[$F{ENTERTAINMENT}]]></groupExpression>
+	</group>
+	<group name="COMMUTED">
+		<groupExpression><![CDATA[$F{COMMUTED}]]></groupExpression>
+	</group>
+	<group name="Group1" isStartNewPage="true" keepTogether="true">
+		<groupHeader>
+			<band height="355">
+				<textField>
+					<reportElement x="0" y="0" width="100" height="30" uuid="54cb5350-03a6-412a-af56-e59bba1d88d1"/>
+					<textFieldExpression><![CDATA[$F{SALUTATION}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="20" width="550" height="40" uuid="e0526997-6a40-480f-bdff-dd457131b145"/>
+					<textFieldExpression><![CDATA[$F{LINE1}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="54" width="550" height="26" uuid="6505076c-9cde-42a7-af8e-b3c83196e1bf"/>
+					<textFieldExpression><![CDATA[$F{LINE2}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="98" width="550" height="21" uuid="408f378d-a5d2-449b-a6cd-57288b0926c7"/>
+					<text><![CDATA[The Emoluments are as follows:                                                                                                                                    $                                                                                                                      ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="128" width="200" height="23" uuid="2208fba7-286b-4ce1-9c96-529f028ace98"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Basic Wage/ Salary ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="149" width="200" height="19" uuid="04a6843d-97e8-476b-89d4-96b81372986b"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Entertainment Allowance ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="169" width="200" height="17" uuid="2e96ef9a-7c94-45e0-818b-b19752bf5a63"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Commuted Allowance]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="470" y="128" width="84" height="30" uuid="64211036-c639-443d-8d85-b5618c35d1b4"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PERSONAL_RATE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="470" y="150" width="82" height="18" uuid="7eb564f2-5986-4afe-8ca8-263d6daafb95"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$F{ENTERTAINMENT}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="471" y="168" width="81" height="18" uuid="c5883214-c302-4383-9602-367f8c9ffc08"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$F{COMMUTED}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="209" width="380" height="29" uuid="57d9fd67-37ad-43de-8298-9a0e88c0a869"/>
+					<textElement>
+						<font size="16" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Deductions                                                              $ ]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="359" y="240" width="100" height="30" uuid="9c71021c-df35-40df-a759-a6b38cacb978"/>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression><![CDATA[$F{PAYE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="359" y="255" width="100" height="30" uuid="897fe0d9-5275-4b0f-9f96-e5c064cde02f"/>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression><![CDATA[$F{NIS}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="359" y="271" width="100" height="30" uuid="6a0d74ee-5e28-4614-850f-5b18002582c6"/>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression><![CDATA[$F{MEDICAL}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="359" y="286" width="100" height="17" uuid="199d3568-9a93-4541-9cec-bb358f7fcef6"/>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression><![CDATA[$F{PENSION}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="255" width="150" height="15" uuid="e2d3f38e-06d5-4cae-9d56-78d648619f78"/>
+					<text><![CDATA[N.I.S]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="328" width="220" height="20" uuid="a039b016-01fe-4bb9-9afb-f670a133fa1c"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total Net Salary ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="240" width="150" height="16" uuid="edb60d9e-14a3-4ea7-883b-4fd692f29747"/>
+					<text><![CDATA[P.A.Y.E]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="270" width="150" height="18" uuid="455228f7-e562-4970-bf5c-9097f55474b8"/>
+					<text><![CDATA[MEDICAL ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="285" width="150" height="15" uuid="bbee39cb-1ca1-4d28-895c-0aae39ffa92a"/>
+					<text><![CDATA[PENSION]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="301" width="220" height="20" uuid="16af8702-8526-4072-b90a-b71d8bb47c03"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total Deductions ]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="471" y="299" width="85" height="21" uuid="b60c0738-31ac-4b6b-96a2-d132184c5af3"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$F{NIS}.add($F{PAYE}.add($F{PENSION}.add($F{MEDICAL})))]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="471" y="327" width="83" height="20" uuid="b9cdf347-d71f-4448-9034-d9e83ec099cb"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$F{PERSONAL_RATE}.subtract($F{NIS}.add($F{PAYE}.add($F{PENSION}.add($F{MEDICAL}))))]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="448" y="327" width="111" height="1" uuid="0a49ac42-8b30-41d3-b9e5-92da7600a03e"/>
+				</line>
+				<line>
+					<reportElement x="448" y="347" width="111" height="1" uuid="f4bb8372-a9b9-4f7b-857a-6cc3f1d219f9"/>
+				</line>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="58" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="131" height="20" uuid="81c2b2ed-4912-47e6-8ceb-bc5b43466d85"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Our Ref: NW: RK]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="20" width="131" height="20" uuid="5c17bd4b-b341-4fdc-a748-0bda5105529d"/>
+				<textFieldExpression><![CDATA[$P{Date Parameter}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="100" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="0" y="-2" width="121" height="24" isPrintWhenDetailOverflows="true" uuid="ddb20323-5eac-4e82-9fd9-0d5ae8128eda"/>
+				<text><![CDATA[The Manager ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="46" width="240" height="30" uuid="b6d2a4e7-794e-4ec9-8eb5-e7ddba59e906"/>
+				<textFieldExpression><![CDATA[$F{BANK_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="22" width="240" height="30" uuid="9d25269c-bd0b-46d8-b0ab-55a6c42a4beb"/>
+				<textFieldExpression><![CDATA[$F{BANK}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="107" splitType="Stretch">
+			<staticText>
+				<reportElement x="2" y="58" width="220" height="30" uuid="bb844f6b-d19c-44c7-a275-506b4ab70fb0"/>
+				<text><![CDATA[Dale De'Roy                                                                 Deputy Human Resource Manager]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="36" width="220" height="30" uuid="2d76283a-b2ed-43c5-94ce-b885f76bc81d"/>
+				<text><![CDATA[...............................................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="20" width="150" height="20" uuid="5a52b1db-4fb8-47c5-854a-6518f69d436a"/>
+				<text><![CDATA[GUYANA POWER & LIGHT INC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="0" width="80" height="18" uuid="f8b26cf5-dea4-4a29-b13b-f3bbbe1a8b86"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Yours Faithfully,]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="1" splitType="Stretch"/>
+	</summary>
+</jasperReport>

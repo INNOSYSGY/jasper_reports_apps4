@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Flight Operations Inspector" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="3215a2b6-7f51-40c4-a8c5-1a96dd7882c0">
+	<property name="ireport.zoom" value="1.4641000000000013"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/ADMIN_PROC_MANUAL_APP_3A"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<queryString>
+		<![CDATA[select
+      p.ID,
+      p.JOB_ID,
+      p.POSITION_NAME,
+      UPPER(p.POSITION_NAME),
+      p.POSITION_ABV,
+      j.REQ_TRAINING_CODE AS COURSE_NUM,
+      j.SUBJECT_COURSE,
+      j.TRAINING_LEVEL,
+      j.REQ_TRAINING_DETAIL as COURSE_TITLE,
+      j.CLASSIFICATION,
+      j.TRAINING_SEQUENCE as CAT,
+      'FAA Academy' as VENUE,
+      o.photo photo
+
+from
+      apps.hr_hcf_position p join apps.hr_hcf_jobtraining j on p.id = j.position_id
+left outer join apps.hr_hcf_orgstructuredtl od on od.id=p.orgdtl_id
+left outer join apps.hr_hcf_orgstructurehd oh on oh.id=od.org_structure_id
+left outer join apps.hr_hcf_organisation o on o.id=oh.org_id
+      where p.position_name = 'Flight Operations Inspector'
+      ORDER BY CAT]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="JOB_ID" class="java.math.BigDecimal"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="UPPER(P.POSITION_NAME)" class="java.lang.String"/>
+	<field name="POSITION_ABV" class="java.lang.String"/>
+	<field name="COURSE_NUM" class="java.lang.String"/>
+	<field name="SUBJECT_COURSE" class="java.lang.String"/>
+	<field name="TRAINING_LEVEL" class="java.lang.String"/>
+	<field name="COURSE_TITLE" class="java.lang.String"/>
+	<field name="CLASSIFICATION" class="java.lang.String"/>
+	<field name="CAT" class="java.math.BigDecimal"/>
+	<field name="VENUE" class="java.lang.String"/>
+	<field name="PHOTO" class="oracle.sql.BLOB"/>
+	<variable name="SER" class="java.math.BigDecimal" incrementType="Group" incrementGroup="COURSE_TITLE" calculation="Count">
+		<variableExpression><![CDATA[$F{COURSE_TITLE}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<group name="COURSE_TITLE">
+		<groupExpression><![CDATA[$F{COURSE_TITLE}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="89" splitType="Stretch">
+			<staticText>
+				<reportElement x="124" y="0" width="268" height="20" uuid="d87aac53-d50c-4b37-9c58-52cd309b4efb"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[GUYANA CIVIL AVIATION AUTHORITY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="124" y="20" width="268" height="20" uuid="ac6fba28-420a-4479-95c2-28bd35be4e6f"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[AVIATION SAFETY DIRECTORATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="428" y="0" width="100" height="20" uuid="06496074-5f1d-4597-a762-a01f075abd74"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Revision No.:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="124" y="40" width="268" height="20" uuid="73a71d03-2082-42a9-85a4-1e60dcdc8ca9"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Administration Procedures Manual]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="428" y="20" width="100" height="20" uuid="5a8ed5a4-a39f-4381-9a32-d6e395f563d3"/>
+				<text><![CDATA[Original]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="20" width="100" height="50" uuid="0de0093f-381a-4d02-a529-90fdf4e64cc7"/>
+				<imageExpression><![CDATA[$F{PHOTO}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="428" y="50" width="116" height="39" uuid="760bfcb8-0bd5-4dc8-b62d-fb8ed9b774f1"/>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="555" height="20" uuid="4847721b-cc20-42bd-8cb8-53c657e48317"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{UPPER(P.POSITION_NAME)}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="54" height="20" uuid="95ccf7af-7e7e-4530-b297-d2cba82f829a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[SER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="54" y="0" width="179" height="20" uuid="5c026061-8116-4800-8180-bcccf6b6ef09"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[COURSE TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="233" y="0" width="44" height="20" uuid="d816c034-0ed2-4d67-bb4c-4508ed0c9b4e"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[CAT*]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="277" y="0" width="100" height="20" uuid="39e6b1f1-af51-4e0f-8e77-959070ce351a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[COURSE#]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="0" width="100" height="20" uuid="d3e6ce1a-6a44-4ae2-965e-330d5fc45fa3"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[VENUE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="477" y="0" width="78" height="20" uuid="08e643ef-b863-4fa1-a33d-9a40df7d72f7"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[DATE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="26">
+			<textField>
+				<reportElement x="0" y="0" width="54" height="26" uuid="b1d256c8-60a9-41c6-8307-a8aa5fa30d68"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{SER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="54" y="0" width="179" height="26" uuid="2f94c772-13bf-4230-af30-43ae91e1fbaf"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{COURSE_TITLE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="477" y="0" width="78" height="26" uuid="164a2ad6-1b6a-482e-ab6e-4db20e07db5b"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="233" y="0" width="44" height="26" uuid="db0afca8-a44f-4908-8191-4d83fe086591"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CAT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="277" y="0" width="100" height="26" uuid="122ffdbc-486e-4192-bdcb-ffba200f73f7"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{COURSE_NUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="377" y="0" width="100" height="26" uuid="fcefe318-eacf-4ab8-8180-8682ffa8b89a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{VENUE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="118" splitType="Stretch">
+			<staticText>
+				<reportElement x="42" y="2" width="232" height="20" uuid="1516ff0c-f2ba-4b12-bd24-3d4921064022"/>
+				<text><![CDATA[*CAT = CATEGORY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="83" y="22" width="418" height="20" uuid="9b48c958-9a0c-4bfb-8c87-d72a98bea53e"/>
+				<text><![CDATA[CATEGORY 1-Mnadatory for Delegation of Functions]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="83" y="62" width="418" height="20" uuid="b3a41413-8c1b-4d02-b7ed-18939c409b63"/>
+				<text><![CDATA[CATEGORY 3= Course to be provided as and when convenient]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="83" y="42" width="418" height="20" uuid="75ace65a-ba80-40c4-bd02-f4ebd05bb53d"/>
+				<text><![CDATA[CATEGORY 2= Course to be provided within (18) Months, if available.]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="97" width="555" height="1" uuid="ff05dbf8-c3c9-452a-93e6-02dc64337ddf"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="98" width="199" height="20" uuid="21f0b38d-5805-465e-a16e-7ae95b944d4f"/>
+				<text><![CDATA[Effective Date: Feb. 01, 2016]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

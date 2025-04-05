@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Travel Subsidy Application" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bd268612-8069-4dd8-80f1-722f22d5767d">
+	<property name="ireport.zoom" value="0.9090909090909095"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT SURNAME, FIRST_NAME, MIDDLE_NAME, TELEPHONE, DEPARTMENT_NAME,
+(APPS.Pkg_Global_Fnts.Fn_Address('HOME',i.Id,'LOT',Sysdate)
+||' '||APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'STREET',SYSDATE)
+||' ' ||decode(APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'VILLAGE_WARD',SYSDATE),null,' ',
+APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'VILLAGE_WARD',SYSDATE)
+||' ')||nvl(APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'COUNTY',SYSDATE),' ')) AS ADDRESS,
+a.emp_id,
+date_employed
+FROM apps.hr_rcm_individual i
+JOIN apps.hr_rcm_employee e
+ON i.id = e.ind_id
+JOIN apps.vw_position_location_v3 a
+ON a.emp_id = e.id
+WHERE a.emp_id =$P{EMP_ID}]]>
+	</queryString>
+	<field name="SURNAME" class="java.lang.String"/>
+	<field name="FIRST_NAME" class="java.lang.String"/>
+	<field name="MIDDLE_NAME" class="java.lang.String"/>
+	<field name="TELEPHONE" class="java.lang.String"/>
+	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp"/>
+	<group name="EMP_ID">
+		<groupExpression><![CDATA[$F{EMP_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="756">
+				<staticText>
+					<reportElement x="195" y="13" width="249" height="20" uuid="2e933080-2854-4a38-9fcc-6b71740d8207"/>
+					<textElement>
+						<font fontName="Times New Roman" size="14" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Travel Subsidy Application Form]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="12" y="45" width="68" height="20" uuid="6ec9a9bb-4b41-4c6a-a8cb-fecdee44f269"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[First Name: ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="391" y="45" width="59" height="20" uuid="923db817-53e9-41ec-b6a7-fbe36d4b0d51"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Last Name:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="12" y="70" width="100" height="20" uuid="ce226761-afff-4b41-904c-28f1343816c5"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Date of Employment:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="195" y="45" width="74" height="20" uuid="a0947aab-4797-4d0b-9783-7820dffe4bac"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Middle Name:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="274" y="65" width="65" height="20" uuid="dc42c3f7-6c1e-42ef-8fdb-13cd5a9dbd5e"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Designation:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="12" y="101" width="100" height="20" uuid="62f59566-8491-452e-9f92-4eff9854143e"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Department:]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="80" y="45" width="100" height="20" uuid="6327f551-dd4a-4901-a77b-5f023650389b"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="274" y="45" width="100" height="20" uuid="272ce8e3-98f1-409f-ba6f-3b6febee0a15"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{MIDDLE_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="450" y="45" width="100" height="20" uuid="3ca17c3c-fa52-4ee9-9086-97a2007b0609"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="dd/MM/yy" isBlankWhenNull="true">
+					<reportElement x="112" y="70" width="68" height="20" uuid="d18fa699-ad42-4d3d-8e45-807b2672414c"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DATE_EMPLOYED}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="112" y="101" width="100" height="20" uuid="924f524a-cedd-4881-b820-04d98278f0d9"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DEPARTMENT_NAME}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="276" y="101" width="70" height="20" uuid="21b71333-be92-4a18-bfd5-453237f4256c"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Tel/Cell No.:]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="344" y="101" width="100" height="20" uuid="b6a78a99-b333-4775-bff9-ae220f3f6396"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TELEPHONE}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="12" y="135" width="48" height="20" uuid="41f4bca1-e2c5-4f6b-8d25-f5779d9e9697"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Address:]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="60" y="135" width="100" height="20" uuid="7cdfa369-2eb0-40a5-9938-e7b87bbf002a"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="155" width="555" height="1" uuid="ff0896f9-1fd9-4d21-9d6d-b2c3f9f99e99"/>
+				</line>
+				<staticText>
+					<reportElement x="291" y="155" width="33" height="20" uuid="fbca4e25-332f-49ce-8603-b38f984d35e4"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Year:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="219" width="131" height="20" uuid="38e0a73f-6dc2-48a4-9795-58988a467184"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Travel Subsidy Requested]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="351" width="100" height="20" uuid="ccc62853-2b3b-4b55-8074-4d61a7d11397"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Date Signed]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="100" y="156" width="100" height="20" uuid="92181643-2d25-49d4-b1db-97e40f850f7a"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[(1)$_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="324" y="176" width="100" height="20" uuid="e4a4fe2c-8cd6-4e53-b894-edb34f99e8c6"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[________________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="156" width="100" height="20" uuid="e61e12fa-f496-42b9-9547-23c990f40b48"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Travel Subsidy Due:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="260" width="155" height="20" uuid="3d0ca138-50b1-470f-8fc1-7974448b0b92"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Balance Due on Travel Subsidy]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="100" y="175" width="100" height="20" uuid="f70ebcc3-268b-41d1-9dc7-f24175c4d47e"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[(2)$_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="324" y="156" width="100" height="20" uuid="3c997fe1-ca30-466b-aff6-146cbcce3b3c"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="291" y="176" width="33" height="20" uuid="d501bf94-af0d-46b5-aa6c-2d8d5587e945"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Year:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="331" width="131" height="20" uuid="f058d243-f6dd-43c2-95bd-6a65a09145db"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[TRAVEL DESTINATION:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="100" y="351" width="100" height="20" uuid="297c969a-8b77-4bd7-8b82-e596a26261fd"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[____/_____/_____]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="279" y="351" width="112" height="20" uuid="58cbcaa8-5fcb-4b30-b565-cc52f3ec3fdf"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Signature of Applicant:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="131" y="331" width="401" height="20" uuid="457f419d-77d7-4dc5-8998-34731d2e4256"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[----------------------------------------------------------------------------------------]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="129" y="239" width="100" height="20" uuid="3c4fe7b8-6d80-4611-b16a-67b2f25b9908"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[(2)$_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="320" y="219" width="33" height="20" uuid="4412d342-50f0-45c2-8ad6-4acf6ce1f269"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Year:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="353" y="220" width="100" height="20" uuid="56eda1cd-31e6-4bf0-8f88-aaace78526d6"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="353" y="240" width="100" height="20" uuid="9edc883a-50a8-4b25-92ba-413796f62ccc"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[________________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="320" y="240" width="33" height="20" uuid="6aa29b62-93ec-429b-9ba1-5ee8bb22a703"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Year:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="131" y="219" width="100" height="20" uuid="c3336d4c-7757-4430-9543-793528c42c3d"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[(1)$_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="379" y="270" width="100" height="20" uuid="ec34d0de-3d77-4aca-be55-3110947e571f"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="155" y="289" width="100" height="20" uuid="83502f17-fcf8-4c30-b2f2-47d824074c9e"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[(2)$_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="379" y="290" width="100" height="20" uuid="c3d4dde9-a683-44e2-8a16-795ea42c1d79"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[________________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="346" y="290" width="33" height="20" uuid="6205e31d-9cd6-4b74-8313-77980ba19bc0"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Year:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="155" y="270" width="100" height="20" uuid="67afcb57-1f28-4363-ad30-31dc128a49d4"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[(1)$_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="346" y="269" width="33" height="20" uuid="637ea4fd-0197-4837-b3be-b4441bd675af"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Year:]]></text>
+				</staticText>
+				<line>
+					<reportElement x="391" y="370" width="100" height="1" uuid="0f5fbd0d-befd-43e3-a86b-08d7eb61240a"/>
+				</line>
+				<line>
+					<reportElement x="0" y="387" width="551" height="1" uuid="3eff8369-d3c4-466e-afb2-09c7e3d2e3f4"/>
+				</line>
+				<staticText>
+					<reportElement x="200" y="387" width="153" height="20" uuid="688345f3-a855-4b82-9e44-0506fc275ff4"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[FOR OFFICIAL USE ONLY]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="15" y="414" width="55" height="20" uuid="1a0f7b35-62d1-490a-bb22-25ab91f1e7be"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[SUBSIDY:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="304" y="414" width="100" height="20" uuid="0b51a8af-d2e6-4a99-bdce-9e7ba0312e01"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[DENIED/   /]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="131" y="415" width="98" height="20" uuid="816759ba-3de9-408a-b5c7-546e2eac6011"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[APPROVED/   /]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="15" y="449" width="116" height="20" uuid="452d1b31-5618-43ce-9935-c58c1625578e"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Please pay (Mr/Mrs/Ms)]]></text>
+				</staticText>
+				<line>
+					<reportElement x="131" y="468" width="138" height="1" uuid="80d9fcc5-5d96-4e80-9ae9-e22ec573aa09"/>
+				</line>
+				<staticText>
+					<reportElement x="274" y="449" width="65" height="20" uuid="aa904af2-3feb-45cf-a57a-d2e9c6c077f2"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[the sum of]]></text>
+				</staticText>
+				<line>
+					<reportElement x="339" y="467" width="211" height="2" uuid="5ee38d25-ab8b-478b-8156-7de989ce5c73"/>
+				</line>
+				<staticText>
+					<reportElement x="379" y="482" width="167" height="20" uuid="7610181d-2449-4d75-92b9-3679732e3b65"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[GYD($.............................:00)]]></text>
+				</staticText>
+				<line>
+					<reportElement x="13" y="499" width="366" height="1" uuid="a35cde77-5f0b-4530-b3aa-b621954a0f98"/>
+				</line>
+				<staticText>
+					<reportElement x="20" y="536" width="70" height="20" uuid="2f1c178b-28c8-4060-8dec-3e6c1e8ad31f"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Received by:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="22" y="573" width="100" height="20" uuid="e4814bfe-4616-4614-b608-ee629ce8cd56"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Authorized Signature:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="299" y="532" width="75" height="20" uuid="b30a94f4-6a3a-4c84-846e-8dcd72eb1779"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Date Received]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="305" y="566" width="69" height="20" uuid="16725fb5-e835-4871-b754-30fc13dc5229"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Checked by:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="305" y="593" width="69" height="20" uuid="c0d8c99a-4bd3-49b1-bc64-2f58fa94451d"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Reviewed by:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="305" y="630" width="69" height="20" uuid="73a1492b-c18b-4f53-94ae-79cf7057aff0"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Date Signed:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="650" width="555" height="20" uuid="8f1428f5-16be-486c-ade6-3f4f90bc4c1f"/>
+					<text><![CDATA[................................................................................................................................................................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="686" width="200" height="20" uuid="92a405cc-f628-4e00-9488-732784750512"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Confirmed Balance due on Travel Subsidy:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="424" y="686" width="100" height="20" uuid="66444701-706c-4740-a35a-7d2abb048b00"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="200" y="705" width="100" height="20" uuid="ad17abb2-0b18-456c-9cd5-d8e926eb4c5b"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[(2)$_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="424" y="706" width="100" height="20" uuid="38d2a0ce-2b1b-4193-aff7-d1620d0e93a5"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[________________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="391" y="706" width="33" height="20" uuid="dcf55e16-7094-4c6c-a5cc-c7ae03d3fe8c"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Year:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="200" y="686" width="100" height="20" uuid="9d91f368-1355-4fca-9910-679efaab83e0"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[(1)$_______________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="391" y="685" width="33" height="20" uuid="4fa58cdf-f3ce-4f15-9a40-f860b0dbebbe"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Year:]]></text>
+				</staticText>
+				<line>
+					<reportElement x="90" y="551" width="132" height="1" uuid="b34e5be5-1d08-4520-aed5-43896b8db079"/>
+				</line>
+				<line>
+					<reportElement x="122" y="586" width="100" height="1" uuid="19a125dc-e595-4e8a-8442-c8a1a4ff9806"/>
+				</line>
+				<line>
+					<reportElement x="374" y="551" width="125" height="1" uuid="9120827a-d712-4609-b0ed-25c651185b03"/>
+				</line>
+				<line>
+					<reportElement x="374" y="585" width="131" height="1" uuid="47ad1163-c353-4b1b-b184-f49d40c2045b"/>
+				</line>
+				<line>
+					<reportElement x="374" y="612" width="130" height="1" uuid="a9fcf153-9b30-4f62-8e7a-928faadaa1f7"/>
+				</line>
+				<line>
+					<reportElement x="374" y="650" width="131" height="1" uuid="08f94fd5-0eb0-4bd5-b8cb-8a7a0592cc5f"/>
+				</line>
+				<line>
+					<reportElement x="339" y="90" width="193" height="1" uuid="d7317d5d-ca66-4419-926d-2dc1e5580bd0"/>
+				</line>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="28" splitType="Stretch"/>
+	</title>
+</jasperReport>

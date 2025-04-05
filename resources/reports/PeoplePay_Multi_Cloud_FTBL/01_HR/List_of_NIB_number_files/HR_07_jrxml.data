@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="General Employee Listing" language="groovy" pageWidth="612" pageHeight="1008" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="09530649-94cc-4c3c-a18a-367632741ad1">
+	<property name="ireport.zoom" value="1.3310000000000004"/>
+	<property name="ireport.x" value="323"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Multi_Cloud/01_HR/List_of_NIB_number"/>
+	<property name="ireport.jasperserver.url" value="http://162.251.61.138:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Listing of Active Employees As At"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SF"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Multi_Cloud/01_HR/List_of_NIB_number_files/HR_07_jrxml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE_END" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_EMP_CLASS" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="start_date" class="java.lang.String"/>
+	<parameter name="end_date" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT DISTINCT DATE_SEPARATED,
+SEPARATED_STATUS,
+I.ID,
+    NVL(I.SURNAME,'') surname, 
+    NVL(I.FIRST_NAME,'') name,
+    NVL(I.MIDDLE_NAME,'') midle,
+    I.DOB, I.SEX_CODE,
+    E.DATE_EMPLOYED,
+    E.EMP_COMPANY_NO,
+    initcap(e.Employment_status) Employment_status ,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'NIB NUMBER',SYSDATE)) NIS_NO,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'TIN',SYSDATE)) TAX_NO,
+    UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'NATIONAL ID',SYSDATE)) NATIONAL_ID,
+    P.POSITION_NAME POSITION_NAME,
+    p.work_location,
+    initcap(E.EMPLOYMENT_CLASS) EMPLOYMENT_CLASS,
+    initcap(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',I.ID,'STREET',SYSDATE)) LOT_STREET,
+    initcap(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',I.ID,'VILLAGE_WARD',SYSDATE)) VILAGE_WARD,
+    initcap(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',I.ID,'COUNTY',SYSDATE)) COUNTY,
+    HO.ADDRESS ORG_ADDRESS, HO.FAXNUM, HO.TELNUM, NIS_REG_NO, TAX_REG_NO,
+ho.organisation_name,
+case when (extract(month from I.dob) <= extract(month from sysdate) and extract(day from I.dob) <= extract(day from sysdate))
+then (extract(year from sysdate) - extract(year from I.dob))
+else
+(extract(year from sysdate) - extract(year from I.dob) - 1)
+end age
+
+    FROM HR_RCM_INDIVIDUAL I
+    INNER JOIN  hr_rcm_employee E ON I.ID = E.IND_ID
+    JOIN HR_HCF_ORGANISATION HO ON E.ORG_ID=HO.ID
+    left outer join VW_ORG_WORKLOCATION_POSITION p on E.POSITION_ID=p.id
+ where
+    trunc($P{DATE_END}) between trunc(E.DATE_EMPLOYED) and trunc(nvl(DATE_SEPARATED,$P{DATE_END}))
+   and e.org_id=$P{IN_ORG_ID}
+      and DATE_EMPLOYED >= case when $P{start_date} is not null then  to_date(   $P{start_date}    ,'yyyy-mm-dd') else DATE_EMPLOYED end
+     and DATE_EMPLOYED <= case when $P{end_date} is not null then  to_date(   $P{end_date}    ,'yyyy-mm-dd') else DATE_EMPLOYED end]]>
+	</queryString>
+	<field name="DATE_SEPARATED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="DATE_SEPARATED"/>
+	</field>
+	<field name="SEPARATED_STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SEPARATED_STATUS"/>
+	</field>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NAME"/>
+	</field>
+	<field name="MIDLE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="MIDLE"/>
+	</field>
+	<field name="DOB" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="DOB"/>
+	</field>
+	<field name="SEX_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SEX_CODE"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="EMPLOYMENT_STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_STATUS"/>
+	</field>
+	<field name="NIS_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NIS_NO"/>
+	</field>
+	<field name="TAX_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TAX_NO"/>
+	</field>
+	<field name="NATIONAL_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NATIONAL_ID"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="WORK_LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION"/>
+	</field>
+	<field name="EMPLOYMENT_CLASS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS"/>
+	</field>
+	<field name="LOT_STREET" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LOT_STREET"/>
+	</field>
+	<field name="VILAGE_WARD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="VILAGE_WARD"/>
+	</field>
+	<field name="COUNTY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COUNTY"/>
+	</field>
+	<field name="ORG_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ADDRESS"/>
+	</field>
+	<field name="FAXNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="NIS_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NIS_REG_NO"/>
+	</field>
+	<field name="TAX_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TAX_REG_NO"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="AGE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="AGE"/>
+	</field>
+	<sortField name="WORK_LOCATION"/>
+	<variable name="Record_Count" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="64" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="2" width="573" height="58" uuid="f6f03185-12da-4d12-8f9b-f382e2c86bec"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="10" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="18" width="569" height="1" uuid="2c9f4d63-169b-42cb-9ba9-b1b21ed80fa8">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</line>
+			<staticText>
+				<reportElement x="134" y="4" width="100" height="15" uuid="ae5851b9-0012-46d2-9158-7b60720565ba">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Middle Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="234" y="4" width="100" height="15" uuid="93595ed3-00da-46a4-ae21-c7b7bc8a59da">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Last Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="4" width="100" height="15" uuid="c59a3729-413e-4d3c-ba42-2c35d2d521f7">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[First Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="337" y="4" width="66" height="15" uuid="5f1d45e8-dbf3-4e54-bc33-5b2e97aa0d6d"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Birth Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="482" y="4" width="81" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="dedffb98-3b6c-4669-8845-a0604f3239c2"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Hire Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="410" y="4" width="66" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="3338047c-dc43-4735-9ceb-18e099d31fc2"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[NIB Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="4" width="25" height="14" forecolor="#000000" backcolor="#FFFFFF" uuid="19ed3fd7-884a-4f1c-b796-cada43a8d47b"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[#]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="234" y="0" width="100" height="15" uuid="f451dfff-eea8-4c6b-9dfc-78d9cc2259a8">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="33" y="0" width="100" height="15" uuid="9df20d76-6497-4818-82ec-cb612f9be886">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="134" y="0" width="100" height="15" uuid="bc33d4a1-447b-4616-906b-365ceefe03a2">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MIDLE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="337" y="0" width="68" height="15" uuid="e33a71e8-41e7-41f6-a596-8a4d948f4845"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DOB}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="25" height="15" uuid="51516974-1c39-408a-8a8c-4a2fd61a1648"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="false"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Record_Count}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="482" y="0" width="81" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="405e0b5f-184e-49f8-9ece-bb7a198696ae"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_EMPLOYED}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="410" y="0" width="66" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="6882fdb6-0dc6-40c4-a928-6d311412bf2d"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NIS_NO}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="4">
+			<line>
+				<reportElement x="4" y="0" width="569" height="1" isPrintWhenDetailOverflows="true" uuid="fba2c8f5-677c-4850-9d22-a157d5a0a372">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="569" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="17" width="569" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="385" y="3" width="100" height="13" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="4" y="2" width="162" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="485" y="3" width="63" height="13" uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

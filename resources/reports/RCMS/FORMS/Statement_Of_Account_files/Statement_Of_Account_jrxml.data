@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report3" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6e27cffd-a99c-4126-91bb-ae2a40118f1d">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/FORMS/Statement_Of_Account"/>
+	<property name="ireport.jasperserver.url" value="http://apps.innosysgy.com:8081/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.464100000000001"/>
+	<property name="ireport.x" value="14"/>
+	<property name="ireport.y" value="88"/>
+	<parameter name="PROP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT date_paid, a.location, a.property_id, a.total_paid,
+trim(Initcap(a.payee_full_name)) payee_full_name,
+ a.alternate_payee,
+total_transactions_amount, b.property_number,
+a.total_demand_due, a.total_interest_due, a.total_property_debt, discount_value
+from payment_header a
+join property b on b.id = a.property_id
+where a.property_id = $P{PROP_ID}]]>
+	</queryString>
+	<field name="DATE_PAID" class="java.sql.Timestamp"/>
+	<field name="LOCATION" class="java.lang.String"/>
+	<field name="PROPERTY_ID" class="java.math.BigDecimal"/>
+	<field name="TOTAL_PAID" class="java.math.BigDecimal"/>
+	<field name="PAYEE_FULL_NAME" class="java.lang.String"/>
+	<field name="ALTERNATE_PAYEE" class="java.lang.String"/>
+	<field name="TOTAL_TRANSACTIONS_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="PROPERTY_NUMBER" class="java.lang.String"/>
+	<field name="TOTAL_DEMAND_DUE" class="java.math.BigDecimal"/>
+	<field name="TOTAL_INTEREST_DUE" class="java.math.BigDecimal"/>
+	<field name="TOTAL_PROPERTY_DEBT" class="java.math.BigDecimal"/>
+	<field name="DISCOUNT_VALUE" class="java.math.BigDecimal"/>
+	<variable name="D_Total" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DEMAND_DUE}]]></variableExpression>
+	</variable>
+	<variable name="V_INTEREST" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_INTEREST_DUE}]]></variableExpression>
+	</variable>
+	<variable name="v_debt" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_PROPERTY_DEBT}]]></variableExpression>
+	</variable>
+	<variable name="P_discount" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{DISCOUNT_VALUE}]]></variableExpression>
+	</variable>
+	<variable name="v_total" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_TRANSACTIONS_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="v_amtowing" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$V{v_debt}.subtract( $V{v_total})]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="95" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="95" uuid="4e29f5c5-9bc7-436c-8821-0b6f21540d97"/>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA["Statement of Account for Property: " + $F{PROPERTY_NUMBER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LETTER_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="113" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="85" uuid="88ce1ad8-4a9e-43c1-966e-17f27f62112c"/>
+				<subreportParameter name="PROP_ID">
+					<subreportParameterExpression><![CDATA[$P{PROP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/FORMS/Statement_Of_Account_files/owner_info"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement x="0" y="93" width="216" height="20" uuid="1638657e-1fa3-42b6-8f31-4198a71126cf"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Statement as at: "]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" evaluationTime="Auto" pattern="¤ #,##0" isBlankWhenNull="false">
+				<reportElement x="428" y="93" width="127" height="20" uuid="83d060ce-48d5-4368-b990-4c57a63d3a85"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial Narrow" size="14" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{v_amtowing}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="326" y="93" width="102" height="20" uuid="fd234aab-75fb-4dc3-86a2-d6686d84020e"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Total Owing:"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="96" height="20" uuid="9dd2b10c-794d-43f6-8dec-f5f2e6e594af"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="352" y="0" width="76" height="20" uuid="5fc9f4bd-11a9-4d5e-add6-9947e320be62"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial Narrow" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Total Debt]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="491" y="0" width="64" height="20" uuid="3fbebd7b-ae74-4083-8831-322120ab4f7e"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial Narrow" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Paid]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="428" y="0" width="63" height="20" uuid="67981fa7-2550-4844-94bd-8134c08defca"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial Narrow" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Discount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="96" y="0" width="120" height="20" uuid="12c41189-8ff4-49d0-b598-38e1107cc42c"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Full Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="216" y="0" width="73" height="20" uuid="1f7e4114-23a0-4c96-9537-0b7586e2011c"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial Narrow" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Demand]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="289" y="0" width="63" height="20" uuid="17060a46-1672-4c6a-90b2-cfc66652fa35"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial Narrow" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Interest]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="0" width="96" height="20" uuid="ff836f6e-d094-4e2b-90fd-5ba9e6dd2355"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_PAID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="96" y="0" width="120" height="20" uuid="0743c8e0-c78e-443f-ab3c-a3ad63c07c51"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYEE_FULL_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="216" y="0" width="73" height="20" uuid="7b5a6bbc-3d25-4229-a34c-bb85c8f23f60"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_DEMAND_DUE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="289" y="0" width="63" height="20" uuid="77374a82-97ad-4aac-b6c5-00899b8e4a14"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_INTEREST_DUE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="352" y="0" width="76" height="20" uuid="3677065d-da7e-4568-ba59-bbea6e291267"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_PROPERTY_DEBT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="491" y="0" width="64" height="20" uuid="4564970d-f7d8-490f-a7fd-0a90e0749629"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_PAID}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="428" y="0" width="63" height="20" uuid="1249f461-b7e6-49dc-a7b9-ca20decf6c59"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DISCOUNT_VALUE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="18" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="78" height="18" uuid="d7784b93-662e-495e-98f5-bc1173900974"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Total:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="216" y="0" width="73" height="18" uuid="8841bd4d-d2d0-41b4-b08d-38196de68e80"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial Narrow" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{D_Total}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="289" y="0" width="63" height="18" uuid="d6a2a29a-2322-4ecd-86a4-f3b052258439"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial Narrow" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_INTEREST}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="352" y="0" width="76" height="18" uuid="4e5ba8fa-fdec-4b8f-882f-f5689d0401d3"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial Narrow" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{v_debt}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="428" y="0" width="63" height="18" uuid="149a217a-d2ef-49f5-9a16-bc0c47d1a7f4"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial Narrow" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{P_discount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="491" y="0" width="64" height="18" uuid="fd0210ce-f143-45cf-bb94-0fde5c6b474b"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial Narrow" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{v_total}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

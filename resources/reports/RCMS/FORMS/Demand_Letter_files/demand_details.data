@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1f356d1d-8a10-480d-8017-50aafbc06db5">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/FORMS/Demand_Letter"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select
+    1 rank,
+    'Interest' label,
+    money((select sum(interest_due) - sum(interest_paid) from property_rate)) value
+from dual
+union
+select
+    2 rank,
+    'Rates Arrears' label,
+    money((select sum(rate_due) - sum(amount_paid) from property_rate where due_date < to_date ('01-01-'||extract(year from sysdate),'dd-mm-yyyy') )) value
+from dual
+union
+select
+    3 rank,
+    'Current Rates' label,
+    money((select sum(rate_due) - sum(amount_paid) from property_rate where due_date >= to_date ('01-01-'||extract(year from sysdate),'dd-mm-yyyy') )) value
+from dual
+union
+select
+    3 rank,
+    'Grand Total' label,
+    money((select (sum(rate_due) - sum(amount_paid)) + (sum(interest_due) - sum(interest_paid))  from property_rate )) value
+from dual]]>
+	</queryString>
+	<field name="RANK" class="java.math.BigDecimal"/>
+	<field name="LABEL" class="java.lang.String"/>
+	<field name="VALUE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="20">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="20" uuid="1f1373d3-fd18-4caf-be3d-198ed16ca5b1"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[RANK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="164" y="0" width="100" height="20" uuid="ad1dd751-be9c-4574-9b49-9a1bff67d233"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Pay Item]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="331" y="0" width="100" height="20" uuid="01663b6f-b731-4200-b6c9-e8f2e6bff6eb"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="20" uuid="c09d818b-5420-4df9-94ea-227adb19a535"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RANK}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="164" y="0" width="100" height="20" uuid="6041bcf3-4019-4ba6-ab69-259e7548d31b"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LABEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="331" y="0" width="100" height="20" uuid="705aaccf-8742-42f0-8ff2-c69c2bc7c926"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALUE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,725 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Employee Appraisal Form" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85bcab7d-a21c-457c-8b26-54349766927e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="288"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Standard_Letters/APR_LETTER"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<subDataset name="Objective" uuid="d10c58b2-a246-48a9-91b0-bfddbbee0d30">
+		<parameter name="P_APP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select
+ID,
+ID ID_DISPLAY,
+APPRAISAL_ID,
+OBJECTIVES,
+ACHIEVED_RESULTS,
+RATING,
+RATING_supervisor,
+COMMENTS
+from HR_APP_MERITJOBOBJECTIVE
+where appraisal_id=$P{P_APP_ID}]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="ID_DISPLAY" class="java.math.BigDecimal"/>
+		<field name="APPRAISAL_ID" class="java.math.BigDecimal"/>
+		<field name="OBJECTIVES" class="java.lang.String"/>
+		<field name="ACHIEVED_RESULTS" class="java.lang.String"/>
+		<field name="RATING" class="java.math.BigDecimal"/>
+		<field name="RATING_SUPERVISOR" class="java.math.BigDecimal"/>
+		<field name="COMMENTS" class="java.lang.String"/>
+		<variable name="Seq" class="java.math.BigDecimal" calculation="Count">
+			<variableExpression><![CDATA[1.0]]></variableExpression>
+			<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="Results" uuid="11a249ff-7b89-479f-9b9a-3d9d0650468a">
+		<parameter name="P_APP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select
+ID,
+ID ID_DISPLAY,
+APPRAISAL_ID,
+OBJECTIVES,
+ACHIEVED_RESULTS,
+RATING,
+RATING_supervisor,
+COMMENTS
+from HR_APP_MERITJOBOBJECTIVE
+where appraisal_id=$P{P_APP_ID}
+and ACHIEVED_RESULTS is not null]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="ID_DISPLAY" class="java.math.BigDecimal"/>
+		<field name="APPRAISAL_ID" class="java.math.BigDecimal"/>
+		<field name="OBJECTIVES" class="java.lang.String"/>
+		<field name="ACHIEVED_RESULTS" class="java.lang.String"/>
+		<field name="RATING" class="java.math.BigDecimal"/>
+		<field name="RATING_SUPERVISOR" class="java.math.BigDecimal"/>
+		<field name="COMMENTS" class="java.lang.String"/>
+		<variable name="Seq" class="java.math.BigDecimal" calculation="Count">
+			<variableExpression><![CDATA[1.0]]></variableExpression>
+			<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="Question" uuid="81f9f7aa-c7ba-4ac5-bbf2-714b94244eba">
+		<parameter name="P_APP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT MR.ID,
+MR.APPRAISAL_ID,
+MR.QUESTIONS_ID,
+(
+SELECT INITCAP(PERFORMANCE_FACTORS)
+FROM HR_APP_MERITCONFIGPFACTORS F
+WHERE F.ID=MQ.PERFORMANCE_FACTORS_ID
+) Factor,
+MR.QUESTIONS,
+MR.RATING,
+MR.RATING_SUPERVISOR
+FROM HR_APP_MERITINCREQUEST MR JOIN
+HR_APP_MERITQUESTION MQ on MR.QUESTIONS_ID=MQ.ID
+where APPRAISAL_ID=$P{P_APP_ID}]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="APPRAISAL_ID" class="java.math.BigDecimal"/>
+		<field name="QUESTIONS_ID" class="java.math.BigDecimal"/>
+		<field name="FACTOR" class="java.lang.String"/>
+		<field name="QUESTIONS" class="java.lang.String"/>
+		<field name="RATING" class="java.math.BigDecimal"/>
+		<field name="RATING_SUPERVISOR" class="java.math.BigDecimal"/>
+		<group name="Factor">
+			<groupExpression><![CDATA[$F{FACTOR}]]></groupExpression>
+		</group>
+	</subDataset>
+	<subDataset name="Factors" uuid="26899e32-7f1e-4c38-842f-3e8536d0db3e">
+		<parameter name="P_MER_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT initcap(REMARKS) Remarks,rating_scale,percentage_range_lower,percentage_range_upper
+FROM HR_APP_MERITCONFIGDTL MD
+where MD.MERIT_CONFIG_ID=$P{P_MER_ID}]]>
+		</queryString>
+		<field name="REMARKS" class="java.lang.String"/>
+		<field name="RATING_SCALE" class="java.lang.String"/>
+		<field name="PERCENTAGE_RANGE_LOWER" class="java.math.BigDecimal"/>
+		<field name="PERCENTAGE_RANGE_UPPER" class="java.math.BigDecimal"/>
+	</subDataset>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="APP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_MER_ID" class="java.math.BigDecimal">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT A.ID,
+a.org_id,
+a.merit_config_id,
+initcap(nvl(first_name,'')||' '||nvl(surname,'')) name,
+a.appraisal_start_period,
+a.appraisal_end_period,
+initcap(b.position_name) position_name,
+b.org_structure,
+b.date_employed,
+(
+select initcap(nvl(first_name,'')||' '||nvl(surname,''))
+from  hr_rcm_employee b
+join hr_rcm_individual a  on a.id=b.ind_id
+where b.id=appraiser
+) appraiser,
+(
+select initcap(b.position_name)
+from  hr_rcm_employee b
+join hr_rcm_individual a  on a.id=b.ind_id
+WHERE B.ID=APPRAISER
+) APPRAISER_POSITION,
+A.INTERVIEWEE_ASPIRATIONS,
+A.INTERVIEWEE_COMMENTS,
+a.interviewer_comments,
+A.AREAS_OF_STRENGHTS,
+A.AREAS_OF_WEAKNESS,
+A.TRAINING_REQUIRED,
+a.mobility_potential,
+initcap(A.APPRAISER_CLASSIFICATION) APPRAISAL_CLASSIFICATION,
+a.EMPLOYEE_POINTS,
+a.MANAGEMENT_POINTS,
+a.MANAGEMENT_PERCENT,
+A.DEDUCTION_PERCENT,
+A.BONUS,
+a.refunded_point,
+a.recommend_promotion,
+A.EMPLOYEE_PERCENT,
+a.hr_comments,
+a.ceo_comments
+
+from hr_app_meritincrement a
+join hr_rcm_employee b on a.emp_id=b.id
+JOIN HR_RCM_INDIVIDUAL ind  ON ind.ID=B.IND_ID
+JOIN HR_HCF_ORGANISATION M ON M.ID = B.ORG_ID
+where a.id=$P{APP_ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="MERIT_CONFIG_ID" class="java.math.BigDecimal"/>
+	<field name="NAME" class="java.lang.String"/>
+	<field name="APPRAISAL_START_PERIOD" class="java.sql.Timestamp"/>
+	<field name="APPRAISAL_END_PERIOD" class="java.sql.Timestamp"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="ORG_STRUCTURE" class="java.lang.String"/>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp"/>
+	<field name="APPRAISER" class="java.lang.String"/>
+	<field name="APPRAISER_POSITION" class="java.lang.String"/>
+	<field name="INTERVIEWEE_ASPIRATIONS" class="java.lang.String"/>
+	<field name="INTERVIEWEE_COMMENTS" class="java.lang.String"/>
+	<field name="INTERVIEWER_COMMENTS" class="java.lang.String"/>
+	<field name="AREAS_OF_STRENGHTS" class="java.lang.String"/>
+	<field name="AREAS_OF_WEAKNESS" class="java.lang.String"/>
+	<field name="TRAINING_REQUIRED" class="java.lang.String"/>
+	<field name="MOBILITY_POTENTIAL" class="java.lang.String"/>
+	<field name="APPRAISAL_CLASSIFICATION" class="java.lang.String"/>
+	<field name="EMPLOYEE_POINTS" class="java.math.BigDecimal"/>
+	<field name="MANAGEMENT_POINTS" class="java.math.BigDecimal"/>
+	<field name="MANAGEMENT_PERCENT" class="java.math.BigDecimal"/>
+	<field name="DEDUCTION_PERCENT" class="java.math.BigDecimal"/>
+	<field name="BONUS" class="java.math.BigDecimal"/>
+	<field name="REFUNDED_POINT" class="java.math.BigDecimal"/>
+	<field name="RECOMMEND_PROMOTION" class="java.lang.String"/>
+	<field name="EMPLOYEE_PERCENT" class="java.math.BigDecimal"/>
+	<field name="HR_COMMENTS" class="java.lang.String"/>
+	<field name="CEO_COMMENTS" class="java.lang.String"/>
+	<variable name="seq" class="java.math.BigDecimal" resetType="None" calculation="System"/>
+	<group name="Appraisal" keepTogether="true">
+		<groupExpression><![CDATA[$F{ID}]]></groupExpression>
+		<groupHeader>
+			<band height="67">
+				<subreport>
+					<reportElement x="0" y="0" width="572" height="67" uuid="a514e556-30f7-427f-8e9b-14aa396f7770"/>
+					<subreportParameter name="P_IN_ORG_ID">
+						<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="81">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="286" height="20" uuid="73d77327-914c-4f9d-a388-5b955091b015"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement>
+						<font fontName="Arial"/>
+						<paragraph leftIndent="3" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Employee Name: "+$F{NAME}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="286" height="20" uuid="67c6efe6-1398-44cd-b262-a8bf7fde6960"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement>
+						<font fontName="Arial"/>
+						<paragraph leftIndent="3" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Employee's Designation: "+$F{POSITION_NAME}]]></textFieldExpression>
+				</textField>
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement x="0" y="40" width="286" height="20" uuid="e5b5a47b-8804-4880-860b-2e734e4cf8e4"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement>
+						<font fontName="Arial"/>
+						<paragraph leftIndent="3" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Date of Employment: "+new SimpleDateFormat("dd MMMMM yyyy").format($F{DATE_EMPLOYED})]]></textFieldExpression>
+				</textField>
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement x="0" y="60" width="286" height="20" uuid="19a58f68-0e9f-4fcb-8679-32efe45ac2ae"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement>
+						<font fontName="Arial"/>
+						<paragraph leftIndent="3" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Evaluation Period: "+new SimpleDateFormat("dd MMMMM yyyy").format($F{APPRAISAL_START_PERIOD})+" - "+new SimpleDateFormat("dd MMMMM yyyy").format($F{APPRAISAL_END_PERIOD})]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="286" y="0" width="269" height="20" uuid="fd7cc4f2-b367-447d-86b0-178ab4b3035d"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement>
+						<font fontName="Arial"/>
+						<paragraph leftIndent="3" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Appraiser's Name: "+$F{APPRAISER}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="286" y="20" width="269" height="20" uuid="66da3381-d1a1-4ad8-b238-be0a8dd7fbe4"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement>
+						<font fontName="Arial"/>
+						<paragraph leftIndent="3" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Appraiser Designation: "+$F{APPRAISER_POSITION}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="286" y="40" width="269" height="20" uuid="15747994-23aa-4949-b421-0048b2513259"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement>
+						<font fontName="Arial"/>
+						<paragraph leftIndent="3" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ORG_STRUCTURE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="286" y="60" width="269" height="20" uuid="27a760b5-2774-4742-8a23-c31c7a886748"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</textField>
+			</band>
+			<band height="1">
+				<subreport>
+					<reportElement x="0" y="0" width="572" height="1" uuid="fd4f0227-e084-4432-9a57-a2639a68abb6"/>
+					<subreportParameter name="APP_ID">
+						<subreportParameterExpression><![CDATA[$P{APP_ID}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:/reports/PeoplePay/01_HR/Standard_Letters/APR_LETTER_files/OBJECTIVES"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band/>
+			<band height="1">
+				<subreport>
+					<reportElement x="0" y="0" width="572" height="1" uuid="d6b5ed5c-4e75-426f-afd2-5c32b78e0f3f"/>
+					<subreportParameter name="APP_ID">
+						<subreportParameterExpression><![CDATA[$P{APP_ID}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:/reports/PeoplePay/01_HR/Standard_Letters/APR_LETTER_files/Accomplishments"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="1">
+				<subreport>
+					<reportElement x="0" y="0" width="572" height="1" uuid="9a572b68-0a11-4c84-9a83-0e5d33ae3809"/>
+					<subreportParameter name="P_MER_ID">
+						<subreportParameterExpression><![CDATA[$P{P_MER_ID}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:/reports/PeoplePay/01_HR/Standard_Letters/APR_LETTER_files/Rating"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="1">
+				<subreport>
+					<reportElement x="-17" y="0" width="572" height="1" uuid="5a034121-791a-4420-a405-de4816be3dfe"/>
+					<subreportParameter name="APP_ID">
+						<subreportParameterExpression><![CDATA[$P{APP_ID}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:/reports/PeoplePay/01_HR/Standard_Letters/APR_LETTER_files/scoring"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="114">
+				<staticText>
+					<reportElement mode="Transparent" x="0" y="0" width="248" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="5695c1d8-b918-43b1-8485-f0a6e7e38156"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[Appraisal Score]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="20" width="100" height="20" uuid="7a33a74f-a2fd-4582-a6ce-2b73a734a40a"/>
+					<textElement>
+						<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="6"/>
+					</textElement>
+					<text><![CDATA[Classification ]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="100" y="20" width="76" height="20" uuid="8768e062-4611-4a7e-8090-d4b5382a4f73"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{APPRAISAL_CLASSIFICATION}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="399" y="40" width="100" height="20" uuid="0a5a469b-1d25-4692-b50c-acf6091a684a"/>
+					<textElement markup="none">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Management Percent]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="248" y="40" width="100" height="20" uuid="b44238c2-2c9c-4827-bca3-30670b225f83"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Management Points]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="248" y="20" width="100" height="20" uuid="9201fc77-2235-4b60-9f06-f083e86d1611"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Employee Points]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="399" y="20" width="100" height="20" uuid="096c2db9-cfd2-4eaf-bee3-8aca8901c73e"/>
+					<textElement markup="none">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Employee Percent]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="248" y="60" width="133" height="20" uuid="5569be5d-1318-42e0-ae38-8a7d4969cfcc"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Promotion Recommended]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="270" y="80" width="15" height="15" uuid="4ef60da9-4e76-4f2c-a901-a2c2ebde42fd"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{RECOMMEND_PROMOTION}=='Y' ?  "X":""]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="248" y="80" width="22" height="20" uuid="d150fd7b-80e0-48c0-bac9-f68a1515cd47"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Yes]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="318" y="80" width="22" height="20" uuid="3045ccba-6076-42e3-8b1b-6006deaa75c2"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[No]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="340" y="80" width="15" height="15" uuid="82405c9f-a545-4ce0-b1c8-22c6f38d128c"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{RECOMMEND_PROMOTION}=='N' ?  "X":""]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement x="348" y="20" width="51" height="20" uuid="609b1752-e134-4f59-b16e-d44671f0f070"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EMPLOYEE_POINTS}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement x="499" y="20" width="48" height="20" uuid="decf84f8-9112-42a6-85d7-9472af79f8b3"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EMPLOYEE_PERCENT}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="348" y="40" width="51" height="20" uuid="3bd65446-01bf-4c75-83d8-f44542b1b7b6"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{MANAGEMENT_POINTS}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement x="499" y="40" width="48" height="20" uuid="2648d3b3-1964-424c-a25d-25a62333233e"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{MANAGEMENT_PERCENT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="100" y="60" width="76" height="20" uuid="38236346-8e7e-44bc-a1b4-87988e912528"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BONUS}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="60" width="100" height="15" uuid="210dd4b1-60c0-4a84-bc7e-fdcb914c00ab"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="6"/>
+					</textElement>
+					<text><![CDATA[Bonus]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="40" width="100" height="20" uuid="50f1c315-b639-4ca6-882d-dbbff93b1440"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="false" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="6"/>
+					</textElement>
+					<text><![CDATA[Deduction Percent]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="100" y="40" width="76" height="20" uuid="1b6e4962-feb7-404f-b011-6d3225992208"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DEDUCTION_PERCENT}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band/>
+			<band height="50"/>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="41">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="572" height="20" uuid="2d64647d-87d1-40f5-8a0d-d9b4036accbf"/>
+					<textElement markup="styled">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{INTERVIEWEE_ASPIRATIONS}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="572" height="20" uuid="5a9bf8e3-bc21-45b9-9909-0b8b263ff33d"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Employee's Aspirations]]></text>
+				</staticText>
+			</band>
+			<band height="40">
+				<staticText>
+					<reportElement x="0" y="0" width="572" height="20" uuid="855f1c5e-aaee-4176-955f-e34c4afbafc8"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Employee's Comments]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="572" height="20" uuid="3ea1272a-caf8-43be-88bd-8b821ebc50ff"/>
+					<textElement markup="styled">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{INTERVIEWEE_COMMENTS}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="40">
+				<staticText>
+					<reportElement x="0" y="0" width="572" height="20" uuid="f3e5a484-eb2e-4c0f-b05c-c87ea9eab049"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Employee's Areas of Strenghts]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="572" height="20" uuid="24f63f57-a182-4a11-a68c-4455a268b787"/>
+					<textElement markup="styled">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{AREAS_OF_STRENGHTS}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="40">
+				<staticText>
+					<reportElement x="0" y="0" width="572" height="20" uuid="8e215749-1107-4923-a77e-4f064b7c9155"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Employee's Areas of Weakness]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="572" height="20" uuid="b511bef3-b056-4c04-ae17-9aeb27084784"/>
+					<textElement markup="styled">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{AREAS_OF_WEAKNESS}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="41">
+				<staticText>
+					<reportElement x="0" y="0" width="572" height="20" uuid="8dd2c1a2-53b1-4550-8b67-c104901322ff"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Employee's Training Requirements]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="572" height="20" uuid="1eb6409e-5d9e-4ac4-8858-0a5cc0bcd02c"/>
+					<textElement markup="styled">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TRAINING_REQUIRED}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="40">
+				<staticText>
+					<reportElement x="0" y="0" width="572" height="20" uuid="c7504117-dced-40f3-9e0d-abe61259fa60"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Employee's Mobility Potential]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="572" height="20" uuid="abff89e1-ffe1-45ef-94d0-21ce17e5a423"/>
+					<textElement markup="styled">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{MOBILITY_POTENTIAL}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="42">
+				<staticText>
+					<reportElement x="0" y="0" width="572" height="20" uuid="d2251ee7-9a88-4ae7-beac-7c7fefc15bd3"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Appraiser's Comments]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="572" height="20" uuid="376d17ed-ec4d-43d9-aa7c-76f911fddec8"/>
+					<textElement markup="styled">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{INTERVIEWER_COMMENTS}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="41">
+				<staticText>
+					<reportElement x="0" y="0" width="572" height="20" uuid="ebab4b6a-6558-411d-8a47-006f00aa48d1"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Human Resources Comments]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="572" height="20" uuid="3ea11c81-07a0-4a0b-b730-8303e00e7ebc"/>
+					<textElement markup="styled">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{HR_COMMENTS}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="89">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="572" height="20" uuid="fc818764-2975-4980-af4c-b12e29b512a8"/>
+					<textElement markup="styled">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CEO_COMMENTS}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="572" height="20" uuid="c296cf38-37d2-4cf5-8550-fac1f9230a5e"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Chief Executive Officer Comments]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="16" width="572" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="1" width="572" height="15" uuid="7d30e0ec-507f-43bf-834f-4ecf54b5e269"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Employee Appraisal Form"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="572" height="1" uuid="b683e5cf-f6d6-4171-9e4e-9426e63b89b8"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

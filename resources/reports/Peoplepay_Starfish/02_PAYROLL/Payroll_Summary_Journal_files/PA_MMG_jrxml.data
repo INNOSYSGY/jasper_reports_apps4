@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Employee Bank Payments" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6a8be228-8acb-4049-bd0c-2dd0ff04b118">
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Peoplepay_Correia/02_PAYROLL/Payroll_Summary_Journal"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Correia"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/Peoplepay_Correia/02_PAYROLL/Payroll_Summary_Journal_files/PA_MMG_jrxml"/>
+	<parameter name="DEPARTMENT_ID" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="Earning_period" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+    UNIT_NAME,
+    DESCRIPTION,
+    case when debit_credit ='DR' then
+    Income_amount
+    else
+    0
+    end as debit_amount,
+    case when debit_credit ='CR' then
+    Income_amount
+    else
+    0
+    end as credit_amount
+ ,trim(to_char( (to_date(month_year, 'yy-mm')), 'MONTH'))||'-'||trim(to_char( (to_date(month_year, 'yy-mm')), 'yyyy')) xxx
+
+from (
+select 
+COA_CODE,UNIT_NAME, DESCRIPTION, sum(income_amount) income_amount, sum(income_amount_ytd) income_amount_ytd, 'DR' Debit_Credit
+,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start) month_year
+from
+(select distinct a.id, COA_CODE,UNIT_NAME, initcap(e.DESCRIPTION) DESCRIPTION, a.income_amount income_amount, a.income_amount_ytd income_amount_ytd, 'DR' Debit_Credit
+,c.period_start
+from hr_rcm_employee b join pa_pmg_payrolldtl c on b.id = c.emp_id
+join hr_hcf_orgstructuredtl x on x.id = c.orgdtl_id
+join PA_PMG_PAYROLLINCOME a on c.id=a.pay_slipno
+join PA_PCF_INCOMECODE e on e.INCOME_CODE=a.INCOME_CODE
+join pa_pcf_earningperiod ep on ep.id  = c.earnings_period_id
+where   
+EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{Earning_period} 
+
+and c.org_id=$P{IN_ORG_ID}  and e.org_id=$P{IN_ORG_ID} 
+and (c.compute_gross_hist !='BASIC_PAY' or earnings_type = 'SUPPL'   or e.id !=6004)
+)
+group by COA_CODE, UNIT_NAME, DESCRIPTION,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start)
+
+
+union 
+
+select COA_CODE,UNIT_NAME,  cast('Basic Salary'  as nvarchar2(100)) DESCRIPTION, sum(time_tax_earnings) + sum (time_nontax_earnings) +  nvl(FN_priorsalary_month($P{Earning_period} ,  COA_CODE),0) 
+-sum(FN_ADHOCPAYMENTSUM_DETAIL(k.earnings_period_id,k.id,  $P{IN_ORG_ID} ))time_tax_earnings
+,  max(time_tax_earnings_YTD) +max (time_nontax_earnings_ytd)
+ time_tax_earnings_ytd, 'DR' Debit_Credit
+,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+join pa_pcf_earningperiod w on w.id = k.earnings_period_id
+where  EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =	$P{Earning_period} 
+and k.compute_gross_hist='BASIC_PAY'
+and earnings_type = 'RG'
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME,  cast('Basic Salary'  as nvarchar2(100)) ,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start)
+
+union
+
+select COA_CODE,UNIT_NAME, DESCRIPTION , sum(amount_deducted) amount_deducted, sum(amount_deducted_ytd) amount_deducted_ytd, 'DR' Debit_Credit
+,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start) month_year
+from
+(select distinct a.id,COA_CODE,UNIT_NAME, initcap(d.DESCRIPTION||' '||DEDUCTION_TYPE) DESCRIPTION , a.amount_deducted amount_deducted, amount_deducted_ytd amount_deducted_ytd, 'DR' Debit_Credit
+,k.period_start
+from  hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join pa_pmg_payrolldeduction a on k.id=a.pay_slipno
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+join Pa_Pcf_Deductioncode d on d.EXPENSE_CODE=a.EXPENSE_CODE
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{Earning_period} 
+and A.DEDUCTION_TYPE='EMPLOYER'
+and k.org_id=$P{IN_ORG_ID} 
+)
+group by COA_CODE,UNIT_NAME, DESCRIPTION,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start)
+
+
+union
+select COA_CODE,UNIT_NAME,  cast('NIS Employer'  as nvarchar2(100))  DESCRIPTION, sum(nis_employer) nis_employer,  sum(nis_employer_YTD) nis_employer_YTD, 'DR' Debit_Credit
+,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{Earning_period} 
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME,  cast('NIS Employer'  as nvarchar2(100)),EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start) 
+
+union 
+
+select COA_CODE,UNIT_NAME, DESCRIPTION , sum(amount_deducted) amount_deducted, sum(amount_deducted_ytd) amount_deducted_ytd, 'CR' Debit_Credit
+,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start) month_year
+from
+(select distinct a.id, COA_CODE,UNIT_NAME, initcap(d.DESCRIPTION||' '||DEDUCTION_TYPE) DESCRIPTION , a.amount_deducted amount_deducted, a.amount_deducted_ytd amount_deducted_ytd, 'CR' Debit_Credit
+,k.period_start
+from  hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join pa_pmg_payrolldeduction a on k.id=a.pay_slipno
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+join Pa_Pcf_Deductioncode d on d.EXPENSE_CODE=a.EXPENSE_CODE
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{Earning_period} 
+and k.org_id=$P{IN_ORG_ID}  and d.org_id=$P{IN_ORG_ID} 
+)
+group by COA_CODE,UNIT_NAME, DESCRIPTION,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start)
+
+union
+
+select COA_CODE,UNIT_NAME, cast('NETPAY'  as nvarchar2(100))  DESCRIPTION, sum(net_pay) net_pay,  sum(net_pay_YTD) net_pay_TD, 'CR' Debit_Credit
+,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{Earning_period} 
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME, cast('NETPAY'  as nvarchar2(100)),EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start)
+
+
+union
+select COA_CODE,UNIT_NAME, cast('PAYE'  as nvarchar2(100))  DESCRIPTION, sum(tax_amount) net_pay,  sum(tax_amount_YTD) net_pay_TD, 'CR' Debit_Credit
+,EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{Earning_period} 
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME, cast('PAYE'  as nvarchar2(100)),EXTRACT(year FROM period_start)||'-'||EXTRACT(month FROM period_start)
+
+union
+select COA_CODE,UNIT_NAME, cast('NIS Employee'  as nvarchar2(100))  DESCRIPTION, sum(nis_employee) net_pay,  sum(nis_employee_YTD) net_pay_TD, 'CR' Debit_Credit
+,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{Earning_period} 
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME, cast('NIS Employee'  as nvarchar2(100)),EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start)
+ 
+
+union
+
+select COA_CODE,UNIT_NAME, cast('NIS Employer'  as nvarchar2(100))  DESCRIPTION, sum(nis_employer) net_pay,  sum(nis_employer_YTD) net_pay_TD, 'CR' Debit_Credit
+,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start) month_year
+from hr_rcm_employee b join pa_pmg_payrolldtl K ON b.id=k.emp_id
+join hr_hcf_orgstructuredtl x on x.id = k.orgdtl_id
+where EXTRACT(year FROM period_start)||EXTRACT(month FROM period_start) =$P{Earning_period} 
+and k.org_id=$P{IN_ORG_ID} 
+group by COA_CODE,UNIT_NAME, cast('NIS Employer'  as nvarchar2(100)) ,EXTRACT(year FROM k.period_start)||'-'||EXTRACT(month FROM k.period_start)
+
+)]]>
+	</queryString>
+	<field name="UNIT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="UNIT_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="UNIT_NAME"/>
+	</field>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="DEBIT_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="DEBIT_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEBIT_AMOUNT"/>
+	</field>
+	<field name="CREDIT_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CREDIT_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="CREDIT_AMOUNT"/>
+	</field>
+	<field name="XXX" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="XXX"/>
+		<property name="com.jaspersoft.studio.field.label" value="XXX"/>
+	</field>
+	<sortField name="UNIT_NAME"/>
+	<sortField name="DESCRIPTION"/>
+	<variable name="Department Debit Total" class="java.math.BigDecimal" resetType="Group" resetGroup="By Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEBIT_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="Seq" class="java.math.BigDecimal" resetType="Group" resetGroup="By Department" calculation="Sum">
+		<variableExpression><![CDATA[1.0]]></variableExpression>
+		<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+	</variable>
+	<variable name="Department Credit Total" class="java.math.BigDecimal" resetType="Group" resetGroup="By Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{CREDIT_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="Grand_total_debit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEBIT_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="Grand_total_credit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CREDIT_AMOUNT}]]></variableExpression>
+	</variable>
+	<group name="By Department">
+		<groupExpression><![CDATA[$F{UNIT_NAME}]]></groupExpression>
+		<groupHeader>
+			<band height="24">
+				<textField>
+					<reportElement x="1" y="1" width="478" height="15" uuid="1794116c-5970-4234-bf08-197d17c9a5f9">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Department: "+$F{UNIT_NAME}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="21">
+				<staticText>
+					<reportElement x="1" y="0" width="185" height="15" uuid="e7ce961f-014d-4708-9c95-aec5422b716e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Department Total:]]></text>
+				</staticText>
+				<textField pattern="$  #,##0">
+					<reportElement x="264" y="0" width="86" height="15" uuid="1d26d25a-b913-42f5-804b-359b87bc5d38">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Department Debit Total}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤#,##0.##;¤-#,##0.##">
+					<reportElement x="395" y="0" width="84" height="15" uuid="2e85fa84-68eb-4309-b0f3-b991332d5bb2"/>
+					<textElement>
+						<font fontName="Arial" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Department Credit Total}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="63" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="3" width="555" height="60" uuid="588366a7-5551-4d20-8583-f1850d7d119e"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="34" splitType="Stretch">
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="0" y="10" width="555" height="15" uuid="46865d30-8147-4ff2-a9bc-2975b0277671"/>
+				<textElement textAlignment="Center" markup="none">
+					<font fontName="Arial" size="12" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Payroll Summary Journal "+$F{XXX}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="17" splitType="Stretch">
+			<staticText>
+				<reportElement x="49" y="0" width="137" height="15" uuid="18ffe70f-b1c9-4e98-befe-af65eb643b4c"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="264" y="0" width="86" height="15" uuid="d8330b94-b783-4c22-9aa5-53480a274013">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Amount DR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="395" y="0" width="84" height="15" uuid="24c80a59-bec1-48bc-8c4a-cf852e3c349a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Arial" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Amount CR]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="19" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="49" y="0" width="137" height="15" isRemoveLineWhenBlank="true" uuid="0ef15c16-7e7f-4a02-b79b-62eb02fbbad6"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="15" y="0" width="30" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="8f777d82-003b-49b5-8f4f-4d0f2c41d997"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Seq}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="264" y="0" width="86" height="15" uuid="209c9441-ec3c-4f5e-9178-a6374f44c809">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfd196ba-cb79-4e3d-976f-b42ca7f6ae08"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DEBIT_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="395" y="0" width="84" height="15" uuid="c2c1b7c9-120a-4b73-99bf-f52ab42b4457">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fc7542e6-e7e9-4242-80d2-f2a7afd40395"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{CREDIT_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<textField pattern="EEEEE, MMMMM, dd  yyyy">
+				<reportElement x="2" y="0" width="121" height="15" backcolor="#999999" uuid="4d5a66d5-2f87-4150-b66c-83638a8d8f2f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="2" y="15" width="553" height="15" uuid="1b626fc9-0f5c-4e28-b0dc-19754d96cbf8"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="528" y="0" width="27" height="15" uuid="f57525a2-72a9-4a23-bae7-5f63c94d5562"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="448" y="0" width="80" height="15" uuid="92acc45a-f63c-461c-bd02-7d30a30d86ea"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="80" splitType="Stretch">
+			<staticText>
+				<reportElement x="86" y="30" width="229" height="15" uuid="5226a9b2-d869-476c-8462-56639df73692"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="30" width="86" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="3dbfb1f7-b0cf-4dd0-bc4e-26b997da7d13"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Prepared By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="51" width="86" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="92411007-c455-4274-9a41-f8282a2bac60"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Checked  By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="86" y="51" width="229" height="15" uuid="43b7aedb-58cf-4f98-b733-96fb347c4875"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<textField pattern="¤#,##0.##;¤-#,##0.##">
+				<reportElement x="265" y="0" width="86" height="15" uuid="71812773-9c30-4bae-ad51-5c4c8ea080d3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand_total_debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.##;¤-#,##0.##">
+				<reportElement x="395" y="0" width="84" height="15" uuid="aaba0d4e-f144-4611-b619-1ca4584faa8a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand_total_credit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="0" width="182" height="15" uuid="2ce57695-0148-4950-9a45-f52058913ef5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Grand Total:"]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

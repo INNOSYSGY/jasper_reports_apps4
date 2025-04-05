@@ -1,0 +1,1094 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Individual Income Tax" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="7" uuid="8190ec3b-be89-418c-867d-c8dba10513df">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/02_PAYROLL/INCOME_TAX_1"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_YEAR" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_PAYMENT_TYPE" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+ho.id org_id,
+ep.emp_company_no,
+min(pa.period_start) Start_date,
+max(pa.period_start) End_date,
+nvl(pa.surname_hist,'')||', '||nvl(pa.first_name_hist,'')||' '||nvl(r.middle_name,'') employee_name,
+initcap(nvl(r.surname,'')||', '||nvl(r.first_name,'')||' '||nvl(r.middle_name,''))||CHR(10)||initcap(
+(Pkg_Global_Fnts.Fn_Address('HOME',r.Id,'LOT',TRUNC(SYSDATE))||' '||PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'STREET',TRUNC(SYSDATE)))||chr(10)
+||decode(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'VILLAGE_WARD',TRUNC(SYSDATE)),null,'',
+PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'VILLAGE_WARD',TRUNC(SYSDATE))||chr(10))
+||nvl(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'COUNTY',TRUNC(SYSDATE)),' ')
+)
+EMPLOYEE_ADDRESS,
+to_char(pa.period_start,'yyyy')+1 Return_Year,
+UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(Ep.IND_ID,'TIN',SYSDATE)) TAX_NO,
+UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(Ep.IND_ID,'NATIONAL ID',SYSDATE)) NATIONAL_ID,
+UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(Ep.IND_ID,'NIS NUMBER',SYSDATE)) NIS_NO,
+pkg_global_fnts.fn_taxceiling(pa.org_id,to_char(pa.period_start,'yyyy'),upper(pa.payment_type_hist)) Threshold,
+       sum(total_tax_earnings)- (sum(nvl(pkg_global_fnts.fn_lessAbs1(pa.period_start,pa.emp_id),0)))   total_tax_earnings,
+sum(total_tax_earnings) Total_income,
+       sum(incentives_taxable) incentives_taxable,
+         sum(benefit_taxable) benefit_taxable,
+       sum(allowance_taxable) allowance_taxable,
+       sum(allowance_nontaxable) allowance_nontaxable,
+      sum(pa.gross_taxable)- (sum(nvl(pkg_global_fnts.fn_lessAbs1(pa.period_start,pa.emp_id),0)))   as Total_Earning,
+      sum(round(tax_amount + retro_taxes,0))    tax_amount,
+sum(FREEPAY) FREEPAY,
+sum(NIS_EMPLOYEE) NIS_EMPLOYEE,
+
+nvl((
+      select ROUND(sum(c.INCOME_AMOUNT),2) INCOME_AMOUNT
+      from PA_PMG_PAYROLLINCOME c
+      join pa_pmg_payrolldtl pd on c.pay_slipno=pd.id
+      JOIN PA_PCF_INCOMECODE IC ON c.INCOME_CODE = IC.INCOME_CODE
+      WHERE UPPER(c.INCOME_CODE) IN ('OT')
+      and to_char(pd.period_start,'yyyy')=$P{P_YEAR}
+      and pd.emp_id=pa.emp_id
+),0) Overtime,
+      HO.organisation_name,
+ho.address,ho.faxnum,ho.telnum,nis_reg_no,tax_reg_no
+
+from pa_pmg_payrolldtl pa
+join VW_EMPLOYEE ep on pa.emp_id=ep.id
+join HR_RCM_INDIVIDUAL r on ep.ind_id=r.id
+join hr_hcf_organisation ho on pa.org_id=ho.id
+where
+pa.org_id=$P{ORG_ID}
+and to_char(pa.period_start,'yyyy')=$P{P_YEAR}
+and upper(trim(pa.payment_type_hist))=UPPER($P{P_PAYMENT_TYPE})
+group by
+ho.id,
+pa.emp_id, ep.emp_company_no,pkg_global_fnts.fn_taxceiling(pa.org_id,to_char(pa.period_start,'yyyy'),upper(pa.payment_type_hist)),
+nvl(pa.surname_hist,'')||', '||nvl(pa.first_name_hist,'')||' '||nvl(r.middle_name,''),
+to_char(pa.period_start,'yyyy')+1
+,UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(Ep.IND_ID,'TIN',SYSDATE)),
+UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(Ep.IND_ID,'NATIONAL ID',SYSDATE)),
+UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(Ep.IND_ID,'NIS NUMBER',SYSDATE)),
+HO.organisation_name,
+ho.address,ho.faxnum,ho.telnum,nis_reg_no,tax_reg_no,
+initcap(nvl(r.surname,'')||', '||nvl(r.first_name,'')||' '||nvl(r.middle_name,''))||CHR(10)||initcap(
+(Pkg_Global_Fnts.Fn_Address('HOME',r.Id,'LOT',TRUNC(SYSDATE))||' '||PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'STREET',TRUNC(SYSDATE)))||chr(10)
+||decode(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'VILLAGE_WARD',TRUNC(SYSDATE)),null,'',
+PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'VILLAGE_WARD',TRUNC(SYSDATE))||chr(10))
+||nvl(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',r.ID,'COUNTY',TRUNC(SYSDATE)),' ')
+)]]>
+	</queryString>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+	<field name="START_DATE" class="java.sql.Timestamp"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="EMPLOYEE_ADDRESS" class="java.lang.String"/>
+	<field name="RETURN_YEAR" class="java.math.BigDecimal"/>
+	<field name="TAX_NO" class="java.lang.String"/>
+	<field name="NATIONAL_ID" class="java.lang.String"/>
+	<field name="NIS_NO" class="java.lang.String"/>
+	<field name="THRESHOLD" class="java.math.BigDecimal"/>
+	<field name="TOTAL_TAX_EARNINGS" class="java.math.BigDecimal"/>
+	<field name="TOTAL_INCOME" class="java.math.BigDecimal"/>
+	<field name="INCENTIVES_TAXABLE" class="java.math.BigDecimal"/>
+	<field name="BENEFIT_TAXABLE" class="java.math.BigDecimal"/>
+	<field name="ALLOWANCE_TAXABLE" class="java.math.BigDecimal"/>
+	<field name="ALLOWANCE_NONTAXABLE" class="java.math.BigDecimal"/>
+	<field name="TOTAL_EARNING" class="java.math.BigDecimal"/>
+	<field name="TAX_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="FREEPAY" class="java.math.BigDecimal"/>
+	<field name="NIS_EMPLOYEE" class="java.math.BigDecimal"/>
+	<field name="OVERTIME" class="java.math.BigDecimal"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="NIS_REG_NO" class="java.lang.String"/>
+	<field name="TAX_REG_NO" class="java.lang.String"/>
+	<sortField name="EMPLOYEE_NAME"/>
+	<variable name="Seq" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+	</variable>
+	<group name="EName" isStartNewPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{EMPLOYEE_NAME}]]></groupExpression>
+		<groupHeader>
+			<band height="58">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="374" height="15" uuid="db0fc09b-9559-449c-80f0-e77ef4b9b351"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="14" width="374" height="15" uuid="1d25c18f-ad6c-4f76-b0ea-f6b930f77b07"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="42" width="374" height="15" uuid="347aa2d7-3c69-4674-bdef-21292f5ef077">
+						<printWhenExpression><![CDATA["N"=="C" ? true:false]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Fax No. "+ $F{FAXNUM}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="28" width="374" height="15" uuid="b59b7086-8f40-4321-82b4-ecd16c5d89ba"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Tel No. "+  $F{TELNUM}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="0" width="368" height="15" uuid="424e0025-15b3-4e41-b84d-46f552bd9136"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="42" width="368" height="15" uuid="ec0e0413-d2dc-4e89-9d5d-f99595660fef">
+						<printWhenExpression><![CDATA["N"=="C" ? true:false]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Fax No. "+ $F{FAXNUM}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="28" width="368" height="15" uuid="4d9f334f-41ff-485b-a344-9d5e524ca1cf"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Tel No. "+  $F{TELNUM}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="14" width="368" height="15" uuid="2e44ab16-1177-4490-b0cf-5da0c074c86e"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="22">
+				<textField isBlankWhenNull="true">
+					<reportElement x="597" y="0" width="155" height="11" uuid="b90c94e6-c214-4ff6-b270-020427b2c938"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Company TIN: "+$F{TAX_REG_NO}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="384" y="9" width="158" height="11" uuid="7306ac94-c3cf-4f27-9f44-f97901162a34"/>
+					<textElement>
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Dear Sir/Madam/Comrade,"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="223" y="0" width="144" height="11" uuid="a547dcbf-797a-4d9a-8b5c-f188c3fa3d2c"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Company TIN: "+$F{TAX_REG_NO}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="10" width="158" height="11" uuid="d7937889-bbca-4589-a598-261fb8ca9c60"/>
+					<textElement>
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Dear Sir/Madam/Comrade,"]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="374" y="-58" width="1" height="57" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="fdc702b1-e797-45eb-a86b-df0d7d983bc3"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement x="374" y="0" width="1" height="20" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="8211b482-e0eb-4ce2-b1a5-b0f99a5aaca2"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+			<band height="26">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="4" width="367" height="22" uuid="7a791e85-6ec5-4db9-adc2-df3ee5caf901"/>
+					<textElement>
+						<font fontName="Arial" size="8"/>
+						<paragraph lineSpacing="AtLeast" lineSpacingSize="1.2" leftIndent="20"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Please note that we(I) have advised the commissioner of Guyana Revenue Authority of salary, etc.,paid to and tax deducted from you for the year ended 31st December "+($F{RETURN_YEAR}-1)+" as follows:"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="384" y="4" width="368" height="22" uuid="66d4d484-8773-4339-84ec-492887c0fbc7"/>
+					<textElement>
+						<font fontName="Arial" size="8"/>
+						<paragraph lineSpacing="AtLeast" lineSpacingSize="1.2" leftIndent="20"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Please note that we(I) have advised the commissioner of Guyana Revenue Authority of salary, etc.,paid to and tax deducted from you for the year ended 31st December "+($F{RETURN_YEAR}-1)+" as follows:"]]></textFieldExpression>
+				</textField>
+			</band>
+			<band/>
+			<band height="268">
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="0" width="154" height="15" uuid="d66040ba-6a26-46a9-93e4-6ba22942f14d"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Salary or Wages (Basic)"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="18" width="154" height="15" uuid="20871f3d-0ac2-450e-848d-0b9404f6b8be"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Rent Free Quarters of House Allowance"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="1" y="35" width="154" height="15" uuid="55e78352-f76c-4f48-b5ce-f69d51664d03"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Bonus and Profit Share"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="70" width="154" height="15" uuid="12b66895-0306-4250-ba2f-00496f6a3138"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Overtime"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="88" width="154" height="15" uuid="2025f9da-3ed5-4645-ba4a-42e7d08f3578"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Board and Lodge"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="247" width="154" height="15" uuid="98432fcf-1f56-4dd9-b610-d087b73a266e"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["INCOME TAX DEDUCTED"]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="0" width="73" height="15" uuid="94456aed-86cf-4ac0-a7af-c6c06ed55cea"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TOTAL_TAX_EARNINGS}-$F{OVERTIME}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="53" width="73" height="15" uuid="99bf4f5d-e634-46ef-ac51-34323a7669bc"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{INCENTIVES_TAXABLE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="158" width="73" height="15" uuid="5fb250b1-816d-4f7f-bef6-2a6f80eb7262"/>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ALLOWANCE_TAXABLE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="70" width="73" height="15" uuid="f64f719b-0ab5-4482-abeb-bbd7402c9c04"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{OVERTIME}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="176" width="73" height="15" uuid="fe51c527-7a5e-46c5-ae1f-45ad8c15ac3e"/>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Dashed"/>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TOTAL_EARNING}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="247" width="73" height="15" uuid="6896a797-d3c0-48da-aa47-7d55bca2556c"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TAX_AMOUNT}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="106" width="154" height="15" uuid="41abf3c2-4565-4aa5-b051-0ee44d348edc"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Fees"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="123" width="154" height="15" uuid="4d14422d-910b-49e6-bebb-8ae08a80873a"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Other Emoluments and Allowances"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="1" y="53" width="154" height="15" uuid="cbd8fd5a-86ba-46d0-bae2-aa893db89596"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["(Other than Incentive Payments)"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="140" width="154" height="15" uuid="3ed74575-dca6-4d19-866e-e058246f90c7"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["All other Allowances paid must be"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="158" width="154" height="15" uuid="0699a355-5c96-4ddc-9b5e-981553bd9126"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" stated and separately listed)"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="176" width="154" height="15" uuid="64fcde8a-6ec5-4908-a687-9547bcfe3030"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Total Income"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="193" width="164" height="15" uuid="36b2ad06-c6a9-4c09-8335-e853efe2ba7a"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["National Insurance Scheme (NIS)"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="211" width="154" height="15" uuid="f8715e69-1213-485f-9514-14f1130036fe"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["(Employee Contributions)"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="229" width="154" height="15" uuid="338952db-fb2c-40a2-a221-89ae4493fa60"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Statutory Deduction"]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="211" width="73" height="15" uuid="27556cee-2460-419f-9f32-07c6e83589e5"/>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{NIS_EMPLOYEE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="229" width="73" height="15" uuid="434c10e0-f7c9-4875-916c-dba6bf1d0ae7"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{FREEPAY}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="35" width="73" height="15" uuid="64ac1a25-d087-4dab-a3a2-9aefbd403e70"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BENEFIT_TAXABLE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="88" width="73" height="15" uuid="0d78049a-6c2c-4608-a07e-6139ae4fcf72"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[0]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="106" width="73" height="15" uuid="5e5eff86-3c84-4b38-92b0-5b30c3841a8d"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[0]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="123" width="73" height="15" uuid="c8f2faed-dc28-4840-9741-fe0bc69e1d1c"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[0]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="140" width="73" height="15" uuid="db9fb843-2d1a-4d4b-966e-45a21621d7ae"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[0]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="155" y="18" width="73" height="15" uuid="ed79b468-6800-4e87-af04-20cd847e68de"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[0]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="2" width="157" height="15" uuid="e3e44881-ecdc-4715-bcac-c3536bf61d7e"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Salary or Wages (Basic)"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="20" width="157" height="15" uuid="09be4e23-5d0f-4a48-a943-a8142209fae8"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Rent Free Quarters of House Allowance"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="384" y="37" width="157" height="15" uuid="9df1f098-c7ad-49e6-85f5-0e94d8bff3ce"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Bonus and Profit Share"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="72" width="157" height="15" uuid="06e9a05b-fe2b-4129-bec8-eabd2476ff40"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Overtime"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="90" width="157" height="15" uuid="4c8db8ec-d192-48f9-93ab-7da00bf356c7"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Board and Lodge"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="249" width="157" height="15" uuid="916f14b8-0b08-4acf-98e3-00c33615c26d"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["INCOME TAX DEDUCTED"]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="2" width="73" height="15" uuid="2fd4edad-4312-43ad-894e-dacb3e9ec303"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TOTAL_TAX_EARNINGS}-$F{OVERTIME}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="55" width="73" height="15" uuid="55050892-a432-4b85-b654-9b4d752cd803"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{INCENTIVES_TAXABLE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="160" width="73" height="15" uuid="1ecb1249-0520-463c-b38a-ee9a54f8827d"/>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ALLOWANCE_TAXABLE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="72" width="73" height="15" uuid="f410d557-0931-4875-a893-ee8ecd3fb5c8"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{OVERTIME}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="178" width="73" height="15" uuid="ffe29ea4-c412-4ab6-9cef-5564aa8ee5e9"/>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Dashed"/>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TOTAL_EARNING}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="249" width="73" height="15" uuid="a384c085-a4f4-40a6-9244-b22e23e91bb6"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TAX_AMOUNT}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="108" width="157" height="15" uuid="0b6cac34-2dec-4b10-89d0-3aae522eb602"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Fees"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="125" width="157" height="15" uuid="9d03ba2d-0f4b-4514-beaa-c20475ea6072"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Other Emoluments and Allowances"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="384" y="55" width="157" height="15" uuid="7bd7e3ba-f67a-4515-ab6f-9224af5e262d"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["(Other than Incentive Payments)"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="142" width="157" height="15" uuid="46aeb9e7-581e-404c-af11-f80077d32490"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["All other Allowances paid must be"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="160" width="157" height="15" uuid="af2578c1-3829-4ccb-8d11-ed374d56ac51"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" stated and separately listed)"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="178" width="157" height="15" uuid="a099662f-220e-4ad8-8453-c1a58b700b5c"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Total Income"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="195" width="167" height="15" uuid="4a20f8a5-2606-48cf-a93c-88446722b6f1"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["National Insurance Scheme (NIS)"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="213" width="157" height="15" uuid="53442903-939c-440d-9232-1760fb920e00"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["(Employee Contributions)"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="231" width="157" height="15" uuid="ca9d0845-e43c-4c1b-bf26-c87a5d3c9b7a"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Statutory Deduction"]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="213" width="73" height="15" uuid="ef7723fc-8ab2-40f7-a35e-fc5eee9724b8"/>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{NIS_EMPLOYEE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="231" width="73" height="15" uuid="0de29c2e-f223-4cd7-8856-ec8886eedf4a"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{FREEPAY}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="37" width="73" height="15" uuid="848bfd8c-571d-49fc-8645-ce6dd5a89380"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BENEFIT_TAXABLE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="90" width="73" height="15" uuid="3316ffbf-f10a-4865-802d-984f0e4bb69b"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[0]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="108" width="73" height="15" uuid="d1d95d06-383a-45ad-bc56-a0dd598faa45"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[0]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="125" width="73" height="15" uuid="d7853ef5-0738-4f29-bd69-42c5352107be"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[0]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="142" width="73" height="15" uuid="b42ca466-fc63-43cb-98d4-42065fe6c7e5"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[0]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00" isBlankWhenNull="true">
+					<reportElement x="541" y="20" width="73" height="15" uuid="a4ea6040-7bc1-468e-95d6-c7040d3ed363"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[0]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="374" y="-24" width="1" height="24" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="5ab15661-3b26-4e78-bd6d-fd312224f5e9"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement x="374" y="2" width="1" height="262" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="7c585706-9982-41ca-b448-15b09907245e"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+			<band height="28">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="365" height="20" uuid="fd5bcaac-031f-4022-adcd-bfc334b3908d"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+						<paragraph lineSpacing="AtLeast" lineSpacingSize="1.2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["If your total income from all sources including the above is over "+new DecimalFormat("#,##0.00").format(780000)+ " you are required under penalty to make a return on Form I attached, to the Commissioner of Revenue Authority, Georgetown, on or before 30th April "+$F{RETURN_YEAR}+"."]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="384" y="0" width="368" height="20" uuid="564b04eb-aa57-4dbd-a192-c6568bf96ec7"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+						<paragraph lineSpacing="AtLeast" lineSpacingSize="1.2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["If your total income from all sources including the above is over "+new DecimalFormat("#,##0.00").format(780000)+ " you are required under penalty to make a return on Form I attached, to the Commissioner of Revenue Authority, Georgetown, on or before 30th April "+$F{RETURN_YEAR}+"."]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="374" y="0" width="1" height="28" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="5b85bed7-755e-4d9e-b175-8780c503e706"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+			<band height="10">
+				<textField isStretchWithOverflow="true">
+					<reportElement x="0" y="0" width="365" height="10" uuid="34921144-dddb-4314-bb43-5f9984c4a401"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Attach the original of this notice to your Income Tax return and retain the duplicate for your records."]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement x="384" y="0" width="368" height="10" uuid="4a90e670-5a9e-45a7-8f71-b6eff6ba918f"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Attach the original of this notice to your Income Tax return and retain the duplicate for your records."]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="14">
+				<textField isStretchWithOverflow="true">
+					<reportElement x="0" y="0" width="365" height="10" uuid="142ca322-2885-4b9b-afa2-e149782d7e67"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+						<paragraph lineSpacing="AtLeast" lineSpacingSize="1.2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["If you are not liable to Income Tax you should claim repayment from the Commissioner of Revenue Authority submitting at same time the original of this notice."]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement x="384" y="0" width="368" height="10" uuid="aaed9677-c903-4b74-8017-8fd658e952da"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+						<paragraph lineSpacing="AtLeast" lineSpacingSize="1.2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["If you are not liable to Income Tax you should claim repayment from the Commissioner of Revenue Authority submitting at same time the original of this notice."]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="374" y="4" width="1" height="6" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="9b170e1a-22eb-450f-9c24-36e0d2225fa6"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+			<band/>
+			<band height="32">
+				<textField isBlankWhenNull="true">
+					<reportElement x="600" y="0" width="152" height="32" uuid="c07d7284-57fd-42b3-b0e6-143d05fa5789"/>
+					<box>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8" isBold="false" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[                   "Yours Co-operatively"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="215" y="0" width="152" height="32" uuid="d90941a1-693d-4555-b6d3-89fe2489fbda"/>
+					<box>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8" isBold="false" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[                   "Yours Co-operatively"]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="374" y="-24" width="1" height="10" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="963ef480-2684-45dd-9dd5-130050fc2ce1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement x="374" y="5" width="1" height="27" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="41d6dd97-7d93-48d0-b00e-983de1dbe24f"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+			<band height="78">
+				<textField isBlankWhenNull="true">
+					<reportElement x="41" y="14" width="151" height="10" uuid="bcbdd49b-b776-4ecf-9e4d-8d29bd180bba"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Employee"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="192" y="14" width="53" height="10" uuid="7aa0d8e0-9d52-4dc2-9710-b677de1a5ade"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA["TIN"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="245" y="14" width="53" height="10" uuid="e1dbb201-8ccc-4357-bbfd-c5205d751fc2"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA["NIS No"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="41" y="24" width="151" height="20" uuid="629b0d25-fe9c-48de-add0-f0955c394168"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EMPLOYEE_ADDRESS}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="192" y="24" width="53" height="20" uuid="1ddc9522-8d40-4509-995a-5561f790acd4"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TAX_NO}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="245" y="24" width="53" height="20" uuid="c4e77c46-ba7e-447b-855c-df64afdc7288"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{NIS_NO}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="14" width="40" height="10" uuid="efca11d6-5864-4632-999a-a5e5bff28fdb"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Seq #"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="1" y="24" width="40" height="20" uuid="cae656a5-5720-483b-9c25-ce41fdf6fd32"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Seq}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="286" y="68" width="79" height="10" uuid="7bae0aad-49cf-41b8-ada4-2102b8b6b8b7"/>
+					<box>
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA["IRD Form 7 A"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="681" y="68" width="71" height="10" uuid="3b70aa33-f53b-445a-beb8-0d95aabb478a"/>
+					<box>
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA["IRD Form 7 A"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="628" y="24" width="53" height="20" uuid="cc76f09c-2327-4b9b-a8b4-3153b1f0641f"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{NIS_NO}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="628" y="14" width="53" height="10" uuid="205c432f-a7ec-4e6e-9026-1f94a5e47a9f"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA["NIS No"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="575" y="14" width="53" height="10" uuid="78c5dccf-da9c-440d-a39c-b2fc6fc41888"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA["TIN"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="384" y="24" width="40" height="20" uuid="c776f0bc-644e-4da2-b85c-0c8250f5fdd7"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Seq}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="384" y="14" width="40" height="10" uuid="d75b24e3-86b6-44d7-8b10-118ba79952b9"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Seq #"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="424" y="24" width="151" height="20" uuid="2c43a229-8976-4a66-837e-ab7ea4ccd761"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EMPLOYEE_ADDRESS}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="575" y="24" width="53" height="20" uuid="4c09154d-af9a-4b07-9e0a-1f437adedac3"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="8"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TAX_NO}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="424" y="14" width="151" height="10" uuid="b5e785c0-99b5-44c5-8084-5048634dae63"/>
+					<box>
+						<pen lineWidth="0.75"/>
+						<topPen lineWidth="0.75"/>
+						<leftPen lineWidth="0.75"/>
+						<bottomPen lineWidth="0.75"/>
+						<rightPen lineWidth="0.75"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="5" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Employee"]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="374" y="0" width="1" height="78" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="69a3e2f8-6069-48e1-a29c-d61c72aa0603"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch">
+			<printWhenExpression><![CDATA["Y"=="N" ? false:false]]></printWhenExpression>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Paysliptac" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f0711479-d978-4a45-8e85-91c1a07ea501">
+	<property name="ireport.zoom" value="1.331000000000001"/>
+	<property name="ireport.x" value="620"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/PeoplePay/02_PAYROLL/PaySlipTAC"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Standard Payslip"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="ireport.jasperserver.report.resource" value="/PeoplePay/02_PAYROLL/Standard_PaySlip_TAC_files/Payslip_jrxml"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Income" uuid="3f763208-05f7-4ca6-b920-c5387cdc40d3">
+		<parameter name="P_PAY_SLIP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT O.PAY_SLIPNO,  ROUND(O.INCOME_AMOUNT,2) INCOME_AMOUNT, INCOME_AMOUNT_YTD,
+    (CASE WHEN O.INCOME_CODE IN ('OT1','OT') THEN
+        ic.Description||'('||quantity||' HR) ' ||'at (Rate:'||REPLACE(TO_CHAR(o.rate,'$999,999'),' ','')||')'
+        ELSE ic.Description END)Description, o.Income_code, O.Emp_id
+    FROM   PA_PMG_PAYROLLINCOME O INNER JOIN PA_PCF_INCOMECODE IC ON O.INCOME_CODE = IC.INCOME_CODE
+    where	pay_slipno=$P{P_PAY_SLIP_ID}
+and IC.org_id=$P{P_ORG_ID}
+	and Income_Amount>0]]>
+		</queryString>
+		<field name="PAY_SLIPNO" class="java.math.BigDecimal"/>
+		<field name="INCOME_AMOUNT" class="java.math.BigDecimal"/>
+		<field name="INCOME_AMOUNT_YTD" class="java.math.BigDecimal"/>
+		<field name="DESCRIPTION" class="java.lang.String"/>
+		<field name="INCOME_CODE" class="java.lang.String"/>
+		<field name="EMP_ID" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="Deduction" uuid="05a4cb69-8b68-495e-aa08-d2cde97def3d">
+		<parameter name="P_PAY_SLIP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select description,
+pd.amount_deducted amount_deducted,
+pd.amount_deducted_ytd
+	from PA_PMG_PAYROLLDEDUCTION pd join PA_PCF_ADMINDEDUCTION adm ON adm.id = pd.adm_deduction_id
+	join PA_PCF_DEDUCTIONCODE ded ON adm.expense_id = ded.id
+	where
+	 (upper(ded.Who_Pays) ='EMPLOYEE' or upper(adm.Deduction_Type)='EMPLOYEE')
+	and amount_deducted>0
+and ded.org_id=$P{P_ORG_ID}
+        and pd.pay_slipno=$P{P_PAY_SLIP_ID}]]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String"/>
+		<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal"/>
+		<field name="AMOUNT_DEDUCTED_YTD" class="java.math.BigDecimal"/>
+	</subDataset>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+pa.org_id,
+pa.pay_batch_id,
+to_char(date_employed,'yyyy-mm-dd') doe,
+pa.id pay_slip_no,pa.surname_hist,pa.first_name_hist,pa.salary_id,pa.period_start,pa.period_end,
+pa.payroll_effective,pa.department_name_hist,pa.organisation_name,initcap(PA.PAYMENT_TYPE_HIST)PAYMENT_TYPE_HIST,
+pa.basic_personal_rate,
+pa.basic_personal_rate_ytd,
+pa.org_id,ep.emp_company_no emp_id,pa.id pay_slip,
+NVL(PA.SURNAME_HIST,'')||', '||NVL(PA.FIRST_NAME_HIST,'')||' '||NVL(R.MIDDLE_NAME,'') EMPLOYEE_NAME,
+nvl(v.unit_name,'Unknown') WORK_LOCATION,
+(
+    SELECT POSITION_NAME
+    FROM VW_ORG_WORKLOCATION_POSITION P
+    WHERE P.ID=pa.POSITION_LOCATION_ID
+) position_name_hist,pa.surname_hist,pa.first_name_hist,
+pa.total_deduction,pa.gross_taxable+pa.gross_nontaxable  AS gross,
+pa.time_tax_earnings,pa.nis_employee,pa.tax_amount,pa.net_pay,
+pa.gross_taxable_ytd+pa.gross_nontaxable_ytd gross_ytd,
+pa.nis_employee_ytd,
+time_tax_earnings_ytd,
+pa.net_pay_ytd,
+pa.total_deduction_ytd,
+pa.tax_amount_ytd,
+(case when manager_approved_by is null then 'N' else 'Y' end) approved
+from pa_pmg_payrolldtl pa
+join PA_PMG_PAYROLLHD ph on pa.pay_batch_id=ph.id
+join HR_RCM_EMPLOYEE ep on pa.emp_id=ep.id
+join HR_RCM_INDIVIDUAL r on ep.ind_id=r.id
+join hr_hcf_organisation ho
+ON PA.ORG_ID=HO.ID
+left outer join vw_organisation_structure v on pa.orgdtl_id=v.id
+WHERE PAY_BATCH_ID=$P{ID}
+order by nvl(v.unit_name,'Unknown'),pa.surname_hist,pa.first_name_hist]]>
+	</queryString>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="PAY_BATCH_ID" class="java.math.BigDecimal"/>
+	<field name="DOE" class="java.lang.String"/>
+	<field name="PAY_SLIP_NO" class="java.math.BigDecimal"/>
+	<field name="SURNAME_HIST" class="java.lang.String"/>
+	<field name="FIRST_NAME_HIST" class="java.lang.String"/>
+	<field name="SALARY_ID" class="java.math.BigDecimal"/>
+	<field name="PERIOD_START" class="java.sql.Timestamp"/>
+	<field name="PERIOD_END" class="java.sql.Timestamp"/>
+	<field name="PAYROLL_EFFECTIVE" class="java.sql.Timestamp"/>
+	<field name="DEPARTMENT_NAME_HIST" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="PAYMENT_TYPE_HIST" class="java.lang.String"/>
+	<field name="BASIC_PERSONAL_RATE" class="java.math.BigDecimal"/>
+	<field name="BASIC_PERSONAL_RATE_YTD" class="java.math.BigDecimal"/>
+	<field name="EMP_ID" class="java.lang.String"/>
+	<field name="PAY_SLIP" class="java.math.BigDecimal"/>
+	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="WORK_LOCATION" class="java.lang.String"/>
+	<field name="POSITION_NAME_HIST" class="java.lang.String"/>
+	<field name="TOTAL_DEDUCTION" class="java.math.BigDecimal"/>
+	<field name="GROSS" class="java.math.BigDecimal"/>
+	<field name="TIME_TAX_EARNINGS" class="java.math.BigDecimal"/>
+	<field name="NIS_EMPLOYEE" class="java.math.BigDecimal"/>
+	<field name="TAX_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="NET_PAY" class="java.math.BigDecimal"/>
+	<field name="GROSS_YTD" class="java.math.BigDecimal"/>
+	<field name="NIS_EMPLOYEE_YTD" class="java.math.BigDecimal"/>
+	<field name="TIME_TAX_EARNINGS_YTD" class="java.math.BigDecimal"/>
+	<field name="NET_PAY_YTD" class="java.math.BigDecimal"/>
+	<field name="TOTAL_DEDUCTION_YTD" class="java.math.BigDecimal"/>
+	<field name="TAX_AMOUNT_YTD" class="java.math.BigDecimal"/>
+	<field name="APPROVED" class="java.lang.String"/>
+	<sortField name="WORK_LOCATION"/>
+	<group name="Department">
+		<groupExpression><![CDATA[$F{WORK_LOCATION}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="968" height="15" uuid="52c22eb9-a715-488a-b63a-d7d6cb985717"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{WORK_LOCATION}.toUpperCase()]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="Pay_Slip" keepTogether="true">
+		<groupExpression><![CDATA[$F{PAY_SLIP_NO}]]></groupExpression>
+		<groupHeader>
+			<band height="42">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="967" height="20" uuid="40f60326-c08f-4f5d-87d9-e8588fdbc7cb"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="26" width="193" height="15" uuid="bdcef565-ff4d-4ab3-ab93-d1ba85ffdc30"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Payslip# '+$F{PAY_SLIP_NO}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="714" y="26" width="253" height="15" uuid="66af4999-2b78-4b0a-abaf-def1d9ae0e5f"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Payroll Period: '+$F{PAYMENT_TYPE_HIST}+' '+new SimpleDateFormat("MMM dd yyyy").format($F{PERIOD_END})]]></textFieldExpression>
+				</textField>
+				<image scaleImage="FillFrame">
+					<reportElement x="345" y="22" width="300" height="18" uuid="0883ab12-297b-40d6-b5ae-f492030d5bbb">
+						<printWhenExpression><![CDATA[$F{APPROVED}=="Y" ? false:true]]></printWhenExpression>
+					</reportElement>
+					<imageExpression><![CDATA["repo:/images/NOT_APPROVED"]]></imageExpression>
+				</image>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="5">
+				<line>
+					<reportElement x="0" y="2" width="968" height="1" uuid="831c3930-e583-46f8-9133-0eb8969bce25"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#CCCCCC"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Prevent">
+			<staticText>
+				<reportElement x="0" y="0" width="44" height="15" uuid="6a01d507-7e65-449b-ae34-c7a20bce9fd9"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Emp]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="44" y="0" width="138" height="15" uuid="9ef8d937-4faa-49a2-a073-08351f442848"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Name"+" D.O.E "+$F{DOE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="182" y="0" width="81" height="15" uuid="9dd8358f-059e-460d-9f6d-9882261e76ff"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Basic]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="263" y="0" width="87" height="15" uuid="014b7ce9-dbb1-4dcb-afb7-4c085fae6206"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Other Income]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="350" y="0" width="47" height="15" uuid="27c4b692-51c8-45da-aec9-634941e6cb74"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Curr]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="397" y="0" width="61" height="15" uuid="7371c0bb-6cbc-45f4-aa5a-5dbfc447003b"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[YTD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="458" y="0" width="81" height="15" uuid="245a9e5d-59dc-489b-bc84-d276fa4d73af"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Gross Pay]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="538" y="0" width="101" height="15" uuid="b114667d-dc22-4dab-af61-b3632f940280"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Deductions]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="639" y="0" width="54" height="15" uuid="f0d414b4-359c-4b2c-ba6f-07406b4e87a3"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Curr]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="693" y="0" width="38" height="15" uuid="5fea8fa5-bad1-42d1-b106-2d574cbc5c24"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[YTD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="731" y="0" width="52" height="15" uuid="fb54e54b-0f4c-4554-bab8-6f23030d19c8"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[NIS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="783" y="0" width="62" height="15" uuid="ddabc4b9-035c-4bd1-87f0-5f8a4e7ba07e"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[PAYE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="845" y="0" width="58" height="15" uuid="190e4d78-ce2c-4754-8c56-1a1414057ff1"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Total Ded.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="903" y="0" width="64" height="15" uuid="42e44831-bd91-4b74-8ed5-72b0433ac011"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Net Pay]]></text>
+			</staticText>
+			<textField>
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="15" width="44" height="15" uuid="103cd723-dbcf-4d56-9e55-060103efa459"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Top">
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_ID}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="44" y="15" width="138" height="15" uuid="88c9cc86-77e5-43a2-9840-a3ff7f5e5cc0"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="458" y="15" width="81" height="15" uuid="b63ec9c3-57fa-490e-8d0f-dec4f32e6982"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GROSS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="182" y="15" width="81" height="15" uuid="4bda8a50-a882-4abd-b8a9-ad67f36922f7"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BASIC_PERSONAL_RATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="903" y="15" width="64" height="15" uuid="ea211702-1993-4d2c-8780-96ffa5427aa3"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NET_PAY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="845" y="15" width="58" height="15" uuid="23546b0e-fb72-4752-bed4-425dea4b7988"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="783" y="15" width="62" height="15" uuid="018aa68b-8007-4232-b554-997e3d9c148a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TAX_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="731" y="15" width="52" height="15" uuid="c8041f21-5072-482f-8d4f-078d7c31ddfc"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NIS_EMPLOYEE}]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement key="table 1" stretchType="RelativeToBandHeight" x="263" y="15" width="195" height="15" isPrintWhenDetailOverflows="true" uuid="fdd6209e-7823-4540-a3f5-41a3e6362cb4"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Income" uuid="94fc52bd-873e-4969-9708-cc5718e1b0bf">
+						<datasetParameter name="P_PAY_SLIP_ID">
+							<datasetParameterExpression><![CDATA[$F{PAY_SLIP_NO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_ORG_ID">
+							<datasetParameterExpression><![CDATA[$F{ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="86" uuid="e61d8cd4-8587-415f-a9e0-59f3f69d7914">
+						<jr:detailCell height="15" rowSpan="1">
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="86" height="15" uuid="8f1e674d-6e58-4864-a522-7db673251d89"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Arial" size="9"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="48" uuid="5d0cc419-82dc-4393-a050-3d5bae484051">
+						<jr:detailCell height="15" rowSpan="1">
+							<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="48" height="15" uuid="bd41b2b0-1247-4721-aa30-9ad6ce18be9a"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial" size="9"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{INCOME_AMOUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="d180d750-bf55-4f21-a551-de3e437d8765">
+						<jr:detailCell height="15" rowSpan="1">
+							<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="61" height="15" uuid="40cbdbbf-d366-463b-a1a5-28385ce38e9b"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial" size="9"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{INCOME_AMOUNT_YTD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<componentElement>
+				<reportElement key="table 1" stretchType="RelativeToBandHeight" x="539" y="15" width="192" height="15" isPrintWhenDetailOverflows="true" uuid="fdd6209e-7823-4540-a3f5-41a3e6362cb4"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Deduction" uuid="08fbc6fa-376b-497d-b3f4-ca32cffab15c">
+						<datasetParameter name="P_PAY_SLIP_ID">
+							<datasetParameterExpression><![CDATA[$F{PAY_SLIP_NO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="P_ORG_ID">
+							<datasetParameterExpression><![CDATA[$F{ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="86" uuid="e61d8cd4-8587-415f-a9e0-59f3f69d7914">
+						<jr:detailCell height="15" rowSpan="1">
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="86" height="15" uuid="8f1e674d-6e58-4864-a522-7db673251d89"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Arial" size="9"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="48" uuid="5d0cc419-82dc-4393-a050-3d5bae484051">
+						<jr:detailCell height="15" rowSpan="1">
+							<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="47" height="15" uuid="bd41b2b0-1247-4721-aa30-9ad6ce18be9a"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial" size="9"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="d180d750-bf55-4f21-a551-de3e437d8765">
+						<jr:detailCell height="15" rowSpan="1">
+							<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="58" height="15" uuid="40cbdbbf-d366-463b-a1a5-28385ce38e9b"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial" size="9"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED_YTD}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="21">
+			<frame>
+				<reportElement x="0" y="0" width="967" height="20" uuid="3c6d28c3-1e05-47bc-82ea-f3088b54a54f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="458" y="0" width="81" height="20" uuid="e8abf864-611e-4e9c-a09b-4d2d7a7b3fe0"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{GROSS_YTD}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="903" y="0" width="64" height="20" uuid="8b0dad8a-64d9-4152-aa7c-c842c66416bc"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{NET_PAY_YTD}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="845" y="0" width="58" height="20" uuid="7edc8710-5fe8-4ed6-8ce9-cb99291b0755"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TOTAL_DEDUCTION_YTD}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="783" y="0" width="62" height="20" uuid="3f41d224-01c1-4059-93c5-83f04e0cd4e3"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TAX_AMOUNT_YTD}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="731" y="0" width="52" height="20" uuid="0a57445a-efeb-4c68-b03d-af3a80bb2f52"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{NIS_EMPLOYEE_YTD}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="182" y="0" width="81" height="20" uuid="f5daa3db-8ed1-40a8-b457-1c5ac1dfb822"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BASIC_PERSONAL_RATE_YTD}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="151" y="0" width="31" height="20" uuid="96c1e16c-6d9f-445d-b507-607d86f517a8"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[YTD]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

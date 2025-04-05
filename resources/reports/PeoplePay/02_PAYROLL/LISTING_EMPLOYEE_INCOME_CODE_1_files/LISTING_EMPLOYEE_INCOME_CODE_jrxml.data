@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Employee with Position and Payment Data" language="groovy" pageWidth="612" pageHeight="792" whenNoDataType="NoDataSection" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="84eefb4c-b08e-4fe4-a91a-83b326401d1e">
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/02_PAYROLL/LISTING_EMPLOYEE_INCOME_CODE_1"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="INCOME_CODE" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+EMP_COMPANY_NO,
+v.work_location,
+v.Position_name||' at '||v.work_location as POSITION_NAME_HIST,
+ SURNAME_HIST,FIRST_NAME_HIST
+, pd.emp_id,
+Period_Start start_date,
+INCOME_AMOUNT
+,INCOME_AMOUNT_YTD,
+Time_Tax_Earnings Personal_Rate,
+nvl(Pd.Payment_Type_Hist,'') Payment_Type,
+W.DESCRIPTION Income_code,
+'Detail Income Listing '||Description Description,Nvl(Employment_Class,'') Employment_Class,Nvl(Pd.Department_Name_Hist,'') Department_Name_Hist,
+nvl(M.ORGANISATION_NAME,'') ORGANISATION_NAME,M.TELNUM,M.FAXNUM,M.ADDRESS,
+k.ACTUAL_PHYSICAL_LOCAL,
+(SELECT EARNING_NAME
+FROM VW_EARNING_PERIOD_NAME V
+where earning_id=$P{EARNINGS_PERIOD_ID}) Payroll_name
+FROM PA_PMG_PAYROLLDTL PD JOIN PA_PMG_PAYROLLINCOME PID ON PD.ID=PID.PAY_SLIPNO
+JOIN HR_RCM_EMPLOYEE K ON K.ID=PD.EMP_ID
+join hr_hcf_organisation m on m.Id=pd.org_Id
+JOIN PA_PCF_INCOMECODE W ON W.INCOME_CODE=PID.INCOME_CODE
+join vw_org_worklocation_position v on pd.position_location_id=v.id
+WHERE PD.EARNINGS_PERIOD_ID =$P{EARNINGS_PERIOD_ID}
+--AND PID.INCOME_CODE=P_INCOME_TYPE
+AND PID.INCOME_CODE=CASE WHEN 'ALL' =upper($P{INCOME_CODE})  THEN PID.INCOME_CODE ELSE to_nchar(upper($P{INCOME_CODE})) END
+AND PID.INCOME_AMOUNT>0
+order by employment_class,department_name_hist,v.work_location,POSITION_NAME_HIST]]>
+	</queryString>
+	<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+	<field name="WORK_LOCATION" class="java.lang.String"/>
+	<field name="POSITION_NAME_HIST" class="java.lang.String"/>
+	<field name="SURNAME_HIST" class="java.lang.String"/>
+	<field name="FIRST_NAME_HIST" class="java.lang.String"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="START_DATE" class="java.sql.Timestamp"/>
+	<field name="INCOME_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="INCOME_AMOUNT_YTD" class="java.math.BigDecimal"/>
+	<field name="PERSONAL_RATE" class="java.math.BigDecimal"/>
+	<field name="PAYMENT_TYPE" class="java.lang.String"/>
+	<field name="INCOME_CODE" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="EMPLOYMENT_CLASS" class="java.lang.String"/>
+	<field name="DEPARTMENT_NAME_HIST" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="ACTUAL_PHYSICAL_LOCAL" class="java.lang.String"/>
+	<field name="PAYROLL_NAME" class="java.lang.String"/>
+	<variable name="RECORD_COUNT" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="INCOME_AMOUNT_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{INCOME_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="INCOME_AMOUNT_YTD_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{INCOME_AMOUNT_YTD}]]></variableExpression>
+	</variable>
+	<variable name="INCOME_AMOUNT_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Income Code" calculation="Sum">
+		<variableExpression><![CDATA[$F{INCOME_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="INCOME_AMOUNT_YTD_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Income Code" calculation="Sum">
+		<variableExpression><![CDATA[$F{INCOME_AMOUNT_YTD}]]></variableExpression>
+	</variable>
+	<variable name="INCOME_AMOUNT_3" class="java.math.BigDecimal" resetType="Group" resetGroup="Position" calculation="Sum">
+		<variableExpression><![CDATA[$F{INCOME_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="INCOME_AMOUNT_YTD_3" class="java.math.BigDecimal" resetType="Group" resetGroup="Position" calculation="Sum">
+		<variableExpression><![CDATA[$F{INCOME_AMOUNT_YTD}]]></variableExpression>
+	</variable>
+	<group name="Company" isStartNewPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{ORGANISATION_NAME}]]></groupExpression>
+	</group>
+	<group name="Employment Class" keepTogether="true">
+		<groupExpression><![CDATA[$F{EMPLOYMENT_CLASS}]]></groupExpression>
+	</group>
+	<group name="Income Code">
+		<groupExpression><![CDATA[$F{INCOME_CODE}]]></groupExpression>
+	</group>
+	<group name="Position" keepTogether="true">
+		<groupExpression><![CDATA[$F{POSITION_NAME_HIST}]]></groupExpression>
+	</group>
+	<group name="Department">
+		<groupExpression><![CDATA[$F{DEPARTMENT_NAME_HIST}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="56" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="56" uuid="6a172a54-d6d3-44e0-a34d-7b29d24bb4a5"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[1626.0]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="31" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="572" height="15" uuid="383b54bf-8d7e-4df1-a5e1-f30721fe01c0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="false" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Payroll Processing "+$F{PAYROLL_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="14" width="572" height="15" uuid="39d08744-e5ba-4982-b66b-71e2d28a4e77"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{INCOME_CODE}=="ALL" ? "All Income Code":$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="24" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="9c4ea5ee-1ad3-4587-abc3-cf9016f1e465"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="24" y="0" width="48" height="15" uuid="661d469c-97df-4c7a-84b3-951d7f54c654"/>
+				<text><![CDATA[Emp#]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="229" y="0" width="86" height="15" uuid="f43102b0-a13d-4d93-89cb-603feae627a3"/>
+				<text><![CDATA[Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="71" y="0" width="74" height="15" uuid="611f3f99-9aee-4168-b669-f8d22e1bbd73"/>
+				<text><![CDATA[Surname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="144" y="0" width="85" height="15" uuid="63af2800-0568-435b-a0a0-7a44b7d9f422"/>
+				<text><![CDATA[First Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="315" y="0" width="64" height="15" uuid="94b3baf3-10a9-4cd6-8d2d-6f7bf72dd3fb"/>
+				<text><![CDATA[Basic]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="67" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="###0;###0-">
+				<reportElement x="0" y="0" width="24" height="15" uuid="ca05da87-986e-48f7-8890-258ae49de5ba"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{RECORD_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="24" y="0" width="48" height="15" uuid="411e7d36-62d4-44bc-a7cd-753379b5215c"/>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="229" y="0" width="86" height="15" uuid="909a8a7c-98a1-485a-b0dc-0f0a60d374ca"/>
+				<textFieldExpression><![CDATA[$F{ACTUAL_PHYSICAL_LOCAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="71" y="0" width="74" height="15" uuid="f3790664-8bf9-436e-8558-0c8c60f0d7f3"/>
+				<textFieldExpression><![CDATA[$F{SURNAME_HIST}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="145" y="0" width="84" height="15" uuid="593f7ab6-4ade-4a32-8176-975a8fba6038"/>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME_HIST}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="315" y="0" width="64" height="15" uuid="0c34d90d-9c1a-4700-8aa1-37217d0c7f3b"/>
+				<textFieldExpression><![CDATA[$F{PERSONAL_RATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="379" y="0" width="58" height="15" uuid="baa251ab-0f2a-4c39-a97a-f84bd15a6203"/>
+				<textFieldExpression><![CDATA[$F{INCOME_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="379" y="15" width="58" height="14" uuid="b6b1fd9d-2f5d-45b7-9b83-b4c59b77a838"/>
+				<textFieldExpression><![CDATA[$F{INCOME_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="47" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="2" width="572" height="19" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="22" width="572" height="18" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="458" y="6" width="72" height="15" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="5" y="6" width="162" height="15" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="534" y="6" width="35" height="15" uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="17" splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="50">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="572" height="20" uuid="ce62c93c-4cf2-4adc-8546-b953fbf94d2e"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Report Returned with No Data"]]></textFieldExpression>
+			</textField>
+		</band>
+	</noData>
+</jasperReport>

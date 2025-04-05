@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Brain Street Job Letter2" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="27fdbe39-0dbe-405b-b104-03661f39a9a0">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/BS_JOB_LETT2"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    TO_CHAR(report_date,'Mon dd,yyyy') AS report_date,
+    o.organisation_name AS send_to,
+    o.address AS send_to_add,
+    address_to,
+    'TO WHOM IT MAY CONCERN',
+        CASE
+            WHEN r.sex_code = 'M' THEN 'Mr.'
+            WHEN r.sex_code = 'F' THEN 'Ms.'
+        END
+     || ' '
+     || initcap(r.first_name)
+     || ' '
+     || initcap(r.surname) AS emp_name,
+    ( apps.pkg_global_fnts.fn_address( 'HOME', r.id, 'LOT', SYSDATE )
+     || ' '
+     || apps.pkg_global_fnts.fn_address( 'HOME', r.id,'STREET', SYSDATE
+    )
+     || ' '
+     || DECODE(apps.pkg_global_fnts.fn_address('HOME',  r.id, 'VILLAGE_WARD',SYSDATE),
+        NULL,
+        ' ',
+        apps.pkg_global_fnts.fn_address( 'HOME', r.id,'VILLAGE_WARD',SYSDATE) || ' '
+    )
+     || nvl(apps.pkg_global_fnts.fn_address(  'HOME', r.id, 'COUNTY',SYSDATE ),
+        ' '
+    ) ) AS address,
+    t.organisation_name AS org_name,
+    TO_CHAR(date_employed,'Month dd,yyyy') date_employed,
+    t.position_name AS position,
+    apps.pkg_global_fnts.fn_num_towords(apps.pkg_global_fnts.fn_personalrate(e.id,SYSDATE) )
+     || ' ('|| TO_CHAR(apps.pkg_global_fnts.fn_personalrate(e.id,SYSDATE),'$999,999.99') AS salary_desc,
+        CASE
+            WHEN r.sex_code = 'M' THEN 'Mr.'
+            WHEN r.sex_code = 'F' THEN 'Ms.'
+        END
+     || ' '
+     || r.first_name
+     || ' '
+     || r.surname AS third_line,
+    'For and on Behalf of' AS for2,
+    '' || t.organisation_name AS org,
+        CASE
+            WHEN r.sex_code = 'M' THEN 'Mr.'
+            WHEN r.sex_code = 'F' THEN 'Ms.'
+        END
+     || ' '
+     || (select INITCAP(employee_name) from apps.vw_position_location_v3 t where t.emp_id = j.signiture_id) AS signature,
+    (select position_name from apps.vw_position_location_v3 t WHERE t.emp_id = j.signiture_id)  position_of_approver,
+    ind_id,
+    j.emp_id,
+    CASE WHEN r.sex_code = 'M' THEN 'Mr.' WHEN r.sex_code = 'F' THEN 'Ms.' END
+    || ' ' || CASE WHEN surname LIKE '%s' THEN  initcap(surname)|| '''' ELSE  initcap(surname)|| '''s' END mrs_surname,
+    t.location,
+    TO_CHAR(apps.fn_getallowance(e.id,SYSDATE),'$999,999.99') AS allowance,
+    apps.pkg_global_fnts.fn_num_towords(quantity)||' ('||quantity||') ' AS quantity,
+    TO_CHAR(apps.pkg_global_fnts.fn_personalrate(e.id,SYSDATE),'$999,999.99') AS salary,
+    TO_CHAR(round(apps.pkg_global_fnts.fn_personalrate(e.id,SYSDATE) + apps.fn_getallowance(e.id,SYSDATE),0),'$999,999,999.99') total,
+    nvl((   SELECT x.AMOUNT
+        FROM apps.HR_RCM_EMPENTITLE x
+        join apps.pa_pcf_incomecode y on y.id=x.income_code_id
+        where x.emp_id = e.id and x.start_date < sysdate and x.end_date is null
+        and upper(y.income_code)='LEAVEPASS'),0) leavepass_amt,
+        leave_type_id,
+         CASE
+            WHEN r.sex_code = 'M' THEN 'He'
+            WHEN r.sex_code = 'F' THEN 'She'
+        END saluation,CASE
+                 WHEN r.sex_code = 'M'  THEN 'His'
+                 WHEN r.sex_code = 'F' THEN 'Her'
+               END as HIS_HER,(select o.address from hr_hcf_organisation o where o.id = 16640) as address2,
+(select o.telnum from hr_hcf_organisation o where o.id = 16640) as telnum
+
+FROM
+    apps.hr_rcm_employee e
+    JOIN apps.hr_rcm_individual r ON e.ind_id = r.id
+    JOIN apps.vw_position_location_v3 t ON t.emp_id = e.id
+    JOIN apps.jobletterreport j ON e.id = j.emp_id
+    JOIN apps.hr_rcm_empleaveentitle ele ON ele.emp_id = e.id
+    CROSS JOIN apps.hr_hcf_organisation o
+WHERE o.id =$P{ORG_ID}  and j.id =$P{ID} and UPPER(APPS.pkg_global_fnts.get_lookup_col(leave_type_id,'value_description')) = UPPER('ANNUAL LEAVE') OR UPPER(APPS.pkg_global_fnts.get_lookup_col(leave_type_id,'value_description')) = UPPER('VACATION LEAVE')]]>
+	</queryString>
+	<field name="REPORT_DATE" class="java.lang.String"/>
+	<field name="SEND_TO" class="java.lang.String"/>
+	<field name="SEND_TO_ADD" class="java.lang.String"/>
+	<field name="ADDRESS_TO" class="java.lang.String"/>
+	<field name="&apos;TOWHOMITMAYCONCERN&apos;" class="java.lang.String"/>
+	<field name="EMP_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="ORG_NAME" class="java.lang.String"/>
+	<field name="DATE_EMPLOYED" class="java.lang.String"/>
+	<field name="POSITION" class="java.lang.String"/>
+	<field name="SALARY_DESC" class="java.lang.String"/>
+	<field name="THIRD_LINE" class="java.lang.String"/>
+	<field name="FOR2" class="java.lang.String"/>
+	<field name="ORG" class="java.lang.String"/>
+	<field name="SIGNATURE" class="java.lang.String"/>
+	<field name="POSITION_OF_APPROVER" class="java.lang.String"/>
+	<field name="IND_ID" class="java.math.BigDecimal"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="MRS_SURNAME" class="java.lang.String"/>
+	<field name="LOCATION" class="java.lang.String"/>
+	<field name="ALLOWANCE" class="java.lang.String"/>
+	<field name="QUANTITY" class="java.lang.String"/>
+	<field name="SALARY" class="java.lang.String"/>
+	<field name="TOTAL" class="java.lang.String"/>
+	<field name="LEAVEPASS_AMT" class="java.math.BigDecimal"/>
+	<field name="LEAVE_TYPE_ID" class="java.lang.String"/>
+	<field name="SALUATION" class="java.lang.String"/>
+	<field name="HIS_HER" class="java.lang.String"/>
+	<field name="ADDRESS2" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="92" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="555" height="92" uuid="704a074a-7df5-4692-91b8-906055ec4de6"/>
+				<imageExpression><![CDATA["repo:BSGPhoto.png"]]></imageExpression>
+			</image>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="305" splitType="Stretch">
+			<staticText>
+				<reportElement x="26" y="40" width="482" height="20" uuid="50802380-fa96-4055-8caa-558b7007ffde"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[To Whom It May Concern]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="81" width="482" height="20" uuid="8a1396f8-b047-47aa-80b2-66327d85f22f"/>
+				<text><![CDATA[Dear Sir/Madam,]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="26" y="101" width="482" height="50" uuid="ac9ffea4-89a4-4f1f-a11f-7257ec286d45"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA["This is the advise that "+$F{EMP_NAME}+" of "+$F{ADDRESS}+ " has been employeed with "+$F{ORG_NAME}+" as an "+$F{POSITION}+" since "+$F{DATE_EMPLOYED}+". "+$F{HIS_HER}+" salary is G"+$F{SALARY_DESC}+" per month."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="26" y="214" width="482" height="20" uuid="6b34c11f-4c87-4588-8809-48b9918c839d"/>
+				<textFieldExpression><![CDATA[$F{SIGNATURE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="26" y="171" width="482" height="23" uuid="b66c017d-a377-4a3c-8659-6bc7d369911a"/>
+				<text><![CDATA[If there are any questions, please do not hesitate to contact me.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="194" width="482" height="20" uuid="13ef1182-e68e-480b-997c-1154cbdd2fa3"/>
+				<text><![CDATA[Best regards,]]></text>
+			</staticText>
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement x="26" y="151" width="482" height="20" uuid="5e02a822-a360-4a43-a8c2-aec5a69a91ed"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="26" y="234" width="482" height="20" uuid="95b1abf4-85c9-423d-8ea6-d9f7993fe778"/>
+				<textFieldExpression><![CDATA[$F{POSITION_OF_APPROVER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement x="26" y="20" width="482" height="20" uuid="9277cc98-4cf4-4d3f-92f2-4974928664dc"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="84">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="12" y="19" width="532" height="27" uuid="e879a528-8208-4681-92aa-7c10747fff98"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{ADDRESS2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="46" width="555" height="20" uuid="bdd4e175-67a8-4f3e-bb2f-6c397d07ff39"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{TELNUM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

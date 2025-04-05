@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of NIS Deduction" language="groovy" pageWidth="612" pageHeight="792" whenNoDataType="NoDataSection" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0dfae0ff-43d5-4ed6-ba60-89c704818afd">
+	<property name="ireport.zoom" value="1.6105100000000014"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/02_PAYROLL/NIS_BREAKDOWN"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="Organisation" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Year" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Month" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="OPTION" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from
+(
+SELECT
+TO_CHAR(TO_DATE(to_char(pa.period_start,'MM'),'MM'),'MONTH') Month_Name,
+PA.EMP_ID,PA.SURNAME_HIST,PA.FIRST_NAME_HIST,
+case when sum(pa.gross_nis) > 50000 then
+'Over $50,000'
+else 'Under $50,00' end Age,
+ep.employment_class_id,
+CASE WHEN  PKG_GLOBAL_FNTS.FN_CALCAGE(DOB, pa.period_end) BETWEEN 16 AND 59 THEN 'Between 16 and 59'
+WHEN PKG_GLOBAL_FNTS.FN_CALCAGE(DOB, pa.period_end)>59 THEN 'Over 60'
+when PKG_GLOBAL_FNTS.FN_CALCAGE(DOB, pa.period_end)<16 then 'Below 16 ' end age_second,
+upper(pkg_global_fnts.fn_getCurNISTAXNO(em.ind_id,'NIS NUMBER',pa.period_start)) NIS_NO,
+sum(pa.gross_nis) gross_nis
+,(sum(pa.gross_taxable)+sum(pa.gross_nontaxable)) Actual_Earnings,
+sum(pa.nis_employer) nis_employer,sum(pa.nis_employee)nis_employee,
+sum(PA.NIS_EMPLOYEE)+ sum(PA.NIS_EMPLOYER) Total_nis
+from pa_pmg_payrolldtl pa
+join pa_pcf_earningperiod ep on PA.EARNINGS_PERIOD_ID=ep.id
+JOIN VW_EMPLOYEE EM ON PA.EMP_ID=EM.ID
+join hr_rcm_individual a on EM.IND_ID=a.id
+WHERE
+PA.NIS_EMPLOYEE + PA.NIS_EMPLOYER > 0
+
+and to_char(pa.period_start,'YYYY')=$P{Year}
+and pa.org_id=$P{Organisation}
+and to_char(pa.period_start,'MM')=$P{Month}
+GROUP BY TO_CHAR(TO_DATE(to_char(pa.period_start,'MM'),'MM'),'MONTH'),ep.employment_class_id,PA.EMP_ID, PA.SURNAME_HIST, PA.FIRST_NAME_HIST, PKG_GLOBAL_FNTS.FN_CALCAGE(DOB, pa.period_end), UPPER(PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(EM.IND_ID,'NIS NUMBER',PA.PERIOD_START))
+ORDER BY PA.SURNAME_HIST,PA.FIRST_NAME_HIST ) b
+where (case when gross_nis > 50000 then
+'O'
+else 'U' end)=$P{OPTION} and employment_class_id !=2325]]>
+	</queryString>
+	<field name="MONTH_NAME" class="java.lang.String"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="SURNAME_HIST" class="java.lang.String"/>
+	<field name="FIRST_NAME_HIST" class="java.lang.String"/>
+	<field name="AGE" class="java.lang.String"/>
+	<field name="EMPLOYMENT_CLASS_ID" class="java.math.BigDecimal"/>
+	<field name="AGE_SECOND" class="java.lang.String"/>
+	<field name="NIS_NO" class="java.lang.String"/>
+	<field name="GROSS_NIS" class="java.math.BigDecimal"/>
+	<field name="ACTUAL_EARNINGS" class="java.math.BigDecimal"/>
+	<field name="NIS_EMPLOYER" class="java.math.BigDecimal"/>
+	<field name="NIS_EMPLOYEE" class="java.math.BigDecimal"/>
+	<field name="TOTAL_NIS" class="java.math.BigDecimal"/>
+	<sortField name="AGE"/>
+	<sortField name="AGE_SECOND"/>
+	<variable name="Record_Count" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_NIS_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_NIS}]]></variableExpression>
+	</variable>
+	<variable name="NIS_EMPLOYEE_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{NIS_EMPLOYEE}]]></variableExpression>
+	</variable>
+	<variable name="NIS_EMPLOYER_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{NIS_EMPLOYER}]]></variableExpression>
+	</variable>
+	<variable name="GROSS_NIS_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{GROSS_NIS}]]></variableExpression>
+	</variable>
+	<variable name="ACTUAL_EARNINGS_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ACTUAL_EARNINGS}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_NIS_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Age_Category" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_NIS}]]></variableExpression>
+	</variable>
+	<variable name="NIS_EMPLOYEE_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Age_Category" calculation="Sum">
+		<variableExpression><![CDATA[$F{NIS_EMPLOYEE}]]></variableExpression>
+	</variable>
+	<variable name="NIS_EMPLOYER_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Age_Category" calculation="Sum">
+		<variableExpression><![CDATA[$F{NIS_EMPLOYER}]]></variableExpression>
+	</variable>
+	<variable name="GROSS_NIS_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Age_Category" calculation="Sum">
+		<variableExpression><![CDATA[$F{GROSS_NIS}]]></variableExpression>
+	</variable>
+	<variable name="ACTUAL_EARNINGS_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Age_Category" calculation="Sum">
+		<variableExpression><![CDATA[$F{ACTUAL_EARNINGS}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_NIS_3" class="java.math.BigDecimal" resetType="Group" resetGroup="Age Category_sec" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_NIS}]]></variableExpression>
+	</variable>
+	<variable name="NIS_EMPLOYEE_3" class="java.math.BigDecimal" resetType="Group" resetGroup="Age Category_sec" calculation="Sum">
+		<variableExpression><![CDATA[$F{NIS_EMPLOYEE}]]></variableExpression>
+	</variable>
+	<variable name="NIS_EMPLOYER_3" class="java.math.BigDecimal" resetType="Group" resetGroup="Age Category_sec" calculation="Sum">
+		<variableExpression><![CDATA[$F{NIS_EMPLOYER}]]></variableExpression>
+	</variable>
+	<variable name="GROSS_NIS_3" class="java.math.BigDecimal" resetType="Group" resetGroup="Age Category_sec" calculation="Sum">
+		<variableExpression><![CDATA[$F{GROSS_NIS}]]></variableExpression>
+	</variable>
+	<variable name="ACTUAL_EARNINGS_3" class="java.math.BigDecimal" resetType="Group" resetGroup="Age Category_sec" calculation="Sum">
+		<variableExpression><![CDATA[$F{ACTUAL_EARNINGS}]]></variableExpression>
+	</variable>
+	<group name="Age_Category">
+		<groupExpression><![CDATA[$F{AGE}]]></groupExpression>
+		<groupHeader>
+			<band height="18">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="1" width="572" height="17" uuid="82090a4e-296b-4504-b040-75689b8f2b35"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{AGE}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="504" y="0" width="68" height="15" uuid="b8c80d2f-1995-4a9e-9c12-f85f3edda650"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="false" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_NIS_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="424" y="0" width="80" height="15" uuid="f422f09c-1c49-4b6f-812b-724cd041d703"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="false" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{NIS_EMPLOYEE_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="364" y="0" width="60" height="15" uuid="789fdd03-ee87-44d9-8547-934c0bff4a40"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="false" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{NIS_EMPLOYER_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="279" y="0" width="85" height="15" uuid="abc6cc10-6d91-4a2a-a7e3-ee56a456fc4e"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="false" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{GROSS_NIS_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="202" y="0" width="77" height="15" uuid="e3eaf197-664d-4c85-b00b-e5e18de65955"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="false" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{ACTUAL_EARNINGS_2}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="25" y="0" width="173" height="15" uuid="abf4acca-31f7-43e5-9e50-746d58ddca26"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="false" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{AGE}+" sub total"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Age Category_sec">
+		<groupExpression><![CDATA[$F{AGE_SECOND}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement x="0" y="0" width="100" height="15" uuid="d74abb6f-24df-4e57-9cc7-4f98eff41489"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{AGE_SECOND}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="18">
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="504" y="0" width="68" height="15" uuid="3f4cb9b2-2e66-48b4-87bd-07456f7f8631"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_NIS_3}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="424" y="0" width="80" height="15" uuid="b7cb9d4d-28ab-468e-be3a-5de7665b99ca"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{NIS_EMPLOYEE_3}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="364" y="0" width="60" height="15" uuid="77c2ffd9-8fb1-474e-8cfd-7596bd20507b"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{NIS_EMPLOYER_3}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="279" y="0" width="85" height="15" uuid="4be9195e-2a1d-4924-af43-d93597236408"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{GROSS_NIS_3}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="201" y="0" width="78" height="15" uuid="1f6f3e45-e3f5-4136-9438-665d5794ab92"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{ACTUAL_EARNINGS_3}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="25" y="0" width="173" height="15" uuid="bb2947ac-5187-4de8-a422-e6bda3d97917"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="false" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{AGE_SECOND}+" sub total"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="53" splitType="Stretch">
+			<subreport>
+				<reportElement x="1" y="0" width="571" height="53" uuid="ffe5a4c6-30e2-487c-b84f-e47fbe745d74"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{Organisation}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="42" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="3" width="572" height="15" uuid="af355c21-3a15-4fb8-981f-133f75b07501"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA['NATIONAL INSURANCE AND SOCIAL SECURITY SCHEME']]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="41" width="570" height="1" uuid="1c0175e4-4ec0-454b-9172-6261a2d3100b"/>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="18" width="572" height="15" uuid="229753f5-d4a5-4f39-b5a7-7267430db9e1"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MONTH_NAME}+","+$P{Year}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="18" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="25" height="15" uuid="82dbf8f4-d289-46c9-b003-2551875063ca"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<line>
+				<reportElement x="1" y="15" width="571" height="1" uuid="4303552c-6fd5-48ac-8fd0-33a9dd5bb016"/>
+			</line>
+			<staticText>
+				<reportElement x="25" y="0" width="108" height="15" uuid="286226fb-c7a6-4d76-ab54-f2456072a9c6"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="133" y="0" width="68" height="15" uuid="440fc5d6-cdb0-48f8-abda-09eba3eea2c6"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[NIS#]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="206" y="0" width="73" height="15" uuid="39cefd9e-444a-45ac-afdd-437407721243"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Act Earning]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="279" y="0" width="85" height="15" uuid="515b5b89-7c50-41df-9ea5-d63a6ccbc620"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Insur Earnings]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="364" y="0" width="58" height="15" uuid="f12f9086-cbd9-4001-8d7d-3152668dca8e"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Employer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="422" y="0" width="82" height="15" uuid="9d2ccc7b-6b2f-437a-9137-298ba20093ba"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Employee]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="504" y="0" width="68" height="15" uuid="673a6efd-80bf-430f-bbe3-4db610c0e3f6"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Total NIS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="25" height="15" uuid="e0541d2b-7538-431d-be45-ab1af3cadf31"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Record_Count}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="25" y="0" width="108" height="15" uuid="2d902c31-0c20-4fc7-83d5-2ae6631cd777"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SURNAME_HIST}+', '+$F{FIRST_NAME_HIST}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="133" y="0" width="68" height="15" uuid="95c8a9d0-cb0f-4b70-aa69-8d1ee3ae22c2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NIS_NO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="202" y="0" width="77" height="15" uuid="508c9881-e548-4e53-a218-8d400e46c417"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACTUAL_EARNINGS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="279" y="0" width="85" height="15" uuid="3fad6586-08f9-472a-8493-608b41522b83"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GROSS_NIS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="364" y="0" width="60" height="15" uuid="3562c79f-9470-4aab-bc77-d3a4a477f765"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NIS_EMPLOYER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="424" y="0" width="80" height="15" uuid="ac396fde-0e3f-4051-985f-a378d3a8e21f"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NIS_EMPLOYEE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="504" y="0" width="68" height="15" uuid="971dac76-ae8a-4fbd-8f68-e91bfb2a0c13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_NIS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="35" splitType="Stretch">
+			<rectangle>
+				<reportElement x="1" y="2" width="571" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<textField evaluationTime="Report">
+				<reportElement x="542" y="0" width="28" height="15" uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="6" y="0" width="162" height="15" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="422" y="0" width="120" height="15" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="19" width="571" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="#,##0">
+				<reportElement x="426" y="0" width="78" height="15" uuid="3e266383-7540-4f27-a53a-60ff187ddb51"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{NIS_EMPLOYEE_1}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0">
+				<reportElement x="367" y="0" width="57" height="15" uuid="ac3733ca-3651-4bcd-abd3-84fdfdf8e622"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{NIS_EMPLOYER_1}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0">
+				<reportElement x="279" y="0" width="85" height="15" uuid="b8313600-fc98-4dd6-9246-19f28e968989"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GROSS_NIS_1}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="98" y="0" width="100" height="15" uuid="029908db-2820-482f-8a1c-7fba7eb9aef2"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Total"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0">
+				<reportElement x="202" y="0" width="77" height="15" uuid="6a15747f-96b1-42ce-a859-f89b12df276c"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ACTUAL_EARNINGS_1}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="504" y="0" width="68" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="a8a77a7d-58c6-45eb-85a1-0b87c37f0d01"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_NIS_1}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

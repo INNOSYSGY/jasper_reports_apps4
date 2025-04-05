@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Employee Job Letter" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85bcab7d-a21c-457c-8b26-54349766927e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GPL/01_HR/Standard_Letters/HR_03"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.61:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Employee Job Letter"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GPL Test"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GPL/01_HR/Standard_Letters/HR_03_files/HR_03_jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<subDataset name="Entitlements" uuid="ce931d9d-6809-4e53-9222-75c45c358c3b">
+		<parameter name="P_EMP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT EMP_COMPANY_NO,initcap(income_type) income_type,to_char(sum(amount),'$999,999') amount
+FROM VW_EMPENTITLE
+WHERE
+TRUNC(SYSDATE) BETWEEN TRUNC(DATE_EFFECTIVE) AND TRUNC(NVL(DATE_EFFECTIVE_END,SYSDATE))
+and emp_id=$P{P_EMP_ID}
+group by EMP_COMPANY_NO,initcap(income_type)]]>
+		</queryString>
+		<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+		<field name="INCOME_TYPE" class="java.lang.String"/>
+		<field name="AMOUNT" class="java.lang.String"/>
+		<variable name="Seq" class="java.math.BigDecimal" calculation="Count">
+			<variableExpression><![CDATA[1.0]]></variableExpression>
+			<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EMP_NO" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ORG_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT
+b.id Emp_id,
+B.ORG_ID,
+B.EMP_COMPANY_NO,
+
+  'Please be informed that '||(case when a.sex_code='F' then 'Ms. ' when a.sex_code='M' then 'Mr. ' end)||
+    initcap(nvl(first_name,'')||' '||nvl(surname,'')) ||' of '||nvl(initcap(trim(
+PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',a.ID,'LOT',SYSDATE)||' '||
+pkg_global_fnts.fn_address('HOME',a.id,'STREET',sysdate)||' '||
+PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',a.ID,'VILLAGE_WARD',SYSDATE)||' '||
+pkg_global_fnts.fn_address('HOME',a.id,'COUNTY',sysdate)
+)),'No given Address')||
+    ' is employed as a ' ||initcap(B.POSITION_NAME)||' at ' ||NVL(M.ORGANISATION_NAME,'')|| '.' LINE1
+    , case when a.sex_code='F' then 'Ms. ' when a.sex_code='M' then 'Mr. ' end
+      ||  initcap(nvl(first_name,'')||' '||nvl(surname,'')) ||' commenced working with '||nvl(m.organisation_name,'') ||' since '||trim(to_char(b.date_employed,'dd-Month-yyyy'))
+    || ' and is presently in receipt of a '||lower(b.Payment_Type)||' salary of '||trim(to_char(pkg_global_fnts.fn_personalrate(b.id,sysdate),'$999,999,999'))||'.' line3
+
+    ,'Any assistance render to '||case when a.sex_code='F' then 'Ms.' when a.sex_code='M' then 'Mr.' end
+    || Initcap(trim(nvl(First_Name,'')||' '||nvl(Surname,'')))|| ' will be highly appreciated.' line4
+
+    ,'Thank You.' line5,
+(SELECT count(1)
+from vw_empentitle
+WHERE TRUNC(SYSDATE) BETWEEN TRUNC(DATE_EFFECTIVE) AND TRUNC(NVL(DATE_EFFECTIVE_END,SYSDATE))
+and emp_id=b.id
+) Has_entitlement
+      , m.organisation_name, m.telnum,nvl(m.faxnum,' ') faxnum, m.address
+
+	from hr_rcm_individual a join hr_rcm_employee b on a.id=b.ind_id
+        JOIN HR_HCF_ORGANISATION M ON M.ID = B.ORG_ID
+where b.id=$P{EMP_NO}
+and b.org_id =  $P{ORG_ID}]]>
+	</queryString>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="LINE1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LINE1"/>
+	</field>
+	<field name="LINE3" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LINE3"/>
+	</field>
+	<field name="LINE4" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LINE4"/>
+	</field>
+	<field name="LINE5" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LINE5"/>
+	</field>
+	<field name="HAS_ENTITLEMENT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="HAS_ENTITLEMENT"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="FAXNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<group name="Employee" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{EMP_COMPANY_NO}]]></groupExpression>
+		<groupHeader>
+			<band height="119">
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
+					<reportElement mode="Transparent" x="14" y="96" width="530" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="d3d275de-9ad2-4a52-82b2-63017a0b9192"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE1}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="14" y="39" width="530" height="20" uuid="339cd43e-f3bd-4316-9493-8598451d8101"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="12" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[To Whom It May Concern]]></text>
+				</staticText>
+			</band>
+			<band height="55">
+				<textField isStretchWithOverflow="true">
+					<reportElement x="14" y="11" width="530" height="20" uuid="cda8da23-c51d-4921-b422-7a2de7a8a775"/>
+					<textElement>
+						<font fontName="Arial"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE3}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band/>
+			<band height="61">
+				<printWhenExpression><![CDATA[$F{HAS_ENTITLEMENT}==0 ? false:true]]></printWhenExpression>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="149">
+				<textField isStretchWithOverflow="true">
+					<reportElement x="14" y="8" width="530" height="20" uuid="53fe8394-3627-4e6b-b99f-6f46aaeac576"/>
+					<textElement>
+						<font fontName="Arial"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE4}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="14" y="95" width="100" height="20" uuid="3949c091-68d9-428b-a58f-3f7bb81bf1a3"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Thank You]]></text>
+				</staticText>
+				<line>
+					<reportElement x="14" y="129" width="145" height="1" uuid="6dc46360-30fc-4938-a791-416675e264b0"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="1" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="70" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="70" uuid="8217f37e-7a6c-4501-bdfd-62255fb8834c"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

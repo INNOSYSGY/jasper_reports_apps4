@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LetterHead" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e5193585-354a-46d2-b627-5b3dc6c375c4">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT_PROD"/>
+	<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[select
+ho.address org_address, ho.faxnum, ho.telnum, nis_reg_no, tax_reg_no,
+HO.ORGANISATION_NAME,
+HO.PHOTO ORG_PHOTO
+FROM HR_HCF_ORGANISATION HO
+where ho.id=$P{P_IN_ORG_ID}]]>
+	</queryString>
+	<field name="ORG_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ADDRESS"/>
+	</field>
+	<field name="FAXNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="NIS_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NIS_REG_NO"/>
+	</field>
+	<field name="TAX_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TAX_REG_NO"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="ORG_PHOTO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_PHOTO"/>
+	</field>
+	<title>
+		<band height="91" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="15" width="800" height="15" uuid="3008591d-aad5-4821-a535-30ebab15d270"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="45" width="800" height="15" uuid="f35935dc-d4b5-4ca2-b0cc-47e2da9536f0">
+					<printWhenExpression><![CDATA["N"=="C" ? true:false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Fax No. '+ $F{FAXNUM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="800" height="15" uuid="2d011b44-471b-4e84-8929-6828cd25e685"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="30" width="800" height="15" uuid="e1076170-f4c1-4af0-8338-d583bbfa6e62"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Tel No. '+  $F{TELNUM}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="-10" width="130" height="80" uuid="62e17211-816e-4937-99e2-f844d1e0617e"/>
+				<imageExpression><![CDATA[$F{ORG_PHOTO}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+</jasperReport>

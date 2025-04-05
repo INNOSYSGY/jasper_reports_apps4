@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Employee Bank Payments" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6a8be228-8acb-4049-bd0c-2dd0ff04b118">
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/02_PAYROLL/GBTIBANKFILE"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.45.15:8081/jasperserver/services/repository"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BANK" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[Select e.Emp_Company_No_Hist,
+upper(decode(e.Surname_Hist,null,e.First_Name_Hist,
+Surname_Hist||decode(e.First_Name_Hist,null,' ',', '||e.First_Name_Hist ))
+)
+Name,G.End_Date,E.Net_Pay,replace(e.Bank_Account_No_HIST,'-','') Bank_Account_No_HIST,e.Org_Structure,E.ORG_ID
+    ,(Select Upper(BANK_ACCOUNT_NO)
+    From Hr_Hcf_Org_Rule
+    Where Org_Id=E.Org_Id
+    AND END_DATE IS NULL OR TRUNC(PERIOD_START) BETWEEN TRUNC(START_DATE) AND TRUNC(END_DATE)) salary_Account
+    From Pa_Pmg_Payrolldtl E Join	Pa_Pcf_Earningperiod G On G.Id=E.Earnings_Period_Id
+    join hr_rcm_employee emp on e.emp_id=emp.id
+    join hr_rcm_individual n on emp.ind_id=n.id
+    WHERE E.PAY_STATUS IN ('CR','AR')
+    And upper(E.EARNINGS_PERIOD_ID)=$P{EARNINGS_PERIOD_ID}
+    AND upper(E.PAYMENT_MODE_HIST)='BANK'
+       and n.bank_branch_id
+    in (
+
+    select ID
+    from hr_hcf_organisation
+    where organisation_type='BANK'
+    and short_name like 'GBTI%'
+    and id=CASE WHEN $P{BANK}=9999 THEN n.bank_branch_id ELSE  $P{BANK} END
+
+    )]]>
+	</queryString>
+	<field name="EMP_COMPANY_NO_HIST" class="java.lang.String"/>
+	<field name="NAME" class="java.lang.String"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="NET_PAY" class="java.math.BigDecimal"/>
+	<field name="BANK_ACCOUNT_NO_HIST" class="java.lang.String"/>
+	<field name="ORG_STRUCTURE" class="java.lang.String"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="SALARY_ACCOUNT" class="java.lang.String"/>
+	<sortField name="NAME"/>
+	<variable name="Total_netpay" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{NET_PAY}]]></variableExpression>
+		<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+	</variable>
+	<variable name="Seq" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[1.0]]></variableExpression>
+		<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="106" height="15" uuid="18ffe70f-b1c9-4e98-befe-af65eb643b4c"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="20"/>
+				</textElement>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="227" y="0" width="169" height="15" uuid="5ee56140-68ca-4a4c-a915-87255d71031d"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="106" y="0" width="121" height="15" uuid="d8330b94-b783-4c22-9aa5-53480a274013"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="10"/>
+				</textElement>
+				<text><![CDATA[Account No]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="106" height="15" isRemoveLineWhenBlank="true" uuid="0ef15c16-7e7f-4a02-b79b-62eb02fbbad6"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10"/>
+					<paragraph rightIndent="20"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NET_PAY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="106" y="0" width="121" height="15" uuid="2bffb422-99c6-42d1-af28-6ab1453f4e92"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10"/>
+					<paragraph rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BANK_ACCOUNT_NO_HIST}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="227" y="0" width="169" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="f18da7fc-b272-48bc-9adf-78c32b89a770"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

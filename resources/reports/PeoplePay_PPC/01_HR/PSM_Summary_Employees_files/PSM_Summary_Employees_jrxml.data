@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PSM-Summary of Employees By Agency" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="09530649-94cc-4c3c-a18a-367632741ad1">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/PSM_Summary_Employees"/>
+	<property name="ireport.jasperserver.url" value="http://190.80.71.15:8081/jasperserver/services/repository"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT distinct Position_abv code,upper(Position_name) Post_Title,null Cat,grade_code Band,lower_scale salary,no_in_position Filled_Amount,
+h.parent_level,
+upper(h.Unit_name) Agency,
+null Grade_Date
+FROM VW_ORG_WORKLOCATION_POSITION P
+join VW_ORGANISATION_STRUCTURE H on  H.ID=P.ORGDTL_ID
+JOIN HR_HCF_ORGANISATION HO ON H.ORG_ID=HO.ID
+where ho.id=$P{IN_ORG_ID}
+ORDER BY h.parent_level]]>
+	</queryString>
+	<field name="CODE" class="java.lang.String"/>
+	<field name="POST_TITLE" class="java.lang.String"/>
+	<field name="CAT" class="java.lang.String"/>
+	<field name="BAND" class="java.lang.String"/>
+	<field name="SALARY" class="java.lang.String"/>
+	<field name="FILLED_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="PARENT_LEVEL" class="java.math.BigDecimal"/>
+	<field name="AGENCY" class="java.lang.String"/>
+	<field name="GRADE_DATE" class="java.lang.String"/>
+	<sortField name="POST_TITLE"/>
+	<variable name="Record_Count" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="Page_Detail" class="java.lang.String">
+		<variableExpression><![CDATA['Page '+$V{PAGE_NUMBER}+ ' of '+$V{PAGE_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="FILLED_AMOUNT_1" class="java.math.BigDecimal" resetType="Group" resetGroup="POSITION" calculation="Sum">
+		<variableExpression><![CDATA[$F{FILLED_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="GroupCount" class="java.math.BigDecimal" resetType="Group" resetGroup="POSITION" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+	</variable>
+	<group name="POSITION">
+		<groupExpression><![CDATA[$F{POST_TITLE}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="83" y="0" width="366" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="eb3d8b17-423e-4f42-b170-12a7a375e291"/>
+					<textElement verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{POST_TITLE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="0" y="0" width="83" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="7bd0f175-c92d-43c0-b4ac-be4090d3d2d9"/>
+					<textElement verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single" leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CODE}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<printWhenExpression><![CDATA[$V{GroupCount}==1 ? false:true]]></printWhenExpression>
+				<staticText>
+					<reportElement x="399" y="0" width="106" height="15" uuid="9daf85e6-6d07-4efc-809e-3e670eaa511f"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph leftIndent="3" rightIndent="1"/>
+					</textElement>
+					<text><![CDATA[Total Title]]></text>
+				</staticText>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="305" y="0" width="94" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="5edb51e3-60e6-4a76-b9b5-b4b9de0aeb69"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single" leftIndent="2" rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{FILLED_AMOUNT_1}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="95" splitType="Stretch">
+			<staticText>
+				<reportElement x="54" y="75" width="467" height="20" uuid="509a4bc5-14c6-409f-8684-9ec90d37c357"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[SUMMARY OF EMPLOYEES BY AGENCY]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="64" uuid="2adafe13-4e31-4c40-824f-ef3776e8c67f"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="31" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="30" width="572" height="1" uuid="2c9f4d63-169b-42cb-9ba9-b1b21ed80fa8"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="1" width="87" height="15" uuid="f7dc6c7f-2280-4653-97cc-7c5cc4470ec0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="78" y="15" width="88" height="15" uuid="347a5929-1a1c-4899-86a9-19f6fe710bbc"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Cat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="166" y="15" width="80" height="15" uuid="67fcd956-dcfd-4196-861e-39bd9c452c1e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Band]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="15" width="79" height="15" uuid="49f17f8d-8f71-4976-9b66-e0d2f743f560"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<text><![CDATA[Salary]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="331" y="15" width="68" height="15" uuid="d805cdc9-39e8-40fc-a041-ec8e17ef6b0e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" isUnderline="false" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<text><![CDATA[Filled Amt]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="399" y="15" width="173" height="15" uuid="7d599bc7-6bca-4d50-aec8-cdeb82bdbeb1"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="3" rightIndent="1"/>
+				</textElement>
+				<text><![CDATA[Agency Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="87" y="0" width="434" height="15" uuid="d32631fc-7d17-4753-93d5-bf53c677d7f1"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Post Title]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="78" y="0" width="88" height="15" uuid="217615e1-1de9-4512-8125-ce911503267c"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="166" y="0" width="80" height="15" uuid="750df037-a7af-44e1-8a6b-2644cfbe3392"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BAND}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="252" y="0" width="79" height="15" uuid="3e11c58c-4952-420f-89bd-715c7c5a8f17"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALARY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="331" y="0" width="68" height="15" uuid="0fcba499-1338-4505-babf-d3e3061f6edf"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FILLED_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="399" y="0" width="173" height="15" uuid="a699690c-12f1-4cd5-8f95-c591d97fe09b"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="3" rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AGENCY}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="1">
+			<printWhenExpression><![CDATA[false]]></printWhenExpression>
+			<line>
+				<reportElement x="0" y="0" width="555" height="1" isPrintWhenDetailOverflows="true" uuid="fba2c8f5-677c-4850-9d22-a157d5a0a372"/>
+				<graphicElement>
+					<pen lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="17" width="572" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="4" y="2" width="162" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="449" y="2" width="100" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="554b8c63-153f-49c9-a297-223e1bc4a6bc"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Page_Detail}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="summary_of_training" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0f494efa-54fb-4e4c-a3f8-28b9701755f9">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Demo Environment"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/Peoplepay_GPL_TRAINING/01_HR/Listing_of_Training_Program_Details_files/summary_of_training.jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Peoplepay_GPL_TRAINING/01_HR/Listing_of_Training_Program_Details"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_PROGRAM_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_MONTH_YEAR" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[select
+    a.*,
+    case when a.duration >= 1 then CAST(FLOOR(a.duration) AS VARCHAR2(255)) || case when a.duration >= 2 then ' hrs ' else ' hr ' end else null end || case when FLOOR(mod((a.duration * 3600), 3600) / 60) > 1 then CAST(FLOOR(mod((a.duration * 3600), 3600) / 60) AS VARCHAR2(255)) || ' mins' else null end duration_in_words  
+from (
+select 
+    a.id program_id, 
+    a.program_name, 
+    b.id course_id, 
+    b.course_name,
+    b.designation_category course_type,
+    case when c.venue is null then 'External' else 'Internal' end type_of_training,
+    to_char(b.start_date, 'fmMonth DD, YYYY') start_date,
+    to_char(d.class_start_time, 'DD-MON-YYYY HH:MIPM') class_start_time, 
+    to_char(d.class_end_time, 'DD-MON-YYYY HH:MIPM') class_end_time, 
+    round((d.class_end_time - d.class_start_time) * 24, 2)  DURATION, 
+    case when e.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || e.first_name || ' ' || e.surname || ' - ' || g.position_name facilitator,
+    f.id emp_id, 
+    e.id ind_id,
+    d.class_name || ' - ' ||  to_char(d.class_start_time, 'HH:MIPM') || ' - ' || to_char(d.class_end_time, 'HH:MIPM') location,
+    h.attendees,
+    i.organisation_name, 
+    i.org_photo,
+    to_char(to_date(substr( $P{IN_MONTH_YEAR} , 1, 2), 'MM'), 'fmMonth') monthYear,
+    to_char(to_date(substr( $P{IN_MONTH_YEAR} , 3, 6), 'YYYY'), 'fmYYYY') monthYear2
+from 
+    hr_trn_program a
+    left join hr_trn_course b on a.id = b.program_id
+    left join hr_trn_course_schedule c on b.id = c.course_id
+    left join hr_trn_course_class d on d.course_schedule_id = c.id
+    left join hr_rcm_individual e on e.id = c.facilitator
+    left join hr_rcm_employee f on e.id = f.ind_id 
+    left join hr_hcf_position g on g.id = f.position_id
+    left join (select 
+                        listagg(ind.first_name || ' ' || ind.surname, '<br>') within group (order by ind.first_name asc) attendees, att.class_id
+                    from 
+                        hr_trn_class_attend att
+                        left join hr_rcm_employee emp on att.emp_id = emp.id
+                        left join hr_rcm_individual ind on ind.id = emp.ind_id
+                    group by
+                        att.class_id
+                    ) h on h.class_id = d.id
+    left join (select id, organisation_name, photo org_photo from hr_hcf_organisation) i on i.id = a.org_id    
+where
+    a.org_id =  $P{IN_ORG_ID} 
+    and a.id = nvl( $P{IN_PROGRAM_ID} , a.id)
+    and to_number(to_char(b.start_date, 'MM') || to_char(b.start_date, 'YYYY')) =  $P{IN_MONTH_YEAR} 
+    )a
+order by
+    a.start_date asc]]>
+	</queryString>
+	<field name="PROGRAM_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PROGRAM_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="PROGRAM_ID"/>
+	</field>
+	<field name="PROGRAM_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PROGRAM_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="PROGRAM_NAME"/>
+	</field>
+	<field name="COURSE_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="COURSE_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="COURSE_ID"/>
+	</field>
+	<field name="COURSE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="COURSE_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="COURSE_NAME"/>
+	</field>
+	<field name="COURSE_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="COURSE_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="COURSE_TYPE"/>
+	</field>
+	<field name="TYPE_OF_TRAINING" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TYPE_OF_TRAINING"/>
+		<property name="com.jaspersoft.studio.field.label" value="TYPE_OF_TRAINING"/>
+	</field>
+	<field name="START_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="START_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="START_DATE"/>
+	</field>
+	<field name="CLASS_START_TIME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CLASS_START_TIME"/>
+		<property name="com.jaspersoft.studio.field.label" value="CLASS_START_TIME"/>
+	</field>
+	<field name="CLASS_END_TIME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CLASS_END_TIME"/>
+		<property name="com.jaspersoft.studio.field.label" value="CLASS_END_TIME"/>
+	</field>
+	<field name="DURATION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="DURATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="DURATION"/>
+	</field>
+	<field name="FACILITATOR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FACILITATOR"/>
+		<property name="com.jaspersoft.studio.field.label" value="FACILITATOR"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="IND_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="IND_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_ID"/>
+	</field>
+	<field name="LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LOCATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="LOCATION"/>
+	</field>
+	<field name="ATTENDEES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ATTENDEES"/>
+		<property name="com.jaspersoft.studio.field.label" value="ATTENDEES"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="ORG_PHOTO" class="oracle.jdbc.OracleBlob">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_PHOTO"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_PHOTO"/>
+	</field>
+	<field name="MONTHYEAR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="MONTHYEAR"/>
+		<property name="com.jaspersoft.studio.field.label" value="MONTHYEAR"/>
+	</field>
+	<field name="MONTHYEAR2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="MONTHYEAR2"/>
+		<property name="com.jaspersoft.studio.field.label" value="MONTHYEAR2"/>
+	</field>
+	<field name="DURATION_IN_WORDS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DURATION_IN_WORDS"/>
+		<property name="com.jaspersoft.studio.field.label" value="DURATION_IN_WORDS"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+</jasperReport>

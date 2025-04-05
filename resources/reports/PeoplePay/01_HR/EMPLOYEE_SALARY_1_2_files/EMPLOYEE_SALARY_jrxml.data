@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Employees Birthday" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="256df055-2d68-4772-add4-d720491dbf7d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/EMPLOYEE_SALARY_1_2"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_YEAR" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_MONTH" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_DAY" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_WORKLOCATION_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select B.EMP_COMPANY_NO,a.FIRST_NAME, a.SURNAME,a.DOB,B.DATE_EMPLOYED,B.EMPLOYMENT_CLASS,p.position_name,c.unit_name,p.work_location,
+B.EMPLOYMENT_STATUS,a.EMAIL
+from HR_RCM_EMPLOYEE B
+join HR_RCM_INDIVIDUAL A ON B.IND_ID=A.ID
+join VW_ORG_WORKLOCATION_POSITION P on b.POSITION_LOCATION_ID=P.id
+join hr_hcf_organisation ho
+on b.org_id=ho.id
+join HR_HCF_ORGSTRUCTUREDTL c on p.orgdtl_id=c.id
+where B.EMPLOYMENT_STATUS not like 'IN-ACTIVE'
+and B.EMPLOYMENT_CLASS not like 'APPLICANT'
+and b.org_id=$P{IN_ORG_ID}
+and extract(year from a.dob)=nvl($P{P_YEAR},extract(year from a.dob))
+and extract(month from a.dob)=nvl($P{P_MONTH},extract(month from a.dob))
+and extract(day from a.dob)=nvl($P{P_DAY},extract(day from a.dob))
+and p.id=nvl($P{P_WORKLOCATION_ID},p.id)
+order by extract(day from a.dob)]]>
+	</queryString>
+	<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+	<field name="FIRST_NAME" class="java.lang.String"/>
+	<field name="SURNAME" class="java.lang.String"/>
+	<field name="DOB" class="java.sql.Timestamp"/>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp"/>
+	<field name="EMPLOYMENT_CLASS" class="java.lang.String"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="UNIT_NAME" class="java.lang.String"/>
+	<field name="WORK_LOCATION" class="java.lang.String"/>
+	<field name="EMPLOYMENT_STATUS" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="74" splitType="Stretch">
+			<subreport>
+				<reportElement x="1" y="0" width="571" height="73" uuid="1ed4afa3-39f8-4eed-b42e-f9c67d0d83df"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="50">
+			<staticText>
+				<reportElement x="0" y="11" width="572" height="25" uuid="6d064717-5753-43a8-9cd6-1e4b5ce74e7b"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Listing of Employees Birthday]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="24" splitType="Stretch">
+			<rectangle>
+				<reportElement x="2" y="0" width="570" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="fc9316f9-2754-4cad-b28f-97495d3bd9a5"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="1" y="0" width="29" height="15" uuid="6ca6633c-362a-42b6-a1f3-e8d86d48977e"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="32" y="0" width="73" height="15" uuid="f629bfec-a4da-421b-83ed-50bbb49b2ef3"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[First Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="106" y="0" width="96" height="15" uuid="4a1e392b-4649-47ce-8648-f258b5f58a3e"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Surname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="205" y="0" width="60" height="15" forecolor="#FF0000" backcolor="#FF0000" uuid="ad5d1ba6-cfbc-46a5-87f3-ee0de72889f1"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[D.O.B]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="0" width="151" height="15" uuid="5fa040e9-49f7-4da5-aaf3-3b21a3ac92cb"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Designation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="491" y="0" width="81" height="15" uuid="eff31f05-4ee6-4b43-adcb-7923312d4039"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Work Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="266" y="0" width="68" height="15" uuid="0f1cc2eb-b7ae-4bf4-8854-f24400f8e5cc"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Email]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="26" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="30" y="0" width="75" height="21" uuid="46742207-cfc5-44c4-8645-34ac9355de00"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="105" y="0" width="99" height="21" uuid="88398885-fa54-4cda-b9b0-313cac0f1990"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM" isBlankWhenNull="true">
+				<reportElement x="204" y="0" width="61" height="21" forecolor="#FF0000" backcolor="#FF0000" uuid="e7d7c257-fcac-4808-8f06-c9d783cc4134"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DOB}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="333" y="1" width="151" height="20" uuid="ad80bb34-3468-4580-bb1a-e097bc34861b"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="490" y="1" width="82" height="20" uuid="837dd550-00f8-4563-a558-cb24c0749a16"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WORK_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="30" height="21" uuid="5594b9c6-4a7a-4f34-802c-b6097f7904ed"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

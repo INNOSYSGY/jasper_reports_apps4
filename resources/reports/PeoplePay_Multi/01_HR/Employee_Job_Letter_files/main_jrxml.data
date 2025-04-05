@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="job_letter" pageWidth="612" pageHeight="792" columnWidth="470" leftMargin="71" rightMargin="71" topMargin="45" bottomMargin="71" uuid="9ebd7ce6-6ab8-4b50-818d-e64929ba7641">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PROD_PAAS_BOS"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="476"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="524"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Multi/01_HR/Employee_Job_Letter"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Multi/01_HR/Employee_Job_Letter_files/main_jrxml"/>
+	<parameter name="EMP_NO" class="java.lang.Integer"/>
+	<parameter name="ORG_ID" class="java.lang.Integer"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+      FIRST_NAME||' '||SURNAME AS NAME_OF_EMPLOYEE,
+               CASE
+                 WHEN i.sex_code = 'M'  THEN 'Mr.'
+                 WHEN i.sex_code = 'F' THEN 'Mrs.'
+               END
+        || ' ' || SURNAME AS SURNAME,
+        p.POSITION_NAME,
+         orgdtl.UNIT_NAME Department,
+        to_char(DATE_EMPLOYED, 'fmMonth DD, YYYY') date_employed, 
+               CASE
+                 WHEN i.sex_code = 'M'  THEN 'He'
+                 WHEN i.sex_code = 'F' THEN 'She'
+               END as HE_SHE,
+               pkg_global_fnts.fn_num_towords(pkg_global_fnts.fn_personalrate(e.id, sysdate)) AS NUMTOWORDS,
+               to_char(pkg_global_fnts.fn_personalrate(e.id, sysdate), 'FML999G999G999G999G990')  AS NUM,
+               o.organisation_name,
+               o.address,
+   			 LOT ||' '|| STREET ||' '|| VILLAGE_WARD ||' '|| COUNTY AS Ind_address, o.letter_head_logo
+          
+FROM hr_rcm_individual i
+JOIN hr_rcm_employee e ON e.ind_id = i.id
+JOIN hr_hcf_position p ON p.id = e.position_id
+JOIN hr_hcf_organisation o ON o.id = e.org_id
+JOIN hr_hcf_orgstructuredtl orgdtl on orgdtl.id = e.orgdtl_id
+join hr_rcm_address adr on (adr.ind_id = i.id and (adr.end_date is null or adr.end_date > trunc(sysdate)))
+WHERE o.id =$P{ORG_ID}
+AND
+e.id =$P{EMP_NO}]]>
+	</queryString>
+	<field name="NAME_OF_EMPLOYEE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME_OF_EMPLOYEE"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME_OF_EMPLOYEE"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_EMPLOYED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="HE_SHE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="HE_SHE"/>
+		<property name="com.jaspersoft.studio.field.label" value="HE_SHE"/>
+	</field>
+	<field name="NUMTOWORDS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NUMTOWORDS"/>
+		<property name="com.jaspersoft.studio.field.label" value="NUMTOWORDS"/>
+	</field>
+	<field name="NUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="NUM"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="IND_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="IND_ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_ADDRESS"/>
+	</field>
+	<field name="LETTER_HEAD_LOGO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="LETTER_HEAD_LOGO"/>
+		<property name="com.jaspersoft.studio.field.label" value="LETTER_HEAD_LOGO"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="190" splitType="Stretch">
+			<textField pattern="MMMM d, yyyy">
+				<reportElement positionType="Float" x="0" y="10" width="470" height="20" uuid="c0b76ed0-2ba8-4b45-9868-2a64947a77ae"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="160" y="50" width="151" height="20" uuid="7d107239-1dd7-4910-bda2-17b88e3a12b0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[To Whom It May Concern]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="80" width="470" height="20" uuid="6fdc51db-f232-4ece-b28c-b7e67898c0dc">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Please be informed that " +$F{NAME_OF_EMPLOYEE} +" of " + $F{IND_ADDRESS}+" is employed as a " + $F{POSITION_NAME} +"  for the " +$F{DEPARTMENT} + " at the Bureau of Statistics, 34 Main & Hope Streets, South Cummingsburg."]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="110" width="470" height="20" uuid="a6351324-d3ba-4347-9412-1789dbdf8a9b"/>
+				<textElement>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME_OF_EMPLOYEE}+" began working with the Bureau with effect from " + $F{DATE_EMPLOYED} +" and is in receipt of an average monthly payment of " + $F{NUMTOWORDS} + " Dollars " + $F{NUM} +"."]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="140" width="470" height="20" uuid="2f719271-25fa-4361-929a-89988fc720da"/>
+				<textElement>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["All for your information. "]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="170" width="250" height="20" uuid="703acda2-9723-4a78-b651-f5a4220df1e1"/>
+				<textElement verticalAlignment="Bottom" markup="html"/>
+				<textFieldExpression><![CDATA["………………… <br> Yonette King <br> Human Resources Officer"]]></textFieldExpression>
+			</textField>
+			<image scaleImage="RealSize" hAlign="Center">
+				<reportElement x="-71" y="-45" width="612" height="50" uuid="a95fa0db-05ad-490b-9b59-a485f67b16e7"/>
+				<imageExpression><![CDATA[$F{LETTER_HEAD_LOGO}]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+</jasperReport>

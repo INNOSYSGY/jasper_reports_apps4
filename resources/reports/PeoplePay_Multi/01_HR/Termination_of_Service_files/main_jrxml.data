@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="termination_of_service" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c473ed53-aa4e-4f85-9d0d-96a5ac0e9b30">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Multi/01_HR/Termination_of_Service"/>
+	<parameter name="MOVEMENT_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select 
+ to_char(trunc(sysdate), 'fmMonth DD, YYYY') date_prepared,
+    'I would like to inform you that your service as '|| a.position_name || ' at the ' || a.organisation_name|| ' is no longer required. Consequently, approval has been given for your employment with the '|| a.organisation_name ||' to be terminated with effect from ' || a.date_separated || ' inclusive. ' par1,
+    'In keeping with the ‘Termination of Employment and Severance Pay Act, Section 15 (1), 16 (1) and 21 (1)’ you will be paid ' || to_char(a.remarks_payment) par2,
+    a.*
+from
+    (select
+        mov.id movement_id, 
+        mov.emp_id, 
+        ind.id ind_id, 
+        emp.position_id,
+        to_char(mov.date_separated, 'fmddth Month, YYYY') date_separated,
+        org.letter_head_logo,
+        org.organisation_name,
+        case 
+            when ind.salutation is null then 
+                case 
+                    when ind.sex_code = 'M' then 'Mr.' 
+                    else 'Ms.' 
+                end 
+            else 
+                ind.salutation
+        end salutation, 
+        ind.first_name, 
+        ind.surname, 
+       from_hr.hr_full_name,
+        pkg_global_fnts.fn_address('HOME', ind.id, null, trunc(sysdate)) address,
+        pos.position_name, 
+        mov.remarks_payment
+    from
+        hr_mov_separationbenefit mov
+        left join hr_rcm_employee emp on mov.emp_id = emp.id
+        left join hr_rcm_individual ind on emp.ind_id = ind.id
+        left join hr_hcf_position pos on emp.position_id = pos.id
+        left join hr_hcf_organisation org on emp.org_id = org.id
+            left join (select case when a.sex_code = 'M' then 'Mr. ' when a.sex_code = 'F' then 'Ms. ' end || initcap(a.first_name || ' ' || a.surname || ', ' || c.position_name) from_hr, initcap(a.first_name || ' ' || a.surname) hr_full_name
+        from hr_rcm_individual a 
+        left join hr_rcm_employee b on a.id = b.ind_id
+        left join hr_hcf_position c on b.position_id = c.id
+        left join hr_hcf_orgstructuredtl d on d.id = b.orgdtl_id
+        where upper(c.position_name) like upper('Head%')
+        and upper(d.unit_name) like upper('Human%Resource%')
+        and (b.date_separated is null or b.date_separated > trunc(sysdate))
+        and rownum = 1) from_hr on 1=1
+    ) a
+    where MOVEMENT_ID =  $P{MOVEMENT_ID}]]>
+	</queryString>
+	<field name="DATE_PREPARED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_PREPARED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_PREPARED"/>
+	</field>
+	<field name="PAR1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR1"/>
+	</field>
+	<field name="PAR2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR2"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR2"/>
+	</field>
+	<field name="MOVEMENT_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="MOVEMENT_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="MOVEMENT_ID"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="IND_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="IND_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_ID"/>
+	</field>
+	<field name="POSITION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_ID"/>
+	</field>
+	<field name="DATE_SEPARATED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_SEPARATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_SEPARATED"/>
+	</field>
+	<field name="LETTER_HEAD_LOGO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LETTER_HEAD_LOGO"/>
+		<property name="com.jaspersoft.studio.field.label" value="LETTER_HEAD_LOGO"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="SALUTATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALUTATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALUTATION"/>
+	</field>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FIRST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="HR_FULL_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="HR_FULL_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="HR_FULL_NAME"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="REMARKS_PAYMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REMARKS_PAYMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="REMARKS_PAYMENT"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="280" splitType="Stretch">
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="0" width="240" height="15" uuid="4c4c2aaa-6290-4f61-8bdf-2b6cb9e24cfe">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DATE_PREPARED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="20" width="240" height="15" uuid="e330a54c-9b5f-4eb9-bbd8-d8e8194dd9fc">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SALUTATION} + " " +$F{FIRST_NAME} + " " + $F{SURNAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="40" width="240" height="15" uuid="b4c3ee7e-53ff-4c16-ad8f-c44ddd65ea3d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="82" width="240" height="15" uuid="89f4c494-d4c6-4ea6-99e8-75f51c7ffa9c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["Dear " + $F{SALUTATION} + " " +$F{SURNAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="192" y="102" width="170" height="30" uuid="e7317365-53e8-4eb1-9051-147bb233f39d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Termination of Service"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="141" width="555" height="15" uuid="2f129e00-16c8-4d45-88d9-d3df6ed1201c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PAR1}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="166" width="555" height="15" uuid="600360cb-2c1e-4f40-b897-aaf3e1b30b72">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PAR2}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="191" width="555" height="15" uuid="6e59b7cf-e2c4-4c98-9877-a12ef5fbb38a">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["Please note that you are required to return the Bureau's identification badge and the GTM card that were issued to you. Be advised that the badge and the card are the property of the Bureau of Statistics and GTM respectively and failure to return same is an offense."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="0" y="216" width="555" height="15" uuid="53d7e93e-d5f9-4936-bf8d-7fb6a26ed627">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["I take this opportunity to thank you for your service and to wish you success in your future endeavor."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="0" y="234" width="130" height="30" uuid="6a05b26b-3e04-4b0a-80e1-5ae573e2a286"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA["........................... <br> " + $F{HR_FULL_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Short_List" language="groovy" pageWidth="421" pageHeight="595" columnWidth="307" leftMargin="57" rightMargin="57" topMargin="3" bottomMargin="20" uuid="0ca2f8c1-2382-4a34-8d1e-76a1015ccd33">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Standard_Letters/APPLICANTS/Short_List_1"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT SURNAME,FIRST_NAME,LOT,STREET,VILLAGE_WARD,TOWN,REGION,COUNTY,ORG_ID,C.ID,
+case lower(to_char(a.sex_code)) when 'f' then 'Ms' when 'm' then 'Mr' end prefix
+FROM HR_RCM_INDIVIDUAL A JOIN HR_RCM_ADDRESS B ON A.ID=B.IND_ID
+LEFT OUTER JOIN HR_RCM_EMPLOYEE C ON A.ID=C.IND_ID
+WHERE A.ID=C.IND_ID AND C.EMPLOYMENT_CLASS_ID=2361 AND C.EMPLOYMENT_STATUS_ID=9596
+AND B.END_DATE IS NULL
+AND B.STREET IS NULL
+AND C.ID=$P{ID}]]>
+	</queryString>
+	<field name="SURNAME" class="java.lang.String"/>
+	<field name="FIRST_NAME" class="java.lang.String"/>
+	<field name="LOT" class="java.lang.String"/>
+	<field name="STREET" class="java.lang.String"/>
+	<field name="VILLAGE_WARD" class="java.lang.String"/>
+	<field name="TOWN" class="java.lang.String"/>
+	<field name="REGION" class="java.lang.String"/>
+	<field name="COUNTY" class="java.lang.String"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="PREFIX" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="307" height="79" uuid="6357786c-4a09-41ab-b57d-959e4b511c53"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/CORPORATE_LETTER_HEAD_1"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<detail>
+		<band height="396" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="14" width="307" height="12" uuid="b4bf69c5-106a-4814-80e7-bacad6097788"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10" isBold="true" isItalic="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PRIVATE AND CONFIDENTIAL]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="41" width="307" height="13" uuid="2bd7eb9c-7317-4fad-b1cb-00292a012fc5"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="71" width="307" height="13" uuid="27e8516d-f666-4cc2-be48-f6fb414b18da"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PREFIX}+". "+($F{FIRST_NAME}!=null? $F{FIRST_NAME}: "") +" "+ ($F{SURNAME}!=null? $F{SURNAME}:"")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="85" width="307" height="13" uuid="e66ea958-b132-4ff1-8203-f59ed8564acd"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{LOT}!=null? $F{LOT}: "") +" "+ ($F{VILLAGE_WARD}!=null? $F{VILLAGE_WARD}: "")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="98" width="307" height="13" uuid="ec82a1b9-2dba-4d62-b623-6017df83676f"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{TOWN}!=null? $F{TOWN}:"") +""+($F{COUNTY} !=null? $F{COUNTY}:"")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="143" width="307" height="14" uuid="87d22d20-3126-49be-a667-20c6ff527a1d"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dear"+" "+$F{PREFIX}+". "+($F{SURNAME}!=null? $F{SURNAME}:"")+","]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="208" width="307" height="27" uuid="62ef3bab-4871-459d-b655-83e211bbdc22"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<text><![CDATA[However, we have shortlisted your application, should a suitable vacancy arise.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="366" width="307" height="12" uuid="59cd1de1-59b0-4543-a2db-88b1908223a5"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[HUGH WATSON (MR)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="378" width="307" height="12" uuid="ef309376-34ed-4d09-a118-8559ba998d66"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[MANAGER - HUMAN RESOURCES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="303" width="307" height="14" uuid="eb05bd6f-2add-4c96-b5ac-7671ca26162d"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<text><![CDATA[Yours Sincerely,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="244" width="307" height="36" isRemoveLineWhenBlank="true" uuid="3a410cba-3ef7-498f-bffa-e6177c9aef38"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<text><![CDATA[We take this opportunity to thank you for the interest expressed in Guyana Bank for Trade and Industry Ltd.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="172" width="307" height="25" uuid="a10b6866-c895-4b0c-8b75-a7ebefb445e5"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<text><![CDATA[We thank you for your application but regret to advise that we are unable to offer you employment at present.]]></text>
+			</staticText>
+			<image scaleImage="RetainShape">
+				<reportElement x="3" y="331" width="97" height="24" uuid="b124e53b-ace4-440b-aad2-44f665a6df7a"/>
+				<imageExpression><![CDATA["repo:/images/T"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

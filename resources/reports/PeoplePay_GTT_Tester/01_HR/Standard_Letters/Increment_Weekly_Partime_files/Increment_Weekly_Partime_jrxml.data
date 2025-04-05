@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0e012215-8173-4941-a6f1-ad6470c87301">
+	<property name="ireport.zoom" value="1.2396694214876045"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="310"/>
+	<queryString>
+		<![CDATA[select
+b.first_name||' '|| surname employee_name,
+c.emp_id,
+org_id,
+z.position_name,
+CASE WHEN to_char(b.sex_code) = 'M' then 'Mr. ' ||to_char(b.surname) ELSE 'Ms/Mrs. '||to_char(b.surname) end salutation,
+'Dear ' ||CASE WHEN to_char(b.sex_code) = 'M' then 'Mr. ' ||to_char(b.surname) ELSE 'Ms/Mrs. '||to_char(b.surname) end ADDRESSE,
+b.surname||',' surname,
+(select g.first_name||' '||g.surname from tbluser e
+         join hr_Rcm_Employee t on t.id=e.employee_no
+         join hr_rcm_individual g on g.id = t.ind_id
+               where t.org_id=a.org_id and user_id = 1336) Signiture_1,
+(select f.position_name from tbluser e
+         join hr_Rcm_Employee t on t.id=e.employee_no
+         join hr_rcm_individual g on g.id = t.ind_id
+         join VW_POSITION_LOCATION_V1 f on f.emp_id=t.id
+               where t.org_id=a.org_id and user_id = 1336) Signiture_2,
+(select f.organisation_name from tbluser e
+         join hr_Rcm_Employee t on t.id=e.employee_no
+         join hr_rcm_individual g on g.id = t.ind_id
+         join VW_POSITION_LOCATION_V1 f on f.emp_id=t.id
+               where t.org_id=a.org_id and user_id = 1336) Signiture_3,
+'Consequent to the review of your performance we have the pleasure in informing you that,
+your wages would be increased effective' ||' '|| trim(to_char(c.start_date, 'dd, Month')) || to_char(c.start_date, ' yyyy') ||'.' LINE_1,
+'The terms and conditions of your employment will remain the same.' LINE_2,
+'We look forward to your valuable contributions and wish you all the very best for a rewarding career with the organization.' LINE_3,
+round(c.HOURLY_RATE)HOURLY_RATE,
+c.start_date
+from hr_Rcm_Employee a
+join hr_rcm_individual b on b.id = a.ind_id
+join HR_RCM_SALARY c on c.emp_id = a.id
+join VW_POSITION_LOCATION_V1 z on z.emp_id = a.id
+where c.end_date is null and org_id = 1749
+order by c.start_date]]>
+	</queryString>
+	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="SALUTATION" class="java.lang.String"/>
+	<field name="ADDRESSE" class="java.lang.String"/>
+	<field name="SURNAME" class="java.lang.String"/>
+	<field name="SIGNITURE_1" class="java.lang.String"/>
+	<field name="SIGNITURE_2" class="java.lang.String"/>
+	<field name="SIGNITURE_3" class="java.lang.String"/>
+	<field name="LINE_1" class="java.lang.String"/>
+	<field name="LINE_2" class="java.lang.String"/>
+	<field name="LINE_3" class="java.lang.String"/>
+	<field name="HOURLY_RATE" class="java.math.BigDecimal"/>
+	<field name="START_DATE" class="java.sql.Timestamp"/>
+	<sortField name="EMP_ID"/>
+	<variable name="h_rate" class="java.math.BigDecimal" resetType="Group" resetGroup="Emp_group">
+		<variableExpression><![CDATA[$F{HOURLY_RATE}]]></variableExpression>
+	</variable>
+	<group name="Emp_group" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{EMP_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="529">
+				<textField pattern="MMMMM dd, yyyy">
+					<reportElement x="0" y="10" width="124" height="23" uuid="339593cd-f78e-449e-a3f3-794bc537d03e"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement x="0" y="183" width="147" height="20" uuid="8284ee6a-8f76-467e-893f-74bcb4391d80"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ADDRESSE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="81" width="145" height="20" uuid="62a9c129-6b95-4aec-8a4c-95f6ab6cf559"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="217" y="144" width="147" height="20" uuid="8cc920a0-9a01-49a8-a424-4041f31d713a"/>
+					<textElement textAlignment="Center">
+						<font fontName="Times New Roman" size="12" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Sub: Increment]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="61" width="173" height="20" uuid="33c29969-c093-447e-aea7-b294fdd85d27"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SALUTATION}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="217" width="572" height="40" uuid="5131c7f1-3e41-4938-9c40-8cc920054217"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE_1}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="272" width="243" height="18" uuid="13991eb1-0cfc-41e9-8cd1-b8a07b2dfe44"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Your Hourly Rate will be increased to: "]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+					<reportElement x="199" y="272" width="44" height="18" uuid="859d3bb2-10eb-4ee8-bf00-01296fe2cf97"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{HOURLY_RATE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="333" width="572" height="35" uuid="d3560f9d-87ce-48b3-a635-98ab298cde8a"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE_3}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="398" width="100" height="20" uuid="60c5a1d6-7287-4154-bce6-7af983d84b4a"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12"/>
+					</textElement>
+					<text><![CDATA[Yours Sincerely, ]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="0" y="450" width="147" height="20" uuid="7f472792-a18a-4948-9bc6-fc7387e415dd"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SIGNITURE_1}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="470" width="147" height="20" uuid="2a91adde-b363-4206-b6fc-c53a63e10c18"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SIGNITURE_2}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="490" width="173" height="20" uuid="ea7fef97-ca38-473f-93c1-28d6ce626224"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SIGNITURE_3}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="300" width="545" height="20" uuid="5245a80d-8cd6-4746-b458-86ff68f68597"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE_2}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="440" width="159" height="1" uuid="b2c86260-bc25-4de2-8b07-ffe2f7bd881f"/>
+				</line>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="1" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="107">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="107" uuid="e8ec3e87-54ad-41e2-8715-4155e33c072b"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+</jasperReport>

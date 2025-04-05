@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Procurement &amp; Materials Managment Unit" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f27a2ead-9399-4210-9006-8d39a3301cd6">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/ISSUE_SUMMARY"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="start_date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="end_date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+1 Main_Group,
+2 Second_Group,
+A.Destination_Organisation "Branch",
+sum(
+case when Transaction_Code='MOVE_RETURN' then Total_Cost*-1
+else Total_Cost end
+) "Amount"
+from vw_stores_requisition a
+where Transaction_Code in ('MOVE_ORDER','MOVE_RETURN')
+and trunc(issue_date) between $P{start_date} and $P{end_date}
+group by A.Destination_Organisation]]>
+	</queryString>
+	<field name="MAIN_GROUP" class="java.math.BigDecimal"/>
+	<field name="SECOND_GROUP" class="java.math.BigDecimal"/>
+	<field name="Branch" class="java.lang.String"/>
+	<field name="Amount" class="java.math.BigDecimal"/>
+	<sortField name="Branch"/>
+	<variable name="REPORT_NAME" class="java.lang.String">
+		<initialValueExpression><![CDATA["Items Purchased By Department/Branch "]]></initialValueExpression>
+	</variable>
+	<variable name="Amount_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{Amount}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{Amount}]]></initialValueExpression>
+	</variable>
+	<group name="Main" isStartNewPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{MAIN_GROUP}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="34">
+				<textField pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement x="351" y="0" width="145" height="20" uuid="331ef2a2-6167-4fe9-9f25-a8dc902c2f13"/>
+					<box>
+						<pen lineStyle="Double"/>
+						<topPen lineWidth="0.5" lineStyle="Double"/>
+						<leftPen lineStyle="Double"/>
+						<bottomPen lineWidth="0.5" lineStyle="Double"/>
+						<rightPen lineStyle="Double"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Amount_2}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="107" y="0" width="244" height="20" uuid="53cf504d-5e2a-484d-99b2-a3432a1ad999"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["TOTAL"]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="50">
+				<subreport>
+					<reportElement x="0" y="0" width="572" height="41" uuid="3c51f313-698a-41a5-a96d-d3bbf82cde2e"/>
+					<subreportParameter name="end_date">
+						<subreportParameterExpression><![CDATA[$P{end_date}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="start_date">
+						<subreportParameterExpression><![CDATA[$P{start_date}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:ITEMS_ISSUE_SUMMARY"]]></subreportExpression>
+				</subreport>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Second_Group" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{SECOND_GROUP}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="10"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="44" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="2" width="572" height="41" uuid="3507754f-fab4-467e-a0ab-9b10878c08aa"/>
+				<subreportParameter name="P_REPORT_NAME">
+					<subreportParameterExpression><![CDATA[$V{REPORT_NAME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_REPORT_TITLE">
+					<subreportParameterExpression><![CDATA[new SimpleDateFormat('dd-MMMMM-yyyy').format($P{start_date})
++' To '+
+new SimpleDateFormat('dd-MMMMM-yyyy').format($P{end_date})]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/MedSys/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="27" splitType="Stretch">
+			<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1 ? true:false]]></printWhenExpression>
+			<staticText>
+				<reportElement x="351" y="12" width="145" height="15" uuid="895721f7-77bf-4056-94c5-cf21ca8e68c5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Total Cost]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="351" y="0" width="145" height="15" uuid="9d3af94f-813e-4dcb-b596-26a2547ba1d1"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Amount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="107" y="0" width="244" height="15" uuid="4ed31175-ca0d-4b54-ae64-3039c3f4e774"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Branch}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="18" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="572" height="1" uuid="30171ac5-2119-4768-8b18-681943203a11"/>
+				<graphicElement>
+					<pen lineWidth="1.25" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="1" width="572" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="0bee7d9e-7f5d-4466-8668-2e2eb1645f1e"/>
+			</rectangle>
+			<textField>
+				<reportElement x="452" y="0" width="102" height="13" uuid="a9261aa9-a31e-4c60-8708-aa8ae0f0ea91"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE, MMMMM dd, yyyy h.mm a" isBlankWhenNull="true">
+				<reportElement x="10" y="0" width="172" height="15" uuid="912fa31a-3810-40a9-9e10-571734312082"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="16" uuid="45bf1a69-d9d0-47df-8c10-87d91aa0aa1a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[SCMS By INNOSYS Inc]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="47" splitType="Prevent">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="41" uuid="03f329db-c91c-4dfd-91dc-764f416af305"/>
+				<subreportParameter name="end_date">
+					<subreportParameterExpression><![CDATA[$P{end_date}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="start_date">
+					<subreportParameterExpression><![CDATA[$P{start_date}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:ISSUE_DETAILS"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

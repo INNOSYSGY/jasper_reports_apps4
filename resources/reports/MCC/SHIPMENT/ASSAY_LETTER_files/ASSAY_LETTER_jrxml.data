@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Assay_Letter" pageWidth="612" pageHeight="792" columnWidth="568" leftMargin="22" rightMargin="22" topMargin="20" bottomMargin="20" uuid="2b54878f-c48b-4637-84bb-1fd33a3df6f5">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MCC"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="152"/>
+	<property name="ireport.callouts" value="##Sat Jan 10 14:13:15 BOT 2015\ncallouts.1.text=\ncallouts.1.bounds=373,373,150,75"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MCC/SHIPMENT/ASSAY_LETTER"/>
+	<property name="ireport.jasperserver.url" value="http://190.80.71.15:8081/jasperserver/services/repository"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<subDataset name="Assay Exchange" uuid="4b14bf67-aca8-4391-a961-91095e226d47">
+		<parameter name="P_SA_HEADER" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_SOURCE" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT lot_number,element,case when upper(element) like '%DMT%' then round(element_assay,4) else round(element_assay,3) end element_assay,sort_field
+from
+(
+SELECT
+l.sa_header_id,
+AL.ID,
+l.id lot_id,
+L.Lot_Number,
+(
+Select SYMBOL
+From Element
+Where Id=Al.Element_Id
+) ELEMENT,
+al.element_assay_adj element_assay,2 sort_field
+From Sa_Lot_Assay Al
+JOIN SA_LOT L ON AL.SA_LOT_ID=L.ID
+where NVL(ELEMENT_ASSAY,0)>0
+AND
+l.sa_header_id=$P{P_SA_HEADER}
+and al.sa_source_id=$P{P_SOURCE}
+UNION ALL
+SELECT l.sa_header_id,L.ID,L.ID LOT_ID,LOT_NUMBER,'DMT' ELEMENT,WEIGHT ELEMENT_ASSAY, 1 SORT_FIELD
+FROM SA_LOT L
+where l.sa_header_id=$P{P_SA_HEADER}
+
+) order by lot_number,sort_field,element]]>
+		</queryString>
+		<field name="LOT_NUMBER" class="java.math.BigDecimal"/>
+		<field name="ELEMENT" class="java.lang.String"/>
+		<field name="ELEMENT_ASSAY" class="java.math.BigDecimal"/>
+		<field name="SORT_FIELD" class="java.math.BigDecimal"/>
+		<sortField name="LOT_NUMBER"/>
+		<sortField name="SORT_FIELD"/>
+	</subDataset>
+	<subDataset name="Assay Exchange Total" uuid="da70f46d-e37d-4039-a7b1-be44cf643aa1">
+		<parameter name="P_SA_HEADER" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_SOURCE" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select *
+from
+(
+SELECT
+distinct
+L.SA_HEADER_ID,
+NULL ID,
+NULL LOT_ID,
+'Total' Lot_Number,
+(
+Select SYMBOL
+From Element
+Where Id=Al.Element_Id
+) ELEMENT,
+--AVG(al.element_assay_adj) element_assay
+(pkg_mcc_assay.F_GET_SUM_PRODUCT(al.sa_source_id,Al.Element_Id)) element_assay
+,2 sort_field
+From Sa_Lot_Assay Al
+JOIN SA_LOT L ON AL.SA_LOT_ID=L.ID
+WHERE NVL(ELEMENT_ASSAY,0)>0
+AND
+L.SA_HEADER_ID=$P{P_SA_HEADER}
+and al.sa_source_id=$P{P_SOURCE}
+--GROUP BY L.SA_HEADER_ID, NULL, NULL, 'Total',Al.Element_Id, 2
+union all
+SELECT l.sa_header_id,null ID,null LOT_ID,'Total' LOT_NUMBER,'DMT'
+ELEMENT,sum(WEIGHT) ELEMENT_ASSAY, 1 SORT_FIELD
+FROM SA_LOT L
+WHERE L.SA_HEADER_ID=$P{P_SA_HEADER}
+GROUP BY l.sa_header_id, null, null, 'Total', 'DMT', 1
+) b order by lot_number,sort_field,element]]>
+		</queryString>
+		<field name="SA_HEADER_ID" class="java.math.BigDecimal"/>
+		<field name="ID" class="java.lang.String"/>
+		<field name="LOT_ID" class="java.lang.String"/>
+		<field name="LOT_NUMBER" class="java.lang.String"/>
+		<field name="ELEMENT" class="java.lang.String"/>
+		<field name="ELEMENT_ASSAY" class="java.math.BigDecimal"/>
+		<field name="SORT_FIELD" class="java.math.BigDecimal"/>
+	</subDataset>
+	<parameter name="P_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_SOURCE_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+H.ID assay_id,
+SYSDATE EXCHANGE_DATE,
+(
+      SELECT NAME||CHR(10)||FULL_ADDRESS
+      FROM VW_CONTACT_DETAILS CD
+      JOIN CONTRACT C ON CD.ID=C.CONTACT_ID
+      WHERE C.ID=SALE_CONTRACT_ID
+) CLIENT,'' ATTENTION,
+a.reference_number
+||'-'||s.shipment_number SHIPMENT_REF,
+' ' PRODUCT_DESC,
+'Please find attached our assays to exchange on following parcel of '
+||
+a.product_description
+ ||
+'  delivered during '||TRIM(TO_CHAR(NVL(S.ARRIVAL_DATE,SYSDATE-360),'Month'))||' '||TRIM(TO_CHAR(NVL(S.ARRIVAL_DATE,SYSDATE-360),'yyyy'))||
+' under vessel '||NVL(S.VESSEL_IDENTIFIER,'unknown')||' to destination '||NVL(DESTINATION,'unknown')||': our reference  '
+||
+A.REFERENCE_NUMBER||'-'||s.shipment_number||'.'  LINE1,
+null line2,
+nvl( (
+    select INITCAP(NVL(FIRST_NAME,'')||' '||NVL(LAST_NAME,''))
+    from APP_USER U
+    where upper(U.USER_NAME)=A.CONTRACT_ADMIN
+     ),INITCAP(a.CONTRACT_ADMIN)) CONTRACT_ADMINISTRATOR,
+U.*
+FROM SA_HEADER H
+JOIN SHIPMENT S ON H.SHIPMENT_ID=S.ID
+JOIN SA_LOT L ON H.ID=L.SA_HEADER_ID
+JOIN Sa_Lot_Assay Al  ON L.ID=AL.SA_LOT_ID
+JOIN AGREEMENT A ON A.ID=S.AGREEMENT_ID
+CROSS JOIN VW_SOFTWARE_USER U
+where H.id=$P{P_ID}
+and al.sa_source_id=$P{P_SOURCE_ID}]]>
+	</queryString>
+	<field name="ASSAY_ID" class="java.math.BigDecimal"/>
+	<field name="EXCHANGE_DATE" class="java.sql.Timestamp"/>
+	<field name="CLIENT" class="java.lang.String"/>
+	<field name="ATTENTION" class="java.lang.String"/>
+	<field name="SHIPMENT_REF" class="java.lang.String"/>
+	<field name="PRODUCT_DESC" class="java.lang.String"/>
+	<field name="LINE1" class="java.lang.String"/>
+	<field name="LINE2" class="java.lang.String"/>
+	<field name="CONTRACT_ADMINISTRATOR" class="java.lang.String"/>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="TELEPHONE" class="java.lang.String"/>
+	<group name="Assay Exchange" isStartNewPage="true" footerPosition="ForceAtBottom" keepTogether="true">
+		<groupExpression><![CDATA[$F{ASSAY_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="58">
+				<textField isBlankWhenNull="true">
+					<reportElement x="289" y="10" width="279" height="15" uuid="f9ff863f-8a38-4681-a493-91463e40fce1">
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="291" y="24" width="277" height="15" uuid="3009b80a-71a9-4bb4-87ba-8fd845e6c5a5">
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TELEPHONE}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="55" width="568" height="1" uuid="4545ae01-05c7-4a5b-8eaf-ef9a5d62800a"/>
+					<graphicElement>
+						<pen lineWidth="2.0" lineColor="#663300"/>
+					</graphicElement>
+				</line>
+				<image>
+					<reportElement x="0" y="0" width="428" height="50" uuid="79902e2c-cd4c-4e29-aed0-caa5aa8c98cf"/>
+					<imageExpression><![CDATA["repo:/reports/MCC/Image/logo"]]></imageExpression>
+				</image>
+			</band>
+			<band height="37">
+				<textField pattern="MMMM d, yyyy">
+					<reportElement x="0" y="20" width="100" height="15" uuid="bef75ab9-8410-4b75-aaa1-b1f8e27e493f">
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EXCHANGE_DATE}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="50">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="18" width="300" height="15" uuid="ad7e0900-ab5e-4419-984a-def06fbc3cf3">
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CLIENT}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="67">
+				<textField>
+					<reportElement mode="Transparent" x="-1" y="5" width="100" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="e8ba2697-379d-4d5d-8dba-65a97b106d55"/>
+					<box padding="0" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single" lineSpacingSize="1.0" firstLineIndent="0" leftIndent="0" rightIndent="0" spacingBefore="0" spacingAfter="0" tabStopWidth="40"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Att:"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement mode="Transparent" x="-1" y="35" width="569" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="84e5800c-a885-4f5d-b3e5-683d45d6a11d"/>
+					<box padding="0" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0"/>
+					<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single" lineSpacingSize="1.0" firstLineIndent="0" leftIndent="0" rightIndent="0" spacingBefore="0" spacingAfter="0" tabStopWidth="40"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Assay Exchange "+$F{SHIPMENT_REF}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="16">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="568" height="15" isPrintWhenDetailOverflows="true" uuid="93391f7d-3833-4495-a4d5-38f7e8139d31">
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Arial Black" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE1}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="16">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="568" height="15" uuid="557b70db-4ff4-435d-b5d0-3522fb0278b9">
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Arial Black" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LINE2}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="47">
+				<frame>
+					<reportElement x="0" y="0" width="568" height="47" uuid="f9f6811a-76cd-4c9b-b8c2-62d655978d43"/>
+					<crosstab>
+						<reportElement x="0" y="0" width="565" height="47" uuid="669d28d4-a347-48bc-b18d-3301d0671834"/>
+						<crosstabDataset isDataPreSorted="true">
+							<dataset>
+								<datasetRun subDataset="Assay Exchange" uuid="5fe29f7c-d8d0-46a6-9d29-d4a3f03a8afe">
+									<datasetParameter name="P_SA_HEADER">
+										<datasetParameterExpression><![CDATA[$F{ASSAY_ID}]]></datasetParameterExpression>
+									</datasetParameter>
+									<datasetParameter name="P_SOURCE">
+										<datasetParameterExpression><![CDATA[$P{P_SOURCE_ID}]]></datasetParameterExpression>
+									</datasetParameter>
+									<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+								</datasetRun>
+							</dataset>
+						</crosstabDataset>
+						<crosstabHeaderCell>
+							<cellContents>
+								<textField isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="38" height="30" uuid="452c704b-747c-4de9-93bc-7c47daef1e7a"/>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<textFieldExpression><![CDATA["Lot"]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabHeaderCell>
+						<rowGroup name="LOT_NUMBER" width="38" totalPosition="End">
+							<bucket class="java.math.BigDecimal">
+								<bucketExpression><![CDATA[$F{LOT_NUMBER}]]></bucketExpression>
+							</bucket>
+							<crosstabRowHeader>
+								<cellContents backcolor="#FFFFFF" mode="Opaque">
+									<box>
+										<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textField isBlankWhenNull="true">
+										<reportElement style="Crosstab Data Text" x="0" y="0" width="38" height="16" uuid="8d58591c-f7ef-41df-84a3-05a70fa9a5d1"/>
+										<textElement verticalAlignment="Middle">
+											<font fontName="Arial" size="9"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$V{LOT_NUMBER}]]></textFieldExpression>
+									</textField>
+								</cellContents>
+							</crosstabRowHeader>
+							<crosstabTotalRowHeader>
+								<cellContents/>
+							</crosstabTotalRowHeader>
+						</rowGroup>
+						<columnGroup name="ELEMENT" height="30">
+							<bucket class="java.lang.String">
+								<bucketExpression><![CDATA[$F{ELEMENT}]]></bucketExpression>
+							</bucket>
+							<crosstabColumnHeader>
+								<cellContents backcolor="#FFFFFF" mode="Opaque">
+									<box>
+										<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+									</box>
+									<textField isBlankWhenNull="true">
+										<reportElement style="Crosstab Data Text" x="0" y="0" width="60" height="30" uuid="2fc5df2d-ce08-4eca-8087-cbf4decc48e1"/>
+										<textElement verticalAlignment="Middle">
+											<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$V{ELEMENT}]]></textFieldExpression>
+									</textField>
+								</cellContents>
+							</crosstabColumnHeader>
+							<crosstabTotalColumnHeader>
+								<cellContents/>
+							</crosstabTotalColumnHeader>
+						</columnGroup>
+						<measure name="ELEMENT_ASSAYMeasure" class="java.math.BigDecimal" calculation="Average">
+							<measureExpression><![CDATA[$F{ELEMENT_ASSAY}]]></measureExpression>
+						</measure>
+						<measure name="DMT" class="java.math.BigDecimal" calculation="Sum">
+							<measureExpression><![CDATA[$F{ELEMENT_ASSAY}]]></measureExpression>
+						</measure>
+						<crosstabCell width="60" height="16">
+							<cellContents>
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textField isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="60" height="16" uuid="fdc3b3d4-0824-46b3-b31a-76cff53f549f"/>
+									<textElement textAlignment="Right" verticalAlignment="Middle">
+										<font fontName="Arial" size="9" isPdfEmbedded="true"/>
+										<paragraph leftIndent="2" rightIndent="4"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{ELEMENT_ASSAYMeasure}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabCell>
+						<crosstabCell width="60" height="0" rowTotalGroup="LOT_NUMBER">
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+							</cellContents>
+						</crosstabCell>
+						<crosstabCell width="50" columnTotalGroup="ELEMENT">
+							<cellContents backcolor="#BFE1FF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textField>
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="6d69f30f-ad74-40f4-be73-69d53804dfdf"/>
+									<textFieldExpression><![CDATA[$V{ELEMENT_ASSAYMeasure}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabCell>
+						<crosstabCell rowTotalGroup="LOT_NUMBER" columnTotalGroup="ELEMENT">
+							<cellContents backcolor="#BFE1FF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textField>
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="71783e22-6a4e-4705-8e1f-646faf4e0909"/>
+									<textFieldExpression><![CDATA[$V{ELEMENT_ASSAYMeasure}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabCell>
+					</crosstab>
+				</frame>
+			</band>
+			<band height="50">
+				<crosstab>
+					<reportElement x="0" y="0" width="568" height="50" uuid="784cfa99-1312-4a2c-aa2c-9457cf9c3568"/>
+					<crosstabDataset isDataPreSorted="true">
+						<dataset>
+							<datasetRun subDataset="Assay Exchange Total" uuid="0fff8952-8e36-45fd-9541-fddad7978ff1">
+								<datasetParameter name="P_SA_HEADER">
+									<datasetParameterExpression><![CDATA[$P{P_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<datasetParameter name="P_SOURCE">
+									<datasetParameterExpression><![CDATA[$P{P_SOURCE_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+					</crosstabDataset>
+					<rowGroup name="LOT_NUMBER" width="38">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{LOT_NUMBER}]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textField>
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="38" height="25" uuid="a4df7aeb-06b2-46a5-9a73-ebfdc0442e3d"/>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{LOT_NUMBER}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents/>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="ELEMENT" height="0">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{ELEMENT}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<box>
+									<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents/>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="ELEMENT_ASSAYMeasure" class="java.math.BigDecimal" calculation="Sum">
+						<measureExpression><![CDATA[$F{ELEMENT_ASSAY}]]></measureExpression>
+					</measure>
+					<crosstabCell width="60" height="25">
+						<cellContents>
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField pattern="#,##0.000" isBlankWhenNull="true">
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="60" height="25" uuid="67cf6611-2243-4a8d-8099-041a77e52b0b"/>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+									<paragraph leftIndent="2" rightIndent="4"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{ELEMENT_ASSAYMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell height="25" rowTotalGroup="LOT_NUMBER">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="6357e1e2-aee7-4ba1-a3c3-f8af40878986"/>
+								<textFieldExpression><![CDATA[$V{ELEMENT_ASSAYMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell width="50" columnTotalGroup="ELEMENT">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="462e1ba1-5a75-4c25-b5c2-55970156e216"/>
+								<textFieldExpression><![CDATA[$V{ELEMENT_ASSAYMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell rowTotalGroup="LOT_NUMBER" columnTotalGroup="ELEMENT">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="32595e58-54d8-4ffa-b5b9-938397e88c3a"/>
+								<textFieldExpression><![CDATA[$V{ELEMENT_ASSAYMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+				</crosstab>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+			<band height="141">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="33" width="201" height="20" uuid="709e8e96-844a-4ea1-bfef-a86012a8b979"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CONTRACT_ADMINISTRATOR}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="100" height="20" uuid="ea9c1824-3057-4309-ac8d-e9465ee0a606"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Best Regards.]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+</jasperReport>

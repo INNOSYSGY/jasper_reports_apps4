@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Tax Remittance" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b75038e1-1dbe-4dea-864e-ab4e870220c3">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Dev_Cloud/02_PAYROLL/TAXREMITTANCE_BY_PERIOD"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#FFBFBF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Tax_Summary" uuid="400a6e4c-dbe5-4b4b-95df-b48bfe62c854">
+		<parameter name="ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_Payroll_Month" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="P_year" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select em.emp_company_no emp_id,pa.surname_hist,pa.first_name_hist,initcap(pa.lot_street_hist||' '||pa.village_name_hist||' '||pa.district_name_hist) address,pkg_global_fnts.fn_getCurNISTAXNO(em.ind_id,'TIN',pa.period_start) TIN,
+sum(pa.gross_taxable) Gross,sum(pa.tax_amount) PAYE,sum(pa.tax_amount_ytd) YTD_Tax
+from pa_pmg_payrolldtl pa
+join pa_pcf_earningperiod ep on PA.EARNINGS_PERIOD_ID=ep.id
+join HR_RCM_EMPLOYEE em on pa.emp_id=em.id
+where pa.org_id=$P{ORG_ID}
+and ep.id=$P{EARNINGS_PERIOD_ID}
+group by em.emp_company_no, pa.surname_hist, pa.first_name_hist, pa.lot_street_hist||' '||pa.village_name_hist||' '||pa.district_name_hist, pkg_global_fnts.fn_getCurNISTAXNO(em.ind_id,'TIN',pa.period_start)
+order by pa.surname_hist,pa.first_name_hist]]>
+		</queryString>
+		<field name="EMP_ID" class="java.lang.String"/>
+		<field name="SURNAME_HIST" class="java.lang.String"/>
+		<field name="FIRST_NAME_HIST" class="java.lang.String"/>
+		<field name="ADDRESS" class="java.lang.String"/>
+		<field name="TIN" class="java.lang.String"/>
+		<field name="GROSS" class="java.math.BigDecimal"/>
+		<field name="PAYE" class="java.math.BigDecimal"/>
+		<field name="YTD_TAX" class="java.math.BigDecimal"/>
+		<variable name="Total Gross" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{GROSS}]]></variableExpression>
+		</variable>
+		<variable name="Total_PAYE" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{PAYE}]]></variableExpression>
+		</variable>
+		<variable name="Record_Count" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[1.0]]></variableExpression>
+			<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select  pa.period_start,pa.period_end,
+initcap(pa.payment_type_hist) payment_type_hist,
+pa.org_id,pa.organisation_name,
+ho.address,ho.faxnum,ho.telnum,nis_reg_no,tax_reg_no,
+sum(pa.tax_amount) PAYE,sum(pa.tax_amount_ytd) YTD_Tax
+from pa_pmg_payrolldtl pa
+join pa_pcf_earningperiod ep on PA.EARNINGS_PERIOD_ID=ep.id
+join hr_hcf_organisation ho
+on pa.org_id=ho.id
+where pa.org_id=$P{IN_ORG_ID}
+and ep.id=$P{EARNINGS_PERIOD_ID}
+group by pa.period_start, pa.period_end, pa.payment_type_hist, pa.org_id, pa.organisation_name, ho.address,
+ho.faxnum, ho.telnum, nis_reg_no, tax_reg_no]]>
+	</queryString>
+	<field name="PERIOD_START" class="java.sql.Timestamp"/>
+	<field name="PERIOD_END" class="java.sql.Timestamp"/>
+	<field name="PAYMENT_TYPE_HIST" class="java.lang.String"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="NIS_REG_NO" class="java.lang.String"/>
+	<field name="TAX_REG_NO" class="java.lang.String"/>
+	<field name="PAYE" class="java.math.BigDecimal"/>
+	<field name="YTD_TAX" class="java.math.BigDecimal"/>
+	<variable name="YTD_TAX_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{YTD_TAX}]]></variableExpression>
+		<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+	</variable>
+	<variable name="PAYE_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PAYE}]]></variableExpression>
+		<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="152" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="20" uuid="e0dd47a8-cd04-4673-aaae-740af125f531"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Guyana Revenue Authority]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="572" height="20" uuid="14694f7a-6185-4d92-81b8-3cdce2e87b0d"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Income Tax]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="50" width="162" height="20" uuid="c1231974-395d-4227-b1fe-290aaae5ae00"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Name of Employer/Business]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="70" width="162" height="20" uuid="b7366131-1aad-4117-a196-47fd06cb9093"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Address]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="90" width="162" height="20" uuid="d037a4b0-3c19-4f30-95b6-77bf3eb8bb76"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[TIN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="110" width="162" height="20" uuid="20eb0a2f-e927-4a8f-8950-99ce240ccc7b"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Payment Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="130" width="162" height="20" uuid="48ecbce8-1ca2-49ee-8566-203779d7dba2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Income Tax for Period]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="162" y="50" width="410" height="20" uuid="7a9aa541-7763-46aa-a635-da90e9189987"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="162" y="70" width="410" height="20" uuid="4d012922-6b7c-4605-83ec-54a98ec38b11"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="162" y="90" width="410" height="20" uuid="996fd153-0feb-409f-bacd-e0c4e3ac1a12"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TAX_REG_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="162" y="109" width="100" height="20" uuid="27918579-eb68-4145-9861-37e968effb4c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENT_TYPE_HIST}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="162" y="130" width="410" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="1fab7511-66b1-4e1d-8445-2d2ee910cd2b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("MMMMM dd, yyyy").format($F{PERIOD_START})+" - "+new SimpleDateFormat("MMMMM dd, yyyy").format($F{PERIOD_END})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="103" splitType="Stretch">
+			<componentElement>
+				<reportElement key="table" style="table" x="0" y="11" width="572" height="80" uuid="fdcc84a7-6c21-41c8-927b-bedbf7457ec7"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Tax_Summary" uuid="40120d36-2e94-4d91-9579-d607d1aed14a">
+						<datasetParameter name="ORG_ID">
+							<datasetParameterExpression><![CDATA[$P{IN_ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="EARNINGS_PERIOD_ID">
+							<datasetParameterExpression><![CDATA[$P{EARNINGS_PERIOD_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="38" uuid="a65dc84d-19f3-4bad-8307-2dd35b6e2387">
+						<jr:columnHeader style="table_TH" height="20" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="38" height="20" uuid="87d0b6cf-b04d-4fbe-9dc1-5f6ccbd98639"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+									<paragraph firstLineIndent="3"/>
+								</textElement>
+								<text><![CDATA[No.]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TH" height="31" rowSpan="1">
+							<textField pattern="###0" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="38" height="31" uuid="2861cfc9-5077-4833-9133-b0dc8dadabb7"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="10"/>
+									<paragraph leftIndent="1" rightIndent="4"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{Record_Count}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="239" uuid="4fa36008-539b-4685-a177-42f6eec34c10">
+						<jr:columnHeader style="table_TH" height="20" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="239" height="20" uuid="f8b687f3-4fab-4488-a94b-04ee64b6bce0"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+									<paragraph firstLineIndent="3"/>
+								</textElement>
+								<text><![CDATA[Name]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="31" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement x="0" y="0" width="239" height="31" uuid="f8266ee1-cdbb-4431-b713-2595f30e7fdc"/>
+								<textElement>
+									<font fontName="Arial" size="10"/>
+									<paragraph leftIndent="1"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{SURNAME_HIST}+', '+$F{FIRST_NAME_HIST}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="a94cb0d2-5c26-4a8b-852c-1ebeb1fd475b">
+						<jr:tableFooter style="table_TH" height="23" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="23" uuid="b040e4b2-95cd-48d9-92b1-b33b809a3188"/>
+								<textElement>
+									<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+									<paragraph firstLineIndent="3"/>
+								</textElement>
+								<text><![CDATA[Totals]]></text>
+							</staticText>
+						</jr:tableFooter>
+						<jr:columnHeader style="table_TH" height="20" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="20" uuid="5a9498b0-089b-46d8-8212-190d6ab83fb6"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+									<paragraph firstLineIndent="3"/>
+								</textElement>
+								<text><![CDATA[TIN#]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="31" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="90" height="31" uuid="3a36db21-3127-4be4-a146-1e8e998764c0"/>
+								<textElement>
+									<font fontName="Arial" size="10"/>
+									<paragraph firstLineIndent="3" leftIndent="3"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{TIN}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="740bf126-6e82-46cb-a031-9ae54789c7dc">
+						<jr:tableFooter style="table_TH" height="23" rowSpan="1">
+							<textField pattern="#,##0" isBlankWhenNull="true">
+								<reportElement mode="Transparent" x="0" y="0" width="90" height="23" forecolor="#000000" backcolor="#FFFFFF" uuid="7bb45c0f-841f-494a-aa90-09577a59b0f1"/>
+								<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+									<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+									<paragraph lineSpacing="Single" rightIndent="4"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{Total Gross}]]></textFieldExpression>
+							</textField>
+						</jr:tableFooter>
+						<jr:columnHeader style="table_TH" height="20" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="20" uuid="74f68380-5b22-466d-879d-3cbb61f298e7"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+									<paragraph firstLineIndent="3" rightIndent="4"/>
+								</textElement>
+								<text><![CDATA[Gross]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="31" rowSpan="1">
+							<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="90" height="31" uuid="7a05296f-4c88-4e16-bd7c-70a784b15eee"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="10"/>
+									<paragraph rightIndent="4"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{GROSS}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="115" uuid="6b215971-edbc-4dc3-b819-78ad01b395dc">
+						<jr:tableFooter style="table_TH" height="23" rowSpan="1">
+							<textField pattern="#,##0" isBlankWhenNull="true">
+								<reportElement mode="Transparent" x="0" y="0" width="115" height="23" forecolor="#000000" backcolor="#FFFFFF" uuid="1c4ca531-7ce0-47d9-bae2-7c84dd26935d"/>
+								<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+									<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+									<paragraph lineSpacing="Single" rightIndent="4"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{Total_PAYE}]]></textFieldExpression>
+							</textField>
+						</jr:tableFooter>
+						<jr:columnHeader style="table_TH" height="20" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="115" height="20" uuid="07df75d2-0689-4b7f-b528-54b4e33e6ee0"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+									<paragraph firstLineIndent="3" rightIndent="4"/>
+								</textElement>
+								<text><![CDATA[PAYE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="31" rowSpan="1">
+							<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+								<reportElement mode="Transparent" x="0" y="0" width="115" height="31" forecolor="#000000" backcolor="#FFFFFF" uuid="42022a39-031b-461d-a264-585fabe0e962"/>
+								<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+									<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+									<paragraph lineSpacing="Single" rightIndent="4"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{PAYE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="35" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="572" height="15" uuid="417fbf45-e9e7-4e99-97e6-4694fec55df9"/>
+				<textElement markup="none">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Please find enclosed a cheque for "+new DecimalFormat("#,##0").format($F{PAYE})+" being amount of income tax deducted from the"+"pay of the above named employees. Total amount remitted for year being "+new DecimalFormat("#,##0").format($F{YTD_TAX})]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+	<noData>
+		<band height="50">
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="50" uuid="1eaae13e-a978-4839-baac-0f69f8c0fc80"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="24" pdfFontName="Helvetica"/>
+				</textElement>
+				<text><![CDATA[Report Returned No Data]]></text>
+			</staticText>
+		</band>
+	</noData>
+</jasperReport>

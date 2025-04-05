@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LEAVE APPROVAL LETTER" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6811fa3b-ecf6-4e94-9da0-6d1b7e6211f3">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/Training/LEAVE_APPROVAL_LETTER"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 'Please refer to your request to proceed on ' ||apps.pkg_global_fnts.fn_num_towords(DAYS_TAKEN)||   ' ('||DAYS_TAKEN||') ' ||
+CASE
+    WHEN DAYS_TAKEN = 1 THEN 'day '
+    ELSE 'days '
+END
+||LEAVE_TYPE|| ' with effect from '||TO_CHAR(FROMDATE, 'Month dd, yyyy')|| ' to '|| TO_CHAR(TODATE, 'Month dd, yyyy')|| ' inclusive. ' ||
+CASE
+    WHEN APPROVED_DATE IS NOT NULL THEN 'Approval has '
+    ELSE 'Approval has not '
+END ||
+'been given for you to proceed.' AS Request_Status,
+CASE
+    WHEN APPROVED_DATE IS NOT NULL THEN ' You are expected to resume duty on'
+    ELSE 'I did not know what to write here'
+END AS Expectation,
+(SELECT
+               CASE
+                 WHEN sex_code = 'M'  THEN 'Mr.'
+                 WHEN sex_code = 'F' THEN 'Mrs.'
+               END FROM apps.vw_position_location_v3 t where t.emp_id = a.emp_id)||
+(SELECT EMPLOYEE_NAME  FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = a.EMP_ID)AS APPLICANT,
+(SELECT POSITION_NAME FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = a.EMP_ID)AS APPLICANT_POSITION,
+(SELECT ORG_STRUCTURE FROM apps.hr_rcm_employee e WHERE e.ID = a.EMP_ID)AS DEPARTMENT,
+(SELECT ORG_STRUCTURE FROM apps.hr_rcm_employee e WHERE e.ID = a.EMP_ID)AS DEPARTMENT_LEVEL_2,
+'Thru'''' Managing Director' AS REPORTING_TO,
+'Dear '|| (SELECT
+               CASE
+                 WHEN sex_code = 'M'  THEN 'Mr.'
+                 WHEN sex_code = 'F' THEN 'Mrs.'
+               END FROM apps.vw_position_location_v3 t where t.emp_id = a.emp_id)
+        ||
+ ' '||SURNAME_HIST|| ',' as  GREETING,
+ ( select employee_name from apps.vw_position_location_v3 t where t.emp_id = b.employee_no) APPROVED_BY,
+(SELECT POSITION_NAME FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = b.EMPLOYEE_NO) POSITION_OF_APPROVER,
+a.EMP_ID
+FROM apps.hr_lv_leavehistory a join  apps.tbluser b on b.user_name = a.verified_by
+WHERE a.EMP_ID =$P{EMP_ID}]]>
+	</queryString>
+	<field name="REQUEST_STATUS" class="java.lang.String"/>
+	<field name="EXPECTATION" class="java.lang.String"/>
+	<field name="APPLICANT" class="java.lang.String"/>
+	<field name="APPLICANT_POSITION" class="java.lang.String"/>
+	<field name="DEPARTMENT" class="java.lang.String"/>
+	<field name="DEPARTMENT_LEVEL_2" class="java.lang.String"/>
+	<field name="REPORTING_TO" class="java.lang.String"/>
+	<field name="GREETING" class="java.lang.String"/>
+	<field name="APPROVED_BY" class="java.lang.String"/>
+	<field name="POSITION_OF_APPROVER" class="java.lang.String"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<group name="EMP_ID">
+		<groupExpression><![CDATA[$F{EMP_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="524">
+				<staticText>
+					<reportElement x="43" y="430" width="100" height="20" uuid="358edcb8-fce4-4e6f-bb28-941f56030498"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<text><![CDATA[Yours sincerely,]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="43" y="198" width="486" height="20" uuid="94bb2cbb-fc49-4b84-8f46-e33565357095"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{GREETING}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="43" y="154" width="100" height="20" uuid="5496ec0a-e456-4324-93f5-39ef6983e09e"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{REPORTING_TO}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="43" y="113" width="100" height="20" uuid="97f4535c-9638-45ee-8ff4-f4c3a44d5a89"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{APPLICANT_POSITION}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="143" y="113" width="221" height="20" uuid="b853427d-ec33-4447-afb4-c06160d4591a"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="43" y="18" width="467" height="20" uuid="f494eac4-5c5c-4c84-9b6b-809d8b47a06c"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Times New Roman" size="13" isBold="true"/>
+					</textElement>
+					<text><![CDATA[GUYANA WATER INC.]]></text>
+				</staticText>
+				<textField pattern="MMMMM dd, yyyy">
+					<reportElement x="43" y="61" width="100" height="20" uuid="cea002ec-fc7c-4737-9d7c-15af424b986d"/>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="43" y="93" width="100" height="20" uuid="ec283b15-ed31-4d85-b6f9-51702572c9a7"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{APPLICANT}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="143" y="93" width="100" height="20" uuid="7897733f-9398-46ef-992b-cd0e6ccbd80b"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{APPLICANT_POSITION}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="43" y="236" width="486" height="20" uuid="43add0a0-9f9f-44e1-847d-72fb9dfda15c"/>
+					<textFieldExpression><![CDATA[$F{REQUEST_STATUS}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="43" y="281" width="486" height="20" uuid="6d5d1231-b90c-4107-8c7e-79279f5e5a0d"/>
+					<textElement>
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EXPECTATION}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="43" y="450" width="486" height="20" uuid="f27b5eb2-5166-4b16-998f-7e32fbc78834"/>
+					<textElement>
+						<font fontName="Times New Roman" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{APPROVED_BY}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="43" y="470" width="486" height="20" uuid="c1e44bb9-1ff3-43cf-a7d2-0b9c195cae9e"/>
+					<textElement>
+						<font fontName="Times New Roman" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{POSITION_OF_APPROVER}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+</jasperReport>

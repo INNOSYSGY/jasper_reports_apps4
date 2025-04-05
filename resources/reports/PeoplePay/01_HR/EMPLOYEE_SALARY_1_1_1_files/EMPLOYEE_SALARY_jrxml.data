@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Employees Birthday" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="256df055-2d68-4772-add4-d720491dbf7d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/EMPLOYEE_SALARY_1_1_1"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_YEAR" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_MONTH" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_DAY" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_WORKLOCATION_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select B.EMP_COMPANY_NO,a.FIRST_NAME, a.SURNAME,a.DOB,B.DATE_EMPLOYED,B.EMPLOYMENT_CLASS,p.position_name,c.unit_name,p.work_location,
+B.EMPLOYMENT_STATUS,a.EMAIL
+from HR_RCM_EMPLOYEE B
+join HR_RCM_INDIVIDUAL A ON B.IND_ID=A.ID
+join VW_ORG_WORKLOCATION_POSITION P on b.POSITION_LOCATION_ID=P.id
+join hr_hcf_organisation ho
+on b.org_id=ho.id
+join HR_HCF_ORGSTRUCTUREDTL c on p.orgdtl_id=c.id
+where B.EMPLOYMENT_STATUS not like 'IN-ACTIVE'
+and B.EMPLOYMENT_CLASS not like 'APPLICANT'
+and b.org_id=$P{IN_ORG_ID}
+and extract(year from B.DATE_EMPLOYED)=nvl($P{P_YEAR},extract(year from B.DATE_EMPLOYED))
+and extract(month from B.DATE_EMPLOYED)=nvl($P{P_MONTH},extract(month from B.DATE_EMPLOYED))
+and extract(day from B.DATE_EMPLOYED)=nvl($P{P_DAY},extract(day from B.DATE_EMPLOYED))
+and p.id=nvl($P{P_WORKLOCATION_ID},p.id)
+order by extract(day from B.DATE_EMPLOYED)]]>
+	</queryString>
+	<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+	<field name="FIRST_NAME" class="java.lang.String"/>
+	<field name="SURNAME" class="java.lang.String"/>
+	<field name="DOB" class="java.sql.Timestamp"/>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp"/>
+	<field name="EMPLOYMENT_CLASS" class="java.lang.String"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="UNIT_NAME" class="java.lang.String"/>
+	<field name="WORK_LOCATION" class="java.lang.String"/>
+	<field name="EMPLOYMENT_STATUS" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="74" splitType="Stretch">
+			<subreport>
+				<reportElement x="1" y="0" width="571" height="73" uuid="1ed4afa3-39f8-4eed-b42e-f9c67d0d83df"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="50">
+			<staticText>
+				<reportElement x="0" y="11" width="572" height="25" uuid="6d064717-5753-43a8-9cd6-1e4b5ce74e7b"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Listing of Employees Anniversary]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="24" splitType="Stretch">
+			<rectangle>
+				<reportElement x="2" y="0" width="570" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="fc9316f9-2754-4cad-b28f-97495d3bd9a5"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="1" y="0" width="29" height="15" uuid="6ca6633c-362a-42b6-a1f3-e8d86d48977e"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="32" y="0" width="69" height="15" uuid="f629bfec-a4da-421b-83ed-50bbb49b2ef3"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[First Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="101" y="0" width="104" height="15" uuid="4a1e392b-4649-47ce-8648-f258b5f58a3e"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Surname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="327" y="0" width="143" height="15" uuid="5fa040e9-49f7-4da5-aaf3-3b21a3ac92cb"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Designation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="483" y="0" width="89" height="15" uuid="eff31f05-4ee6-4b43-adcb-7923312d4039"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Work Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="264" y="0" width="64" height="15" uuid="0f1cc2eb-b7ae-4bf4-8854-f24400f8e5cc"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Email]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="206" y="0" width="58" height="15" forecolor="#FF0000" backcolor="#FF0000" uuid="bc4801e2-f153-4840-9f25-b267a8fe71b1"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[D.O.E]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="26" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="30" y="0" width="71" height="21" uuid="46742207-cfc5-44c4-8645-34ac9355de00"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="101" y="0" width="106" height="21" uuid="88398885-fa54-4cda-b9b0-313cac0f1990"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="327" y="1" width="143" height="20" uuid="ad80bb34-3468-4580-bb1a-e097bc34861b"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="482" y="1" width="90" height="20" uuid="837dd550-00f8-4563-a558-cb24c0749a16"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WORK_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="30" height="21" uuid="5594b9c6-4a7a-4f34-802c-b6097f7904ed"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM">
+				<reportElement x="206" y="1" width="58" height="20" forecolor="#FF0000" backcolor="#FF0000" uuid="8cc7b5c9-e8d3-498a-897a-bb59b8296b5b"/>
+				<textFieldExpression><![CDATA[$F{DATE_EMPLOYED}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

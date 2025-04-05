@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Gafoors_Job_Letter" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ecff3c86-8004-444c-ba5c-46297bf672de">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors Prod"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/01_HR/Standard_Letters/Gafoors_Job_Letter"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/01_HR/Standard_Letters/Gafoors_Job_Letter_files/main_jrxml"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal"/>
+	<parameter name="ORG_ID" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+        'Dear ' Salutation,
+        i.FIRST_NAME||' '||i.SURNAME AS NAME_OF_EMPLOYEE,
+               CASE
+                 WHEN i.sex_code = 'M'  THEN 'Mr.'
+                 WHEN i.sex_code = 'F' THEN 'Mrs.'
+               END
+        || ' ' || i.SURNAME || ',' AS SURNAME,
+        '<b>' || (Pkg_Global_Fnts.Fn_Address('HOME',i.Id,'LOT',Sysdate)||
+        ' '
+        ||PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'STREET',SYSDATE)||
+        ' '
+        ||decode(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'VILLAGE_WARD',SYSDATE),null,' ',
+         PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'VILLAGE_WARD',SYSDATE)||' ')
+        ||nvl(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'COUNTY',SYSDATE),' ')) || '</b>' AS ADDRESS,
+        p.POSITION_NAME,
+        TO_CHAR(e.DATE_EMPLOYED,'ddth fmMonth,yyyy') as DATE_EMPLOYED,
+        CASE
+                WHEN i.sex_code = 'M'  THEN 'His'
+                WHEN i.sex_code = 'F' THEN 'Her'
+         END as HIS_HER,
+        TO_CHAR(pkg_global_fnts.fn_personalrate(e.id, sysdate),'$999,999.99') AS NUM,
+        '<b>Regards,</b>' closure, 
+        '<b>' || (select employee_name from vw_position_location_v3 p where p.emp_id = 9225) || '</b>' AS signature,
+        '<b>' || (select position_name from vw_position_location_v3 p WHERE p.emp_id = 9225) || '</b>' position_of_approver,
+		sysdate,
+        o.telnum,
+        o.organisation_name,
+        o.address as address2,
+        '<u> <b> RE: ' || 'Job Letter for ' || i.FIRST_NAME||' '||i.SURNAME || '</b></u>' subject,
+               
+        'I hereby certify that ' || '<b>' ||
+            CASE
+                WHEN i.sex_code = 'M'  THEN 'Mr.'
+                WHEN i.sex_code = 'F' THEN 'Mrs.'
+            END || ' ' || i.FIRST_NAME||' '||i.SURNAME || '</b>' || ' has been employed by '|| o.organisation_name ||' from the ' || DATE_EMPLOYED ||
+        ' as a ' || p.POSITION_NAME || ' in the ' || e.org_structure || '.' Paragraph_1,
+        
+            CASE
+                 WHEN i.sex_code = 'M'  THEN 'Mr.'
+                 WHEN i.sex_code = 'F' THEN 'Mrs.'
+            END
+        || ' ' || i.SURNAME || ' is in receipt of a monthly salary of <b>' || (to_char(to_date((pkg_global_fnts.fn_personalrate(e.id, sysdate)),'j'), 'jsp')) ||
+        ' dollars (' || trim(TO_CHAR(pkg_global_fnts.fn_personalrate(e.id, sysdate),'$999,999.99'))  || ').</b>' Paragraph_2,              
+                                                                
+        'Kindly render any necessary services to ' || 
+            CASE
+                WHEN i.sex_code = 'M'  THEN 'Mr.'
+                WHEN i.sex_code = 'F' THEN 'Mrs.'
+            END
+        || ' ' || i.SURNAME || '.' Paragraph_3
+FROM hr_rcm_individual i
+JOIN hr_rcm_employee e ON e.ind_id = i.id
+JOIN vw_position_location_v3 p ON p.emp_id = e.id
+JOIN hr_hcf_organisation o ON o.id =$P{ORG_ID} 
+WHERE e.id =$P{EMP_ID}]]>
+	</queryString>
+	<field name="SALUTATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALUTATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALUTATION"/>
+	</field>
+	<field name="NAME_OF_EMPLOYEE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME_OF_EMPLOYEE"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME_OF_EMPLOYEE"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_EMPLOYED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="HIS_HER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="HIS_HER"/>
+		<property name="com.jaspersoft.studio.field.label" value="HIS_HER"/>
+	</field>
+	<field name="NUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="NUM"/>
+	</field>
+	<field name="CLOSURE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CLOSURE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CLOSURE"/>
+	</field>
+	<field name="SIGNATURE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SIGNATURE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SIGNATURE"/>
+	</field>
+	<field name="POSITION_OF_APPROVER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_OF_APPROVER"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_OF_APPROVER"/>
+	</field>
+	<field name="SYSDATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="SYSDATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SYSDATE"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TELNUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="ADDRESS2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS2"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS2"/>
+	</field>
+	<field name="SUBJECT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUBJECT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUBJECT"/>
+	</field>
+	<field name="PARAGRAPH_1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PARAGRAPH_1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PARAGRAPH_1"/>
+	</field>
+	<field name="PARAGRAPH_2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PARAGRAPH_2"/>
+		<property name="com.jaspersoft.studio.field.label" value="PARAGRAPH_2"/>
+	</field>
+	<field name="PARAGRAPH_3" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PARAGRAPH_3"/>
+		<property name="com.jaspersoft.studio.field.label" value="PARAGRAPH_3"/>
+	</field>
+	<group name="SALUTATION">
+		<groupExpression><![CDATA[$F{SALUTATION}]]></groupExpression>
+	</group>
+	<group name="NAME_OF_EMPLOYEE">
+		<groupExpression><![CDATA[$F{NAME_OF_EMPLOYEE}]]></groupExpression>
+	</group>
+	<group name="SURNAME">
+		<groupExpression><![CDATA[$F{SURNAME}]]></groupExpression>
+	</group>
+	<group name="ADDRESS">
+		<groupExpression><![CDATA[$F{ADDRESS}]]></groupExpression>
+	</group>
+	<group name="POSITION_NAME">
+		<groupExpression><![CDATA[$F{POSITION_NAME}]]></groupExpression>
+	</group>
+	<group name="DATE_EMPLOYED">
+		<groupExpression><![CDATA[$F{DATE_EMPLOYED}]]></groupExpression>
+	</group>
+	<group name="HIS_HER">
+		<groupExpression><![CDATA[$F{HIS_HER}]]></groupExpression>
+	</group>
+	<group name="NUM">
+		<groupExpression><![CDATA[$F{NUM}]]></groupExpression>
+	</group>
+	<group name="SIGNATURE">
+		<groupExpression><![CDATA[$F{SIGNATURE}]]></groupExpression>
+	</group>
+	<group name="POSITION_OF_APPROVER">
+		<groupExpression><![CDATA[$F{POSITION_OF_APPROVER}]]></groupExpression>
+	</group>
+	<group name="TELNUM">
+		<groupExpression><![CDATA[$F{TELNUM}]]></groupExpression>
+	</group>
+	<group name="ORGANISATION_NAME">
+		<groupExpression><![CDATA[$F{ORGANISATION_NAME}]]></groupExpression>
+	</group>
+	<group name="ADDRESS2">
+		<groupExpression><![CDATA[$F{ADDRESS2}]]></groupExpression>
+	</group>
+	<group name="PARAGRAPH_1">
+		<groupExpression><![CDATA[$F{PARAGRAPH_1}]]></groupExpression>
+	</group>
+	<group name="PARAGRAPH_2">
+		<groupExpression><![CDATA[$F{PARAGRAPH_2}]]></groupExpression>
+	</group>
+	<group name="PARAGRAPH_3">
+		<groupExpression><![CDATA[$F{PARAGRAPH_3}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="141" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="3" width="570" height="137" uuid="b4e77836-1c85-47d8-96f5-e1b823c85676"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="90" splitType="Stretch">
+			<textField>
+				<reportElement x="204" y="59" width="230" height="24" printWhenGroupChanges="DATE_EMPLOYED" uuid="59242e48-dc50-4be6-bdcf-8630a2eafe28"/>
+				<textElement markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUBJECT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="19" y="-48" width="147" height="30" uuid="6c71003c-3419-491a-ae4a-0e2cb08150c2"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="246" splitType="Stretch">
+			<textField>
+				<reportElement x="18" y="-88" width="102" height="50" uuid="ed80eee8-9b0e-4a68-8f5c-f1032e7d42a7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a7f066f3-8d6a-40b2-baf9-8ecaa87126fd"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="4" width="100" height="30" uuid="a85aa72c-bad1-4f54-bf23-ac50ac28ce4b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="70d58193-5fbb-4a58-a79e-1ece72014b12"/>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALUTATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="45" y="4" width="119" height="30" uuid="ccc8147b-cb35-41bd-8d25-487f771f1626"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="41" width="547" height="51" uuid="ec41c1bc-f1f9-4ab1-a5bf-0433a98d7e0b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ed1a58d0-806b-4c40-b14d-5226c65f26b9"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARAGRAPH_1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="88" width="547" height="40" uuid="cabd9413-a231-4917-8c54-d9f62a716646">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1f99f17e-9b52-45aa-968e-abd4ceb57de2"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARAGRAPH_2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="135" width="547" height="30" uuid="03d43610-b021-48e3-be9e-0ee01dd5576a"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARAGRAPH_3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="213" width="250" height="30" uuid="b13afad9-9392-4c69-97c8-c8665369957b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="56aedfdc-70c2-42e8-b7b8-42773795047d"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_OF_APPROVER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="195" width="100" height="30" uuid="a9c6cf98-bc13-4747-aefd-60dec228b6c8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b56691b0-6558-4d21-a9a4-335904d2e01b"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SIGNATURE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="176" width="100" height="30" uuid="7476d6d0-310d-46c2-a90e-e5a7273a1c96">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e2720163-283b-4576-8a77-274699ed47d8"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CLOSURE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

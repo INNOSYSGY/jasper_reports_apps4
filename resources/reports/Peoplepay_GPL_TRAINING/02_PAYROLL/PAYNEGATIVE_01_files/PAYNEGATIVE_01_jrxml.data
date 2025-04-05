@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Employee Zero/Negative Payroll" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty" uuid="30dc92cf-5df3-4ec4-85bf-a867220c38da">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="517"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/02_PAYROLL/PAYNEGATIVE_01"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.56.101:8081/jasperserver/services/repository"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select *
+from table(pkg_reports.sp_negativepayrol_rpt($P{EARNINGS_PERIOD_ID}))]]>
+	</queryString>
+	<field name="EARNPRD" class="java.math.BigDecimal"/>
+	<field name="ENAME" class="java.lang.String"/>
+	<field name="MISC_DEDUCTION_SUM" class="java.math.BigDecimal"/>
+	<field name="MEDICAL_SUM" class="java.math.BigDecimal"/>
+	<field name="TIMEEARNINGS" class="java.math.BigDecimal"/>
+	<field name="GROSS" class="java.math.BigDecimal"/>
+	<field name="OTHERINCOME" class="java.math.BigDecimal"/>
+	<field name="NET_PAY" class="java.math.BigDecimal"/>
+	<field name="NIS_EMPLOYEE" class="java.math.BigDecimal"/>
+	<field name="TAX_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="PIECEEARNINGS" class="java.math.BigDecimal"/>
+	<field name="UNION_DUES" class="java.math.BigDecimal"/>
+	<field name="TOTAL_DEDUCTION" class="java.math.BigDecimal"/>
+	<field name="ALLOWANCE" class="java.math.BigDecimal"/>
+	<field name="INCENTIVES" class="java.math.BigDecimal"/>
+	<field name="PERSONAL_RATE" class="java.math.BigDecimal"/>
+	<field name="BENEFIT" class="java.math.BigDecimal"/>
+	<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="PAYMENT_TYPE" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<variable name="Report_GROSS" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{GROSS}]]></variableExpression>
+	</variable>
+	<variable name="Report_NET_PAY" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{NET_PAY}]]></variableExpression>
+	</variable>
+	<variable name="Report_TOTAL_DEDUCTION" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></variableExpression>
+	</variable>
+	<variable name="Report_Medical_SUM" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{MEDICAL_SUM}]]></variableExpression>
+	</variable>
+	<variable name="Report_MISC_DEDUCTION_SUM" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{MISC_DEDUCTION_SUM}]]></variableExpression>
+	</variable>
+	<variable name="Report_NIS_EMPLOYEE" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{NIS_EMPLOYEE}]]></variableExpression>
+	</variable>
+	<variable name="Report_TAX_AMOUNT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TAX_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="Report_OTHERINCOME" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{OTHERINCOME}]]></variableExpression>
+	</variable>
+	<variable name="Report_INCENTIVES" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{INCENTIVES}]]></variableExpression>
+	</variable>
+	<variable name="Report_BENEFIT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{BENEFIT}]]></variableExpression>
+	</variable>
+	<variable name="Report_ALLOWANCE" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ALLOWANCE}]]></variableExpression>
+	</variable>
+	<variable name="Report_PIECEEARNINGS" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PIECEEARNINGS}]]></variableExpression>
+	</variable>
+	<variable name="Report_TIMEEARNINGS" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TIMEEARNINGS}]]></variableExpression>
+	</variable>
+	<variable name="Report_PERSONAL_RATE" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PERSONAL_RATE}]]></variableExpression>
+	</variable>
+	<variable name="Record_Count" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="P_IN_ORG_ID" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="69" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="968" height="69" uuid="ecb6e22f-2b15-4e0d-b654-6ce7d96b49d7"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_LEGAL_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="0" width="967" height="20" uuid="45de23ce-0132-44db-9c49-8a97e16f2b95"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Zero/Negative Payroll Analysis]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="24" splitType="Stretch">
+			<staticText>
+				<reportElement x="156" y="5" width="66" height="17" uuid="d52c729f-74a8-4231-befa-4ac95a058d23"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Basic]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="223" y="5" width="53" height="17" uuid="3fc120bd-4795-4c3a-99fb-dba50cb78cc9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="5" width="50" height="17" uuid="4ded9cde-424c-429b-8312-cb2e0fb92aa3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Piece]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="327" y="5" width="57" height="17" uuid="c07b27a7-06dc-47be-8f9f-8ecf73a34043"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Allowance]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="386" y="5" width="40" height="17" uuid="da1fe98a-0ba3-4965-8d4c-0722d14614fa"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Benefit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="427" y="5" width="48" height="17" uuid="69bc346f-9a60-4e8a-91e1-f0890c235113"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Incentives]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="476" y="5" width="73" height="17" uuid="5d04f8b2-d50a-4116-bcae-30edc75abe05"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Other Earnings]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="549" y="5" width="58" height="17" uuid="573356fa-e550-4b4f-9a3c-0422740e36e2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Gross]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="607" y="5" width="54" height="17" uuid="5ca18592-a823-432a-8ad9-cc09284b9271"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Paye]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="661" y="5" width="59" height="17" uuid="3fda4282-1229-450a-b80e-32843baadf35"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[NIS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="721" y="5" width="61" height="17" uuid="13f607a8-bf1c-454f-96b8-3ee400ed15f6"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Misc. Ded]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="782" y="5" width="58" height="17" uuid="3b6423fa-7ebb-45b3-9500-ec93dadab842"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Med. Fee]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="840" y="5" width="60" height="17" uuid="1e62fd79-719c-42d1-bd64-2b3986b74b4d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Total Ded]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="900" y="5" width="68" height="17" uuid="c23f400d-a66b-40b6-bcc3-39db79f9ff4a"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Net Pay]]></text>
+			</staticText>
+			<line>
+				<reportElement x="4" y="22" width="964" height="1" uuid="9e1c8851-4396-41bf-a5a6-1bcab2dc2251"/>
+			</line>
+			<staticText>
+				<reportElement x="100" y="5" width="55" height="17" uuid="d52c729f-74a8-4231-befa-4ac95a058d23"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="29" y="5" width="70" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="44de2f41-d3c8-4dd9-b42f-e774eb9c2e37"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Employee No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="5" width="26" height="17" uuid="cc0547f0-3d7d-45e1-b2c0-4e752edf6386"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="156" y="0" width="67" height="20" uuid="81632bd4-9f50-417f-9cfd-f140075d2cb7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERSONAL_RATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="223" y="0" width="53" height="20" uuid="e6c92e8b-4662-4a49-8720-b47953a40660"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TIMEEARNINGS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="278" y="0" width="50" height="20" uuid="01738f73-29dd-4d31-91ed-0baa5769f5a3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PIECEEARNINGS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="327" y="0" width="57" height="20" uuid="85004cc3-dadc-493a-acec-f3da8b9fc65d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ALLOWANCE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="386" y="0" width="40" height="20" uuid="7467c6ef-fb6e-4c36-aea0-a12c4c52fb57"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BENEFIT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="427" y="0" width="49" height="20" uuid="eda66a03-b29a-4eb0-91ef-a04ce37b0b4d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INCENTIVES}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="476" y="0" width="73" height="20" uuid="7d2840ef-4699-430a-b1db-53342763cdca"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OTHERINCOME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="549" y="0" width="58" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="9e677df1-e3e8-4eec-9fef-0e9c5067b79b"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GROSS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="607" y="0" width="54" height="20" uuid="f1decf43-8098-4022-ae10-f0ff315f1f2d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TAX_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="661" y="0" width="59" height="20" uuid="70b9f702-6b33-4bc7-ab4b-4ee9403433a7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NIS_EMPLOYEE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="721" y="0" width="61" height="20" uuid="951bc6f7-543f-47be-b749-8acd65b0014d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MISC_DEDUCTION_SUM}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="782" y="0" width="58" height="20" uuid="7634c311-a9e0-476d-96c8-406bb3f2b90e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MEDICAL_SUM}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="900" y="0" width="68" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="4978de58-46a2-4797-a573-481e57299653"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NET_PAY}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="21" width="967" height="1" uuid="40b37d36-c96f-4a76-b270-cf20f56b9c27"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="839" y="0" width="61" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="3a13ce5f-902c-4cba-b8bd-8c9e3dc977e6"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="0" width="55" height="20" uuid="5c4f413f-ccc2-479c-a9a1-56f36869c7bc"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ENAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="29" y="0" width="70" height="20" uuid="6b66d017-f8d6-4a44-a67f-bd09eda5355e"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="4" y="0" width="25" height="20" uuid="b0bd0042-a354-421a-85e9-a53ab295fcc0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Record_Count}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="21" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="968" height="20" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="d7cc0094-7d1b-42c6-818a-94096d5ad780"/>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="900" y="0" width="68" height="20" uuid="ad77ad60-5c85-41a9-8404-f3bef6825aca"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_NET_PAY}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="838" y="0" width="62" height="20" uuid="e0eeb28d-09cf-4930-a7ef-12e6d182003f"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_TOTAL_DEDUCTION}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="782" y="0" width="58" height="20" uuid="cd204b8c-0c5e-4e87-bd06-552289e6d30d"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_Medical_SUM}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="721" y="0" width="58" height="20" uuid="09190933-32f9-4dda-a25e-7ff2965e72b8"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_MISC_DEDUCTION_SUM}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="661" y="0" width="60" height="20" uuid="bbfa44c7-f434-47ee-8506-7d2152fb6730"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_NIS_EMPLOYEE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="607" y="0" width="54" height="20" uuid="d9d6e446-dcfc-414e-9254-e580b8b61371"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_TAX_AMOUNT}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="549" y="0" width="58" height="20" uuid="710de7c3-94ae-4c58-9c6d-f0ecdca8539f"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_GROSS}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="475" y="0" width="74" height="20" uuid="f07f86c8-a7dc-4592-ac4e-89224e9939ba"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_OTHERINCOME}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="427" y="0" width="49" height="20" uuid="f2bb0fdc-099d-4895-a287-adea11cbcf85"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_INCENTIVES}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="386" y="0" width="40" height="20" uuid="c662ef33-a32e-45da-a1fc-3dd3e193cb8a"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_BENEFIT}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="328" y="0" width="56" height="20" uuid="884ad770-06a7-4c08-adc8-8a5e7533bd12"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_ALLOWANCE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="278" y="0" width="51" height="20" uuid="4bf620e3-07d1-4abf-9f5b-6a5c0cb88cbc"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_PIECEEARNINGS}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="156" y="0" width="66" height="20" uuid="2168a49e-d9c7-4f51-b878-1784a477c6ae"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_PERSONAL_RATE}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="3" y="0" width="122" height="20" uuid="7488aba2-a37b-4f98-84f1-981f31019ee9"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Grand Total]]></text>
+				</staticText>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="224" y="0" width="52" height="20" uuid="d5e9b558-33e1-467d-b442-5f5fabca9e3d"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Report_TIMEEARNINGS}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</summary>
+	<noData>
+		<band height="50"/>
+	</noData>
+</jasperReport>

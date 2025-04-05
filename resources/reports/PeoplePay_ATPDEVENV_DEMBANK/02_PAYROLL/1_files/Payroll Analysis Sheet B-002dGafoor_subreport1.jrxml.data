@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll Analysis Sheet B-Gafoor_subreport1" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="77b7e9ef-3881-487f-8f44-9b112a2fd355">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_ATPDEVENV_SF/02_PAYROLL/1"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="lmorales"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_ATPDEVENV_SF/02_PAYROLL/1_files/Payroll Analysis Sheet B-Gafoor_subreport1.jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Starfish_DEV_AutonomousDB_DataAdapter"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PAY_SLIP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT O.PAY_SLIPNO,  ROUND(O.INCOME_AMOUNT,2) INCOME_AMOUNT, INCOME_AMOUNT_YTD,
+    (CASE WHEN O.INCOME_CODE IN ('OT1','OT', 'NR','SF') THEN
+        ic.Description||'('||quantity||' HR at Rate:'||REPLACE(TO_CHAR(o.rate,'$999,999.99'),' ','')||')'
+        ELSE ic.Description END)Description, o.Income_code, O.Emp_id
+    FROM   PA_PMG_PAYROLLINCOME O INNER JOIN PA_PCF_INCOMECODE IC ON O.INCOME_CODE = IC.INCOME_CODE
+    where	pay_slipno=$P{PAY_SLIP_ID}
+and ic.org_id=$P{P_ORG_ID}
+	and Income_Amount>0]]>
+	</queryString>
+	<field name="PAY_SLIPNO" class="java.math.BigDecimal"/>
+	<field name="INCOME_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="INCOME_AMOUNT_YTD" class="java.math.BigDecimal"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="INCOME_CODE" class="java.lang.String"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<variable name="Total Income" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{INCOME_AMOUNT}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="90" height="15" uuid="451db553-2c79-4faf-99b6-11ed5baa11ce"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="90" y="0" width="64" height="15" uuid="80aff1e4-dcc9-4fb8-b76d-31aabfdcb50b"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INCOME_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

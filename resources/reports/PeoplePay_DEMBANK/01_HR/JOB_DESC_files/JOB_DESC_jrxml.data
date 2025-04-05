@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Job Description" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9adc9da5-dbaf-46c1-aa77-fccb08602334">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="15"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_DEMBANK/01_HR/JOB_DESC"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="lmorales"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Job Description"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DEMBANK - PROD_AutonomousDB_DataAdapter"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GPL/01_HR/Standard_Letters/JOB_DESC_files/JOB_DESC_jrxml"/>
+	<subDataset name="Position Responsibilities" uuid="3adfc392-8198-4380-b8d2-785ccd32b796">
+		<parameter name="p_position_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select id,p.responsibility_code,p.responsibility_detail
+from hr_hcf_jobresponsibility p
+where p.job_id=$P{p_position_id}
+order by id]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="RESPONSIBILITY_CODE" class="java.lang.String"/>
+		<field name="RESPONSIBILITY_DETAIL" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Qualification" uuid="e6a0add3-4a4c-4ce5-ba56-a1b1254d5a1c">
+		<parameter name="p_position_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select nvl(TRAINING_LEVEL,'')||' '||nvl(SUBJECT_COURSE,' ') qualification,req_training_detail
+from hr_hcf_jobtraining
+where job_id=$P{p_position_id}
+AND CLASSIFICATION='Qualification']]>
+		</queryString>
+		<field name="QUALIFICATION" class="java.lang.String"/>
+		<field name="REQ_TRAINING_DETAIL" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Experience" uuid="42d3432c-c113-4ef6-9dc7-031502191c39">
+		<parameter name="p_position_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select id,experience_required,duration_unit,duration_quantity
+from hr_hcf_jobexperience
+where job_id=$P{p_position_id}]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="EXPERIENCE_REQUIRED" class="java.lang.String"/>
+		<field name="DURATION_UNIT" class="java.lang.String"/>
+		<field name="DURATION_QUANTITY" class="java.math.BigDecimal"/>
+	</subDataset>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select p.id,p.job_id,initcap(p.position_name) position_name,p.position_abv,
+  (
+  select initcap(position_name)
+  from hr_hcf_position h
+  where h.id=p.report_to
+  ) report_to,
+(
+select grade_code
+from hr_hcf_positiongrade g
+where g.id=p.grade_id
+) grade,
+initcap(d.unit_name) unit_name,HD.ORG_ID,
+ho.id,ho.parent_org_id,ho.organisation_name,ho.address,
+ho.short_name,ho.telnum,ho.faxnum,
+ho.nis_reg_no,ho.tax_reg_no
+from hr_hcf_position p
+join hr_hcf_orgstructuredtl d on p.orgdtl_id=d.id
+join hr_hcf_orgstructurehd hd on d.org_structure_id=hd.id
+join hr_hcf_organisation ho on hd.org_id=ho.id
+where p.id=$P{ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="JOB_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="JOB_ID"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="POSITION_ABV" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_ABV"/>
+	</field>
+	<field name="REPORT_TO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO"/>
+	</field>
+	<field name="GRADE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="GRADE"/>
+	</field>
+	<field name="UNIT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="UNIT_NAME"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="COLUMN_9" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="PARENT_ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PARENT_ORG_ID"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="SHORT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SHORT_NAME"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="FAXNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
+	</field>
+	<field name="NIS_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NIS_REG_NO"/>
+	</field>
+	<field name="TAX_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TAX_REG_NO"/>
+	</field>
+	<group name="Position" isStartNewPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{ID}]]></groupExpression>
+		<groupHeader>
+			<band height="213">
+				<staticText>
+					<reportElement x="0" y="98" width="35" height="20" uuid="f573e6a5-6a5a-4968-b9b0-c759838fa6fd"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Title:]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="76" y="98" width="496" height="20" uuid="ae476f05-1e5a-45ad-9886-9fe2b5b7a768"/>
+					<textElement>
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="76" y="138" width="496" height="20" uuid="822d1ab1-46fa-45f9-9ca9-ca1ccb1ec54e"/>
+					<textElement>
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{UNIT_NAME}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="138" width="76" height="20" uuid="23ff4d92-5536-437c-8671-9ea9f931bd22"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Work Unit]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="158" width="76" height="20" uuid="419f982f-0640-49cd-a959-87178d04c050"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Grade Scale]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="76" y="158" width="496" height="20" uuid="aa20a62d-39c4-490a-b991-5604ee399e5c"/>
+					<textElement>
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{GRADE}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Opaque" x="0" y="71" width="572" height="20" backcolor="#CCCCCC" uuid="dc1475d2-cd57-4609-9f01-19437d7e94ab"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Position Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="178" width="76" height="20" uuid="abc8e904-2db5-4458-a2ae-fe9547139a14"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Report To:]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="76" y="178" width="496" height="20" uuid="91836977-f432-4250-8598-891bf7afa8b4"/>
+					<textElement>
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{REPORT_TO}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="207" width="572" height="1" uuid="3a1cd172-99d5-4d95-8328-e56a334e166c"/>
+					<graphicElement>
+						<pen lineWidth="2.0"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement x="0" y="118" width="35" height="20" uuid="f573e6a5-6a5a-4968-b9b0-c759838fa6fd"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Code:]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="76" y="118" width="496" height="20" uuid="ae476f05-1e5a-45ad-9886-9fe2b5b7a768"/>
+					<textElement>
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{POSITION_ABV}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<subreport>
+					<reportElement x="0" y="0" width="572" height="71" uuid="41bdcf33-eb73-403d-ba2d-fe7291c448d8"/>
+					<subreportParameter name="P_IN_ORG_ID">
+						<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="49">
+				<staticText>
+					<reportElement x="0" y="0" width="267" height="20" uuid="0e6531ce-bf4b-4587-85b0-092ff60f7d4d"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Duties and Responsibilities:]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement key="table" x="18" y="29" width="511" height="20" uuid="927dcdd5-a723-49de-8e62-bdfb8e6f16b7"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Position Responsibilities" uuid="8dd4ce44-9ea1-47a7-8de3-dd9137056d23">
+							<datasetParameter name="p_position_id">
+								<datasetParameterExpression><![CDATA[$F{JOB_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="68" uuid="3a74e80a-bdc9-4276-92f7-eaa6533151ff">
+							<jr:detailCell height="25" rowSpan="1">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="68" height="20" uuid="50968cc6-8111-4f30-b1d1-0a09f77cce5c"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{RESPONSIBILITY_CODE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="484" uuid="3f78cbe6-2c53-43dd-8fed-5ffd75c281e4">
+							<jr:detailCell height="25" rowSpan="1">
+								<textField textAdjust="StretchHeight">
+									<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="484" height="20" uuid="1afb6ffa-fb1f-450a-a358-0f259b424c36"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+										<paragraph lineSpacing="1_1_2" leftIndent="5"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{RESPONSIBILITY_DETAIL}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="49">
+				<staticText>
+					<reportElement x="0" y="0" width="267" height="20" uuid="331c5d2f-9e4f-4532-8ed0-b33e182131a9"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Qualification:]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement key="table" x="18" y="20" width="511" height="20" uuid="690520ee-38ab-410f-bc8b-17f0d1eb0bf8"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Qualification" uuid="4e1db92f-c661-4d13-96fa-ed0c336a1d1d">
+							<datasetParameter name="p_position_id">
+								<datasetParameterExpression><![CDATA[$F{JOB_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="90" uuid="2de82ba4-cd21-465f-8078-1ab415e71ba2">
+							<jr:detailCell height="20" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="90" height="20" uuid="caf1b9ef-a330-40c4-83e0-d8fbaec991f5"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{QUALIFICATION}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="402" uuid="4ae6e755-9a95-4b2d-bf2e-4394e985e12c">
+							<jr:detailCell height="20" rowSpan="1">
+								<textField textAdjust="StretchHeight">
+									<reportElement x="0" y="0" width="402" height="20" uuid="2247a90e-f488-48bc-8985-095b1d992543"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+										<paragraph lineSpacing="1_1_2"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{REQ_TRAINING_DETAIL}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="57">
+				<staticText>
+					<reportElement x="0" y="0" width="267" height="20" uuid="fef91dda-94f7-4876-aebb-4ad26b5313ef"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Experience:]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement key="table" x="18" y="20" width="511" height="20" uuid="9cce6eae-1a0f-4f43-bbda-f3b5e75cd1f7"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Experience" uuid="8f7e8d53-019c-433b-9bfa-10a67b8fd10c">
+							<datasetParameter name="p_position_id">
+								<datasetParameterExpression><![CDATA[$F{JOB_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="525" uuid="88798553-5e16-4c5b-8106-6f0cef618ad0">
+							<jr:detailCell height="20" rowSpan="1">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="525" height="20" uuid="3e963be5-e571-49e1-8193-f32001c53f8c"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+										<paragraph lineSpacing="1_1_2"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{EXPERIENCE_REQUIRED}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="34">
+				<rectangle>
+					<reportElement x="10" y="10" width="555" height="0" forecolor="#FFFFFF" backcolor="#FFFFFF" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+				</rectangle>
+			</band>
+			<band height="50"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="15" width="572" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="2" width="162" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

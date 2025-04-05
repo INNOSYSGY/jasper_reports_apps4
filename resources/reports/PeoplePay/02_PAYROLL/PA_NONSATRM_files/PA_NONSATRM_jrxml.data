@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Non Statutory Remittances" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="53808aee-21b1-4032-bcf9-a8ea5864cfbe">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select *
+from table ( PKG_REPORTS.SP_LST_NON_STAT_REMIT)]]>
+	</queryString>
+	<field name="NOF" class="java.math.BigDecimal"/>
+	<field name="EMP_COMPANY_NO_HIST" class="java.lang.String"/>
+	<field name="SURNAME_HIST" class="java.lang.String"/>
+	<field name="FIRST_NAME_HIST" class="java.lang.String"/>
+	<field name="MIDDLE_NAME" class="java.lang.String"/>
+	<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="DEDUCTION_NO" class="java.lang.String"/>
+	<field name="EXP_DESCRIPTION" class="java.lang.String"/>
+	<variable name="TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></variableExpression>
+		<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="220" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy" isBlankWhenNull="true">
+				<reportElement x="-1" y="106" width="162" height="20" uuid="4ad6bc65-7870-425e-b448-3de3e1612130"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="2" y="128" width="100" height="20" uuid="4983d523-1c3c-4b8a-83c4-cf8c742c8a89"/>
+				<text><![CDATA[Dear Sir/Madam,]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="2" y="159" width="553" height="20" uuid="90480103-dea9-4276-9343-4962fb6bb943"/>
+				<textElement markup="none"/>
+				<textFieldExpression><![CDATA["Please acknowledge receipt the sum of "+$V{TOTAL}+" as per cheque #......................dated..........attached being"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="2" y="179" width="553" height="20" uuid="7a425a4f-d4d8-4db6-bcd0-b001a41c54b8"/>
+				<text><![CDATA[deductions made on behalf on the above mentioned enitity from the salaries of the following employees for the]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="199" width="553" height="20" uuid="99ffa726-f68f-40ab-8da8-39d06fab6f7e"/>
+				<text><![CDATA[month of ...............................................................]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="0" y="0" width="553" height="100" uuid="03ad8e70-fcf9-433c-a54f-1fdd8dc081fd"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="2" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="29" height="20" uuid="8a811228-1ec3-44a6-956d-26fdae3ae144"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="29" y="0" width="70" height="20" uuid="56060f72-2c89-43fe-8ed7-76b8f52de81d"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="199" y="0" width="100" height="20" uuid="2e37e3d5-2b23-4532-b6b8-9d1c206b42b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[First Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="99" y="0" width="100" height="20" uuid="1eb9481c-ae06-48d6-b297-14f2d0bc09b3"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Surname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="299" y="0" width="76" height="20" uuid="36a2a8c6-2895-4c2f-9a80-b26cd90f774f"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Middle Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="475" y="0" width="80" height="20" uuid="c01d3f02-477e-44b9-87ce-ef927f5283cb"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Remarks]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="375" y="0" width="100" height="20" uuid="a718a946-af4e-43e8-9421-58b6d90646ae"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="19" width="555" height="1" forecolor="#CCCCCC" uuid="7151b967-80c2-4936-ae9c-098d92d3a841"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="-1" y="0" width="30" height="15" uuid="15f5efa9-d40f-4869-a308-9b5b3d0afa7e"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOF}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="29" y="0" width="70" height="15" uuid="37aa0345-e999-42b1-8247-4888e9454d23"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO_HIST}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="199" y="0" width="100" height="15" uuid="f0467555-1c09-4ef8-82f4-7a91ff4fc856"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME_HIST}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="99" y="0" width="100" height="15" uuid="8a50967a-3f14-4726-9a9e-b289b050ec37"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SURNAME_HIST}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="299" y="0" width="76" height="15" uuid="fa77c7b1-9eed-4dd8-a0ca-8c3384a9128c"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{MIDDLE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern=" #,##0" isBlankWhenNull="true">
+				<reportElement x="375" y="0" width="100" height="15" uuid="4f99fc0e-3708-4ebb-bd73-a0edd500311a"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="487" y="14" width="68" height="1" uuid="3c99a375-6ac8-468b-a289-2436a375be84"/>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="-1" y="0" width="555" height="15" forecolor="#999999" backcolor="#999999" uuid="a8c6df23-0d53-427e-854d-22a715edf328"/>
+				<textField evaluationTime="Report">
+					<reportElement x="528" y="0" width="27" height="15" uuid="360ef276-0164-4e60-8020-819ba1e79a2b"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="448" y="0" width="80" height="15" uuid="237b4234-56b3-4e0a-9825-700ae1a65579"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE, MMMMM, dd  yyyy">
+					<reportElement x="2" y="0" width="279" height="15" uuid="7a514210-b009-4a06-93ee-21e72073c9bb"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+			<staticText>
+				<reportElement x="0" y="15" width="555" height="15" uuid="2c0a0197-8e1d-405e-af0b-bbe87d64595c"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="22" splitType="Stretch">
+			<staticText>
+				<reportElement x="275" y="1" width="100" height="20" uuid="6564f219-8370-4d95-9ebc-e5be4fa81685"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern=" $ #,##0">
+				<reportElement x="375" y="1" width="100" height="20" uuid="5dda1703-ca88-4411-9c91-5c03ba8e09e3"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

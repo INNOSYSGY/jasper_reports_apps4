@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Batches by Period" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ad7bfe22-9479-4aec-ad61-dd0eb38ea70f">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/PAYMENT/BATHCES_BY_PERIOD"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.18:8081/jasperserver/services/repository"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\Steffon Assing\\Dropbox\\Mayor and City Council\\Revenue Collection System Restart\\reports\\headers\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select initcap(a.USER_NAME) as CASHIER,
+r.TOTAL_AMOUNT,
+r.TOTAL_RECEIVED,
+r.TOTAL_CASH,
+r.TOTAL_CHEQUE,
+r.TOTAL_CHEQUE,
+r.TOTAL_ADVANCE,
+(select reference_value from references re where r.status=re.id) status,
+r.DATE_OPENED,
+r.DATE_CLOSED,
+r.APPROVED_BY,
+r.approved_date,
+ r.BATCH_TYPE,
+ r.BATCH_NO
+from RECEIPT_BATCH r
+join APP_USER a
+on r.cashier=a.id]]>
+	</queryString>
+	<field name="CASHIER" class="java.lang.String"/>
+	<field name="TOTAL_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="TOTAL_RECEIVED" class="java.math.BigDecimal"/>
+	<field name="TOTAL_CASH" class="java.math.BigDecimal"/>
+	<field name="TOTAL_CHEQUE" class="java.math.BigDecimal"/>
+	<field name="TOTAL_ADVANCE" class="java.math.BigDecimal"/>
+	<field name="STATUS" class="java.lang.String"/>
+	<field name="DATE_OPENED" class="java.sql.Timestamp"/>
+	<field name="DATE_CLOSED" class="java.sql.Timestamp"/>
+	<field name="APPROVED_BY" class="java.lang.String"/>
+	<field name="APPROVED_DATE" class="java.sql.Timestamp"/>
+	<field name="BATCH_TYPE" class="java.lang.String"/>
+	<field name="BATCH_NO" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="752" height="79" uuid="715e716e-3381-4ee1-b4c0-4673a39f4bc2"/>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA["Listing of Batches by Period"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LANDSCAPE_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="70" height="20" uuid="706cd961-bb1d-4e8b-a7c3-fdff72aef838"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cashier]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="0" width="85" height="20" uuid="07353859-7913-4675-b54c-a0a7892ae965"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="155" y="0" width="85" height="20" uuid="446fc69a-7c0d-4f61-b102-4fdedbdf8ad3"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Cash]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="240" y="0" width="85" height="20" uuid="7d55a87c-b408-437d-8c5c-ccf8e6dd9972"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Cheque]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="325" y="0" width="100" height="20" uuid="c2722caf-d19d-40c5-b7c2-f441a24e2050"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Total Advance]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="425" y="0" width="45" height="20" uuid="1fdf1d70-b33a-4494-95e7-9e7d981dd4e5"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="470" y="0" width="85" height="20" uuid="effe6b83-0277-4195-bffe-26f2103d7049"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Approved By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="555" y="0" width="80" height="20" uuid="88b6f3d1-beae-4896-bda9-a10cb83f3551"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Approved Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="635" y="0" width="117" height="20" uuid="c5daf03a-d505-4ad5-be37-e30505989d6c"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Batch #]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="70" height="20" uuid="37055cf4-51cd-4757-96ad-4334ad98f2bd"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CASHIER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="70" y="0" width="85" height="20" uuid="f1bf3a00-a051-4579-874e-61513b2a5fcd"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="155" y="0" width="85" height="20" uuid="2fac9535-b261-494a-b237-6ccd6a957d53"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_CASH}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="240" y="0" width="85" height="20" uuid="d4e0bfca-e674-4c25-bcb7-a2408c8f768c"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_CHEQUE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="325" y="0" width="100" height="20" uuid="5f775f29-5cb2-4086-a596-1655a549845f"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_ADVANCE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="425" y="0" width="45" height="20" uuid="95f6d374-c2c2-43a7-8e3f-b29e98947467"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STATUS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="470" y="0" width="85" height="20" uuid="2e51229e-b78d-4b93-acf8-b76c6c2759a6"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{APPROVED_BY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yy" isBlankWhenNull="true">
+				<reportElement x="555" y="0" width="80" height="20" uuid="342b7777-66ae-461a-8007-8e9ac321b884"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{APPROVED_DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="635" y="0" width="117" height="20" uuid="201ed269-8075-45aa-8dd3-513162a1bd58"/>
+				<textElement>
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BATCH_NO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="752" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="67377bb4-429b-48d5-b35c-6dfae3264a5e"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="752" height="15" uuid="dd252cb7-4352-4815-b197-892c72bdd0d2"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="139" height="13" uuid="df0d11b7-0923-4665-9928-817de563a61f"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="723" y="0" width="29" height="13" uuid="aeb01442-d6a4-4724-ac2c-4b98ed62ab39"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="666" y="0" width="57" height="13" uuid="64b5027e-b644-4f42-a92d-755eadc1a378"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

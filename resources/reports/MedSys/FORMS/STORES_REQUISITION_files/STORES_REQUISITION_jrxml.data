@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Stores Requisition" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="161e325f-ba05-4479-aa0e-74ab63e9a475">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/FORMS/STORES_REQUISITION"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<subDataset name="Items" uuid="9bf433f3-113e-431e-b5b6-4393cad598c3">
+		<parameter name="P_MISC_TRAN_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select *
+from vw_stores_requisition_all a
+where a.MISC_TRANS_ID=$P{P_MISC_TRAN_ID}
+order by  description, line_id]]>
+		</queryString>
+		<field name="MISC_TRANS_ID" class="java.math.BigDecimal"/>
+		<field name="ISSUE_DATE" class="java.sql.Timestamp"/>
+		<field name="ITEM_NO" class="java.lang.String"/>
+		<field name="LINE_ID" class="java.math.BigDecimal"/>
+		<field name="INVENTORY_ITEM_ID" class="java.math.BigDecimal"/>
+		<field name="DESCRIPTION" class="java.lang.String"/>
+		<field name="UOM" class="java.lang.String"/>
+		<field name="REQUEST" class="java.math.BigDecimal"/>
+		<field name="ISSUE" class="java.math.BigDecimal"/>
+		<field name="RECEIVER" class="java.lang.String"/>
+		<field name="QUANTITY_TRANSACTION" class="java.math.BigDecimal"/>
+		<field name="TRANSACTION_DESCRIPTION" class="java.lang.String"/>
+		<field name="TRANSACTION_CODE" class="java.lang.String"/>
+		<field name="NEXT_SIDE" class="java.lang.String"/>
+		<field name="NEXT_SIDE_CODE" class="java.lang.String"/>
+		<field name="TAX_AMOUNT" class="java.math.BigDecimal"/>
+		<field name="PURCHASE_PRICE" class="java.math.BigDecimal"/>
+		<field name="AVERAGE_COST" class="java.math.BigDecimal"/>
+		<field name="TOTAL_COST" class="java.math.BigDecimal"/>
+		<field name="DESTINATION_ORGANISATION" class="java.lang.String"/>
+		<variable name="Total" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{TOTAL_COST}]]></variableExpression>
+		</variable>
+	</subDataset>
+	<parameter name="P_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+misc_trans_id id,
+date_requested,
+issue_date,
+(
+    select description
+    from tblorganization c
+    where c.organization_id=a.oraganisation_id_dest
+) Dest_org,
+(
+    select description
+    from tblorganization c
+    where c.organization_id=a.oraganisation_id_source
+) Source_org,
+h.COMPANY_NAME,VILLAGE_TOWN||', '||h.DISTRICT||', '||h.COUNTRY ADDRESS,EMAIL,
+                        'Tel# '||h.TELEPHONE_NOS Telphone, 'Fax # '||h.FAX_NOS FAX
+
+
+from tblmisctrans a
+CROSS JOIN TBLSYSTEMCONFIGURATION h
+where misc_trans_id=$P{P_ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="DATE_REQUESTED" class="java.sql.Timestamp"/>
+	<field name="ISSUE_DATE" class="java.sql.Timestamp"/>
+	<field name="DEST_ORG" class="java.lang.String"/>
+	<field name="SOURCE_ORG" class="java.lang.String"/>
+	<field name="COMPANY_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="TELPHONE" class="java.lang.String"/>
+	<field name="FAX" class="java.lang.String"/>
+	<group name="Stores Req">
+		<groupExpression><![CDATA[$F{ID}]]></groupExpression>
+		<groupHeader>
+			<band height="42">
+				<subreport>
+					<reportElement x="1" y="0" width="570" height="41" uuid="40901d36-7b10-4619-ad3b-ec660de7402c"/>
+					<subreportParameter name="P_REPORT_NAME">
+						<subreportParameterExpression><![CDATA["STORES REQUISITION"]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:/reports/MedSys/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="92">
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="0" width="95" height="20" uuid="c9144ccb-ef1a-4b78-8871-83db1157a6c7"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Request DATE :"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="306" y="0" width="71" height="20" uuid="403bd6d9-50df-4750-b763-9e03522f6adb"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["NO:"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="305" y="20" width="72" height="20" uuid="dcabd1c1-f008-40b7-b616-9450fc38c977"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Branch/Dept :"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="20" width="94" height="20" uuid="90074571-39ae-415e-b55d-727d8beb6a80"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Destination :"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="41" width="95" height="20" uuid="0ea27fcd-0bff-44b7-8e9e-ec67cd1a7fd4"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Issue DATE :"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="95" y="0" width="122" height="20" uuid="e7da2c67-44f1-4601-ada4-eebb599ced16"/>
+					<textElement verticalAlignment="Middle">
+						<font isUnderline="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DATE_REQUESTED}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="377" y="0" width="194" height="20" uuid="9c1ba5ca-8eb4-453d-82fb-2d750be35cee"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{ID}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="377" y="21" width="194" height="20" uuid="86c6726a-941b-4d87-993a-e18e69a7a9fe"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{SOURCE_ORG}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="95" y="21" width="122" height="20" uuid="01df4b93-de00-4afb-9e99-e56df3ae2511"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{DEST_ORG}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="96" y="41" width="121" height="20" uuid="15e90049-d0e0-4bb2-8a29-c195ffdc4797"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{ISSUE_DATE}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="50">
+				<componentElement>
+					<reportElement key="table" x="1" y="0" width="570" height="50" uuid="bc03d64b-2cd0-4014-947d-031206c52a54"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Items" uuid="ae353cf1-7ab3-4e9d-a723-91bf84e8a7fa">
+							<datasetParameter name="P_MISC_TRAN_ID">
+								<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="59" uuid="35170951-42ab-4579-8bf4-8e399de42a94">
+							<jr:columnHeader height="32" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="59" height="32" uuid="0459c206-f847-4dbb-93cd-84c88eafbb14"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+										<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+										<paragraph leftIndent="2" rightIndent="2"/>
+									</textElement>
+									<textFieldExpression><![CDATA["Item No"]]></textFieldExpression>
+								</textField>
+							</jr:columnHeader>
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="59" height="20" uuid="15903578-f826-4a0f-a19c-45cee10222d0"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9"/>
+										<paragraph leftIndent="2" rightIndent="2"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{ITEM_NO}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="158" uuid="4456a513-05f6-4e17-b658-d5b35f12b4f5">
+							<jr:columnHeader height="32" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="158" height="32" uuid="c25bc8a2-02c2-4655-9bbc-905cc54ffb98"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+										<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+										<paragraph leftIndent="2" rightIndent="2"/>
+									</textElement>
+									<textFieldExpression><![CDATA["Description"]]></textFieldExpression>
+								</textField>
+							</jr:columnHeader>
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="158" height="20" uuid="6cc09832-a1c9-4b09-afb5-74603fa72c92"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9"/>
+										<paragraph leftIndent="2" rightIndent="2"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="59" uuid="074336cd-b96b-41ee-a08a-0899c01fd34a">
+							<jr:columnHeader height="32" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="59" height="32" uuid="1ed3846f-5b82-47f2-92e0-10a6a1595b0a"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+										<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+										<paragraph leftIndent="2" rightIndent="2"/>
+									</textElement>
+									<textFieldExpression><![CDATA["Qty. Req."]]></textFieldExpression>
+								</textField>
+							</jr:columnHeader>
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="59" height="20" uuid="262a3266-4d63-48bf-a8ef-2119428acdb8"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement textAlignment="Right" verticalAlignment="Middle">
+										<font fontName="Arial" size="9"/>
+										<paragraph leftIndent="2" rightIndent="3"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{REQUEST}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="59" uuid="294d159c-6c08-468d-8d2c-4947308d1946">
+							<jr:columnHeader height="32" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="59" height="32" uuid="ca50a473-9a02-460e-87ae-55aea1c11973"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+										<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+										<paragraph leftIndent="2" rightIndent="2"/>
+									</textElement>
+									<textFieldExpression><![CDATA["Qty. Issued"]]></textFieldExpression>
+								</textField>
+							</jr:columnHeader>
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="59" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="a12bf3c1-52ca-4459-ad24-f32a82d3479c"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+										<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+										<paragraph lineSpacing="Single" leftIndent="2" rightIndent="3"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{ISSUE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="76" uuid="b6a2b8dd-22d4-457c-ad68-f60dd2a64962">
+							<jr:columnHeader height="32" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="76" height="32" uuid="4ca356c9-e813-4e77-a50c-15b998c90c22"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+										<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+										<paragraph leftIndent="2" rightIndent="2"/>
+									</textElement>
+									<textFieldExpression><![CDATA["Receiver"]]></textFieldExpression>
+								</textField>
+							</jr:columnHeader>
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="76" height="20" uuid="fa397325-43ac-4889-8588-ee55a5d5eef2"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font fontName="Arial" size="9"/>
+										<paragraph leftIndent="2" rightIndent="1"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{RECEIVER}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:columnGroup width="71" uuid="131a92e9-077a-4b3f-947f-8047ad86c9db">
+							<jr:columnGroup width="71" uuid="735d3534-d02d-452c-95a9-ae183cb525b2">
+								<jr:column width="71" uuid="5d59baf2-8d49-4137-ae5f-e74ad58447bf">
+									<jr:tableFooter height="30" rowSpan="1">
+										<textField pattern="" isBlankWhenNull="true">
+											<reportElement mode="Transparent" x="0" y="0" width="71" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="2958b18d-a99e-4918-a9e8-2d74fb666a6c"/>
+											<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+												<topPen lineWidth="0.5"/>
+												<leftPen lineWidth="0.5"/>
+												<bottomPen lineWidth="0.5"/>
+												<rightPen lineWidth="0.5"/>
+											</box>
+											<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+												<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+												<paragraph lineSpacing="Single" leftIndent="2" rightIndent="3"/>
+											</textElement>
+											<textFieldExpression><![CDATA["Total"]]></textFieldExpression>
+										</textField>
+									</jr:tableFooter>
+									<jr:columnHeader height="32" rowSpan="1">
+										<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+											<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="71" height="32" uuid="e4994fe4-0c68-41ce-ae66-6ec1082f28d4"/>
+											<box>
+												<topPen lineWidth="0.5"/>
+												<leftPen lineWidth="0.5"/>
+												<bottomPen lineWidth="0.5"/>
+												<rightPen lineWidth="0.5"/>
+											</box>
+											<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+												<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+												<paragraph leftIndent="2" rightIndent="2"/>
+											</textElement>
+											<textFieldExpression><![CDATA["Average Cost"]]></textFieldExpression>
+										</textField>
+									</jr:columnHeader>
+									<jr:detailCell height="20" rowSpan="1">
+										<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+											<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="71" height="20" uuid="41ff3c3f-dbf7-44e7-9833-4368aa481573"/>
+											<box>
+												<topPen lineWidth="0.5"/>
+												<leftPen lineWidth="0.5"/>
+												<bottomPen lineWidth="0.5"/>
+												<rightPen lineWidth="0.5"/>
+											</box>
+											<textElement textAlignment="Right" verticalAlignment="Middle">
+												<font fontName="Arial"/>
+												<paragraph leftIndent="2" rightIndent="3"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{PURCHASE_PRICE}]]></textFieldExpression>
+										</textField>
+									</jr:detailCell>
+								</jr:column>
+							</jr:columnGroup>
+						</jr:columnGroup>
+						<jr:column width="73" uuid="26e3d165-1b8e-44a8-810d-4929e852fc94">
+							<jr:tableHeader height="0" rowSpan="1"/>
+							<jr:tableFooter height="30" rowSpan="1">
+								<textField pattern="#,##0" isBlankWhenNull="true">
+									<reportElement mode="Transparent" x="0" y="0" width="72" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="eb99d2a7-3992-41ee-b0c8-635f346e2c78"/>
+									<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+										<pen lineStyle="Dashed"/>
+										<topPen lineWidth="0.5" lineStyle="Solid"/>
+										<leftPen lineWidth="0.5" lineStyle="Solid"/>
+										<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+										<rightPen lineWidth="0.5" lineStyle="Solid"/>
+									</box>
+									<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+										<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+										<paragraph lineSpacing="Single" leftIndent="2" rightIndent="3"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{Total}]]></textFieldExpression>
+								</textField>
+							</jr:tableFooter>
+							<jr:columnHeader height="32" rowSpan="1">
+								<textField isStretchWithOverflow="true">
+									<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="72" height="32" uuid="c5679563-3153-4041-ab49-38f392affcda"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+										<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+										<paragraph leftIndent="2" rightIndent="2"/>
+									</textElement>
+									<textFieldExpression><![CDATA["Total Cost"]]></textFieldExpression>
+								</textField>
+							</jr:columnHeader>
+							<jr:columnFooter height="0" rowSpan="1"/>
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+									<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="72" height="20" uuid="7181b87c-e851-4842-84dc-6b18ec423190"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement textAlignment="Right" verticalAlignment="Middle">
+										<font fontName="Arial"/>
+										<paragraph leftIndent="2" rightIndent="3"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{TOTAL_COST}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="50">
+				<textField isBlankWhenNull="true">
+					<reportElement x="121" y="15" width="140" height="20" uuid="fd69a764-415f-433d-8e97-1ea20893d914"/>
+					<box>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement>
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="15" width="121" height="20" uuid="b433014b-ed71-418f-a5f6-65447e4c6cbd"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["STROKEKEEP'S SIG."]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="428" y="15" width="143" height="20" uuid="b2d2660b-f3d4-4883-b252-465d4ed4ea99"/>
+					<box>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement>
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="238" y="15" width="189" height="20" uuid="94faa016-2bc9-440d-bc7f-28ef96ed4c86"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Rec'd by"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

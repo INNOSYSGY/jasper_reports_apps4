@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d5a81d76-8a48-4aec-8620-16b70163c3d4">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/IPED_appointment_letter"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select (select description from pa_pcf_incomecode g where g.id = a.income_code_id) income_name, amount,b.id,
+(amount*12) yearly_fig
+from hr_rcm_empentitle a join hr_rcm_employee b on b.id = a.emp_id
+where ( amount>0 or admin_status = 'SYS')
+and  EMP_ID =32544
+and end_date is null
+
+union
+
+select cast('Basic Salary' as nvarchar2(200)),
+pkg_global_fnts.fn_personalrate(b.id, sysdate),b.id,
+pkg_global_fnts.fn_personalrate(b.id, sysdate)*12 yearly_fig
+from  hr_rcm_employee b
+where  ID = 32544
+and separated_status is null]]>
+	</queryString>
+	<field name="INCOME_NAME" class="java.lang.String"/>
+	<field name="AMOUNT" class="java.math.BigDecimal"/>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="YEARLY_FIG" class="java.math.BigDecimal"/>
+	<variable name="sum_monthly" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="yearl" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="161" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="63" width="179" height="20" uuid="c51d766b-a258-4001-a2f1-9c31709f4fcd"/>
+				<textFieldExpression><![CDATA[$F{INCOME_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="325" y="63" width="91" height="20" uuid="e97b0bc2-94bb-4818-b809-418db98b60ac"/>
+				<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="442" y="63" width="113" height="20" uuid="0956f7b8-3e79-49a9-948a-f1444797699f"/>
+				<textFieldExpression><![CDATA[$F{YEARLY_FIG}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="325" y="0" width="91" height="20" uuid="47cb3632-60f6-4e77-ada2-3becbb8f5fe1"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Monthly]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="442" y="0" width="113" height="20" uuid="6f3644ab-fac7-4f77-b85c-b4fe157d3c7b"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Year]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="325" y="30" width="91" height="20" uuid="8f0e4dc1-b4cc-40eb-a18c-937964f75065"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[G$]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="442" y="30" width="113" height="20" uuid="43e571a3-ecfb-4d6f-a2e6-14d648a6ce48"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[G$]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="97" width="179" height="20" uuid="2bf0c9c8-42a0-46aa-84d9-30bac5ea991a"/>
+				<textFieldExpression><![CDATA[Gross Salary]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="311" y="97" width="105" height="20" uuid="3c5ab444-9bd6-4859-8e24-e9d444e161c4"/>
+				<textFieldExpression><![CDATA[$V{sum_monthly}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

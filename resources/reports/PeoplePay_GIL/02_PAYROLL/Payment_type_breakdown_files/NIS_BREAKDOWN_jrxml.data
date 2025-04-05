@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll Disbursement Summary" language="groovy" pageWidth="612" pageHeight="792" whenNoDataType="NoDataSection" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0dfae0ff-43d5-4ed6-ba60-89c704818afd">
+	<property name="ireport.zoom" value="1.6105100000000014"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/02_PAYROLL/Payment_type_breakdown"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8085/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="NIS Breakdown"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/02_PAYROLL/Payment_type_breakdown_files/NIS_BREAKDOWN_jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GIL-OMPREME-ANY"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EMP_ID" class="java.math.BigDecimal"/>
+	<parameter name="SESSION_ID" class="java.lang.String"/>
+	<parameter name="SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[select  
+(select nvl(sum(net_pay),0) from pa_pmg_payrolldtl x 
+  join hr_rcm_employee ep1 on x.emp_id=ep1.id
+  join HR_HCF_WORKLOCATIONPOSITION wp1 on wp1.id=ep1.POSITION_LOCATION_ID
+  join hr_hcf_worklocation wl1 on wl1.id=wp1.WKLOCATION_ID
+  join hr_hcf_position w2 on w2.id=wp1.position_id
+where earnings_period_id= $P{EARNINGS_PERIOD_ID}  and upper(PAYMENT_MODE_HIST)='CASH' and x.orgdtl_id=pa.orgdtl_id
+and exists (select 1
+                        from RPT_PARAMETER w1
+                        WHERE 
+                        W1.SESSION_ID= $P{SESSION_ID} 
+                         and
+                         option_value=case when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYEE' then to_char(ep1.id) 
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='GRADE_SCALE' then to_char(w2.grade_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='ORG_STRUCT_LEVEL' then to_char(w2.orgdtl_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='POSITION_LOCATION' then to_char(ep1.POSITION_LOCATION_ID)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='WORK_LOCATION' then to_char(wl1.id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='UNION' then to_char(ep1.union_code_id)
+                                              end
+                        )
+) 
++
+(select nvl(sum(net_pay*y.PERCENT_SPLIT),0) from pa_pmg_payrolldtl x join HR_RCM_DISBURSEMENT y on y.SALARY_ID=x.SALARY_ID       
+ where earnings_period_id= $P{EARNINGS_PERIOD_ID}  and upper(PAYMENT_MODE_HIST)='MULTI' and x.orgdtl_id=pa.orgdtl_id and upper(y.PAYMENT_MODE_DIST)='CASH' and (x.period_start BETWEEN y.START_DATE and y.END_DATE or (x.period_start>y.START_DATE and y.end_date is null)))
+cash,
+(select nvl(sum(net_pay),0) from pa_pmg_payrolldtl x join hr_rcm_employee ep1 on x.emp_id=ep1.id
+  join HR_HCF_WORKLOCATIONPOSITION wp1 on wp1.id=ep1.POSITION_LOCATION_ID
+  join hr_hcf_worklocation wl1 on wl1.id=wp1.WKLOCATION_ID
+  join hr_hcf_position w2 on w2.id=wp1.position_id
+where earnings_period_id= $P{EARNINGS_PERIOD_ID}  and upper(PAYMENT_MODE_HIST)='BANK' and x.orgdtl_id=pa.orgdtl_id
+and exists (select 1
+                        from RPT_PARAMETER w1
+                        WHERE 
+                        W1.SESSION_ID= $P{SESSION_ID} 
+                         and
+                         option_value=case when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYEE' then to_char(ep1.id) 
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='GRADE_SCALE' then to_char(w2.grade_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='ORG_STRUCT_LEVEL' then to_char(w2.orgdtl_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='POSITION_LOCATION' then to_char(ep1.POSITION_LOCATION_ID)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='WORK_LOCATION' then to_char(wl1.id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='UNION' then to_char(ep1.union_code_id)
+                                              end
+                        )
+)
++
+(select nvl(sum(net_pay*y.PERCENT_SPLIT),0) from pa_pmg_payrolldtl x join HR_RCM_DISBURSEMENT y on y.SALARY_ID=x.SALARY_ID       
+ where earnings_period_id= $P{EARNINGS_PERIOD_ID}  and upper(PAYMENT_MODE_HIST)='MULTI' and x.orgdtl_id=pa.orgdtl_id and upper(y.PAYMENT_MODE_DIST)='BANK' and (x.period_start BETWEEN y.START_DATE and y.END_DATE or (x.period_start>y.START_DATE and y.end_date is null)))
+bank,
+(select nvl(sum(net_pay),0) from pa_pmg_payrolldtl x 
+join hr_rcm_employee ep1 on x.emp_id=ep1.id
+  join HR_HCF_WORKLOCATIONPOSITION wp1 on wp1.id=ep1.POSITION_LOCATION_ID
+  join hr_hcf_worklocation wl1 on wl1.id=wp1.WKLOCATION_ID
+  join hr_hcf_position w2 on w2.id=wp1.position_id
+where earnings_period_id= $P{EARNINGS_PERIOD_ID}  and upper(PAYMENT_MODE_HIST)='CHEQUE' and x.orgdtl_id=pa.orgdtl_id
+and exists (select 1
+                        from RPT_PARAMETER w1
+                        WHERE 
+                        W1.SESSION_ID= $P{SESSION_ID} 
+                         and
+                         option_value=case when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYEE' then to_char(ep1.id) 
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='GRADE_SCALE' then to_char(w2.grade_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='ORG_STRUCT_LEVEL' then to_char(w2.orgdtl_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='POSITION_LOCATION' then to_char(ep1.POSITION_LOCATION_ID)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='WORK_LOCATION' then to_char(wl1.id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='UNION' then to_char(ep1.union_code_id)
+                                              end
+                        )
+)
++ 
+(select nvl(sum(net_pay*y.PERCENT_SPLIT),0) from pa_pmg_payrolldtl x join HR_RCM_DISBURSEMENT y on y.SALARY_ID=x.SALARY_ID       
+ where earnings_period_id= $P{EARNINGS_PERIOD_ID}  and upper(PAYMENT_MODE_HIST)='MULTI' and x.orgdtl_id=pa.orgdtl_id and upper(y.PAYMENT_MODE_DIST)='CHEQUE' and (x.period_start BETWEEN y.START_DATE and y.END_DATE or (x.period_start>y.START_DATE and y.end_date is null)))
+cheque,
+(select nvl(sum(net_pay),0) from pa_pmg_payrolldtl x where earnings_period_id= $P{EARNINGS_PERIOD_ID}  and upper(PAYMENT_MODE_HIST) not in ('CHEQUE','BANK','CASH')  and x.orgdtl_id=pa.orgdtl_id) + 
+(select nvl(sum(net_pay*y.PERCENT_SPLIT),0) from pa_pmg_payrolldtl x join HR_RCM_DISBURSEMENT y on y.SALARY_ID=x.SALARY_ID       
+ where earnings_period_id= $P{EARNINGS_PERIOD_ID}  and upper(PAYMENT_MODE_HIST)='MULTI' and x.orgdtl_id=pa.orgdtl_id and upper(y.PAYMENT_MODE_DIST) not in ('CHEQUE','BANK','CASH') and (x.period_start BETWEEN y.START_DATE and y.END_DATE or (x.period_start>y.START_DATE and y.end_date is null)))
+other,
+v.unit_name,
+EMPLOYMENT_CLASS_HIST,
+period_start, period_end
+from pa_pmg_payrolldtl pa 
+join vw_organisation_structure v on pa.orgdtl_id=v.id
+join hr_rcm_employee ep on pa.emp_id=ep.id
+join HR_RCM_INDIVIDUAL r on ep.ind_id=r.id
+join hr_hcf_organisation ho on pa.org_id=ho.id
+join HR_HCF_WORKLOCATIONPOSITION wp on wp.id=ep.POSITION_LOCATION_ID
+join hr_hcf_worklocation wl on wl.id=wp.WKLOCATION_ID
+join hr_hcf_position w on w.id=wp.position_id
+where pa.earnings_period_id= $P{EARNINGS_PERIOD_ID} 
+and exists (select 1
+                        from RPT_PARAMETER w1
+                        WHERE 
+                        W1.SESSION_ID= $P{SESSION_ID} 
+                         and
+                         option_value=case when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYEE' then to_char(ep.id) 
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='GRADE_SCALE' then to_char(w.grade_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='ORG_STRUCT_LEVEL' then to_char(w.orgdtl_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='POSITION_LOCATION' then to_char(ep.POSITION_LOCATION_ID)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='WORK_LOCATION' then to_char(wl.id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='UNION' then to_char(ep.union_code_id)
+                                              end
+                        )
+group by pa.orgdtl_id,v.unit_name,EMPLOYMENT_CLASS_HIST,
+period_start, period_end
+
+]]>
+	</queryString>
+	<field name="CASH" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="CASH"/>
+	</field>
+	<field name="BANK" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="BANK"/>
+	</field>
+	<field name="CHEQUE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="CHEQUE"/>
+	</field>
+	<field name="OTHER" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="OTHER"/>
+	</field>
+	<field name="UNIT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="UNIT_NAME"/>
+	</field>
+	<field name="EMPLOYMENT_CLASS_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS_HIST"/>
+	</field>
+	<field name="PERIOD_START" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_START"/>
+	</field>
+	<field name="PERIOD_END" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_END"/>
+	</field>
+	<sortField name="UNIT_NAME"/>
+	<variable name="Record_Count" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="V_BANK" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{BANK}]]></variableExpression>
+	</variable>
+	<variable name="V_CHEQUE" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CHEQUE}]]></variableExpression>
+	</variable>
+	<variable name="V_CASH" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CASH}]]></variableExpression>
+	</variable>
+	<variable name="V_OTHERS" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{OTHER}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="53" splitType="Stretch">
+			<subreport>
+				<reportElement x="1" y="0" width="571" height="53" uuid="ffe5a4c6-30e2-487c-b84f-e47fbe745d74"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="37" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="0" width="570" height="19" uuid="6a67f048-a637-4a1a-9dd9-b52c33c3d6ab"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Payroll Disbursement Summary]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="19" width="300" height="15" uuid="86128048-4e6e-459c-b706-df76083b6655">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYMENT_CLASS_HIST}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="375" y="19" width="42" height="15" uuid="2af1f473-8bb0-4ce8-aae9-4fccd85a321d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Period:]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="410" y="19" width="84" height="15" uuid="87c8891e-10af-4142-8acb-e92b3b991b24">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERIOD_START}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="483" y="19" width="24" height="15" uuid="77441f5a-0fb4-43d7-a09d-ae98a00013ec">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[To:]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="500" y="19" width="82" height="15" uuid="738f36ac-bac0-4d19-86f7-d088e499a4a5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERIOD_END}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<line>
+				<reportElement x="1" y="18" width="571" height="1" uuid="4303552c-6fd5-48ac-8fd0-33a9dd5bb016"/>
+			</line>
+			<staticText>
+				<reportElement x="1" y="3" width="209" height="15" uuid="cf9d3d89-4812-4d93-823a-e61d3367e4c5">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="13ae01da-6b5d-492c-a13d-b4cef0656e0a"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Department]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="211" y="3" width="90" height="15" uuid="dcfcf2b1-9926-4e90-8ef8-794b2b0fc3a0">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CASH]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="303" y="3" width="90" height="15" uuid="6eedd3dc-638c-4f9f-bdc0-57ce1f6efde7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[BANK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="395" y="3" width="90" height="15" uuid="6a8432c2-b36c-4b00-a862-e176f78612e2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CHEQUE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="489" y="3" width="80" height="15" uuid="acd89fb6-4dd5-4ea5-99b9-52243c0c1a38">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[OTHERS]]></text>
+			</staticText>
+			<line>
+				<reportElement x="1" y="1" width="570" height="1" uuid="1c0175e4-4ec0-454b-9172-6261a2d3100b"/>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="0" width="209" height="15" uuid="23f417f2-a486-4218-b934-6763f1deea84">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="13ae01da-6b5d-492c-a13d-b4cef0656e0a"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{UNIT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="211" y="0" width="90" height="15" uuid="cf4b5c1b-17b1-4c0b-b8b3-0d257cc105ac">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{CASH}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="304" y="0" width="90" height="15" uuid="63aff1c5-e584-45ce-b2c5-e06605f850b6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{BANK}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="395" y="1" width="90" height="15" uuid="06741a2f-ef44-43d0-9da0-5e5358e5414f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{CHEQUE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="490" y="1" width="80" height="15" uuid="98d15adb-fe8d-488f-9aed-d6b73b0463ee">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{OTHER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="35" splitType="Stretch">
+			<rectangle>
+				<reportElement x="1" y="2" width="571" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<textField evaluationTime="Report">
+				<reportElement x="542" y="0" width="28" height="15" uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="6" y="0" width="162" height="15" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="422" y="0" width="120" height="15" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="19" width="571" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="0" width="209" height="15" uuid="868431b0-367d-4841-b6e3-05a479276032">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="13ae01da-6b5d-492c-a13d-b4cef0656e0a"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="211" y="0" width="90" height="15" uuid="b4d917be-52b0-4afb-adfb-eb119144ee2d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_CASH}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="304" y="0" width="90" height="15" uuid="bc792b90-5849-4b83-9574-516a6925fdf7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_BANK}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="395" y="0" width="90" height="15" uuid="648e312c-40f7-4889-8c80-bf3ab3a2d352">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_CHEQUE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="490" y="0" width="80" height="15" uuid="ee328bfd-2dd1-44f5-b74c-f474c1b11183">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58ecef2-c507-4540-a037-d63ecf4f9519"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_OTHERS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

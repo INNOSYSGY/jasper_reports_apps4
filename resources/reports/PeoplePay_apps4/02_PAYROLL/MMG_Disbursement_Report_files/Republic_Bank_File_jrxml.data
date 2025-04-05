@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Employee Bank Payments" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6a8be228-8acb-4049-bd0c-2dd0ff04b118">
+	<property name="ireport.zoom" value="1.3310000000000006"/>
+	<property name="ireport.x" value="13"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/MMG_Disbursement_Report"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/02_PAYROLL/MMG_Disbursement_Report_files/Republic_Bank_File_jrxml"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BANK" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select distinct
+       r.ID,
+       r.EMP_ID,
+       r.PERIOD_START,
+       r.cell_no CELL_NO,
+       i.FIRST_NAME||' '||
+       replace(trim(replace(i.surname,'-','')),' ','') name,
+       r.MMG_AMOUNT MMG_AMOUNT,
+       r.REMARKS,
+       r.CREATED,
+       r.CREATED_BY,
+       r.UPDATED,
+       r.UPDATED_BY,
+       r.ORG_ID,
+       'BlazeDSLDisursement'||to_char(r.PERIOD_START,'MONTHYYYY') label,
+       o.COA_CODE,
+       o.UNIT_NAME,
+       elov.Earning_Name
+  from pa_pmg_payrolldtl pa 
+  join pa_pcf_earningperiod ep on ep.id=pa.earnings_period_id
+  join hr_rcm_employee e on e.id=pa.emp_id  
+  join hr_rcm_individual i on i.id=e.ind_id
+  left join HR_HCF_ORGSTRUCTUREDTL o on o.id=e.orgdtl_id
+  join 
+  (
+  select 
+ORGANISATION_NAME||' '|| initcap(payment_type)||' '||employment_class||' Start Date- '||to_char(start_date,'yyyy-Mon-dd')
+||' End Date- '||to_char(end_date,'yyyy-Mon-dd')||' - '||EARNINGS_TYPE||' '||initcap(replace(compute_gross,'_',' ')) earning_name
+,earning_id
+from 
+(select 
+e.id earning_id,
+E.ORG_ID,
+H.short_name ORGANISATION_NAME,
+EARNINGS_TYPE,
+(
+      SELECT VALUE_DESCRIPTION
+      FROM HR_HCF_LOOKUP
+      WHERE ID=E.EMPLOYMENT_CLASS_ID)EMPLOYMENT_CLASS,
+Y.COMPANY_YEAR,
+
+trunc(E.START_DATE) START_DATE,E.END_DATE,E.PAYROLL_CUTOFF,E.START_PAID_FOR,E.END_PAID_FOR,E.PAYMENT_PERIOD_NO,E.PAYMENT_TYPE,E.PAY_STATUS,
+E.EPAYROLL_STATUS,
+E.ENTERED_BY,E.ENTRY_DATE,E.VERIFIED_BY,E.VERIFIED_DATE,
+H.Telnum,H.Faxnum, H.Address,compute_gross
+FROM  PA_PCF_EARNINGPERIOD E JOIN
+hr_hcf_companyyear y on e.company_year_id=y.id
+join hr_hcf_organisation h on e.org_id=h.id 
+WHERE 
+exists (
+select 1
+from pa_pmg_payrollhd h
+where h.earnings_period_id=e.id  
+)
+   
+
+   
+) B
+order by start_date desc
+  
+  
+  )
+  elov on elov.earning_id=ep.id
+  join PA_PMG_PAYROLL_MMG_REFUND r on r.emp_id=pa.emp_id and trunc(ep.start_date)=trunc(r.period_start)
+  where r.org_id= $P{IN_ORG_ID} 
+  AND ep.id= $P{EARNINGS_PERIOD_ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="PERIOD_START" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_START"/>
+	</field>
+	<field name="CELL_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CELL_NO"/>
+	</field>
+	<field name="NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NAME"/>
+	</field>
+	<field name="MMG_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="MMG_AMOUNT"/>
+	</field>
+	<field name="REMARKS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="REMARKS"/>
+	</field>
+	<field name="CREATED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="CREATED"/>
+	</field>
+	<field name="CREATED_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CREATED_BY"/>
+	</field>
+	<field name="UPDATED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="UPDATED"/>
+	</field>
+	<field name="UPDATED_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="UPDATED_BY"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="LABEL" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LABEL"/>
+	</field>
+	<field name="COA_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COA_CODE"/>
+	</field>
+	<field name="UNIT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="UNIT_NAME"/>
+	</field>
+	<field name="EARNING_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EARNING_NAME"/>
+	</field>
+	<sortField name="COA_CODE"/>
+	<sortField name="NAME"/>
+	<variable name="total_mmg_amount" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{MMG_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="sum_mmg_amount" class="java.math.BigDecimal" resetType="Group" resetGroup="Branch" calculation="Sum">
+		<variableExpression><![CDATA[$F{MMG_AMOUNT}]]></variableExpression>
+	</variable>
+	<group name="Branch" isReprintHeaderOnEachPage="true">
+		<groupExpression><![CDATA[$F{COA_CODE}]]></groupExpression>
+		<groupHeader>
+			<band height="28">
+				<textField>
+					<reportElement x="0" y="5" width="240" height="15" uuid="5376c27d-0194-45bb-b951-fd1cf60527d5">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{COA_CODE}+" "+$F{UNIT_NAME}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<textField pattern="¤#,##0.##;¤-#,##0.##" isBlankWhenNull="true">
+					<reportElement x="251" y="0" width="110" height="15" uuid="7b68257e-0167-425d-9fa1-b100386a07d6"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sum_mmg_amount}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="184" y="-1" width="126" height="17" uuid="6be0e0fd-130d-4787-824d-92db5c091f9d"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Department Total:]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="65" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="57" uuid="405e9e39-8df7-437e-9bc3-56f1679b0ef7"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="555" height="20" uuid="01b246f6-1482-45f1-9606-6f31031f5d63">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EARNING_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="33">
+			<staticText>
+				<reportElement x="0" y="5" width="151" height="15" uuid="18ffe70f-b1c9-4e98-befe-af65eb643b4c"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Employee Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="151" y="5" width="88" height="15" uuid="5ee56140-68ca-4a4c-a915-87255d71031d"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Cell No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="5" width="121" height="15" uuid="d8330b94-b783-4c22-9aa5-53480a274013">
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="0"/>
+				</textElement>
+				<text><![CDATA[MMG Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="395" y="5" width="160" height="15" uuid="24c80a59-bec1-48bc-8c4a-cf852e3c349a"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Remarks]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="23" width="555" height="1" uuid="ab06b77c-1d60-431c-a0cd-12ee7f8749b7"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="151" height="15" isRemoveLineWhenBlank="true" uuid="0ef15c16-7e7f-4a02-b79b-62eb02fbbad6"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="151" y="0" width="88" height="15" uuid="8a036a50-f6a8-4296-b50a-d83a7d6f20a1"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CELL_NO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.##;¤-#,##0.##" isBlankWhenNull="true">
+				<reportElement x="252" y="0" width="121" height="15" uuid="2bffb422-99c6-42d1-af28-6ab1453f4e92"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10"/>
+					<paragraph rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MMG_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.##;¤-#,##0.##" isBlankWhenNull="true">
+				<reportElement x="395" y="0" width="160" height="15" uuid="ed530d5b-909b-44e1-bb1e-6ec7c4c50d0a"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REMARKS}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="16">
+			<textField pattern="¤#,##0.##;¤-#,##0.##" isBlankWhenNull="true">
+				<reportElement x="251" y="0" width="110" height="15" uuid="16887b09-aa01-483f-9534-136858de0a92"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_mmg_amount}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="184" y="-1" width="100" height="17" uuid="0a78a6ef-85cb-43b5-a127-15b8f876c980"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Grand Total:]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

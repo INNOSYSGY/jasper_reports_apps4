@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Letter Portrait Header" language="groovy" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="820abe5e-016a-45c0-87e3-5007c6e9f4e9">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="lmorales"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/01_HR/Standard_Letters/HR_03_files/LETTER_HEAD_PORTRAIT"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/01_HR/Standard_Letters/HR_03"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Employee Job Letter"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GAFOORS"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="356"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="637"/>
+	<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_IN_ADDR" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT address org_address,
+	faxnum,
+	telnum,
+	nis_reg_no,
+	tax_reg_no,
+	email,
+	ORGANISATION_NAME,
+	PHOTO ORG_PHOTO,
+	TO_CHAR( current_date,'fmMonth fmDD, YYYY') today,
+	dir.LOT || ' ' || dir.STREET || ' ' || dir.VILLAGE_WARD addresed_adr,
+	dir.BUSINESS_ACTIVITY || ', ' || dir.BUSINESS_NAME addressed_head
+FROM HR_HCF_ORGANISATION HO
+	join dir_clients dir ON dir.org_id = ho.id
+WHERE 
+	  ho.id = $P{P_IN_ORG_ID} 
+	 AND  dir.id = $P{P_IN_ADDR}]]>
+	</queryString>
+	<field name="ORG_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ADDRESS"/>
+	</field>
+	<field name="FAXNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FAXNUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TELNUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="NIS_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NIS_REG_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="NIS_REG_NO"/>
+	</field>
+	<field name="TAX_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TAX_REG_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="TAX_REG_NO"/>
+	</field>
+	<field name="EMAIL" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMAIL"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMAIL"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="ORG_PHOTO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_PHOTO"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_PHOTO"/>
+	</field>
+	<field name="TODAY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TODAY"/>
+		<property name="com.jaspersoft.studio.field.label" value="TODAY"/>
+	</field>
+	<field name="ADDRESED_ADR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESED_ADR"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESED_ADR"/>
+	</field>
+	<field name="ADDRESSED_HEAD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESSED_HEAD"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESSED_HEAD"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="230" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="0" y="2" width="612" height="15" uuid="460fbdd1-654f-4223-a385-a5af6b427b30"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="63" width="118" height="57" uuid="67f84a3c-29f5-4ccc-b78e-9c349b24698e"/>
+				<textElement textAlignment="Left">
+					<font fontName="Calibri" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="441" y="98" width="152" height="60" uuid="d38a03a4-84f4-47c3-9105-f16b41f7c147">
+					<printWhenExpression><![CDATA["N"=="C" ? true:false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA['FAX: '+ $F{FAXNUM}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="439" y="38" width="152" height="52" uuid="b9b58b62-4f32-4b8b-aa37-b12be390299a"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA['TEL: '+  $F{TELNUM}]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Blank">
+				<reportElement x="4" y="10" width="110" height="48" uuid="5ad4f44d-95f2-48cf-a831-7c417aeb3877"/>
+				<imageExpression><![CDATA[$F{ORG_PHOTO}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="180" y="17" width="232" height="15" uuid="d072be56-f84f-4a77-b58e-165ebda1e525"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Email: '+  $F{EMAIL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="3" y="132" width="177" height="20" uuid="68ad4de7-d281-40a2-9838-8bc65d34be0e"/>
+				<textElement textAlignment="Left">
+					<font fontName="Candara" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TODAY}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="3" y="162" width="177" height="20" uuid="230839a8-4904-4269-b0eb-f16a4d3cbcf4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Candara" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESSED_HEAD}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="2" y="186" width="175" height="20" uuid="c5809d43-456b-484c-a475-277317cca3f9"/>
+				<textElement>
+					<font fontName="Candara" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESED_ADR}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

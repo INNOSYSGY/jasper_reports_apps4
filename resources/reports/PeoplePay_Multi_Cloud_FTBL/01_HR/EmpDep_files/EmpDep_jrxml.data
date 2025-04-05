@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report4" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7ce88d5d-7d09-4410-9610-defb1ca4e767">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="4"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/Kerrie/employeedepartment"/>
+	<property name="ireport.jasperserver.url" value="http://apps.innosysgy.com:8081/jasperserver/services/repository"/>
+	<queryString>
+		<![CDATA[SELECT department_id, department_name, dep.location_id, street_address, city,
+state_province, postal_code, country_id
+FROM departments dep JOIN locations loc ON dep.location_id = loc.location_id]]>
+	</queryString>
+	<field name="DEPARTMENT_ID" class="java.math.BigDecimal"/>
+	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
+	<field name="LOCATION_ID" class="java.math.BigDecimal"/>
+	<field name="STREET_ADDRESS" class="java.lang.String"/>
+	<field name="CITY" class="java.lang.String"/>
+	<field name="STATE_PROVINCE" class="java.lang.String"/>
+	<field name="POSTAL_CODE" class="java.lang.String"/>
+	<field name="COUNTRY_ID" class="java.lang.String"/>
+	<sortField name="DEPARTMENT_ID"/>
+	<variable name="dep_id_v" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$F{DEPARTMENT_ID}]]></variableExpression>
+	</variable>
+	<group name="depgroup" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{DEPARTMENT_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="122">
+				<textField>
+					<reportElement x="115" y="22" width="100" height="20" uuid="ef858c43-3072-463a-9fc6-788bd8a60e7f"/>
+					<textElement textAlignment="Justified"/>
+					<textFieldExpression><![CDATA[$F{STREET_ADDRESS}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="115" y="42" width="100" height="20" uuid="43abce00-4500-4426-95d4-13afa6cc2ef7"/>
+					<textElement textAlignment="Justified"/>
+					<textFieldExpression><![CDATA[$F{CITY}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="115" y="62" width="100" height="20" uuid="847c6858-3053-4841-934c-f2969e2fda41"/>
+					<textElement textAlignment="Justified"/>
+					<textFieldExpression><![CDATA[$F{STATE_PROVINCE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="115" y="82" width="100" height="20" uuid="4dd25a43-c050-4f89-8092-aba1d579752f"/>
+					<textElement textAlignment="Justified"/>
+					<textFieldExpression><![CDATA[$F{POSTAL_CODE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="115" y="102" width="100" height="20" uuid="64ae22f4-5f48-460a-a0c0-1e6e2b18113f"/>
+					<textElement textAlignment="Justified"/>
+					<textFieldExpression><![CDATA[$F{COUNTRY_ID}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="15" y="22" width="100" height="20" uuid="fd58b8cc-692e-4489-aa26-eae000c6c3a8"/>
+					<text><![CDATA[Location:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="115" y="2" width="100" height="20" uuid="6113c30e-9321-4587-974b-664f58fff1ad"/>
+					<textFieldExpression><![CDATA[$F{DEPARTMENT_NAME}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="15" y="2" width="100" height="20" uuid="2414097a-d83f-41c0-97c7-8127bd5122d6"/>
+					<text><![CDATA[Department:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="50"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="194" y="0" width="225" height="20" uuid="7da03a15-a388-4f91-982a-21df498d5202"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[All Employees by Department]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="1" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="134" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="134" uuid="6577ee4e-e1d9-49de-aeef-b46f39c04fc0"/>
+				<parametersMapExpression><![CDATA[$F{DEPARTMENT_ID}]]></parametersMapExpression>
+				<subreportExpression><![CDATA[$F{DEPARTMENT_ID}]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="50"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement x="450" y="0" width="80" height="20" uuid="55b021c6-e1d6-45d0-b6d2-3cc98ce9e76e"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="532" y="0" width="40" height="20" uuid="e815ba99-68f9-47c8-a186-6017e7f03572"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="100" height="20" uuid="695ba05f-5f8a-47ee-a6bc-d5a749ba8165"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

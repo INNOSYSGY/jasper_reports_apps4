@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Insufficient_Grades" language="groovy" pageWidth="396" pageHeight="612" columnWidth="324" leftMargin="36" rightMargin="36" topMargin="3" bottomMargin="20" uuid="beaf98a8-49ad-46a8-9d7d-0418261e2102">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Standard_Letters/APPLICANTS/Insufficient_Grades"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT SURNAME,FIRST_NAME,LOT,STREET,VILLAGE_WARD,TOWN,REGION,COUNTY,ORG_ID,C.ID,
+case lower(to_char(a.sex_code)) when 'f' then 'Ms' when 'm' then 'Mr' end prefix
+FROM HR_RCM_INDIVIDUAL A JOIN HR_RCM_ADDRESS B ON A.ID=B.IND_ID
+LEFT OUTER JOIN HR_RCM_EMPLOYEE C ON A.ID=C.IND_ID
+WHERE A.ID=C.IND_ID AND C.EMPLOYMENT_CLASS_ID=2361 AND C.EMPLOYMENT_STATUS_ID=9595
+AND B.END_DATE IS NULL
+AND C.ID=$P{ID}]]>
+	</queryString>
+	<field name="SURNAME" class="java.lang.String"/>
+	<field name="FIRST_NAME" class="java.lang.String"/>
+	<field name="LOT" class="java.lang.String"/>
+	<field name="STREET" class="java.lang.String"/>
+	<field name="VILLAGE_WARD" class="java.lang.String"/>
+	<field name="TOWN" class="java.lang.String"/>
+	<field name="REGION" class="java.lang.String"/>
+	<field name="COUNTY" class="java.lang.String"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="PREFIX" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="71" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="324" height="71" uuid="658bd02e-20e6-4660-b183-d802a3e5e6db"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/CORPORATE_LETTER_HEAD_1"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<detail>
+		<band height="405" splitType="Stretch">
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="43" width="324" height="14" uuid="1dd774d0-f42b-4663-b9e4-9d24f9ce3123"/>
+				<textElement>
+					<font fontName="DejaVu Serif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="15" width="324" height="12" uuid="e2128e67-fc65-4666-bdf2-af8e40e63b60"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10" isBold="true" isItalic="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PRIVATE AND CONFIDENTIAL]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="79" width="324" height="14" uuid="0193f851-779b-40fd-b707-f84967551f53"/>
+				<textElement>
+					<font fontName="DejaVu Serif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PREFIX}+". "+($F{FIRST_NAME}!=null? $F{FIRST_NAME}: "") +" "+ ($F{SURNAME}!=null? $F{SURNAME}:"")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="95" width="324" height="13" uuid="f26285b3-6d69-430a-8caa-4e99cfc0e6f4"/>
+				<textElement>
+					<font fontName="DejaVu Serif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{LOT}!=null? $F{LOT}: "") +" "+ ($F{STREET}!=null? $F{STREET}:"")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="107" width="324" height="13" uuid="be046b5f-3f6a-4459-9c54-fd608617d006"/>
+				<textElement>
+					<font fontName="DejaVu Serif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{VILLAGE_WARD}!=null? $F{VILLAGE_WARD}: "") +"   "+ ($F{TOWN}!=null? $F{TOWN}:"")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="119" width="324" height="13" uuid="5eea28a6-aa81-41ea-b320-6d8b3413b5c8"/>
+				<textElement>
+					<font fontName="DejaVu Serif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COUNTY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="154" width="324" height="13" uuid="cd0b461e-4792-4c17-9168-76e2a6635b3d"/>
+				<textElement>
+					<font fontName="DejaVu Serif"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dear"+" "+$F{PREFIX}+". "+($F{SURNAME}!=null? $F{SURNAME}:"")+","]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="198" width="324" height="40" uuid="ce182ff4-8c87-4baa-a7a0-9d079ff28e9f"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<text><![CDATA[However, we advice that our minimum qualification requirements are five (5) subjects, including English Language and Mathematics. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="178" width="324" height="19" uuid="0fd1e0fa-daa1-4395-993f-a753f14f1b1f"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<text><![CDATA[We acknowledge receipt of your application for employment.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="390" width="324" height="12" uuid="6f50651a-9918-4d9c-b4c8-67f0b0b0e547"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[MANAGER - HUMAN RESOURCES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="309" width="324" height="14" uuid="72e6de55-6df0-4220-a81b-67a55dcfa5f8"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<text><![CDATA[Yours Sincerely,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="243" width="324" height="14" isRemoveLineWhenBlank="true" uuid="395e4dfc-d2da-4283-b9e6-b234bdb1ca89"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10"/>
+				</textElement>
+				<text><![CDATA[The grades accepted are as follows :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="378" width="324" height="12" uuid="51aa9d2c-8b04-4837-a91b-ecec32bc15ea"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="10" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[HUGH WATSON (MR)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="263" width="324" height="14" uuid="91bdeced-7e67-4b1d-bc1e-33bcb3831289"/>
+				<textElement>
+					<font fontName="DejaVu Serif"/>
+				</textElement>
+				<text><![CDATA[- CXC - Grades 1, 2 & 3]]></text>
+			</staticText>
+			<image scaleImage="RetainShape">
+				<reportElement x="1" y="341" width="97" height="24" uuid="86e41b82-266c-4be6-9dd0-efb52f9c8d3e"/>
+				<imageExpression><![CDATA["repo:/images/T"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

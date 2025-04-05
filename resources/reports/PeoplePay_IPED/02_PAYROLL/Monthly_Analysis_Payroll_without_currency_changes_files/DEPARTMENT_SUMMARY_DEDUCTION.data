@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Department Deduction Summary" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="0d0075d0-04a6-4bf2-8ff4-da8d7a29d8fb">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/1"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/02_PAYROLL/1_files/DEPARTMENT_SUMMARY_DEDUCTION"/>
+	<property name="com.jaspersoft.studio.report.description" value="Department Deduction Summary"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+	<parameter name="P_EARNINGS_PERIOD" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_DEPARTMENT_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="allEmployees" class="java.math.BigDecimal"/>
+	<parameter name="SESSION_ID" class="java.lang.String"/>
+	<parameter name="SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="P_PERIOD_MONTH_YEAR" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select Initcap(ded.description) Description, round(sum(pd.Amount_deducted),0) Amount_deducted
+from PA_PMG_PAYROLLDEDUCTION pd
+join pa_pmg_payrolldtl pa on pd.pay_slipno=pa.id
+join PA_PCF_ADMINDEDUCTION adm ON adm.id = pd.adm_deduction_id
+join PA_PCF_DEDUCTIONCODE ded ON pd.expense_code = ded.expense_code
+join hr_rcm_employee ep on pa.emp_id=ep.id
+join HR_RCM_INDIVIDUAL r on ep.ind_id=r.id
+join hr_hcf_position w on w.id=ep.position_id
+left outer join vw_organisation_structure v on pa.orgdtl_id=v.id
+where
+((upper(pa.PAYMENT_TYPE_HIST) = case   when  $P{P_EARNINGS_PERIOD} =-25 then to_char(upper(pa.PAYMENT_TYPE_HIST))	                               
+                                    when $P{P_EARNINGS_PERIOD}=-15  then 'MONTHLY'
+                                    when $P{P_EARNINGS_PERIOD}=-5    then 'WEEKLY'
+                                    end
+and extract(year from pa.period_end)||extract(month from pa.period_end)= $P{P_PERIOD_MONTH_YEAR}
+and pa.org_id=$P{P_ORG_ID}
+)
+or 
+pa.EARNINGS_PERIOD_ID= $P{P_EARNINGS_PERIOD}
+) 
+and
+  (upper(ded.Who_Pays) ='EMPLOYEE' or upper(adm.Deduction_Type)='EMPLOYEE')
+and ded.org_id=$P{P_ORG_ID}
+and 
+(      $P{allEmployees}  = 1 or 
+exists (select 1
+                        from RPT_PARAMETER w1
+                        WHERE 
+                        W1.SESSION_ID=  $P{SESSION_ID} 
+                         and
+                         option_value=case when option_name = $P{SEARCH_OPTION}    and option_name ='EMPLOYEE' then to_char(ep.id) 
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='GRADE_SCALE' then to_char(w.grade_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='ORG_STRUCT_LEVEL' then to_char(w.orgdtl_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='POSITION' then to_char(ep.position_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='WORK_LOCATION' then to_char(ep.wklocation_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='UNION' then to_char(ep.union_code_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYMENT_TYPE' then to_char(ep.EMPLOYMENT_TYPE_ID)
+                                                end
+                        )
+
+)
+ AND NVL(V.ID,0)=
+CASE WHEN NVL($P{P_DEPARTMENT_ID},0)=9999 THEN NVL(V.ID,0) ELSE NVL($P{P_DEPARTMENT_ID},0) END
+group by Initcap(ded.description)]]>
+	</queryString>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED"/>
+	</field>
+	<variable name="AMOUNT_DEDUCTED_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement stretchType="RelativeToBandHeight" x="4" y="0" width="85" height="15" uuid="acaa7327-9056-42f7-b150-4b62c59d7652"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement stretchType="RelativeToBandHeight" x="89" y="0" width="64" height="15" uuid="6e34ce01-a0ee-4e94-be6c-ddc57efe314b"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="17" splitType="Stretch">
+			<textField pattern="#,##0" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="89" y="0" width="64" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="1c4bfc0b-590f-4790-9181-1bf29e09345d"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{AMOUNT_DEDUCTED_1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="4" y="0" width="85" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="ca622a95-61cf-4a3e-827b-7035de1a47b7"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Total Deductions]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

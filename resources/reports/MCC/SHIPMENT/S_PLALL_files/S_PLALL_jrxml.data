@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="P&amp;L Test" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bca61ee2-f623-4f6f-abc8-da4e7f2060bb">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MCC/SHIPMENT/S_PLALL"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.56.102:8081/jasperserver/services/repository"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<subDataset name="PL" uuid="312ec674-a696-46bc-a983-963eb429ffa2">
+		<parameter name="p_shipment_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT *
+  FROM
+    ( with cntr as
+    ( SELECT LEVEL AS n FROM dual CONNECT BY LEVEL <= 38
+    )
+  SELECT CONTRACT_NO,
+      case c.n
+      when 1 then 'Purchase from'
+      when 2 then 'Sold To'
+      when 3 then '<b>Contract No:</b>'
+      when 4 then 'Product'
+      when 5 then 'Tonnage'
+      when 6 then 'Metal content'
+      when 7 then '<b>Sale</b>'
+      when 8 then 'First Payment'
+      when 9 then 'Second Payment'
+      when 10 then 'Third Payment'
+      when 11 then 'Final Payment'
+      when 12 then '<b>Total</b>'
+      when 13 then '<b>Purchase</b>'
+      when 14 then 'First Payment'
+      when 15 then 'Second Payment'
+      when 16 then 'Third Payment'
+      when 17 then 'Final Payment'
+      when 18 then '<b>Total</b>'
+      when 19 then '<b>Invoice gain</b>'
+      when 20 then '<b>Expenses</b>'
+      when 21 then 'Pre-Load rep Assays'
+      when 22 then 'Freight'
+      when 23 then 'Special handling'
+      when 24 then 'Representation'
+      when 25 then 'Party assays'
+      when 26 then 'Umpires'
+       when 27 then 'Bank Charges'
+       when 28 then 'Agents Purchase'
+       when 29 then 'Agents sale'
+       when 30 then 'Hedge Loss'
+       when 31 then '<b>Operation Expenses</b>'
+       when 32 then '<b>Sub Total<b>'
+       when 33 then 'Loan Fee'
+       when 34 then 'Financing'
+       when 35 then '<b>Financial Expenses</b>'
+       when 36 then '<b>Sub Total Gain (Loss)</b>'
+       when 37 then '<b>NET GAIN</b>'
+       when 38 then 'gain/ton'
+       END AS option_name,
+    case c.n
+      when 1 then purchase_from
+      when 2 then sold_to
+      when 3 then contract_no
+      when 4 then is_second
+      when 5 then tonnage
+      when 6 then metal_content
+      when 7 then sale
+      when 8 then s_first_payment
+      when 9 then s_second_payment
+      when 10 then s_third_payment
+      when 11 then s_final_payment
+      when 12 then s_total
+      when 13 then p_purchase
+      when 14 then p_first_payment
+      when 15 then p_second_payment
+      when 16 then p_third_payment
+      when 17 then p_final_payment
+      when 18 then p_total
+      when 19 then p_invoice_gain
+      when 20 then p_expenses
+      when 21 then pre_load
+      when 22 then freight
+      when 23 then special_handling
+      when 24 then representation
+      when 25 then party_assays
+      when 26 then umpires
+      when 27 then bank_charges
+      when 28 then agents_purchase
+      when 29 then agents_sale
+      when 30 then hedge_loss
+      when 31 then operation_expenses
+      when 32 then sub_total
+      when 33 then loan_fee
+      when 34 then financing
+      when 35 then financial_expenses
+      when 36 then sub_total_gain_loss
+      when 37 then net_gain
+      when 38 then gain_ton
+      end option_values,
+          case c.n
+      when 1 then 1
+      when 2 then 2
+      when 3 then 3
+      when 4 then 4
+      when 5 then 5
+      when 6 then 6
+      when 7 then 7
+      when 8 then 8
+      when 9 then 9
+      when 10 then 10
+      when 11 then 11
+      when 12 then 12
+      when 13 then 13
+      when 14 then 14
+      when 15 then 15
+      when 16 then 16
+      when 17 then 17
+      when 18 then 18
+      when 19 then 19
+      when 20 then 20
+      when 21 then 21
+      when 22 then 22
+      when 23 then 23
+      when 24 then 24
+      when 25 then 25
+      when 26 then 26
+      when 27 then 27
+      when 28 then 28
+      when 29 then 29
+      when 30 then 30
+      when 31 then 31
+      when 32 then 32
+      when 33 then 33
+      when 34 then 34
+      when 35 then 35
+      when 36 then 36
+      when 37 then 37
+      when 38 then 38
+      END sort_values
+  FROM
+    (
+     select *
+     from
+     TABLE(mcc_profit_and_loss_all)
+    ) origin_table
+  cross join cntr c
+    ) tab]]>
+		</queryString>
+		<field name="CONTRACT_NO" class="java.lang.String"/>
+		<field name="OPTION_NAME" class="java.lang.String"/>
+		<field name="OPTION_VALUES" class="java.lang.String"/>
+		<field name="SORT_VALUES" class="java.math.BigDecimal"/>
+		<sortField name="SORT_VALUES"/>
+	</subDataset>
+	<queryString>
+		<![CDATA[select 1
+from dual]]>
+	</queryString>
+	<field name="1" class="java.math.BigDecimal"/>
+	<group name="fgg">
+		<groupExpression><![CDATA[$F{1}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="132">
+				<crosstab>
+					<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="572" height="132" uuid="8705859b-52df-47b5-9edf-b5c869ef5026"/>
+					<crosstabDataset isDataPreSorted="true">
+						<dataset>
+							<datasetRun subDataset="PL" uuid="7a660f78-d3fc-4ae7-be78-81d77b584177">
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+					</crosstabDataset>
+					<rowGroup name="OPTION_NAME" width="120">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{OPTION_NAME}]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="120" height="15" uuid="b16fd74d-7880-4ca3-a7bc-ae20cfce49f4"/>
+									<textElement textAlignment="Left" markup="html">
+										<font fontName="SansSerif" size="9" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{OPTION_NAME}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents/>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="CONTRACT_NO" height="20">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{CONTRACT_NO}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="84" height="20" uuid="4d57be34-6cc9-4119-8f52-ed1f303c76f1">
+										<printWhenExpression><![CDATA[false]]></printWhenExpression>
+									</reportElement>
+									<textFieldExpression><![CDATA[$V{CONTRACT_NO}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents/>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="OPTION_VALUESMeasure" class="java.lang.String">
+						<measureExpression><![CDATA[$F{OPTION_VALUES}]]></measureExpression>
+					</measure>
+					<crosstabCell width="85" height="15">
+						<cellContents>
+							<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="84" height="15" uuid="ab64ca22-fc5b-46b7-b14a-99a98a159fef"/>
+								<textElement textAlignment="Right" markup="none">
+									<font fontName="SansSerif" size="9"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell height="25" rowTotalGroup="OPTION_NAME">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="76a0b79c-05e6-4808-8440-2e8f338508fe"/>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell width="50" columnTotalGroup="CONTRACT_NO">
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="9318be74-a5a4-432c-8343-552d33fc0795"/>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell rowTotalGroup="OPTION_NAME" columnTotalGroup="CONTRACT_NO">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="b5f6233b-53d0-4868-8dd4-699d01c9edc6"/>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+				</crosstab>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="70" splitType="Stretch">
+			<staticText>
+				<reportElement x="263" y="12" width="309" height="20" uuid="f152fdd0-5fb8-467f-95bc-8a74bff5ed40"/>
+				<textElement>
+					<font fontName="Arial" size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[MARGIN SHEET PROFIT & LOSS]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="0" width="263" height="67" uuid="745d7fef-6de4-4a65-ab08-d6ce9f1e6394"/>
+				<imageExpression><![CDATA["repo:/reports/MCC/Image/logo"]]></imageExpression>
+			</image>
+			<line>
+				<reportElement x="105" y="67" width="467" height="2" uuid="9fb9ea47-d6de-43a6-bc7f-03a46b05d160"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineColor="#CC3300"/>
+				</graphicElement>
+			</line>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="2" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="15" forecolor="#CCCCCC" backcolor="#CC0033" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+				<graphicElement>
+					<pen lineColor="#990033"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="15" width="572" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Innovative Systems Inc®]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="11" y="0" width="200" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="936" y="1" width="0" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="bf29d155-322a-4ed6-887e-85e4736d1c5a"/>
+				<textElement verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="451" y="0" width="80" height="13" uuid="3212cf6a-e5ab-49d4-8567-6fb167baa826"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="531" y="0" width="40" height="13" uuid="71ae52aa-ba3d-4f2f-8d07-73934daefbe6"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

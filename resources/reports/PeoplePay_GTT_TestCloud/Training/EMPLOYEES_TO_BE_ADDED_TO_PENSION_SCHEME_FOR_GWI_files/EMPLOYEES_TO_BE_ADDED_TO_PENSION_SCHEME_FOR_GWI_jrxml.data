@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EMPLOYEES_TO_BE_ADDED_TO_PENSION_SCHEME,GWI" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1cadcf98-6313-4de9-bf73-efb29bd69a59">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/Training/EMPLOYEES_TO_BE_ADDED_TO_PENSION_SCHEME_FOR_GWI"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<subDataset name="New Dataset 1" uuid="51d09ba1-7721-4e11-ae10-647991a89bc8">
+		<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="START_DATE" class="java.util.Date">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="END_DATE" class="java.util.Date">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT
+(FIRST_NAME||' '||MIDDLE_NAME||' '||SURNAME) emp_name
+FROM hr_rcm_individual a join hr_rcm_employee b on b.ind_id = a.id
+where org_id = $P{P_IN_ORG_ID} and DATE_EMPLOYED between $P{START_DATE} and $P{END_DATE}]]>
+		</queryString>
+		<field name="EMP_NAME" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="START_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="END_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+'Please be advised that employees listed below are no longer employed at '|| organisation_name  LINE1
+FROM hr_hcf_organisation
+where id = $P{P_IN_ORG_ID} AND start_date < $P{START_DATE} AND start_date < $P{END_DATE}]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="17" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="13" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="10" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="372" splitType="Stretch">
+			<staticText>
+				<reportElement x="21" y="50" width="121" height="20" uuid="0a7351fa-dd93-489f-90e2-465cb1d26953"/>
+				<text><![CDATA[Ms.Malini Ramdhan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="70" width="121" height="20" uuid="df3992d4-d02e-4fce-8628-6192e58ed962"/>
+				<text><![CDATA[Assisstant Supervisor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="130" width="121" height="20" uuid="a763f05d-bd9c-4817-89c9-92570a05d3a9"/>
+				<text><![CDATA[South Cummingsburg]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="108" width="121" height="20" uuid="f6f6f865-6fb5-44c1-845d-2459d0c243b8"/>
+				<text><![CDATA[Lot 78 Church Street]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="90" width="121" height="20" uuid="807c8f81-dbe8-482c-bd43-100dcd64d8fb"/>
+				<text><![CDATA[ASSURIA Life Inc. (GY)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="198" width="100" height="20" uuid="62eec952-3cf7-4696-9792-481ecb5054fc"/>
+				<text><![CDATA[Dear Ms. Ramdhan,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="150" width="121" height="20" uuid="d8c0091e-d5f9-4497-aea8-207731466aff"/>
+				<text><![CDATA[Georgetown]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="239" width="217" height="20" uuid="89b077af-8f52-4ef9-a9a3-ecc140d94132"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RE: Addition to the Scheme]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="270" width="520" height="32" uuid="52ee7698-027d-4dd3-aa51-10aff573de7f"/>
+				<text><![CDATA[Please see application Forms for the under mentioned persons who have joined the Pension scheme. Kindly add him to the plan.]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="21" y="10" width="100" height="20" uuid="542c8565-17f8-49e7-b751-d5d97729bdd9"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement key="table" x="21" y="313" width="360" height="59" uuid="a14901e3-6dd3-4b39-866d-330905e9254e"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="New Dataset 1" uuid="2b510b1f-7a4f-47c7-8a60-dfa29338dc33">
+						<datasetParameter name="P_IN_ORG_ID">
+							<datasetParameterExpression><![CDATA[$P{P_IN_ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="START_DATE">
+							<datasetParameterExpression><![CDATA[$P{START_DATE}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="END_DATE">
+							<datasetParameterExpression><![CDATA[$P{END_DATE}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="35" uuid="4a34c8e8-991b-475a-b379-3bafa474a6fc">
+						<jr:detailCell height="20" rowSpan="1">
+							<textField>
+								<reportElement x="0" y="0" width="35" height="20" uuid="8b13ba9d-5ec1-4eb4-ae0d-f352222e00e3"/>
+								<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="175" uuid="be390dea-2493-450e-9d5c-deaddb3d1f38">
+						<jr:tableFooter height="3" rowSpan="1"/>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="175" height="20" uuid="31973675-d9be-43c4-89b4-ebd08db51ce9"/>
+								<textFieldExpression><![CDATA[$F{EMP_NAME}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="104">
+			<staticText>
+				<reportElement x="21" y="84" width="160" height="20" uuid="a44f5923-c7b0-4f0a-9b11-0390b03f7487"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Human Resources Managager]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="64" width="100" height="20" uuid="39a309b3-7696-4d9f-93ee-89e2dd7d0f47"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[S. Jacobs]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="34" width="100" height="20" uuid="4882a6b8-c154-4401-8aad-37bd290e2305"/>
+				<text><![CDATA[Yours Sincerely,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="0" width="244" height="20" uuid="9ab09a4c-8886-42f7-a4cd-3b04fbc26980"/>
+				<text><![CDATA[Kindly add them to the Pension Plan.]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

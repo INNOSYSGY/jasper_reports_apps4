@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.0.final using JasperReports Library version 6.21.0-4f56c4f36cd19e17675219a9ac4692d5f0f13b06  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CORR_PROMOTION_LETTER" pageWidth="595" pageHeight="842" columnWidth="451" leftMargin="72" rightMargin="72" topMargin="20" bottomMargin="20" uuid="c0e94081-f59c-40a3-ab6e-c47093bb856a">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PROD_PAAS_PAC"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="icarter"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Multi/01_HR/Change_Position_Promotion_Letter_PAC"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Multi/01_HR/Change_Position_Promotion_Letter_PAC_files/main_jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="IN_ORG_ID" class="java.lang.Integer"/>
+	<parameter name="IN_MOV_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT
+    'Please be informed that approval has been granted for your promotion to '||a.new_position||' with the '||a.organisation_name||' as per attached contract.' par1,
+    'Your promotion is effective from '||a.confirm_date||'.' par2,
+    'Management takes this opportunity to wish you continued success in your new role and urge you to keep striving for excellence in the execution of your duties.' par3,
+    'Yours Sincerely <br><br><br>……………………….…...............<br><b>' || upper(nvl(a.report_to_admin_sign, 'Insert Report to Admin')) || '</b>' par6,
+    a.*
+FROM
+    (SELECT
+        org.*,
+        to_char(mov.approved_date, 'fmMonth fmDD, YYYY') date_prepared,
+        to_char(mov.from_date, 'fmMonth fmDD, YYYY') confirm_date,
+        to_char(mov.from_date -1 , 'fmMonth fmDD, YYYY') confirm_date_minus_one,
+        case when ind.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || ind.first_name ||' ' || ind.surname fullname,
+        case when ind.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || ind.surname surname,
+        pos_new.position_name new_position,
+        to_char(nvl(mov.personal_rate, 0)+nvl(ent.amount, 0), 'FML999G999G999G999G990D00') gross_salary,
+        initcap(pkg_global_fnts.fn_num_towords(nvl(personal_rate, 0)+nvl(ent.amount, 0))||' Dollars') gross_salary_words,
+        (select 
+            case when inda.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || first_name ||' ' || surname || ' (' || posa.position_name || ')' 
+        from 
+            hr_rcm_employee empa
+            join hr_rcm_individual inda on empa.ind_id = inda.id 
+            join hr_hcf_position posa on empa.position_id = posa.id
+        where 
+            empa.id = mov.report_to_admin) report_to_admin,
+        (select 
+            inda.sig_photo
+        from tblapprovalhistory apphist 
+        join tbluser userapp on upper(userapp.user_name) = upper(apphist.created_by)
+        join hr_rcm_employee empa on userapp.employee_no = empa.id
+        join hr_rcm_individual inda on empa.ind_id = inda.id 
+        join hr_hcf_position posa on empa.position_id = posa.id
+        where apphist.table_name_key = mov.id
+		and apphist.table_name = 'HR_MOV_EMPMOVEMENT_NEW'
+		and apphist.action = 'APPROVAL'
+		and apphist.id = (select min(a.id) from tblapprovalhistory a where a.table_name_key = mov.id and a.table_name = 'HR_MOV_EMPMOVEMENT_NEW')
+        and rownum = 1
+        ) report_to_admin_sign_img,
+        (select 
+            case when inda.sex_code = 'M' then 'Mr. ' else 'Ms. ' end ||  inda.first_name ||' ' || inda.surname ||',<br> ' || posa.position_name
+        from tblapprovalhistory apphist 
+        join tbluser userapp on upper(userapp.user_name) = upper(apphist.created_by)
+        join hr_rcm_employee empa on userapp.employee_no = empa.id
+        join hr_rcm_individual inda on empa.ind_id = inda.id 
+        join hr_hcf_position posa on empa.position_id = posa.id
+        where apphist.table_name_key = mov.id
+		and apphist.table_name = 'HR_MOV_EMPMOVEMENT_NEW'
+		and apphist.action = 'APPROVAL'
+		and apphist.id = (select min(a.id) from tblapprovalhistory a where a.table_name_key = mov.id and a.table_name = 'HR_MOV_EMPMOVEMENT_NEW')
+        and rownum = 1) report_to_admin_sign,
+        (select 
+           case when indf.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || first_name ||' ' || surname || ' (' ||  posf.position_name || ')' 
+        from 
+            hr_rcm_employee empf
+            join hr_rcm_individual indf on empf.ind_id = indf.id 
+            join hr_hcf_position posf on empf.position_id = posf.id
+        where 
+            empf.id = mov.report_to_func) report_to_func,    
+        case 
+            when mov.approved_by is null then 'NOT APPROVED'
+            else
+                case 
+                    when mov.verified_by is null then  'NOT VERIFIED'
+                    else ' '
+                end
+        end as movement_status,
+        (select 
+            adr.lot || ' ' || 
+            nvl(adr.street ||case when adr.street is not null then '<br>' else null end, null) || 
+            nvl(adr.village_ward || case when adr.village_ward is not null then'<br>' else null end,null) || 
+            nvl(adr.town || case when adr.town is not null then '<br>' else null end, null) || 
+            nvl(adr.county, null)
+        from hr_rcm_address adr
+        where adr.ind_id = ind.id
+        and adr.address_type = 'HOME'
+        and (adr.end_date is null or adr.end_date >= trunc(sysdate))) address, 
+        'Re: Promotion: '|| pos_new.position_name  header,
+        initcap(replace(wk.location_description, ',', ', <br>')) work_location,
+        (select 
+		    listagg(case when inda.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || first_name ||' ' || surname || ', ' || posa.position_name, '<br>') within group (order by posa.position_name) cc_to
+		from 
+		    hr_rcm_employee empa
+		    join hr_rcm_individual inda on empa.ind_id = inda.id 
+		    join hr_hcf_position posa on empa.position_id = posa.id
+		where 
+		    exists(select 1 from rpt_parameter where session_id =  $P{IN_MOV_ID}  and option_name = 'MOVEMENT' and option_value = empa.id)) cc_to
+    FROM    
+        hr_mov_empmovement_new mov
+        LEFT JOIN hr_rcm_employee emp on mov.emp_id = emp.id
+        LEFT JOIN hr_rcm_individual ind on emp.ind_id = ind.id
+        LEFT JOIN hr_rcm_address adr on adr.ind_id = ind.id
+        LEFT JOIN (select a.id, b.probation_duration, (to_char(to_date(floor(b.probation_duration) ,'j'), 'jsp')) probation_duration2,  letter_head_logo, letter_footer_logo, organisation_name, address org_address, telnum, faxnum, email, website  from hr_hcf_organisation a LEFT JOIN hr_hcf_org_rule b on a.id = b.org_id) org on org.id = mov.org_id
+        LEFT JOIN hr_hcf_position pos_new on mov.position_id = pos_new.id
+        LEFT JOIN hr_hcf_worklocation wk on wk.id = emp.wklocation_id
+        LEFT JOIN (select sum(amount) amount, id
+                            from (select movent.amount  , m.id
+                                            from hr_mov_empentitle movent   
+                                            join hr_mov_empmovement_new m on m.id = movent.movement_id
+                                            where movent.admin_status = 'SYS'
+                                            and movent.start_date = m.from_date
+                                            and m.id =$P{IN_MOV_ID}
+                                        UNION
+                                        select empent.amount  , m.id
+                                            from hr_rcm_empentitle empent   
+                                            join hr_mov_empmovement_new m on m.emp_id = empent.emp_id
+                                            where empent.admin_status = 'SYS'
+                                            and empent.start_date <= m.from_date
+                                            and (empent.end_date is null or empent.end_date >= m.from_date+1)
+                                            and m.id = $P{IN_MOV_ID}
+                            ) a
+                            group by id) ent on ent.id = mov.id
+    WHERE
+        exists(SELECT
+                        1
+                    FROM
+                        hr_mov_empmovement_new a
+                    WHERE
+                        a.id = mov.id
+                        and a.org_id = $P{IN_ORG_ID} 
+                        and a.id = $P{IN_MOV_ID} 
+    )
+)A]]>
+	</queryString>
+	<field name="PAR1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR1"/>
+	</field>
+	<field name="PAR2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR2"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR2"/>
+	</field>
+	<field name="PAR3" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR3"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR3"/>
+	</field>
+	<field name="PAR6" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR6"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR6"/>
+	</field>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="PROBATION_DURATION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PROBATION_DURATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="PROBATION_DURATION"/>
+	</field>
+	<field name="PROBATION_DURATION2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PROBATION_DURATION2"/>
+		<property name="com.jaspersoft.studio.field.label" value="PROBATION_DURATION2"/>
+	</field>
+	<field name="LETTER_HEAD_LOGO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="LETTER_HEAD_LOGO"/>
+		<property name="com.jaspersoft.studio.field.label" value="LETTER_HEAD_LOGO"/>
+	</field>
+	<field name="LETTER_FOOTER_LOGO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="LETTER_FOOTER_LOGO"/>
+		<property name="com.jaspersoft.studio.field.label" value="LETTER_FOOTER_LOGO"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="ORG_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ADDRESS"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TELNUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="FAXNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FAXNUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
+	</field>
+	<field name="EMAIL" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMAIL"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMAIL"/>
+	</field>
+	<field name="WEBSITE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WEBSITE"/>
+		<property name="com.jaspersoft.studio.field.label" value="WEBSITE"/>
+	</field>
+	<field name="DATE_PREPARED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_PREPARED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_PREPARED"/>
+	</field>
+	<field name="CONFIRM_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_DATE"/>
+	</field>
+	<field name="CONFIRM_DATE_MINUS_ONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_DATE_MINUS_ONE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_DATE_MINUS_ONE"/>
+	</field>
+	<field name="FULLNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FULLNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="FULLNAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="NEW_POSITION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NEW_POSITION"/>
+		<property name="com.jaspersoft.studio.field.label" value="NEW_POSITION"/>
+	</field>
+	<field name="GROSS_SALARY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="GROSS_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="GROSS_SALARY"/>
+	</field>
+	<field name="GROSS_SALARY_WORDS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="GROSS_SALARY_WORDS"/>
+		<property name="com.jaspersoft.studio.field.label" value="GROSS_SALARY_WORDS"/>
+	</field>
+	<field name="REPORT_TO_ADMIN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_ADMIN"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_ADMIN"/>
+	</field>
+	<field name="REPORT_TO_ADMIN_SIGN_IMG" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_ADMIN_SIGN_IMG"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_ADMIN_SIGN_IMG"/>
+	</field>
+	<field name="REPORT_TO_ADMIN_SIGN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_ADMIN_SIGN"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_ADMIN_SIGN"/>
+	</field>
+	<field name="REPORT_TO_FUNC" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_FUNC"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_FUNC"/>
+	</field>
+	<field name="MOVEMENT_STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="MOVEMENT_STATUS"/>
+		<property name="com.jaspersoft.studio.field.label" value="MOVEMENT_STATUS"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="HEADER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="HEADER"/>
+		<property name="com.jaspersoft.studio.field.label" value="HEADER"/>
+	</field>
+	<field name="WORK_LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_LOCATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION"/>
+	</field>
+	<field name="CC_TO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CC_TO"/>
+		<property name="com.jaspersoft.studio.field.label" value="CC_TO"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="590">
+			<image scaleImage="RealSize">
+				<reportElement x="-73" y="-20" width="596" height="520" uuid="141b5380-1e66-4d62-a00c-99ff01025f4a"/>
+				<imageExpression><![CDATA[$F{LETTER_HEAD_LOGO}]]></imageExpression>
+			</image>
+			<image scaleImage="RealSize">
+				<reportElement x="-72" y="540" width="595" height="50" uuid="271d245a-e768-45b3-96ab-7725f6e5900d"/>
+				<imageExpression><![CDATA[$F{LETTER_FOOTER_LOGO}]]></imageExpression>
+			</image>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" isPrintRepeatedValues="false" x="0" y="165" width="450" height="20" uuid="c3fc110c-a5a1-4937-88ee-a03804070ab1"/>
+				<textElement markup="html">
+					<font size="12" isBold="false" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_PREPARED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" isPrintRepeatedValues="false" x="0" y="190" width="450" height="20" uuid="68a2aa65-9bce-4941-b04f-e4c686135449"/>
+				<textElement markup="html">
+					<font size="12" isBold="false" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FULLNAME} +"<br>"+$F{NEW_POSITION}+ "<br>"+$F{WORK_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="215" width="450" height="20" uuid="cc54c37e-8806-4854-a70c-d0799402b026"/>
+				<textElement markup="html">
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dear "+$F{SURNAME} + ","]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="265" width="450" height="20" uuid="bbca0cee-6bae-42b7-b05d-ce28b13181cc">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR1}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="290" width="450" height="20" uuid="e40c5e3a-6879-442d-a436-3443e06ebd45">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR2}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="315" width="450" height="20" uuid="f9d14da1-f6dd-46e0-8495-6acaf3abcbe0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR3}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="130" width="450" height="20" forecolor="#D90804" uuid="481b4139-d6c1-47da-a360-93a02348dadf"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="12" isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MOVEMENT_STATUS}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="240" width="450" height="20" uuid="6aea9839-de5e-4db5-9b80-9475c7398c98">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" markup="html">
+					<font size="12" isBold="true" isUnderline="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HEADER}]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement positionType="Float" x="0" y="340" width="450" height="100" uuid="8c1ba00f-597a-46ce-a325-b98aa38e38f5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement x="0" y="80" width="450" height="20" uuid="3c41d53e-788e-4ad8-a316-399032464dea">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement markup="html">
+						<font size="12" isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{REPORT_TO_ADMIN_SIGN}]]></textFieldExpression>
+				</textField>
+				<image scaleImage="FillFrame">
+					<reportElement x="0" y="20" width="120" height="50" isRemoveLineWhenBlank="true" uuid="59a1147a-dcbe-4c63-9a49-a054e70783d9"/>
+					<imageExpression><![CDATA[$F{REPORT_TO_ADMIN_SIGN_IMG}]]></imageExpression>
+				</image>
+				<staticText>
+					<reportElement x="0" y="0" width="450" height="80" uuid="0705f265-6023-4612-9576-f7fdaa0ba359">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[Yours Sincerely, 
+
+
+
+..........................................]]></text>
+				</staticText>
+			</frame>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="30" y="450" width="420" height="20" uuid="a55a8438-b462-42be-88d9-d86a548e8d13">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{CC_TO} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CC_TO}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="450" width="30" height="20" uuid="0eed18ee-7525-49f7-a99b-ffb972e13c46">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{CC_TO} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["CC: "]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

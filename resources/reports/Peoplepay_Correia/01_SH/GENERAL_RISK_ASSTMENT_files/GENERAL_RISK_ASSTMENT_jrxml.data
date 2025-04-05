@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Risk Register" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fc0077ee-2a1d-4135-808c-9508e1191a48">
+	<property name="ireport.zoom" value="0.9090909090909131"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="180"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_SH/GENERAL_RISK_ASSTMENT"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8080/jasperserver/services/repository"/>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    rsk.id,
+	emp.org_id,
+    review_number,
+    review_date,
+    version_number,
+    date_review,
+    (select first_name||' '||surname from hr_rcm_individual ind where ind.id=emp.ind_id)Assessed_by,
+    (select first_name||' '||surname from hr_rcm_individual i join hr_rcm_employee e on i.id=e.ind_id where e.id=rsk.authourised_by) authourised_by,
+    location_name,
+    building_number,
+    date_assessed,
+     jwshc,(select a.value_description
+from table(pkg_global_fnts.get_lookup_value('HS-BUILDING-CLASS')) a
+where a.id=rsk.occupancy_classification) occupancy_classification,
+
+(select value_description
+from table(pkg_global_fnts.get_lookup_value('HS-BUILDING-CONST')) a
+where a.id=rsk.construction_class) construction_class,
+    permit req_perm,
+    have_permit hav_perm,
+    epa_licence_num,
+    l_issue_date,
+    expiry_date,
+    copy_attached,
+    fire_cer_num,
+    cer_issued_date,
+    f_expiry_date,
+    elec_cer_num,
+    elec_issue_date,
+    elec_expiry_date,
+    num_floor,
+    area_first_floor,
+    occu_first_floor,
+    area_seco_floor,
+    occu_seco_floor,
+    area_thir_floor,
+    occu_thir_floor,
+    area_four_floor,
+    occu_four_floor,
+    build_capacity,
+    req_fire_cer,
+    have_fire_cer
+FROM
+    hr_hs_risk_assessment rsk
+    join hr_rcm_employee emp on emp.id=rsk.emp_id
+WHERE
+    rsk.id=$P{ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="REVIEW_NUMBER" class="java.math.BigDecimal"/>
+	<field name="REVIEW_DATE" class="java.sql.Timestamp"/>
+	<field name="VERSION_NUMBER" class="java.math.BigDecimal"/>
+	<field name="DATE_REVIEW" class="java.sql.Timestamp"/>
+	<field name="ASSESSED_BY" class="java.lang.String"/>
+	<field name="AUTHOURISED_BY" class="java.lang.String"/>
+	<field name="LOCATION_NAME" class="java.lang.String"/>
+	<field name="BUILDING_NUMBER" class="java.math.BigDecimal"/>
+	<field name="DATE_ASSESSED" class="java.sql.Timestamp"/>
+	<field name="JWSHC" class="java.lang.String"/>
+	<field name="OCCUPANCY_CLASSIFICATION" class="java.lang.String"/>
+	<field name="CONSTRUCTION_CLASS" class="java.lang.String"/>
+	<field name="REQ_PERM" class="java.lang.String"/>
+	<field name="HAV_PERM" class="java.lang.String"/>
+	<field name="EPA_LICENCE_NUM" class="java.math.BigDecimal"/>
+	<field name="L_ISSUE_DATE" class="java.sql.Timestamp"/>
+	<field name="EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="COPY_ATTACHED" class="java.lang.String"/>
+	<field name="FIRE_CER_NUM" class="java.math.BigDecimal"/>
+	<field name="CER_ISSUED_DATE" class="java.sql.Timestamp"/>
+	<field name="F_EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="ELEC_CER_NUM" class="java.math.BigDecimal"/>
+	<field name="ELEC_ISSUE_DATE" class="java.sql.Timestamp"/>
+	<field name="ELEC_EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="NUM_FLOOR" class="java.math.BigDecimal"/>
+	<field name="AREA_FIRST_FLOOR" class="java.lang.String"/>
+	<field name="OCCU_FIRST_FLOOR" class="java.math.BigDecimal"/>
+	<field name="AREA_SECO_FLOOR" class="java.lang.String"/>
+	<field name="OCCU_SECO_FLOOR" class="java.math.BigDecimal"/>
+	<field name="AREA_THIR_FLOOR" class="java.lang.String"/>
+	<field name="OCCU_THIR_FLOOR" class="java.math.BigDecimal"/>
+	<field name="AREA_FOUR_FLOOR" class="java.lang.String"/>
+	<field name="OCCU_FOUR_FLOOR" class="java.math.BigDecimal"/>
+	<field name="BUILD_CAPACITY" class="java.lang.String"/>
+	<field name="REQ_FIRE_CER" class="java.lang.String"/>
+	<field name="HAVE_FIRE_CER" class="java.lang.String"/>
+	<title>
+		<band height="70">
+			<subreport>
+				<reportElement x="1" y="0" width="966" height="70" uuid="5ff3a129-6439-4b11-bc26-59a6411c5250"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_LEGAL_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="57">
+			<staticText>
+				<reportElement x="0" y="15" width="968" height="35" uuid="0ed5b610-85fd-4132-93d1-4db9dcf6c2fe"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="14" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Safety & Health General Risk  Assessment Form ]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="151">
+			<rectangle>
+				<reportElement x="0" y="4" width="967" height="134" uuid="9ae1d360-77c1-4326-ad3f-af9396f9ca32"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="5" y="12" width="54" height="20" isPrintWhenDetailOverflows="true" uuid="465ac4e9-fc0f-43f7-b16b-c4cb23f5d40c"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[RA #]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="55" y="12" width="145" height="20" isPrintWhenDetailOverflows="true" uuid="dcdc5a16-7da7-4d39-ace9-8c95c82cc237"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REVIEW_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="254" y="12" width="95" height="20" isPrintWhenDetailOverflows="true" uuid="29aa1145-d37a-463a-aec3-5758f6b9b42a"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Date of this Review]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="348" y="12" width="141" height="20" isPrintWhenDetailOverflows="true" uuid="4a701feb-4d35-4414-9c28-80c14d76d019"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd- MM- yyyy").format($F{REVIEW_DATE})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="520" y="11" width="81" height="20" isPrintWhenDetailOverflows="true" uuid="fda0db31-bfb5-41c5-b3f7-9b2c17a26a67"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Version #]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="619" y="11" width="142" height="20" isPrintWhenDetailOverflows="true" uuid="02062c46-cae7-4416-9a0e-fa1e502eead8"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VERSION_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="773" y="12" width="64" height="20" isPrintWhenDetailOverflows="true" uuid="75962779-33c7-420f-84a4-876e4f41e866"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Review Date:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="837" y="12" width="127" height="20" isPrintWhenDetailOverflows="true" uuid="5b59d483-3bdf-4ab9-a9b9-e8c7357193a3"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd- MM- yyyy").format($F{DATE_REVIEW})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="51" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="a49b95c8-99f3-482e-8356-9bf397573552"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Authorised by:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="89" y="51" width="150" height="20" isPrintWhenDetailOverflows="true" uuid="cf4d69ed-631e-4ff7-97c7-c582d22bea4f"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AUTHOURISED_BY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="254" y="51" width="85" height="20" isPrintWhenDetailOverflows="true" uuid="332859f6-974f-4c04-a01d-142aacc52473"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Location Name:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="329" y="51" width="184" height="20" isPrintWhenDetailOverflows="true" uuid="bac2f337-3428-4568-a715-e970c6cc4fbd"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOCATION_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="520" y="51" width="91" height="20" isPrintWhenDetailOverflows="true" uuid="6b3ea6ef-b0d0-4240-bc28-e8810a811667"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Building #]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="619" y="51" width="138" height="20" isPrintWhenDetailOverflows="true" uuid="38e3d3c0-1ad7-4b44-913d-14a99a3738b9"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BUILDING_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="781" y="51" width="55" height="20" isPrintWhenDetailOverflows="true" uuid="64c47bbf-d1b8-4a59-ac6b-662331332352"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="836" y="51" width="132" height="20" isPrintWhenDetailOverflows="true" uuid="5e22dd90-41b2-429a-94a1-386d6cb577db"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd- MM- yyyy").format($F{DATE_ASSESSED})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="8" y="95" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="cd19adb1-b638-427a-a155-a67e82fbbe7e"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Assessed by:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="100" y="95" width="145" height="20" isPrintWhenDetailOverflows="true" uuid="3aee2e93-9a88-4d31-b92b-f9d1e15d05b6"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ASSESSED_BY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="253" y="95" width="140" height="20" isPrintWhenDetailOverflows="true" uuid="cac3898e-361a-4f3c-8e4a-ea88b444468e"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[JWSHC Representative:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="390" y="95" width="195" height="20" isPrintWhenDetailOverflows="true" uuid="bcbdb3b5-ae1a-4e00-b750-330c48e3aea1"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{JWSHC}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="321">
+			<rectangle>
+				<reportElement x="1" y="3" width="967" height="302" uuid="a7e5b5b4-9e58-404d-a076-51c625b76094"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="9" y="5" width="321" height="20" isPrintWhenDetailOverflows="true" uuid="45d71eea-7a27-49c3-915d-44516842189d"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Occupancy Classification of the building]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="55" y="25" width="392" height="23" isPrintWhenDetailOverflows="true" uuid="2d29452d-551a-4302-9f85-cc963e7b1b78"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OCCUPANCY_CLASSIFICATION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="12" y="71" width="321" height="20" isPrintWhenDetailOverflows="true" uuid="c3164de8-548a-4f86-9f13-9c79ec1b9b66"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Construction Classifiaction- Fire ratings of building]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="55" y="91" width="390" height="20" isPrintWhenDetailOverflows="true" uuid="a839ca64-907e-41f3-b86c-b77d6df05ef4"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONSTRUCTION_CLASS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="12" y="132" width="249" height="20" isPrintWhenDetailOverflows="true" uuid="72f8c0b8-47f7-4a59-aee0-6f7d77092f97"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Does the building require an EPA permit/license?]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="262" y="132" width="241" height="20" isPrintWhenDetailOverflows="true" uuid="49bb08fb-0c2c-403b-9f96-d42cf918f5e1"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REQ_PERM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="560" y="132" width="232" height="20" isPrintWhenDetailOverflows="true" uuid="8769a609-4274-4989-bf7c-8424adeb1ceb"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Does the building have an EPA permit/license?]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="792" y="132" width="175" height="20" isPrintWhenDetailOverflows="true" uuid="44430518-5d48-46fe-bd21-a39d093bd449"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HAV_PERM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="13" y="169" width="122" height="20" isPrintWhenDetailOverflows="true" uuid="3f044fb8-f316-4d66-aca8-22f7ff217ea1"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[EPA License Number]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="122" y="169" width="107" height="20" isPrintWhenDetailOverflows="true" uuid="b0c39d6f-00a5-4094-982d-04bf75ab801a"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EPA_LICENCE_NUM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="257" y="167" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="a17d00b1-6e5c-46de-827b-36bd4aa02826"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Issue Date]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="360" y="167" width="119" height="20" isPrintWhenDetailOverflows="true" uuid="5fa5c1ad-83ac-4974-b37d-b817c665fca1"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd- MM- yyyy").format($F{L_ISSUE_DATE})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="530" y="166" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="fec1d507-3c57-45f7-b784-167eaf227d73"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Expiry Date]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="630" y="166" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="d610a58d-d40b-4067-aee1-1c6622565fc4"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd- MM- yyyy").format($F{EXPIRY_DATE})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="767" y="164" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="69cdb693-54c4-49f6-a37e-dd6a34478070"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Copy Attached]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="867" y="164" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="0304b741-4f6e-43ce-9dfa-49ddc47459e3"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COPY_ATTACHED}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="13" y="203" width="224" height="20" isPrintWhenDetailOverflows="true" uuid="59487bae-1860-4670-a2bf-b8f535da95ba"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Does the building require a fire certificate?]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="227" y="203" width="133" height="20" isPrintWhenDetailOverflows="true" uuid="16a5e5c8-e974-4ea0-a2cb-9daef2727601"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REQ_FIRE_CER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="428" y="203" width="200" height="20" isPrintWhenDetailOverflows="true" uuid="df02d78f-a883-450c-a8be-c85d2ea9dd5f"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Does the building have a fire certificate?]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="628" y="203" width="143" height="20" isPrintWhenDetailOverflows="true" uuid="55fb3da5-85da-408f-b555-c18989609cea"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HAVE_FIRE_CER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="14" y="237" width="116" height="20" isPrintWhenDetailOverflows="true" uuid="a2351097-6ec3-4617-a95b-3e9ab4a5100d"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Fire Certificate number]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="131" y="237" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="a64608a6-faf3-479a-a2ff-7b42078e3e53"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRE_CER_NUM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="290" y="237" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="bc139b24-91ab-4623-aa5a-5fcdff287f4e"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Issued Date]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="390" y="237" width="113" height="20" isPrintWhenDetailOverflows="true" uuid="af9f5dce-d305-4b26-b155-27f2dd7b6911"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd- MM- yyyy").format($F{CER_ISSUED_DATE})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="520" y="237" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="ed1f4814-66ce-4bd5-a579-167454910b7e"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Expiry Date]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="619" y="237" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="cccde0a4-872c-4beb-b0ee-a59a4f35b050"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd- MM- yyyy").format($F{F_EXPIRY_DATE})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="761" y="237" width="106" height="20" isPrintWhenDetailOverflows="true" uuid="d07879f9-d468-428d-93f6-731a7080ac8c"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Copy Attached]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="867" y="237" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="752db8b6-d09e-42b5-be9f-deb76e6989bb"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COPY_ATTACHED}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="17" y="267" width="138" height="20" isPrintWhenDetailOverflows="true" uuid="a0fac1c6-b153-4482-baf0-9b0d4681d9de"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Electrical Certificate number]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="155" y="267" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="fd08bc23-9e70-443f-9c49-72c49aa339ab"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ELEC_CER_NUM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="293" y="267" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="4527d05b-0047-4f0c-8c36-9e13ee52e204"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Issued Date]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="393" y="267" width="113" height="20" isPrintWhenDetailOverflows="true" uuid="89b026f4-e066-41c8-a508-35adb18c7fae"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd- MM- yyyy").format($F{ELEC_ISSUE_DATE})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="520" y="267" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="a02ae982-18c2-4091-895c-0e5d8262185b"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Expiry Date]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="619" y="267" width="111" height="20" isPrintWhenDetailOverflows="true" uuid="257e19de-25f9-4bb5-9157-6d6a32f7e346"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd- MM- yyyy").format($F{ELEC_EXPIRY_DATE})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="764" y="267" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="2f120dbe-b727-4dbf-8d25-5abf2b4f5984"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[# Floors]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="864" y="267" width="107" height="20" isPrintWhenDetailOverflows="true" uuid="97f9bac3-d1e1-4379-bfc8-125bd273f56f"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUM_FLOOR}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="136">
+			<rectangle>
+				<reportElement x="1" y="1" width="964" height="131" uuid="5d0a1771-f382-42bb-a5ac-0238471c0b58"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="123" y="45" width="67" height="20" isPrintWhenDetailOverflows="true" uuid="93f69655-db94-4a35-9eda-34d30e2825aa"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[1st Floor]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="193" y="6" width="97" height="20" isPrintWhenDetailOverflows="true" uuid="23a25268-d183-4aba-8b6c-79a02f48d5c7"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OCCU_FIRST_FLOOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="298" y="5" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="440ce3ed-c065-4d88-9552-8fdba3d84dee"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[2nd Floor]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="398" y="5" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="aba306a8-2bf6-4775-84c8-80596c097a07"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AREA_SECO_FLOOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="300" y="45" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="756ad1af-d463-418e-9e73-db8dabf6803f"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[2nd Floor]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="399" y="45" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="e888620e-e549-42ee-9c5e-57ea8882567a"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OCCU_SECO_FLOOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="506" y="6" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="92bc516b-ac82-4f91-a3a4-b518aebd97a4"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[3rd Floor]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="606" y="6" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="7110bd82-6c53-4115-9457-42db65a8bcc9"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AREA_THIR_FLOOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="506" y="44" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="d661e972-a567-4d82-a237-5b73599c9dcb"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[3rd Floor]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="606" y="44" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="93de2f1d-ae27-48ee-8bf9-ebb05ad7e25e"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OCCU_THIR_FLOOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="126" y="6" width="67" height="20" isPrintWhenDetailOverflows="true" uuid="df5b2a6c-1a05-4821-8c8c-78936e45effe"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[1st Floor]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="190" y="45" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="338caba5-d854-4e86-b802-cd2ccef42f52"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AREA_FIRST_FLOOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="744" y="6" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="43ab329c-433c-4379-b255-c46fbdc4bfe2"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[4th Floor]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="844" y="6" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="e82d856f-dc46-4fcc-bc05-c8ca5740914e"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AREA_FOUR_FLOOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="745" y="43" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="9f1d22eb-1adb-41b8-9877-9614722295f8"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[4th Floor]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="845" y="43" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="f320e37a-2754-4122-bedd-0b6ae5bf7f82"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OCCU_FOUR_FLOOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="5" y="100" width="555" height="20" isPrintWhenDetailOverflows="true" uuid="a8efaa7b-b5f2-4f52-93b2-e7e21f51e4f1"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Based on the Fire & occupancy space calculation is there adequate, over or under capacity in the building?]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="560" y="100" width="146" height="20" isPrintWhenDetailOverflows="true" uuid="a93efdd9-a75f-42c1-b514-f392032d4703"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BUILD_CAPACITY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="8" y="5" width="114" height="20" isPrintWhenDetailOverflows="true" uuid="8c274c9c-40bf-459c-98df-988a46eeff11"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Area in meter square]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="6" y="45" width="116" height="20" isPrintWhenDetailOverflows="true" uuid="fb20f5de-5dff-4054-962f-b5e9126fac86"/>
+				<textElement>
+					<font fontName="Arial" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Occupancy of each floor]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

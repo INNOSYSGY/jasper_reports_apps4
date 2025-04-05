@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Lising of Drugs By BNF" language="groovy" pageWidth="1008" pageHeight="595" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="98778e76-2700-4634-a76c-2e98c2320564">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="389"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/LS_BNF"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8081/jasperserver/services/repository"/>
+	<queryString>
+		<![CDATA[SELECT
+T.INVENTORY_ITEM_ID,
+              (select value_description a
+              FROM TABLE(PKG_GLOBAL_FNTS.GET_LOOKUP_VALUE('TBLPHARMACOPOEIA'))
+              WHERE id=T.PHARMACOPOEIA) PHARMACOPOEIA,
+T.DRUG_STRENGTH,
+T.ORG_ITEM_DESCRIPTION,
+T.GENERIC_NAME,
+T.BRAND_NAME,
+              (select value_description a
+              FROM TABLE(PKG_GLOBAL_FNTS.GET_LOOKUP_VALUE('TBLDRUGFAMILY'))
+              where id=T.DRUG_FAMILY)DRUG_FAMILY,
+          (SELECT VALUE_DESCRIPTION A
+          FROM TABLE(PKG_GLOBAL_FNTS.GET_LOOKUP_VALUE('TBLDRUGCLASS'))
+          where id=T.INDICATIONS_CLASSIFICATION) INDICATIONS_CLASSIFICATION,
+T.INDICATIONS,
+T.CAUTIONS,
+T.DOSE_ADULT,
+T.DOSE_CHILD,
+T.DOSAGE_FORM,
+T.CONTRA_INDICATIONS,
+T.SIDE_EFFECTS,
+ COMPANY_NAME,VILLAGE_TOWN||', '||DISTRICT||', '||COUNTRY ADDRESS,EMAIL,
+                        'Tel# '||TELEPHONE_NOS Telphone, 'Fax # '||FAX_NOS FAX
+FROM TBLINVENTORYITEM T
+cross join TBLSYSTEMCONFIGURATION
+where organization_id=122]]>
+	</queryString>
+	<field name="INVENTORY_ITEM_ID" class="java.math.BigDecimal"/>
+	<field name="PHARMACOPOEIA" class="java.lang.String"/>
+	<field name="DRUG_STRENGTH" class="java.lang.String"/>
+	<field name="ORG_ITEM_DESCRIPTION" class="java.lang.String"/>
+	<field name="GENERIC_NAME" class="java.lang.String"/>
+	<field name="BRAND_NAME" class="java.lang.String"/>
+	<field name="DRUG_FAMILY" class="java.lang.String"/>
+	<field name="INDICATIONS_CLASSIFICATION" class="java.lang.String"/>
+	<field name="INDICATIONS" class="java.lang.String"/>
+	<field name="CAUTIONS" class="java.lang.String"/>
+	<field name="DOSE_ADULT" class="java.lang.String"/>
+	<field name="DOSE_CHILD" class="java.lang.String"/>
+	<field name="DOSAGE_FORM" class="java.lang.String"/>
+	<field name="CONTRA_INDICATIONS" class="java.lang.String"/>
+	<field name="SIDE_EFFECTS" class="java.lang.String"/>
+	<field name="COMPANY_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="TELPHONE" class="java.lang.String"/>
+	<field name="FAX" class="java.lang.String"/>
+	<sortField name="ORG_ITEM_DESCRIPTION"/>
+	<group name="Drug" isStartNewPage="true" minHeightToStartNewPage="100" keepTogether="true">
+		<groupExpression><![CDATA[$F{INVENTORY_ITEM_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="36">
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="83e986e7-9b4c-40f7-bb3d-9c38f4019888" x="12" y="20" width="181" height="15"/>
+					<textElement>
+						<font fontName="Arial" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ORG_ITEM_DESCRIPTION}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="db7e9db0-8f29-40ca-9626-1a9e2e77f3cf" x="193" y="20" width="193" height="15"/>
+					<textElement>
+						<font fontName="Arial" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DRUG_STRENGTH}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="ffcc17d8-b224-4c0a-8de9-7342acaf6a08" x="386" y="20" width="193" height="15"/>
+					<textElement>
+						<font fontName="Arial" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{GENERIC_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="1de69640-b40e-4be0-8174-d764d3cb4f88" x="579" y="20" width="193" height="15"/>
+					<textElement>
+						<font fontName="Arial" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BRAND_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="68ad79c6-ec25-4749-bbc9-6c3c83675b70" x="772" y="20" width="196" height="15"/>
+					<textElement>
+						<font fontName="Arial" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DRUG_FAMILY}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="7ff45f49-c47b-4943-97fd-7fba8745f23a" x="12" y="0" width="181" height="15"/>
+					<textElement>
+						<font fontName="Arial" size="11" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Drug/Item Name]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="14e2c12f-41b0-46de-abb1-b4b4d00972cd" x="193" y="0" width="193" height="15"/>
+					<textElement>
+						<font fontName="Arial" size="11" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Drug Strength]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="29d3ebf9-0d2b-4fb2-a394-6b68bc3265a9" x="386" y="0" width="193" height="15"/>
+					<textElement>
+						<font fontName="Arial" size="11" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Generic Name]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="7c5c0282-beb2-4d65-8ceb-7e5dea450756" x="579" y="0" width="193" height="15"/>
+					<textElement>
+						<font fontName="Arial" size="11" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Brand Name]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="44c7b9d8-eef8-4426-b3a3-bf433964e52e" x="772" y="0" width="195" height="15"/>
+					<textElement>
+						<font fontName="Arial" size="11" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Drug Family]]></text>
+				</staticText>
+			</band>
+			<band height="21">
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="b0c476af-2ca5-4b26-bd0e-cf109d58a0d4" x="193" y="0" width="337" height="20"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{INDICATIONS_CLASSIFICATION}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="21a483d6-9a03-4c9d-a399-17727aeed900" mode="Transparent" x="12" y="1" width="181" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[Indication Classification:]]></text>
+				</staticText>
+			</band>
+			<band height="41">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="69a642d4-f18f-46bb-9e2e-fef48b8aa5da" x="12" y="21" width="477" height="19"/>
+					<textElement markup="html">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{INDICATIONS}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="c6527ef7-02f9-4715-929b-9a893408f06d" x="489" y="21" width="467" height="19"/>
+					<textElement markup="html">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CONTRA_INDICATIONS}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="1824e054-e7c5-4e5e-a967-34ea548cc2a5" x="12" y="1" width="250" height="20"/>
+					<textElement>
+						<font fontName="Arial" size="11" isBold="true" isItalic="true"/>
+					</textElement>
+					<text><![CDATA[Indication]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="57d77baf-332c-4408-b98f-adbcd9d17723" x="489" y="1" width="356" height="20"/>
+					<textElement>
+						<font fontName="Arial" size="11" isBold="true" isItalic="true"/>
+					</textElement>
+					<text><![CDATA[Contra-Indication]]></text>
+				</staticText>
+			</band>
+			<band height="41">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="4cc704c5-df6a-4bea-8ae5-be8b7918007a" x="489" y="20" width="467" height="20"/>
+					<textElement markup="html">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DOSE_ADULT}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="32b67f16-8942-4283-a574-08448dc9abb3" x="12" y="20" width="459" height="20" isPrintWhenDetailOverflows="true"/>
+					<textElement markup="html">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DOSE_CHILD}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="2071cc50-0c6a-487c-969d-5e8e7029e0df" x="12" y="0" width="250" height="20"/>
+					<textElement>
+						<font fontName="Arial" size="11" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Child Dosage]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="a39c6cce-c728-462e-adc9-7ac34e9b5186" x="489" y="0" width="253" height="20"/>
+					<textElement>
+						<font fontName="Arial" size="11" isBold="true" isItalic="true"/>
+					</textElement>
+					<text><![CDATA[Adult Dosage]]></text>
+				</staticText>
+			</band>
+			<band height="44">
+				<staticText>
+					<reportElement uuid="54f7d8a7-c16a-4d4c-96b2-48ec92ed114e" x="12" y="0" width="250" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="11" isBold="true" isItalic="true"/>
+					</textElement>
+					<text><![CDATA[Caution]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="c59df0ed-dc9b-487f-aa62-79a8231cacf8" x="12" y="20" width="459" height="20" isPrintWhenDetailOverflows="true"/>
+					<textElement markup="html">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CAUTIONS}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="a10a1fac-5a22-4287-a241-4ff77377d6dd" x="489" y="0" width="253" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="11" isBold="true" isItalic="true"/>
+					</textElement>
+					<text><![CDATA[Side Effective]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="71cf65da-ea94-4e84-98b5-ca3e9ba57df5" x="489" y="20" width="467" height="20"/>
+					<textElement markup="html">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SIDE_EFFECTS}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="69" splitType="Stretch">
+			<textField>
+				<reportElement uuid="877c3ec5-d5cc-414f-80db-57bf61cea644" x="0" y="49" width="967" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PHARMACOPOEIA}+' Drug Listing']]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="9ac4c5a6-e0f8-442e-957e-1580759d8a9a" x="0" y="0" width="968" height="20"/>
+				<textElement textAlignment="Center" markup="none">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPANY_NAME}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="5e29ab27-a7fb-4cfb-b7d9-62356c47ea9b" x="0" y="20" width="968" height="20"/>
+				<textElement textAlignment="Center" markup="none">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement uuid="c723acc1-27db-40ba-a363-7ec952c809c7" x="0" y="0" width="227" height="63"/>
+				<imageExpression><![CDATA["repo:/images/coat_of_arm"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement uuid="7ef39d52-1fbf-4fc3-98ca-9a9fdc5b70c3" x="901" y="0" width="66" height="63"/>
+				<imageExpression><![CDATA["repo:/images/company_logo"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf" mode="Opaque" x="2" y="4" width="966" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC"/>
+			</rectangle>
+			<textField>
+				<reportElement uuid="3393b061-7d07-468f-997f-4cded61b8d0d" x="842" y="4" width="102" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="4d8264ca-885c-4795-94d0-72f1bd428dc4" x="944" y="4" width="18" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE, MMMMM dd, yyyy" isBlankWhenNull="true">
+				<reportElement uuid="aefd0541-a2ad-40d2-b601-cdb65e54d0b8" x="2" y="4" width="172" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="aadc7cbd-88ea-4125-83f8-05e97fd395b8" x="2" y="4" width="966" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[GPHC-SCMS By INNOSYS Inc]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

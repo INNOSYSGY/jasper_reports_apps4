@@ -1,0 +1,1112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MCC_Margin_Sheet" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="988" leftMargin="10" rightMargin="10" topMargin="20" bottomMargin="20" isTitleNewPage="true" isIgnorePagination="true" uuid="3595fc67-e88e-4f2f-a0e5-45704c75ed6e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="9"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MCC/MARGINSHEET/M_01"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.14:8081/jasperserver/services/repository"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Buyer Margin Sheet" uuid="9f2917fa-b3c7-417f-afd3-741e832a9d6d">
+		<parameter name="p_Bmargin_sheet" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select *
+from
+(
+select *
+from vw_margin_sheet_payable
+where tab_type='BUYER'
+and margin_sheet_id=$P{p_Bmargin_sheet}
+union all
+select *
+from vw_margin_sheet_payable_total
+where tab_type='BUYER'
+and margin_sheet_id=$P{p_Bmargin_sheet}
+UNION ALL
+Select *
+FROM TABLE(pkg_margin_sheet.fn_Payable_Fill_Rows($P{p_Bmargin_sheet},'BUYER'))
+)
+order by element,sort_field]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="MARGIN_SHEET_ID" class="java.math.BigDecimal"/>
+		<field name="TAB_TYPE" class="java.lang.String"/>
+		<field name="MARGIN_SHEET_TAB_ID" class="java.math.BigDecimal"/>
+		<field name="ELEMENT_ID" class="java.math.BigDecimal"/>
+		<field name="ELEMENT" class="java.lang.String"/>
+		<field name="OPTION_NAME" class="java.lang.String"/>
+		<field name="OPTION_VALUES" class="java.math.BigDecimal"/>
+		<field name="SORT_FIELD" class="java.math.BigDecimal"/>
+		<sortField name="SORT_FIELD"/>
+	</subDataset>
+	<subDataset name="Seller Margin Sheet" uuid="9f2917fa-b3c7-417f-afd3-741e832a9d6d">
+		<parameter name="p_Smargin_sheet" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select *
+from
+(
+select *
+from vw_margin_sheet_payable
+where tab_type='SELLER'
+and margin_sheet_id=$P{p_Smargin_sheet}
+union all
+select *
+from vw_margin_sheet_payable_total
+where tab_type='SELLER'
+and margin_sheet_id=$P{p_Smargin_sheet}
+union all
+Select *
+FROM TABLE(pkg_margin_sheet.fn_Payable_Fill_Rows($P{p_Smargin_sheet},'SELLER'))
+)
+order by element,sort_field]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="MARGIN_SHEET_ID" class="java.math.BigDecimal"/>
+		<field name="TAB_TYPE" class="java.lang.String"/>
+		<field name="MARGIN_SHEET_TAB_ID" class="java.math.BigDecimal"/>
+		<field name="ELEMENT_ID" class="java.math.BigDecimal"/>
+		<field name="ELEMENT" class="java.lang.String"/>
+		<field name="OPTION_NAME" class="java.lang.String"/>
+		<field name="OPTION_VALUES" class="java.math.BigDecimal"/>
+		<field name="SORT_FIELD" class="java.math.BigDecimal"/>
+		<sortField name="SORT_FIELD"/>
+		<variable name="variable1" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Buyer Margin Penalty" uuid="d15eeadd-9057-484b-9277-efdc48ab63bc">
+		<parameter name="p_BMargin_Penalty" class="java.math.BigDecimal"/>
+		<queryString>
+			<![CDATA[select *
+from
+(
+select *
+from VW_MARGIN_SHEET_PENALTY
+where tab_type='BUYER'
+and margin_sheet_id=$P{p_BMargin_Penalty}
+union all
+select *
+from vw_margin_sheet_pen_deduction
+where tab_type='BUYER'
+and margin_sheet_id=$P{p_BMargin_Penalty}
+union all
+Select *
+From Vw_Margin_Deduction_Total
+where tab_type='BUYER'
+and margin_sheet_id=$P{p_BMargin_Penalty}
+union all
+Select *
+FROM TABLE(pkg_margin_sheet.fn_deduction_Fill_Rows($P{p_BMargin_Penalty},'BUYER'))
+)]]>
+		</queryString>
+		<field name="SHEET_ID" class="java.math.BigDecimal"/>
+		<field name="MARGIN_SHEET_ID" class="java.math.BigDecimal"/>
+		<field name="TAB_TYPE" class="java.lang.String"/>
+		<field name="MARGIN_SHEET_TAB_ID" class="java.math.BigDecimal"/>
+		<field name="ELEMENTS" class="java.lang.String"/>
+		<field name="OPTION_NAME" class="java.lang.String"/>
+		<field name="OPTION_VALUES" class="java.math.BigDecimal"/>
+		<field name="SORT_FIELD" class="java.math.BigDecimal"/>
+		<sortField name="SORT_FIELD"/>
+	</subDataset>
+	<subDataset name="Seller Margin Penalty" uuid="9440710c-ff8a-445d-9509-25ac5a0ec62e">
+		<parameter name="p_SMargin_penalty" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select *
+from
+(
+select *
+from vw_margin_sheet_penalty
+where tab_type='SELLER'
+and margin_sheet_id=$P{p_SMargin_penalty}
+union all
+select *
+from vw_margin_sheet_pen_deduction
+where tab_type='SELLER'
+and margin_sheet_id=$P{p_SMargin_penalty}
+union all
+Select *
+From Vw_Margin_Deduction_Total
+where tab_type='SELLER'
+and margin_sheet_id=$P{p_SMargin_penalty}
+union all
+Select *
+FROM TABLE(pkg_margin_sheet.fn_deduction_Fill_Rows($P{p_SMargin_penalty},'SELLER'))
+)]]>
+		</queryString>
+		<field name="SHEET_ID" class="java.math.BigDecimal"/>
+		<field name="MARGIN_SHEET_ID" class="java.math.BigDecimal"/>
+		<field name="TAB_TYPE" class="java.lang.String"/>
+		<field name="MARGIN_SHEET_TAB_ID" class="java.math.BigDecimal"/>
+		<field name="ELEMENTS" class="java.lang.String"/>
+		<field name="OPTION_NAME" class="java.lang.String"/>
+		<field name="OPTION_VALUES" class="java.math.BigDecimal"/>
+		<field name="SORT_FIELD" class="java.math.BigDecimal"/>
+		<sortField name="SORT_FIELD"/>
+	</subDataset>
+	<subDataset name="Margin Expense" uuid="4507c1f1-e6d2-4221-b826-c202d4d3a13e">
+		<parameter name="p_margin_sheet_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select *
+from vw_margin_sheet_expense
+where margin_sheet_id=$P{p_margin_sheet_id}]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="MARGIN_SHEET_ID" class="java.math.BigDecimal"/>
+		<field name="EPENSE_ID" class="java.math.BigDecimal"/>
+		<field name="EXPENSE_TYPE" class="java.lang.String"/>
+		<field name="EXPENSE_AMOUNT" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="Financed" uuid="f3e09071-9ece-4aca-877d-945ad2480af4">
+		<parameter name="P_MARGIN_SHEET" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select percent_financed,period,interest_rate,
+margin_sheet_id
+from margin_sheet_funding f
+where margin_sheet_id=$P{P_MARGIN_SHEET}]]>
+		</queryString>
+		<field name="PERCENT_FINANCED" class="java.math.BigDecimal"/>
+		<field name="PERIOD" class="java.math.BigDecimal"/>
+		<field name="INTEREST_RATE" class="java.math.BigDecimal"/>
+		<field name="MARGIN_SHEET_ID" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="Gains" uuid="02f6e5b4-f660-40d2-8115-a3bc873ea0b4">
+		<parameter name="p_margin_sheet_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select margin_sheet_id,ELEMENT,GAIN_VALUE
+FROM MARGIN_SHEET_GAIN
+where margin_sheet_id=$P{p_margin_sheet_id}]]>
+		</queryString>
+		<field name="MARGIN_SHEET_ID" class="java.math.BigDecimal"/>
+		<field name="ELEMENT" class="java.lang.String"/>
+		<field name="GAIN_VALUE" class="java.math.BigDecimal"/>
+		<variable name="Total_Gains" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{GAIN_VALUE}]]></variableExpression>
+		</variable>
+	</subDataset>
+	<parameter name="id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select *
+from vw_margin_sheet
+where id=$P{id}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="MARGIN_SHEET_NO" class="java.lang.String"/>
+	<field name="PRODUCT" class="java.lang.String"/>
+	<field name="SUPPLIER" class="java.math.BigDecimal"/>
+	<field name="BUYER" class="java.math.BigDecimal"/>
+	<field name="MOISTURE_PERCENT" class="java.math.BigDecimal"/>
+	<field name="PURCHASE" class="java.math.BigDecimal"/>
+	<field name="SALE" class="java.math.BigDecimal"/>
+	<field name="START_DATE" class="java.sql.Timestamp"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="GROSS_GAIN" class="java.math.BigDecimal"/>
+	<field name="TOTAL_EXPENSES" class="java.math.BigDecimal"/>
+	<field name="NET_PROFIT" class="java.math.BigDecimal"/>
+	<field name="FINAL" class="java.lang.String"/>
+	<field name="CREATED_BY" class="java.lang.String"/>
+	<field name="DATE_CREATED" class="java.sql.Timestamp"/>
+	<field name="LAST_MODIFIED_BY" class="java.lang.String"/>
+	<field name="DATE_LAST_MODIFIED" class="java.sql.Timestamp"/>
+	<field name="COST_OF_CAPITAL" class="java.math.BigDecimal"/>
+	<field name="SELLER_NAME" class="java.lang.String"/>
+	<field name="BUYER_NAME" class="java.lang.String"/>
+	<field name="SELLER_TAB_ID" class="java.math.BigDecimal"/>
+	<field name="QP_TYPE_SELLER" class="java.lang.String"/>
+	<field name="QP_TYPE_DETAIL_SELLER" class="java.lang.String"/>
+	<field name="SETTLEMENT_PERCENT_SELLER" class="java.math.BigDecimal"/>
+	<field name="SETTLEMENT_EVENT_SELLER" class="java.lang.String"/>
+	<field name="SETTLEMENT_EVENT_DAYS_SELLER" class="java.math.BigDecimal"/>
+	<field name="BUYER_TAB_ID" class="java.math.BigDecimal"/>
+	<field name="QP_TYPE_BUYER" class="java.lang.String"/>
+	<field name="QP_TYPE_DETAIL_BUYER" class="java.lang.String"/>
+	<field name="SETTLEMENT_PERCENT_BUYER" class="java.math.BigDecimal"/>
+	<field name="SETTLEMENT_EVENT_BUYER" class="java.lang.String"/>
+	<field name="SETTLEMENT_EVENT_DAYS_BUYER" class="java.math.BigDecimal"/>
+	<group name="Margin_Sheet" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{ID}]]></groupExpression>
+		<groupHeader>
+			<band height="69">
+				<textField>
+					<reportElement x="242" y="49" width="476" height="20" uuid="1fe0f3f4-5df2-47e3-aa2e-7c12f6a66e0f"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PRODUCT}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="9" y="0" width="968" height="28" uuid="789563fc-009e-42d2-b384-809b1a769235"/>
+					<textElement textAlignment="Center">
+						<font size="20" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Margin Sheet]]></text>
+				</staticText>
+				<line>
+					<reportElement x="176" y="45" width="792" height="1" uuid="9b5999e7-0513-4bcd-8b92-d40e3db972df"/>
+					<graphicElement>
+						<pen lineWidth="2.5" lineColor="#990033"/>
+					</graphicElement>
+				</line>
+				<image>
+					<reportElement mode="Opaque" x="33" y="0" width="305" height="43" uuid="426f0222-d6af-4796-af6d-969f806ecadc"/>
+					<imageExpression><![CDATA["repo:/reports/MCC/Image/logo"]]></imageExpression>
+				</image>
+				<textField isBlankWhenNull="true">
+					<reportElement x="33" y="49" width="367" height="20" uuid="16ae5a65-3592-49d3-916e-8b25734985ba"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Margin Sheet No: "+$F{MARGIN_SHEET_NO}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="125">
+				<crosstab>
+					<reportElement mode="Opaque" x="38" y="35" width="460" height="90" uuid="d4799e86-c45b-4967-b16f-f28a4d6ef5e6"/>
+					<crosstabParameter name="p_seller_sheet_id" class="java.math.BigDecimal">
+						<parameterValueExpression><![CDATA[]]></parameterValueExpression>
+					</crosstabParameter>
+					<crosstabDataset isDataPreSorted="true">
+						<dataset>
+							<datasetRun subDataset="Seller Margin Sheet" uuid="f8069713-dc9d-4cb2-8610-1a9da836ea38">
+								<datasetParameter name="p_Smargin_sheet">
+									<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+					</crosstabDataset>
+					<crosstabHeaderCell>
+						<cellContents/>
+					</crosstabHeaderCell>
+					<rowGroup name="OPTION_NAME" width="70">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{OPTION_NAME}]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="70" height="13" uuid="c4a0feb6-db18-4db5-9721-6baef1ad96c2"/>
+									<textElement textAlignment="Left">
+										<font fontName="Arial" size="8" isBold="true"/>
+										<paragraph leftIndent="1"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{OPTION_NAME}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents/>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="ELEMENT" height="13">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{ELEMENT}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="40" height="13" uuid="f4d06ed2-c634-45dd-8128-82ddd70eb4bf">
+										<printWhenExpression><![CDATA[$V{ELEMENT}.startsWith('z-')? false:true]]></printWhenExpression>
+									</reportElement>
+									<textElement textAlignment="Right">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{ELEMENT}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents/>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="OPTION_VALUESMeasure" class="java.math.BigDecimal" calculation="Highest">
+						<measureExpression><![CDATA[$F{OPTION_VALUES}]]></measureExpression>
+					</measure>
+					<crosstabCell width="41" height="13">
+						<cellContents>
+							<textField pattern="###0.000" isBlankWhenNull="true">
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="40" height="13" uuid="f7383d84-e81d-4121-821a-4c53577e7cb9"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+				</crosstab>
+				<crosstab>
+					<reportElement mode="Opaque" x="503" y="36" width="443" height="89" uuid="4a715240-354e-40c9-ab6e-fa18264c7c50"/>
+					<crosstabParameter name="p_buyer_sheet_id" class="java.math.BigDecimal">
+						<parameterValueExpression><![CDATA[]]></parameterValueExpression>
+					</crosstabParameter>
+					<crosstabDataset isDataPreSorted="true">
+						<dataset>
+							<datasetRun subDataset="Buyer Margin Sheet" uuid="2264bb5e-0709-40e5-9e06-9f5c3162934a">
+								<datasetParameter name="p_Bmargin_sheet">
+									<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+					</crosstabDataset>
+					<crosstabHeaderCell>
+						<cellContents/>
+					</crosstabHeaderCell>
+					<rowGroup name="OPTION_NAME" width="70">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{OPTION_NAME}]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="70" height="13" uuid="b1c0f430-6455-4221-9301-d652bdcf1953"/>
+									<textElement textAlignment="Left">
+										<font fontName="Arial" size="8" isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{OPTION_NAME}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents/>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="ELEMENT" height="13">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{ELEMENT}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" x="1" y="0" width="40" height="13" uuid="485b101b-75fe-460a-9696-7de5047f3ca6">
+										<printWhenExpression><![CDATA[$V{ELEMENT}.startsWith('z-')? false:true]]></printWhenExpression>
+									</reportElement>
+									<textElement textAlignment="Right">
+										<font size="8" isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{ELEMENT}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents/>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="OPTION_VALUESMeasure" class="java.math.BigDecimal" calculation="Highest">
+						<measureExpression><![CDATA[$F{OPTION_VALUES}]]></measureExpression>
+					</measure>
+					<crosstabCell width="42" height="13">
+						<cellContents>
+							<textField isStretchWithOverflow="true" pattern="#,##0.000" isBlankWhenNull="true">
+								<reportElement style="Crosstab Data Text" x="1" y="0" width="40" height="13" uuid="eef92a8b-a041-4399-b375-942f13b9fe4e"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+				</crosstab>
+				<textField>
+					<reportElement x="33" y="0" width="469" height="20" uuid="246842ca-ce19-41af-8046-08eb16451cb5"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SELLER_NAME}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="501" y="0" width="467" height="20" uuid="68944997-c2ae-4db8-9863-0fe72491e4a6"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BUYER_NAME}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="33" y="0" width="935" height="1" uuid="9903d726-3d52-4aea-af6c-2c7a2224780c"/>
+				</line>
+				<line>
+					<reportElement stretchType="RelativeToBandHeight" x="500" y="0" width="1" height="125" uuid="c15647c3-a38e-4a61-82bf-ae0d518dcdb2"/>
+				</line>
+				<line>
+					<reportElement stretchType="RelativeToBandHeight" x="968" y="0" width="1" height="125" uuid="c15647c3-a38e-4a61-82bf-ae0d518dcdb2"/>
+				</line>
+				<line>
+					<reportElement stretchType="RelativeToBandHeight" x="33" y="0" width="1" height="125" uuid="c15647c3-a38e-4a61-82bf-ae0d518dcdb2"/>
+				</line>
+				<staticText>
+					<reportElement x="38" y="22" width="100" height="14" uuid="bdfd7566-d9a8-4b7b-9e17-ac890f6e3dba"/>
+					<textElement>
+						<font isBold="true"/>
+						<paragraph leftIndent="1"/>
+					</textElement>
+					<text><![CDATA[Payments]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="503" y="22" width="100" height="14" uuid="8d85d5e9-0051-492e-82b8-d94a8dc9fce4"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Payments]]></text>
+				</staticText>
+			</band>
+			<band height="105">
+				<crosstab>
+					<reportElement mode="Opaque" x="38" y="14" width="460" height="90" uuid="12f2087d-589a-423b-a703-316127f11cf3"/>
+					<crosstabDataset isDataPreSorted="true">
+						<dataset>
+							<datasetRun subDataset="Seller Margin Penalty" uuid="d668f590-3d0b-48fb-8900-d3295bcd5ac7">
+								<datasetParameter name="p_SMargin_penalty">
+									<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+					</crosstabDataset>
+					<rowGroup name="OPTION_NAME" width="70">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{OPTION_NAME}]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField>
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="70" height="13" uuid="072afabd-c674-4fd2-92fd-9b89f96ad657"/>
+									<textElement textAlignment="Left">
+										<font fontName="Arial" size="8" isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{OPTION_NAME}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents/>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="ELEMENTS" height="13">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{ELEMENTS}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="40" height="13" uuid="dbff8cbc-1c6d-40a0-b35d-fc87b991d27e">
+										<printWhenExpression><![CDATA[$V{ELEMENTS}.startsWith('z-')? false:true]]></printWhenExpression>
+									</reportElement>
+									<textElement textAlignment="Right">
+										<font size="8" isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{ELEMENTS}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents/>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="OPTION_VALUESMeasure" class="java.math.BigDecimal" calculation="Highest">
+						<measureExpression><![CDATA[$F{OPTION_VALUES}]]></measureExpression>
+					</measure>
+					<crosstabCell width="40" height="13">
+						<cellContents>
+							<textField pattern="###0.00" isBlankWhenNull="true">
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="40" height="13" uuid="96e52585-27d4-43b2-8fad-ce698da8c59a"/>
+								<textElement textAlignment="Right">
+									<font fontName="Arial" size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell height="25" rowTotalGroup="OPTION_NAME">
+						<cellContents backcolor="#BFFFFF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="48b7a4ee-e2d3-4c2f-b5a7-b8081d8d12b3"/>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell width="50" columnTotalGroup="ELEMENTS">
+						<cellContents backcolor="#BFFFFF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="0a28807d-be0d-4e9a-8e63-4320379bc7c9"/>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell rowTotalGroup="OPTION_NAME" columnTotalGroup="ELEMENTS">
+						<cellContents backcolor="#BFFFFF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="5284e6b5-7b04-42bd-aa8b-60e42325aa32"/>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+				</crosstab>
+				<staticText>
+					<reportElement x="38" y="0" width="93" height="13" uuid="8d2f41e8-b521-4387-b9b7-ee29a35e30b3"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Deduction]]></text>
+				</staticText>
+				<crosstab>
+					<reportElement x="503" y="13" width="440" height="91" uuid="244759f1-00db-49ac-a234-88a99ccfaa01"/>
+					<crosstabDataset isDataPreSorted="true">
+						<dataset>
+							<datasetRun subDataset="Buyer Margin Penalty" uuid="599ce402-01e8-4258-8000-e19d932eab88">
+								<datasetParameter name="p_BMargin_Penalty">
+									<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+					</crosstabDataset>
+					<rowGroup name="OPTION_NAME" width="70">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{OPTION_NAME}]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField>
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="70" height="13" uuid="f6e64a81-8077-46cf-a0fd-0396e0c5d90f"/>
+									<textElement textAlignment="Left">
+										<font size="8" isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{OPTION_NAME}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents/>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="ELEMENTS" height="13">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{ELEMENTS}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="40" height="13" uuid="3ab06a86-04b1-45bf-82eb-b0d01e965365">
+										<printWhenExpression><![CDATA[$V{ELEMENTS}.startsWith('z-')? false:true]]></printWhenExpression>
+									</reportElement>
+									<textElement textAlignment="Right">
+										<font size="8" isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{ELEMENTS}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents/>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="OPTION_VALUESMeasure" class="java.math.BigDecimal" calculation="Highest">
+						<measureExpression><![CDATA[$F{OPTION_VALUES}]]></measureExpression>
+					</measure>
+					<crosstabCell width="40" height="13">
+						<cellContents>
+							<textField pattern="###0.00" isBlankWhenNull="true">
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="40" height="13" uuid="426384d6-a942-4219-a796-1b5d59218e38"/>
+								<textElement textAlignment="Right">
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell height="25" rowTotalGroup="OPTION_NAME">
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="b4857186-c69f-4424-8785-97a0e88c3daf"/>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell width="50" columnTotalGroup="ELEMENTS">
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="cc4e41b6-2920-471b-915e-f17f7d978591"/>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell rowTotalGroup="OPTION_NAME" columnTotalGroup="ELEMENTS">
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="6e893ebd-a0c1-4087-87de-e7337c611b30"/>
+								<textFieldExpression><![CDATA[$V{OPTION_VALUESMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+				</crosstab>
+				<staticText>
+					<reportElement x="503" y="0" width="100" height="13" uuid="6223d94f-a321-4657-85af-9226359e24f7"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Deduction]]></text>
+				</staticText>
+				<line>
+					<reportElement stretchType="RelativeToBandHeight" x="500" y="0" width="1" height="105" uuid="c15647c3-a38e-4a61-82bf-ae0d518dcdb2"/>
+				</line>
+				<line>
+					<reportElement stretchType="RelativeToBandHeight" x="968" y="0" width="1" height="105" uuid="c15647c3-a38e-4a61-82bf-ae0d518dcdb2"/>
+				</line>
+				<line>
+					<reportElement stretchType="RelativeToBandHeight" x="33" y="0" width="1" height="105" uuid="c15647c3-a38e-4a61-82bf-ae0d518dcdb2"/>
+				</line>
+			</band>
+			<band height="44">
+				<staticText>
+					<reportElement x="102" y="3" width="59" height="13" uuid="eb1feb76-4041-4b95-9a6f-f00198cf3a2e"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[QP:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="102" y="16" width="59" height="13" uuid="0f9f603e-dbe4-4c4f-a0a5-0781bd8b56a8"/>
+					<text><![CDATA[Settlement:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="102" y="29" width="59" height="13" uuid="eee77fff-1785-4cfa-a99e-20eebd6c602c"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[Final:]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="161" y="16" width="220" height="13" uuid="07a090a3-f98a-4d44-9c9f-04338ecda36a"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SETTLEMENT_EVENT_SELLER}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="526" y="3" width="61" height="13" uuid="26562da8-1105-4cdd-8095-1a0fee2d74d8"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[QP:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="526" y="16" width="61" height="13" uuid="a6ea91ab-5069-4d8f-a0e0-1844f1492f15"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[Settlement:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="526" y="29" width="61" height="13" uuid="2d11d469-9f4c-4c6a-9478-aef08279e2e0"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[Final:]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="587" y="16" width="343" height="13" uuid="e89f3efc-2bf5-4262-8d34-14f2ece18cc2"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SETTLEMENT_EVENT_BUYER}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement stretchType="RelativeToBandHeight" x="500" y="0" width="1" height="44" uuid="c15647c3-a38e-4a61-82bf-ae0d518dcdb2"/>
+				</line>
+				<line>
+					<reportElement stretchType="RelativeToBandHeight" x="968" y="0" width="1" height="44" uuid="c15647c3-a38e-4a61-82bf-ae0d518dcdb2"/>
+				</line>
+				<line>
+					<reportElement stretchType="RelativeToBandHeight" x="33" y="0" width="1" height="44" uuid="c15647c3-a38e-4a61-82bf-ae0d518dcdb2"/>
+				</line>
+				<textField isBlankWhenNull="true">
+					<reportElement x="161" y="3" width="220" height="13" uuid="33f795c9-76e7-4ac5-b371-2d020aae2279"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{QP_TYPE_SELLER}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="587" y="3" width="343" height="13" uuid="a8e8afc9-49ac-4155-8efb-2bc933fd08eb"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{QP_TYPE_BUYER}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="63">
+				<staticText>
+					<reportElement x="33" y="3" width="157" height="13" uuid="8f219f4b-fe07-4459-ab06-875d7c838d41"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Deal Summary]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="33" y="16" width="70" height="13" uuid="940db701-b2cb-46c9-9b70-c431dee8b14a"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[Sale]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="33" y="28" width="70" height="13" uuid="f4578475-7ea5-4bb0-83ad-35c77639872e"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[Purchase]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="33" y="42" width="70" height="15" uuid="d3857898-c1fc-412a-8267-589b0899dc06"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Gross Gain]]></text>
+				</staticText>
+				<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+					<reportElement x="107" y="28" width="87" height="13" uuid="104a70e7-9a41-4470-8b82-9b2ac2bcf274"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8"/>
+						<paragraph rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PURCHASE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+					<reportElement x="107" y="16" width="87" height="13" uuid="90ab9665-8390-4a90-ac12-fa12f154e3c2"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8"/>
+						<paragraph rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SALE}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="33" y="0" width="935" height="1" uuid="6a4981d1-b547-4d84-b4a4-2c9f4c02a6a0"/>
+				</line>
+				<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="107" y="42" width="87" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="bca84668-350e-4258-b057-37c15a940671"/>
+					<box topPadding="1" bottomPadding="1">
+						<pen lineWidth="0.25" lineStyle="Double"/>
+						<topPen lineWidth="0.25" lineStyle="Double"/>
+						<leftPen lineWidth="0.0" lineStyle="Dotted"/>
+						<bottomPen lineWidth="0.25" lineStyle="Double"/>
+						<rightPen lineWidth="0.0" lineStyle="Dotted"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{GROSS_GAIN}]]></textFieldExpression>
+				</textField>
+				<componentElement>
+					<reportElement key="table" x="350" y="13" width="167" height="47" uuid="7c719e8d-5e70-4fce-9fe6-391d5204c408"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Gains" uuid="ae1eb386-f409-4d7a-868e-af3ed2baedb9">
+							<datasetParameter name="p_margin_sheet_id">
+								<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="58" uuid="9902f995-c20c-4c82-b258-f02b91d0ad8c">
+							<jr:detailCell height="13" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="58" height="13" uuid="2b5eb184-f00c-4b93-b525-5152fe608ab1"/>
+									<textElement>
+										<font fontName="Arial" size="9" isBold="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{ELEMENT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="72" uuid="8e6ce75a-4231-4d19-9e3e-dc70c593e759">
+							<jr:tableFooter height="15" rowSpan="1">
+								<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="72" height="15" uuid="ad4986c4-5688-4c40-9e32-0154ffbd40a2"/>
+									<box>
+										<topPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.75"/>
+									</box>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="8"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{Total_Gains}]]></textFieldExpression>
+								</textField>
+							</jr:tableFooter>
+							<jr:detailCell height="13" rowSpan="1">
+								<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="72" height="13" uuid="ad4986c4-5688-4c40-9e32-0154ffbd40a2"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="8"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{GAIN_VALUE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+				<staticText>
+					<reportElement x="350" y="0" width="92" height="13" uuid="8f219f4b-fe07-4459-ab06-875d7c838d41"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Terms Details:]]></text>
+				</staticText>
+			</band>
+			<band height="50">
+				<componentElement>
+					<reportElement key="table" x="33" y="0" width="167" height="50" uuid="7c719e8d-5e70-4fce-9fe6-391d5204c408"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Margin Expense" uuid="ae1eb386-f409-4d7a-868e-af3ed2baedb9">
+							<datasetParameter name="p_margin_sheet_id">
+								<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="71" uuid="9902f995-c20c-4c82-b258-f02b91d0ad8c">
+							<jr:detailCell height="13" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="70" height="13" uuid="2b5eb184-f00c-4b93-b525-5152fe608ab1"/>
+									<textElement>
+										<font fontName="Arial" size="9" isBold="false"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{EXPENSE_TYPE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="89" uuid="8e6ce75a-4231-4d19-9e3e-dc70c593e759">
+							<jr:detailCell height="13" rowSpan="1">
+								<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+									<reportElement x="2" y="0" width="87" height="13" uuid="ad4986c4-5688-4c40-9e32-0154ffbd40a2"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="8"/>
+										<paragraph rightIndent="2"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{EXPENSE_AMOUNT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+				<componentElement>
+					<reportElement key="table 1" x="618" y="2" width="360" height="48" uuid="3dfdca21-9abf-4d6c-ba90-3b22c4e5eb41"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Financed" uuid="18b872bc-e37c-4afb-868d-ad5a9c996829">
+							<datasetParameter name="P_MARGIN_SHEET">
+								<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="73" uuid="6d62d28f-2796-4f2b-aef9-0df6b0f94e82">
+							<jr:tableFooter height="30" rowSpan="1"/>
+							<jr:columnHeader height="15" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="72" height="15" uuid="85c38051-7e82-4343-a256-55506e65f270"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" isBold="true"/>
+									</textElement>
+									<text><![CDATA[% provisional]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="15" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="72" height="15" uuid="ab3dcd1c-cb78-408c-9671-1941814e6dd6"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{PERCENT_FINANCED}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="68" uuid="da2c09fa-49f5-4e62-805c-be121196347c">
+							<jr:tableFooter height="30" rowSpan="1"/>
+							<jr:columnHeader height="15" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="67" height="15" uuid="1bbc24a3-46bd-4e8e-b8fd-add5d8b69f4e"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" isBold="true"/>
+									</textElement>
+									<text><![CDATA[payment/ton]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="15" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="67" height="15" uuid="943ea1eb-578f-49a9-9537-c3ace5211cfc"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{PERIOD}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="66" uuid="95ab6a99-e1ff-4038-bb0f-9ea4eb18f5a5">
+							<jr:tableFooter height="30" rowSpan="1"/>
+							<jr:columnHeader height="15" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="66" height="15" uuid="656d625d-7a1f-4a98-a99c-1b28ac568bde"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" isBold="true"/>
+									</textElement>
+									<text><![CDATA[Libor + 2.0%]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="15" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="66" height="15" uuid="8cd5e8be-8de0-49d8-887b-acfa17de39ad"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{INTEREST_RATE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="55" uuid="b7cf53ac-fadf-459b-8670-edffb32f0954">
+							<jr:tableFooter height="30" rowSpan="1"/>
+							<jr:columnHeader height="15" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="54" height="15" uuid="d59b7824-63cf-4dec-bfd7-a5d31c4c7f7e"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" isBold="true"/>
+									</textElement>
+									<text><![CDATA[Time]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="15" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="54" height="15" uuid="ff0a71cf-efbc-45d6-8135-a0b16a1061c0"/>
+									<textElement textAlignment="Right">
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{PERIOD}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+				<staticText>
+					<reportElement x="418" y="2" width="183" height="20" uuid="6d8de380-e3c3-43ba-a695-4923ba5f6824"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="false" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Cost of Capital Details:]]></text>
+				</staticText>
+			</band>
+			<band height="16">
+				<staticText>
+					<reportElement x="33" y="0" width="70" height="13" uuid="a342ae06-613b-4a84-8fae-ebc83924567e"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Net Gain]]></text>
+				</staticText>
+				<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="113" y="0" width="87" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="ae88effe-e610-468f-83ec-18b6abb5651f"/>
+					<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{NET_PROFIT}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="210" y="0" width="90" height="15" uuid="c18947a0-aa01-48e9-a5d0-a5237fa4be8c"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[dmt]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="34" splitType="Stretch">
+			<rectangle>
+				<reportElement x="33" y="1" width="957" height="15" forecolor="#CCCCCC" backcolor="#990000" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+				<graphicElement>
+					<pen lineColor="#990033"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="1" y="18" width="968" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Innovative Systems Inc®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="697" y="4" width="234" height="13" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="33" y="3" width="227" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font fontName="Arial" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="933" y="4" width="27" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="bf29d155-322a-4ed6-887e-85e4736d1c5a"/>
+				<textElement verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

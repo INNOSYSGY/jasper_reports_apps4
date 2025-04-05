@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="VACATION_LEAVE" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="72c45b74-f9a7-41e2-a11a-9aec8d851278">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/Training/VACATION_LEAVE"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="16"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 'We refer to your application for leave dated ' ||TRIM (TO_CHAR(TO_DATE (((ENTRY_DATE))),'Month DD, YYYY')) || ' for '
+|| apps.pkg_global_fnts.fn_num_towords(DAYS_TAKEN)|| ' (' ||DAYS_TAKEN|| ') ' ||
+CASE
+ WHEN DAYS_TAKEN = 1 THEN ' day '
+ ELSE ' days '
+END
+||INITCAP(LEAVE_TYPE)|| ' from ' ||TRIM (TO_CHAR(TO_DATE (((FROMDATE))),'Month DD, YYYY'))||
+' to '||TRIM (TO_CHAR(TO_DATE (((TODATE))),'Month DD, YYYY'))||' inclusive. ' AS LEAVE_RESPONSE1 ,
+a.REMARKS AS LEAVE_RESPONSE,
+a.emp_id,
+( select employee_name from apps.vw_position_location_v3 t where t.emp_id = b.employee_no) APPROVED_BY,
+(SELECT POSITION_NAME FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = b.EMPLOYEE_NO) POSITION_OF_APPROVER,
+ (SELECT EMPLOYEE_NAME FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = a.EMP_ID) APPLICANT,
+ (SELECT POSITION_NAME FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = a.EMP_ID) APPLICANT_POSITION,
+ (SELECT INITCAP(department) FROM apps.vw_position_location_v3 t WHERE t.EMP_ID = a.EMP_ID) DEPARTMENT,
+ 'Dear '|| (SELECT
+               CASE
+                 WHEN sex_code = 'M'  THEN 'Mr.'
+                 WHEN sex_code = 'F' THEN 'Mrs.'
+               END FROM apps.vw_position_location_v3 t where t.emp_id = a.emp_id)
+        ||
+ ' '||SURNAME_HIST|| ',' as  GREETING, 'Ref: tt '||TO_CHAR(SYSDATE,'DD.MM.YYYY') || ' ' AS bottom_date
+FROM apps.hr_lv_leavehistory a join  apps.tbluser b on b.user_name = a.verified_by
+WHERE a.EMP_ID = $P{EMP_ID}
+--WHERE a.REMARKS IS NOT NULL AND a.DEFERRED_LEAVE = 1]]>
+	</queryString>
+	<field name="LEAVE_RESPONSE1" class="java.lang.String"/>
+	<field name="LEAVE_RESPONSE" class="java.lang.String"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="APPROVED_BY" class="java.lang.String"/>
+	<field name="POSITION_OF_APPROVER" class="java.lang.String"/>
+	<field name="APPLICANT" class="java.lang.String"/>
+	<field name="APPLICANT_POSITION" class="java.lang.String"/>
+	<field name="DEPARTMENT" class="java.lang.String"/>
+	<field name="GREETING" class="java.lang.String"/>
+	<field name="BOTTOM_DATE" class="java.lang.String"/>
+	<sortField name="EMP_ID"/>
+	<group name="emp_id">
+		<groupExpression><![CDATA[$F{EMP_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="510">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="16" y="245" width="522" height="20" uuid="8ecdb3ea-ceed-4ddb-93ad-544202b8c0d3"/>
+					<textFieldExpression><![CDATA[$F{GREETING}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="16" y="288" width="522" height="34" uuid="0aee3432-717f-4c06-9d6f-0d9a5dc732e0"/>
+					<textFieldExpression><![CDATA[$F{LEAVE_RESPONSE1}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="16" y="338" width="522" height="28" uuid="4c4babd7-cab5-49b8-93b8-f24e28d2483a"/>
+					<textFieldExpression><![CDATA[$F{LEAVE_RESPONSE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="MMMMM dd, yyyy">
+					<reportElement x="16" y="90" width="153" height="20" uuid="59465404-5cdf-40af-af6b-e49dbd827f32"/>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="16" y="120" width="522" height="20" uuid="4e454f78-b754-4880-b6a7-55f59e7c0b43"/>
+					<textFieldExpression><![CDATA[$F{APPLICANT}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="16" y="140" width="522" height="20" uuid="65cd14dc-6cbd-4bb0-acc1-e05e9d16a409"/>
+					<textFieldExpression><![CDATA[$F{APPLICANT_POSITION}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="16" y="160" width="522" height="20" uuid="7e1f4331-6532-4ba9-9723-e9d13a1902b3"/>
+					<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="16" y="200" width="153" height="20" uuid="3c2fa49e-2bed-4a2b-b72e-530b24f0dbce"/>
+					<textElement>
+						<font fontName="Times New Roman" size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Thru' Officer-in-Charge]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="16" y="443" width="522" height="20" uuid="18131ecd-ca3c-47e5-89fc-842211fe4be1"/>
+					<textElement>
+						<font fontName="Times New Roman" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{APPROVED_BY}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="16" y="463" width="522" height="20" uuid="ba71d32f-65b3-432a-8d33-135e55a6afb5"/>
+					<textElement>
+						<font fontName="Times New Roman" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{POSITION_OF_APPROVER}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="16" y="423" width="201" height="20" uuid="d209bc36-a542-4fc0-acf5-0c4f0630bfe0"/>
+					<text><![CDATA[...............]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="16" y="387" width="201" height="20" uuid="84825709-1568-4630-b6c0-ce6b513714e1"/>
+					<text><![CDATA[Yours faithfully,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="217" y="30" width="209" height="20" uuid="46faa0e8-8992-412b-83f0-65feb5dbe130"/>
+					<textElement textAlignment="Center">
+						<font fontName="Times New Roman" size="13" isBold="true"/>
+					</textElement>
+					<text><![CDATA[GUYANA WATER INC.]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="438" y="490" width="100" height="20" uuid="90258f9a-f4ce-41c9-81ad-f8b20fe4cf22"/>
+					<textElement textAlignment="Right" verticalAlignment="Bottom">
+						<font fontName="Times New Roman" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BOTTOM_DATE}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+</jasperReport>

@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Agreements By Contract Adminisrator" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="874918dd-7cf2-42a0-8689-852ced0e6010">
+	<property name="ireport.zoom" value="1.7715610000000017"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MCC/MARGINSHEET/M_02"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.125:8081/jasperserver/services/repository"/>
+	<parameter name="date_start" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="date_end" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="element" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select a.id,
+a.date_created agreement_create_date,
+a.reference_number,a.product_description,
+(select initcap(c.name)
+from contact c
+where c.id=p.contact_id) purchase_contact,p.reference_number purchase_contract_ref,
+initcap(p.qp_type) purchase_quotation_type,
+(select initcap(c.name)
+from contact c
+where c.id=s.contact_id) sale_contact,
+s.reference_number sale_contract_ref,
+initcap(s.qp_type) sale_quotation_type,
+nvl((select nvl(initcap(decode(first_name,null,last_name,first_name||' '||last_name)),'Unknown')
+from app_user u
+where upper(u.user_name)=upper(a.contract_admin)
+),'Unknown') Contract_Admin
+from agreement a
+left outer join contract p on a.purchase_contract_id=p.id
+left outer join contract s on a.sale_contract_id=s.id]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="AGREEMENT_CREATE_DATE" class="java.sql.Timestamp"/>
+	<field name="REFERENCE_NUMBER" class="java.lang.String"/>
+	<field name="PRODUCT_DESCRIPTION" class="java.lang.String"/>
+	<field name="PURCHASE_CONTACT" class="java.lang.String"/>
+	<field name="PURCHASE_CONTRACT_REF" class="java.lang.String"/>
+	<field name="PURCHASE_QUOTATION_TYPE" class="java.lang.String"/>
+	<field name="SALE_CONTACT" class="java.lang.String"/>
+	<field name="SALE_CONTRACT_REF" class="java.lang.String"/>
+	<field name="SALE_QUOTATION_TYPE" class="java.lang.String"/>
+	<field name="CONTRACT_ADMIN" class="java.lang.String"/>
+	<sortField name="CONTRACT_ADMIN"/>
+	<sortField name="AGREEMENT_CREATE_DATE"/>
+	<variable name="Seq" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[1.0]]></variableExpression>
+		<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+	</variable>
+	<group name="Contract Administrator">
+		<groupExpression><![CDATA[$F{CONTRACT_ADMIN}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="54ced0a3-fad8-4b3f-982e-12ff5a87800b" x="2" y="0" width="317" height="15"/>
+					<textElement>
+						<font isBold="true" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Contract Administrator: "+$F{CONTRACT_ADMIN}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="47" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="c52d513b-f3f3-479b-a6c3-bb124e5c0302" x="162" y="0" width="487" height="33"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Listing of Agreements By Contract Administrator]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="5b86119d-1da6-4df5-9da7-716c691ebdba" x="110" y="44" width="858" height="1"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineColor="#CC0033"/>
+				</graphicElement>
+			</line>
+			<image>
+				<reportElement uuid="8b4ea083-932e-411a-aea0-29c4fe576a0b" x="2" y="0" width="589" height="33"/>
+				<imageExpression><![CDATA["repo:/reports/MCC/Image/logo"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<line>
+				<reportElement uuid="45fed678-576e-41b1-bc57-ef706ea39131" x="0" y="14" width="968" height="1"/>
+				<graphicElement>
+					<pen lineColor="#CC0000"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="0d5763eb-92d4-4745-b8d1-85655d78e22e" x="30" y="0" width="67" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Created Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="967a1fdf-32c0-4181-aac3-44ff35032fc0" x="100" y="0" width="69" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Agreement #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="74175ad0-226c-4620-9886-d266aec20e24" x="381" y="0" width="147" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Purchaser Contract Party]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="743a468d-630c-4929-aa48-09402c706f86" x="531" y="0" width="100" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Purchase Contract #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="65241b09-0819-441d-a4dc-3247fa0d17f1" mode="Transparent" x="179" y="0" width="192" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Product Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b086917e-7ceb-4354-b7e5-ceb4f29a3de9" mode="Transparent" x="635" y="0" width="36" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[QP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="896c0188-2bce-4a5d-add6-4e414a27b232" mode="Transparent" x="674" y="0" width="139" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Sale Contract Party]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="89ec37e6-9143-42ce-a485-ea75d5c1645b" mode="Transparent" x="817" y="0" width="87" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Sales Contract #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4bbe348c-77f2-4d35-b98b-a094499d8a20" mode="Transparent" x="909" y="0" width="57" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[QP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0a01dcc8-6028-4546-80ba-d6d5c863ffa2" x="0" y="0" width="20" height="15"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[#]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField pattern="yyyy-MM-dd" isBlankWhenNull="true">
+				<reportElement uuid="00200a8f-d757-4292-8b56-5fa7e99188a5" x="30" y="0" width="67" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AGREEMENT_CREATE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="322cb2e5-4332-4302-80f9-667b5cad664a" x="100" y="0" width="69" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REFERENCE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ce41e6b2-3084-4a78-94db-9a317e38e95a" x="381" y="0" width="147" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PURCHASE_CONTACT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="86f99626-a918-49e5-8242-3db54a049a05" x="531" y="0" width="100" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PURCHASE_CONTRACT_REF}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="9edc9d7b-eac5-41db-a3ed-42d042d25174" mode="Transparent" x="179" y="0" width="192" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRODUCT_DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="1bf85103-cf47-4a2b-a935-17b69b6207b2" mode="Transparent" x="635" y="0" width="36" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PURCHASE_QUOTATION_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement uuid="d87b1557-5ff1-4207-ad75-5b344e7ae4e4" mode="Transparent" x="674" y="0" width="139" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALE_CONTACT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="6ab37785-76ac-421a-8fb8-722e56f2cbdd" mode="Transparent" x="817" y="0" width="87" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALE_CONTRACT_REF}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="81eb994c-ca37-4792-a60f-7f1fe3d5c4c8" x="909" y="0" width="57" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALE_QUOTATION_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement uuid="d0051e19-a3c4-494b-9055-c17e26dac521" x="0" y="0" width="20" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Seq}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<rectangle>
+				<reportElement uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf" x="0" y="0" width="968" height="15" forecolor="#CC0000" backcolor="#CC0033"/>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="b2a773d7-a277-4610-901a-ea782d2775b0" mode="Transparent" x="2" y="15" width="966" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Innovative Systems Inc®]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy" isBlankWhenNull="false">
+				<reportElement uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9" mode="Transparent" x="736" y="1" width="190" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="d542132f-c136-4dc8-8760-3f15164318a0" mode="Transparent" x="0" y="1" width="227" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="#,##0" isBlankWhenNull="false">
+				<reportElement uuid="bf29d155-322a-4ed6-887e-85e4736d1c5a" mode="Transparent" x="928" y="1" width="38" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="c105d6bc-8168-4640-8a27-f84d41649654" x="2" y="1" width="924" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Listing of Agreements By Contract Administrator]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

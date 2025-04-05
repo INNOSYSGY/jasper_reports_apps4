@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Assay_Letter" language="groovy" pageWidth="612" pageHeight="792" columnWidth="568" leftMargin="22" rightMargin="22" topMargin="20" bottomMargin="20" uuid="2b54878f-c48b-4637-84bb-1fd33a3df6f5">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MCC"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.callouts" value="##Fri May 08 09:57:59 BOT 2015\ncallouts.1.text=\ncallouts.1.bounds=373,373,150,75"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MCC/SHIPMENT/HEDGE_POSITION"/>
+	<property name="ireport.jasperserver.url" value="http://190.80.71.15:8081/jasperserver/services/repository"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="P_BUYER" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+ upper(a.buyer) buyer,
+a.shipment_number,
+  h.status hedge_status,
+  b.destination,
+  h.element,
+  hd.quantity,
+  hd.quantity_mnt_code,
+  hd.buy_price_period_start,
+  hd.buy_price_period_end,
+  pkg_mcc.get_qp_display(to_date(hd.buy_price_period_start,'yyyy-mm-dd'),to_date(hd.buy_price_period_end,'yyyy-mm-dd')) buy_date,
+  nvl(hd.buy_price,
+  pkg_mcc.f_get_qp_future_price(upper(h.element),to_date(hd.buy_price_period_start,'yyyy-mm-dd'),to_date(hd.buy_price_period_end,'yyyy-mm-dd'))
+  )as buy_price
+  from vw_shipment a
+  join shipment b on a.id=b.id
+  join vw_hedge h on a.id=h.shipment_id
+  join vw_hedge_details hd on h.id=hd.hedge_id
+where upper(status)<>'CLOSED'
+and a.buyer_id=(case when nvl($P{P_BUYER},9999)=9999 then
+a.buyer_id else $P{P_BUYER} end)]]>
+	</queryString>
+	<field name="BUYER" class="java.lang.String"/>
+	<field name="SHIPMENT_NUMBER" class="java.lang.String"/>
+	<field name="HEDGE_STATUS" class="java.lang.String"/>
+	<field name="DESTINATION" class="java.lang.String"/>
+	<field name="ELEMENT" class="java.lang.String"/>
+	<field name="QUANTITY" class="java.math.BigDecimal"/>
+	<field name="QUANTITY_MNT_CODE" class="java.lang.String"/>
+	<field name="BUY_PRICE_PERIOD_START" class="java.lang.String"/>
+	<field name="BUY_PRICE_PERIOD_END" class="java.lang.String"/>
+	<field name="BUY_DATE" class="java.lang.String"/>
+	<field name="BUY_PRICE" class="java.math.BigDecimal"/>
+	<sortField name="BUYER"/>
+	<sortField name="SHIPMENT_NUMBER"/>
+	<sortField name="ELEMENT"/>
+	<variable name="Group_Count" class="java.lang.Number" resetType="Group" resetGroup="Class" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<group name="Buyer">
+		<groupExpression><![CDATA[$F{BUYER}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="568" height="20" uuid="07b608d5-45dc-40b4-aaad-3e4c08f480cc"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BUYER}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="9"/>
+		</groupFooter>
+	</group>
+	<group name="Class">
+		<groupExpression><![CDATA[$F{SHIPMENT_NUMBER}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="6"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="58" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="55" width="568" height="1" uuid="4545ae01-05c7-4a5b-8eaf-ef9a5d62800a"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineColor="#663300"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="151" y="0" width="417" height="25" uuid="de32c0c1-0840-452f-bfd8-4b24e793de73"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[HEDGE  POSITION]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="0" width="568" height="53" uuid="d9567e74-74bc-4d55-963b-78f8579db72f"/>
+				<imageExpression><![CDATA["repo:/reports/MCC/Image/logo"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="15" uuid="1f16de3b-f764-4d1a-b4b5-fbb596d764a7"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Class]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="136" height="15" uuid="ce5c940d-d4c4-4df1-93be-f4ee35183b47"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Destination]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="236" y="0" width="50" height="15" uuid="f27c8cce-b47f-4262-8e22-db380901f410"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Element]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="0" width="100" height="15" uuid="f1ad89bf-7540-4d88-8e8c-2fa19210fa0e"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<text><![CDATA[Payable Quantity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="488" y="0" width="80" height="15" uuid="16f0c3ce-931c-4b36-988f-890775b01100"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="7"/>
+				</textElement>
+				<text><![CDATA[Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="387" y="0" width="100" height="15" uuid="3bc948d1-6930-4573-8054-908c82f49d44"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<text><![CDATA[Expected QP]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="100" height="15" uuid="0a4792c1-167e-4f7c-b966-9af2ed743a55"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Class_COUNT}==1 ? $F{SHIPMENT_NUMBER}:""]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="100" y="0" width="136" height="15" uuid="5ec9513e-94cf-4171-80e9-61d86e1b4f10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Class_COUNT}==1 ? $F{DESTINATION}:""]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="236" y="0" width="50" height="15" uuid="620ce3da-9161-4e57-a101-46fb8578e9ad"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ELEMENT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="286" y="0" width="100" height="15" uuid="d73d42f6-4a88-417c-99f7-655c49be995f"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat('###0.00').format($F{QUANTITY})+" "+$F{QUANTITY_MNT_CODE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$  #,##0.00" isBlankWhenNull="true">
+				<reportElement x="488" y="0" width="80" height="15" uuid="ee52bdc5-0603-495f-9006-10afa068c701"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph rightIndent="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BUY_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="387" y="0" width="101" height="15" uuid="40c450ca-456d-4863-95b9-3262d0e4cd8f"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BUY_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="569" height="15" forecolor="#CC0000" backcolor="#CC0033" uuid="8d5ff126-08f5-4432-8a28-b89031f84434"/>
+			</rectangle>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="14" width="570" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="1d6e281d-94fa-4822-b348-695c86cd4688"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Innovative Systems Inc®]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="401" y="0" width="140" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="5ecd8d1f-0945-4a26-8a7f-6b1874e4093a"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement mode="Transparent" x="0" y="0" width="94" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="4ecfdbe6-0bdb-4db1-ae66-6e51edfe678f"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="542" y="0" width="27" height="13" forecolor="#000000" backcolor="#FFFFFF" uuid="743b63f1-fbdc-43ed-af4f-323b406462f8"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="570" height="13" uuid="bbcf0268-1aea-45af-95b3-399d369c9a58"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Hedge Position]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+</jasperReport>

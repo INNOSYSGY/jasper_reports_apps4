@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Demand History" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6626c827-b6b6-478d-ae5e-f70702738a98">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/FORMS/DEMAND_HISTORY"/>
+	<property name="ireport.jasperserver.url" value="http://190.80.71.15:8081/jasperserver/services/repository"/>
+	<parameter name="WARD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select property_number, property_type, owners, total_due, demand_amount, demand_status from
+vw_property p
+join vw_property_demand pd on p.id=pd.property_id
+where p.ward = $P{WARD_ID}]]>
+	</queryString>
+	<field name="PROPERTY_NUMBER" class="java.lang.String"/>
+	<field name="PROPERTY_TYPE" class="java.lang.String"/>
+	<field name="OWNERS" class="java.lang.String"/>
+	<field name="TOTAL_DUE" class="java.math.BigDecimal"/>
+	<field name="DEMAND_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="DEMAND_STATUS" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="752" height="79" uuid="8d8e997a-9520-43ac-aec3-819ebf257fac"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LANDSCAPE_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="20" uuid="dc58eb39-94f7-4b23-ab31-cc362e12b0d9"/>
+				<text><![CDATA[PROPERTY_NUMBER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="100" height="20" uuid="3e5de9ea-5cc7-47e2-90dc-30ecfef61c14"/>
+				<text><![CDATA[PROPERTY_TYPE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="0" width="100" height="20" uuid="b21769a7-2090-4098-a4dd-995293c56813"/>
+				<text><![CDATA[OWNERS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="0" width="100" height="20" uuid="3e4c976b-56f1-4266-bb91-6b1b0c64f9c6"/>
+				<text><![CDATA[DEMAND_AMOUNT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="0" width="100" height="20" uuid="5228d233-963f-4353-b30e-f01aaf0ec0ad"/>
+				<text><![CDATA[DEMAND_STATUS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="20" uuid="7d651c2b-d3ed-4600-a06c-9951793a4958"/>
+				<textFieldExpression><![CDATA[$F{PROPERTY_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="0" width="100" height="20" uuid="b3abb5cf-2fe3-41aa-b5f3-1d95e68919eb"/>
+				<textFieldExpression><![CDATA[$F{PROPERTY_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="0" width="100" height="20" uuid="30ccc5cb-1eb0-48b7-86da-3e7e838a16f8"/>
+				<textFieldExpression><![CDATA[$F{OWNERS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="300" y="0" width="100" height="20" uuid="0c43e00e-3d2e-4ed1-86b2-5ac2994c2540"/>
+				<textFieldExpression><![CDATA[$F{DEMAND_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="0" width="100" height="20" uuid="bef106f4-2b02-43b0-9e77-37f82e102731"/>
+				<textFieldExpression><![CDATA[$F{DEMAND_STATUS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

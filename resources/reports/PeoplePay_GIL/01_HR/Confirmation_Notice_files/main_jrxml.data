@@ -1,0 +1,770 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="General Salary Adjustment Notice" pageWidth="612" pageHeight="792" columnWidth="468" leftMargin="72" rightMargin="72" topMargin="20" bottomMargin="20" uuid="9ad1cc46-f38d-4e53-9edb-d81c3e55865f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors_Cloud_Development"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/01_HR/Confirmation_Notice"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/01_HR/Confirmation_Notice_files/main_jrxml"/>
+	<subDataset name="ENTITLEMENTS" uuid="96fa231c-ba59-432e-9ef3-f096160ef55e">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors Prod"/>
+		<parameter name="IN_EMP_ID" class="java.math.BigDecimal"/>
+		<parameter name="CURR_SAL_START_DATE" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[select * from (SELECT 
+    b.emp_id, 
+    b.entitlement, 
+    to_char(b.prev_amount, 'FML999G999G999G999G990') prev_amount, 
+    case when b.prev_amount = b.curr_amount then 'Same' else to_char(b.curr_amount, 'FML999G999G999G999G990') end curr_amount
+FROM(
+select 
+    emp_id, 
+    to_nchar('Basic Salary') entitlement,
+    (select * from (
+        select 
+            personal_rate
+         from 
+            hr_rcm_salary 
+        where 
+            emp_id = $P{IN_EMP_ID}
+            and end_date is not null 
+            and end_date != start_date
+            and personal_rate != 0
+        order by 
+            id desc) 
+    where 
+        rownum = 1) prev_amount,
+    personal_rate curr_amount
+from 
+    hr_rcm_salary 
+where 
+    emp_id =$P{IN_EMP_ID} 
+    and (end_date is null or end_date > trunc(sysdate))
+union
+select distinct 
+    ent.emp_id,
+    inc.description
+    ,(select * from (select prev_ent.amount from hr_rcm_empentitle prev_ent join pa_pcf_incomecode prev_inc on prev_ent.income_code_id = prev_inc.id
+                                    where prev_inc.id = inc.id and prev_ent.emp_id = $P{IN_EMP_ID}    and prev_ent.admin_status = 'SYS' and ((prev_ent.end_date is not null and prev_ent.end_date != prev_ent.start_date) or (prev_ent.end_date is null and prev_ent.start_date < to_date($P{CURR_SAL_START_DATE} , 'DD-MON-YYYY'))) order by prev_ent.id desc) 
+        where rownum = 1) prev_amount
+    ,(select * from (select ent_curr.amount from hr_rcm_empentitle ent_curr join pa_pcf_incomecode inc_curr on ent_curr.income_code_id = inc_curr.id
+                                    where inc_curr.id = inc.id and ent_curr.emp_id = $P{IN_EMP_ID}   and ent_curr.admin_status = 'SYS' and (ent_curr.end_date >= trunc(sysdate) or ent_curr.end_date is null))) curr_amount
+from
+    hr_rcm_empentitle ent
+    join pa_pcf_incomecode inc on ent.income_code_id = inc.id
+where 
+    ent.emp_id = $P{IN_EMP_ID}
+    and ent.admin_status = 'SYS') B) C
+where c.curr_amount is not null]]>
+		</queryString>
+		<field name="EMP_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+			<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+		</field>
+		<field name="ENTITLEMENT" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ENTITLEMENT"/>
+			<property name="com.jaspersoft.studio.field.label" value="ENTITLEMENT"/>
+		</field>
+		<field name="PREV_AMOUNT" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="PREV_AMOUNT"/>
+			<property name="com.jaspersoft.studio.field.label" value="PREV_AMOUNT"/>
+		</field>
+		<field name="CURR_AMOUNT" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="CURR_AMOUNT"/>
+			<property name="com.jaspersoft.studio.field.label" value="CURR_AMOUNT"/>
+		</field>
+	</subDataset>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_SESSION_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="IN_ALL_EMPLOYEES" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[select
+    d.*,
+    to_char(round(d.old_basic_salary), 'FML999G999G999G999G990D00') old_basic_salary_formatted,
+    to_char(round(d.confirm_basic_salary), 'FML999G999G999G999G990D00') confirm_basic_salary_formatted,
+    to_char(round(d.extra_hours_salary), 'FML999G999G999G999G990D00') extra_hours_salary_formatted,
+    to_char(round(d.extra_hours_confirm_salary), 'FML999G999G999G999G990D00') extra_hours_confirm_salary_formatted,
+    to_char(round(d.total_saturday_salary), 'FML999G999G999G999G990D00') total_saturday_salary_formatted,
+    to_char(round(d.total_confirm_saturday_salary), 'FML999G999G999G999G990D00') total_confirm_saturday_salary_formatted,
+    to_char(round(d.old_salary), 'FML999G999G999G999G990D00') old_salary_formatted,
+    to_char(round(d.confirm_salary), 'FML999G999G999G999G990D00') confirm_salary_formatted,
+    to_char(round(d.old_total_salary), 'FML999G999G999G999G990D00') old_total_salary_formatted,
+    to_char(round(d.confirm_total_salary), 'FML999G999G999G999G990D00') confirm_total_salary_formatted
+from(
+select 
+    c.*,
+    round(nvl(c.old_basic_salary, 0) + nvl(c.extra_hours_salary, 0) + case when  upper(c.position_name) like upper('%surveillance%') or upper(c.position_name) like upper('%guard%')  then 0 else nvl(c.total_saturday_salary,0) end) old_salary,
+    round(nvl(c.confirm_basic_salary, 0) + nvl(c.extra_hours_confirm_salary, 0) + case when  upper(c.position_name) like upper('%surveillance%') or upper(c.position_name) like upper('%guard%')  then 0 else nvl(c.total_confirm_saturday_salary,0) end) confirm_salary,
+    --nvl(c.personal_rate,0) + nvl(c.cumulative_allowance, 0) salary,
+    --nvl(c.personal_rate,0) + nvl(c.cumulative_allowance, 0) + nvl(c.entitlements,0) total_salary
+    round(nvl(c.old_basic_salary,0) + nvl(c.extra_hours_salary,0) + case when  upper(c.position_name) like upper('%surveillance%') or upper(c.position_name) like upper('%guard%')  then 0 else nvl(c.total_saturday_salary,0) end + nvl(c.entitlements,0)) old_total_salary,
+    round(nvl(c.confirm_basic_salary,0) + nvl(c.extra_hours_confirm_salary,0) + case when  upper(c.position_name) like upper('%surveillance%') or upper(c.position_name) like upper('%guard%')  then 0 else nvl(c.total_confirm_saturday_salary,0) end + nvl(c.entitlements,0)) confirm_total_salary
+from(
+select 
+    b.*, 
+    case when  upper(b.position_name) like upper('%surveillance%') or upper(b.position_name) like upper('%guard%')  then round(b.monthly_hours - b.standard_hours, 2) * 1.5  else  round(b.monthly_hours - b.standard_hours, 2) end extra_hours,
+    (round(b.monthly_hours - b.standard_hours, 2) * b.confirm_hourly_rate * 1.5) extra_hours_confirm_salary,
+    (round(b.monthly_hours - b.standard_hours, 2) * b.hourly_rate * 1.5) extra_hours_salary,
+    (b.total_saturday_hours * b.confirm_hourly_rate * 1.5) total_confirm_saturday_salary,
+    (b.total_saturday_hours * b.hourly_rate * 1.5) total_saturday_salary
+from(
+select
+    a.*,
+    case when  upper(a.position_name) like upper('%surveillance%') or upper(a.position_name) like upper('%guard%')  then  round(case when a.payment_type = 'MONTHLY' then ((a.normal_shift_duration * 6) * 52)/12 when a.payment_type = 'WEEKLY' then (a.normal_shift_duration * 6) end, 2) else round(case when a.payment_type = 'MONTHLY' then ((a.normal_shift_duration * 5) * 52)/12 when a.payment_type = 'WEEKLY' then (a.normal_shift_duration * 5) end, 2) end monthly_hours,
+    (a.standard_hours * a.confirm_hourly_rate) confirm_basic_salary,
+    (a.standard_hours * a.hourly_rate) old_basic_salary,    
+    round(case when a.payment_type = 'MONTHLY' then (a.saturday_shift_duration * 52)/12 when a.payment_type = 'WEEKLY' then a.saturday_shift_duration end , 2) total_saturday_hours,
+    case when upper(a.department) like upper('%Department%') then a.department else a.department || ' Department' end department_name
+from (
+    select
+    to_char(trunc(sysdate), 'fmMonth fmDD, YYYY') date_prepared,
+    (select ind.first_name ||' ' || ind.surname ||'<br>Personnel Officer'
+from 
+    HR_HCF_WORKLOCATIONPOSITION  wkp
+    left join hr_hcf_position pos on wkp.position_id = pos.id
+    left join hr_rcm_employee emp on emp.position_location_id = wkp.id
+    left join hr_rcm_individual ind on ind.id = emp.ind_id
+where 
+    upper(pos.position_name) like upper('%Personnel Officer%')
+    and (emp.date_separated is null or emp.date_separated > trunc(sysdate))
+    and rownum = 1) signature,
+    case when ind.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || ind.first_name ||' ' || ind.surname name,
+    case when ind.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || ind.surname surname,
+    (select position_name from hr_hcf_position where id = wkpos.position_id) position_name,
+    (select unit_name from hr_hcf_position pos join hr_hcf_orgstructuredtl org on pos.orgdtl_id = org.id where pos.id = wkpos.position_id)  department,
+    (select location_description from hr_hcf_worklocation where id = wkpos.wklocation_id) work_location,
+    emp.payment_type,
+    pkg_global_fnts.fn_Address('HOME', emp.ind_id , 'ALL',sysdate) ind_address,
+    to_number(Pkg_Global_Fnts.Fn_Getemprule(emp.Id, 'STANDARD_HOURS',sysdate)) standard_hours,
+    Pkg_Global_Fnts.Fn_Hourlyrate(emp.id, sysdate) Hourly_Rate,
+    sal.start_date sal_start_date, emp.lunch_hour,
+    (select to_char(start_time,'HH:MI PM')||' to '||to_char(end_time,'HH:MI PM') 
+        from HR_ATT_SHIFT where id = emp.shift_id) normal_shift,
+    round((select (24 * abs(END_TIME- START_TIME)) - nvl(emp.lunch_hour, 0)
+        from hr_att_shift
+        where id = emp.shift_id), 2) normal_shift_duration,
+    (select to_char(start_time,'HH:MI PM')||' to '||to_char(end_time,'HH:MI PM')
+        from HR_ATT_SHIFT a where is_saturday = 1 and id = emp.saturday_shift_id) saturday_shift,
+    round((select (24 * abs(END_TIME- START_TIME)) - case when lunch_time_start is not null and lunch_time_end is not null then (24*abs(LUNCH_TIME_END- LUNCH_TIME_START)) else case when less_lunch_hour = 1 then 1 else 0 end end
+        from hr_att_shift
+        where is_saturday = 1 and id = emp.saturday_shift_id), 2) saturday_shift_duration,
+    shift.less_lunch_hour less_lunch_hour,
+    sat_shift.less_lunch_hour sat_less_lunch_hour, 
+    ent.amount entitlements, 
+    sal.personal_rate personal_rate,
+    sal.emp_id emp_id, 
+    emp.employment_class_id employment_class_id,
+    emp.orgdtl_id orgdtl_id,
+    emp.position_location_id position_location_id,
+    wk.id work_location_id,
+    emp.org_id org_id,
+    emp.date_employed, 
+    inc_code.inc_desc income_codes,
+    emp.confirmed, 
+    emp.appointment_date date_confirmed,
+    nvl(sal.confirm_hourly_rate,  Pkg_Global_Fnts.Fn_Hourlyrate(emp.id, sysdate)) confirm_hourly_rate,
+    nvl(sal.confirm_personal_rate, sal.personal_rate) confirm_personal_rate,
+    sal.confirm_start_date, 
+    sal.confirm_end_date,
+    to_char(nvl(sal.confirm_start_date, emp.appointment_date), 'fmMonth fmDD, YYYY') date_effective,
+    emp.emp_company_no
+    from 
+        hr_rcm_employee emp 
+        left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+        left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+        left join hr_att_shift shift on shift.id = emp.shift_id
+        left join hr_att_shift sat_shift on sat_shift.id = emp.saturday_shift_id
+        left join hr_rcm_individual ind on emp.ind_id = ind.id
+        left join hr_rcm_address adr on (adr.ind_id = ind.id and upper(adr.address_type) = upper('HOME') and (adr.end_date is null or adr.end_date > trunc(sysdate)))
+        left join hr_rcm_salary sal on (sal.emp_id = emp.id and (sal.end_date is null or sal.end_date > trunc(sysdate)))
+        left join (select 
+                            ent_curr.emp_id, sum(ent_curr.amount) amount
+                        from
+                            hr_rcm_empentitle ent_curr
+                            join pa_pcf_incomecode inc_curr on ent_curr.income_code_id = inc_curr.id 
+                        where
+                            ent_curr.admin_status = 'SYS'
+                            and inc_curr.income_code != 'CUMMALL'
+                            and (ent_curr.end_date >= trunc(sysdate) or ent_curr.end_date is null)
+                            group by ent_curr.emp_id) ent on (ent.emp_id = emp.id)
+        left join (select 
+                            ent_curr.emp_id,  listagg(to_char(inc_curr.description), ';') within group (order by ent_curr.emp_id) inc_desc
+                        from
+                            hr_rcm_empentitle ent_curr
+                            join pa_pcf_incomecode inc_curr on ent_curr.income_code_id = inc_curr.id 
+                        where
+                            ent_curr.admin_status = 'SYS'
+                            and inc_curr.income_code != 'CUMMALL'
+                            and (ent_curr.end_date >= trunc(sysdate) or ent_curr.end_date is null)
+                        group by ent_curr.emp_id) inc_code on inc_code.emp_id = emp.id
+    where emp.org_id = $P{IN_ORG_ID} 
+    and (emp.date_separated is null or emp.separated_status_id is null)
+    and ($P{IN_ALL_EMPLOYEES} = 1 or
+    	exists (SELECT 
+    					1
+    				FROM 
+    					RPT_PARAMETER W1
+    				WHERE 
+    					W1.SESSION_ID =$P{IN_SESSION_ID}
+    				AND 
+    					option_value=case when option_name =$P{IN_SEARCH_OPTION} and option_name ='EMPLOYEE' then to_char(sal.emp_id)
+						when option_name = $P{IN_SEARCH_OPTION} and option_name = 'ORG_STRUCT_LEVEL' then to_char(emp.orgdtl_id)
+						when option_name =$P{IN_SEARCH_OPTION} and option_name = 'EMPLOYMENT_CLASS' then to_char(emp.employment_class_id)
+                        when option_name =$P{IN_SEARCH_OPTION} and option_name = 'POSITION_LOCATION' then to_char(emp.position_location_id)
+                        when option_name =$P{IN_SEARCH_OPTION} and option_name = 'WORK_LOCATION' then to_char(wk.id)
+						end
+    				)
+    )
+)a)b)c)d order by d.name asc]]>
+	</queryString>
+	<field name="DATE_PREPARED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_PREPARED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_PREPARED"/>
+	</field>
+	<field name="SIGNATURE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SIGNATURE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SIGNATURE"/>
+	</field>
+	<field name="NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="WORK_LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_LOCATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION"/>
+	</field>
+	<field name="PAYMENT_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAYMENT_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_TYPE"/>
+	</field>
+	<field name="IND_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="IND_ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_ADDRESS"/>
+	</field>
+	<field name="STANDARD_HOURS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="STANDARD_HOURS"/>
+		<property name="com.jaspersoft.studio.field.label" value="STANDARD_HOURS"/>
+	</field>
+	<field name="HOURLY_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="HOURLY_RATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="HOURLY_RATE"/>
+	</field>
+	<field name="SAL_START_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="SAL_START_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SAL_START_DATE"/>
+	</field>
+	<field name="LUNCH_HOUR" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="LUNCH_HOUR"/>
+		<property name="com.jaspersoft.studio.field.label" value="LUNCH_HOUR"/>
+	</field>
+	<field name="NORMAL_SHIFT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NORMAL_SHIFT"/>
+		<property name="com.jaspersoft.studio.field.label" value="NORMAL_SHIFT"/>
+	</field>
+	<field name="NORMAL_SHIFT_DURATION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NORMAL_SHIFT_DURATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="NORMAL_SHIFT_DURATION"/>
+	</field>
+	<field name="SATURDAY_SHIFT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SATURDAY_SHIFT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SATURDAY_SHIFT"/>
+	</field>
+	<field name="SATURDAY_SHIFT_DURATION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SATURDAY_SHIFT_DURATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="SATURDAY_SHIFT_DURATION"/>
+	</field>
+	<field name="LESS_LUNCH_HOUR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="LESS_LUNCH_HOUR"/>
+		<property name="com.jaspersoft.studio.field.label" value="LESS_LUNCH_HOUR"/>
+	</field>
+	<field name="SAT_LESS_LUNCH_HOUR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SAT_LESS_LUNCH_HOUR"/>
+		<property name="com.jaspersoft.studio.field.label" value="SAT_LESS_LUNCH_HOUR"/>
+	</field>
+	<field name="ENTITLEMENTS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ENTITLEMENTS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ENTITLEMENTS"/>
+	</field>
+	<field name="PERSONAL_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PERSONAL_RATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PERSONAL_RATE"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="EMPLOYMENT_CLASS_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYMENT_CLASS_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS_ID"/>
+	</field>
+	<field name="ORGDTL_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORGDTL_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGDTL_ID"/>
+	</field>
+	<field name="POSITION_LOCATION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_LOCATION_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_LOCATION_ID"/>
+	</field>
+	<field name="WORK_LOCATION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_LOCATION_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION_ID"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_EMPLOYED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="INCOME_CODES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="INCOME_CODES"/>
+		<property name="com.jaspersoft.studio.field.label" value="INCOME_CODES"/>
+	</field>
+	<field name="CONFIRMED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRMED"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRMED"/>
+	</field>
+	<field name="DATE_CONFIRMED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_CONFIRMED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_CONFIRMED"/>
+	</field>
+	<field name="CONFIRM_HOURLY_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_HOURLY_RATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_HOURLY_RATE"/>
+	</field>
+	<field name="CONFIRM_PERSONAL_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_PERSONAL_RATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_PERSONAL_RATE"/>
+	</field>
+	<field name="CONFIRM_START_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_START_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_START_DATE"/>
+	</field>
+	<field name="CONFIRM_END_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_END_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_END_DATE"/>
+	</field>
+	<field name="DATE_EFFECTIVE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_EFFECTIVE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EFFECTIVE"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_COMPANY_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="MONTHLY_HOURS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="MONTHLY_HOURS"/>
+		<property name="com.jaspersoft.studio.field.label" value="MONTHLY_HOURS"/>
+	</field>
+	<field name="CONFIRM_BASIC_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_BASIC_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_BASIC_SALARY"/>
+	</field>
+	<field name="OLD_BASIC_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="OLD_BASIC_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="OLD_BASIC_SALARY"/>
+	</field>
+	<field name="TOTAL_SATURDAY_HOURS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_SATURDAY_HOURS"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_SATURDAY_HOURS"/>
+	</field>
+	<field name="DEPARTMENT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT_NAME"/>
+	</field>
+	<field name="EXTRA_HOURS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EXTRA_HOURS"/>
+		<property name="com.jaspersoft.studio.field.label" value="EXTRA_HOURS"/>
+	</field>
+	<field name="EXTRA_HOURS_CONFIRM_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EXTRA_HOURS_CONFIRM_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="EXTRA_HOURS_CONFIRM_SALARY"/>
+	</field>
+	<field name="EXTRA_HOURS_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EXTRA_HOURS_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="EXTRA_HOURS_SALARY"/>
+	</field>
+	<field name="TOTAL_CONFIRM_SATURDAY_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_CONFIRM_SATURDAY_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_CONFIRM_SATURDAY_SALARY"/>
+	</field>
+	<field name="TOTAL_SATURDAY_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_SATURDAY_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_SATURDAY_SALARY"/>
+	</field>
+	<field name="OLD_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="OLD_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="OLD_SALARY"/>
+	</field>
+	<field name="CONFIRM_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_SALARY"/>
+	</field>
+	<field name="OLD_TOTAL_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="OLD_TOTAL_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="OLD_TOTAL_SALARY"/>
+	</field>
+	<field name="CONFIRM_TOTAL_SALARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_TOTAL_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_TOTAL_SALARY"/>
+	</field>
+	<field name="OLD_BASIC_SALARY_FORMATTED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="OLD_BASIC_SALARY_FORMATTED"/>
+		<property name="com.jaspersoft.studio.field.label" value="OLD_BASIC_SALARY_FORMATTED"/>
+	</field>
+	<field name="CONFIRM_BASIC_SALARY_FORMATTED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_BASIC_SALARY_FORMATTED"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_BASIC_SALARY_FORMATTED"/>
+	</field>
+	<field name="EXTRA_HOURS_SALARY_FORMATTED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EXTRA_HOURS_SALARY_FORMATTED"/>
+		<property name="com.jaspersoft.studio.field.label" value="EXTRA_HOURS_SALARY_FORMATTED"/>
+	</field>
+	<field name="EXTRA_HOURS_CONFIRM_SALARY_FORMATTED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EXTRA_HOURS_CONFIRM_SALARY_FORMATTED"/>
+		<property name="com.jaspersoft.studio.field.label" value="EXTRA_HOURS_CONFIRM_SALARY_FORMATTED"/>
+	</field>
+	<field name="TOTAL_SATURDAY_SALARY_FORMATTED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_SATURDAY_SALARY_FORMATTED"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_SATURDAY_SALARY_FORMATTED"/>
+	</field>
+	<field name="TOTAL_CONFIRM_SATURDAY_SALARY_FORMATTED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_CONFIRM_SATURDAY_SALARY_FORMATTED"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_CONFIRM_SATURDAY_SALARY_FORMATTED"/>
+	</field>
+	<field name="OLD_SALARY_FORMATTED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="OLD_SALARY_FORMATTED"/>
+		<property name="com.jaspersoft.studio.field.label" value="OLD_SALARY_FORMATTED"/>
+	</field>
+	<field name="CONFIRM_SALARY_FORMATTED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_SALARY_FORMATTED"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_SALARY_FORMATTED"/>
+	</field>
+	<field name="OLD_TOTAL_SALARY_FORMATTED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="OLD_TOTAL_SALARY_FORMATTED"/>
+		<property name="com.jaspersoft.studio.field.label" value="OLD_TOTAL_SALARY_FORMATTED"/>
+	</field>
+	<field name="CONFIRM_TOTAL_SALARY_FORMATTED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CONFIRM_TOTAL_SALARY_FORMATTED"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONFIRM_TOTAL_SALARY_FORMATTED"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="70">
+			<subreport>
+				<reportElement x="0" y="0" width="468" height="70" uuid="7880fde5-c418-4ba1-80e8-077b2bcf7d20">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="440" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<componentElement>
+				<reportElement positionType="Float" x="0" y="300" width="468" height="20" isRemoveLineWhenBlank="true" uuid="596c32da-969f-40e3-bb4b-51b345be7634">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[1 == 0]]></printWhenExpression>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="ENTITLEMENTS" uuid="7da52a6e-f2f3-4752-912d-6cec925df117">
+						<datasetParameter name="IN_EMP_ID">
+							<datasetParameterExpression><![CDATA[$F{EMP_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="CURR_SAL_START_DATE">
+							<datasetParameterExpression><![CDATA[$F{SAL_START_DATE}]]></datasetParameterExpression>
+						</datasetParameter>
+					</datasetRun>
+					<jr:listContents height="20" width="468">
+						<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+							<reportElement positionType="Float" x="0" y="0" width="140" height="20" uuid="2e4d21ab-4877-40a3-adb0-c27905348b00"/>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{ENTITLEMENT}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+							<reportElement positionType="Float" x="140" y="0" width="150" height="20" uuid="724337b8-1bc4-4a7b-acdf-46ba583d19b4">
+								<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{PREV_AMOUNT}]]></textFieldExpression>
+						</textField>
+						<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+							<reportElement positionType="Float" x="290" y="0" width="178" height="20" uuid="f1266b09-fc1e-4cde-b2d6-212ae7136189"/>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{CURR_AMOUNT}]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="40" width="140" height="15" uuid="e8fcedbc-4f10-465a-a190-43d0c5f998b8">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date:"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="60" width="140" height="15" uuid="06389089-3165-492a-90e0-b175ef0df947">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Emp No:"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="80" width="140" height="15" uuid="939a88ef-6952-47af-83aa-11fc7ab9ac89">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Name:"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="100" width="140" height="15" uuid="b57472df-ebe5-4d21-af31-94990ecf8d64">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Address:"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="120" width="140" height="15" uuid="fe7a2e22-484c-44c3-abce-c5d149a997ab">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Job Title:"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="140" width="140" height="15" uuid="8d8eafaf-3a3b-4d9c-bc97-9f1f92b0a507">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Department:"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="160" width="140" height="15" uuid="af9e20cc-1679-4576-83fc-bf80af012c78">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Work Location:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="20" width="328" height="15" uuid="d0ed99b4-98e3-400d-862e-80f01233b41d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["CONFIRMATION"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="140" y="40" width="328" height="15" uuid="e4c1120e-44bb-4c2b-9791-d0072abfbf3b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_PREPARED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="140" y="60" width="328" height="15" uuid="6a73a4da-809a-4739-ac6c-6758f78c73fc">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="140" y="80" width="328" height="15" uuid="9d465add-20c8-4c9d-b155-e82e7611dc9b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="140" y="100" width="328" height="15" uuid="47b8746f-0a92-494d-9377-f5165417f07f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IND_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="140" y="120" width="328" height="15" uuid="8a33d941-ab60-4e5a-825c-6ceb33f6e100">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="140" y="140" width="328" height="15" uuid="3fe94700-b2ea-4b01-b979-5829adc58c3a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="140" y="160" width="328" height="15" uuid="685b5ea2-75f6-42fb-be0d-26f46a5c2c54">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WORK_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="180" width="140" height="15" uuid="c7ce6080-c266-43d4-93b4-402689b32aad">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["W.E.F:"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="140" y="180" width="328" height="15" uuid="ba08d2c8-6587-43f3-9eb0-093420c0b46d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_EFFECTIVE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="140" y="210" width="150" height="15" uuid="d1454dd6-85e2-4936-815d-733ddb529f9c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9" isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["From"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="290" y="210" width="150" height="15" uuid="81cd4550-4593-49b0-9ed6-edcc3f03c583">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9" isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["To"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="0" y="230" width="140" height="20" uuid="61d63da4-5c2d-45af-ac08-2d00471a9a9d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["Basic Salary"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="140" y="230" width="150" height="20" uuid="aa42dacf-42d0-4a9b-b289-2a4f3dee6a75">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{OLD_BASIC_SALARY_FORMATTED}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="290" y="230" width="150" height="20" uuid="2917a3e9-1e90-4e04-a3f1-2e5f4984eb1c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[($F{CONFIRM_BASIC_SALARY_FORMATTED}.equals($F{OLD_BASIC_SALARY_FORMATTED}) ? "Same" : $F{CONFIRM_BASIC_SALARY_FORMATTED})]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement positionType="Float" x="0" y="250" width="440" height="20" uuid="780852c8-067a-4856-a017-f179f72c038b">
+					<printWhenExpression><![CDATA[$F{EXTRA_HOURS}.intValue() > 0]]></printWhenExpression>
+				</reportElement>
+				<textField>
+					<reportElement positionType="Float" x="0" y="0" width="140" height="20" uuid="fb726e28-9aec-4a2a-a497-3beed55c1e74">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textFieldExpression><![CDATA["Cummulative Allowance"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement positionType="Float" x="140" y="0" width="150" height="20" uuid="b39f3cd7-1204-4f6c-b663-590a223bc3d0">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[$F{EXTRA_HOURS_SALARY_FORMATTED}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement positionType="Float" x="290" y="0" width="150" height="20" uuid="ec263dde-04f6-4f58-9ec1-b04ba13d2de5">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[($F{EXTRA_HOURS_CONFIRM_SALARY_FORMATTED}.equals($F{EXTRA_HOURS_SALARY_FORMATTED}) ? "Same" : $F{EXTRA_HOURS_CONFIRM_SALARY_FORMATTED})]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="114">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="468" height="39" uuid="ac344414-bd4c-45f2-adba-fdd78630c0c7"/>
+				<staticText>
+					<reportElement positionType="Float" x="0" y="24" width="468" height="15" uuid="653bdbf9-79ec-42d9-84cb-019e68cb7fa4">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement markup="html">
+						<font size="9" isBold="false"/>
+					</textElement>
+					<text><![CDATA[CC: Payroll]]></text>
+				</staticText>
+				<textField textAdjust="StretchHeight">
+					<reportElement positionType="Float" x="0" y="0" width="468" height="15" uuid="7d9a4796-d6db-4061-989d-13181650e39d">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement markup="html"/>
+					<textFieldExpression><![CDATA["<b>Regards,</b><br><br><br>...............................................................<br><b>"+$F{SIGNATURE}+"</b>"]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+</jasperReport>

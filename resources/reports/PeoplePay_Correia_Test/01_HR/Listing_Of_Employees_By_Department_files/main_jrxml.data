@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fa143165-4db3-4bee-86c0-0f03a1d2b2cc">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Production Cloud MultiOrg"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Listing_Of_Employees_By_Department"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Listing of employees by department"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay/01_HR/Listing_Of_Employees_By_Department_files/main_jrxml"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[select rownum,
+			emp.emp_company_no as "Emp No.",
+			initcap(ind.surname  || ', ' 
+                            || NVL(ind.first_name, '' ) 
+                            || ' ' 
+                            || NVL(ind.middle_name, '' ) ) as "Full Name",
+        case when ind.sex_code = 'F' then 'Female' 
+                 when ind.sex_code = 'M' then 'Male'
+                 else 'No Sex' end Sex,
+        emp.employment_status,
+        emp.org_structure as "Designation",
+        initcap(pos.position_name) as "Position",
+        orgstruct.unit_name as "Department"
+        from hr_rcm_individual IND
+        join hr_rcm_employee EMP
+        on ind.id = emp.ind_id
+        join VW_ORGANISATION_STRUCTURE ORGSTRUCT 
+        on orgstruct.id = emp.orgdtl_id
+        join((select id, POSITION_NAME 
+              from  hr_hcf_position) pos
+              join HR_HCF_WORKLOCATIONPOSITION posloc
+              on pos.id = posloc.position_id)
+              on posloc.id = emp.position_location_id
+where orgstruct.org_id =  $P{IN_ORG_ID} 
+and emp.DATE_SEPARATED is null]]>
+	</queryString>
+	<field name="ROWNUM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+	</field>
+	<field name="Emp No." class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Emp No."/>
+	</field>
+	<field name="Full Name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Full Name"/>
+	</field>
+	<field name="SEX" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SEX"/>
+	</field>
+	<field name="EMPLOYMENT_STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_STATUS"/>
+	</field>
+	<field name="Designation" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Designation"/>
+	</field>
+	<field name="Position" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Position"/>
+	</field>
+	<field name="Department" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Department"/>
+	</field>
+	<sortField name="Department"/>
+	<sortField name="Full Name"/>
+	<variable name="Emp_Count" class="java.math.BigDecimal" calculation="Count">
+		<variableExpression><![CDATA[$F{Emp No.}]]></variableExpression>
+	</variable>
+	<group name="Department" isReprintHeaderOnEachPage="true" keepTogether="true">
+		<groupHeader>
+			<band height="16">
+				<textField>
+					<reportElement x="0" y="0" width="280" height="13" isPrintInFirstWholeBand="true" uuid="45e087a4-cdb9-42aa-a774-2ed22a18db9d">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Arial" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Department: " + $F{Department}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="15" width="555" height="1" uuid="45887b6d-0e7d-4e3d-a53e-f43acfa54ca3">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="65" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="63" uuid="2c2e91c6-3d29-44c3-9b61-5d6e3e4c02f8"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="14" uuid="b1c80943-0c78-425e-9ed2-29985542ad26">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Listing of Employees By Department]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="20" width="555" height="1" uuid="a7dca8ca-ccfd-4a25-9127-2744f940e455">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.75"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement mode="Transparent" x="40" y="6" width="71" height="12" uuid="898c4fb6-2f8f-4b08-8ca1-25ca05af230d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cfd2de0-ee5b-4b70-8f6e-33aa4297e5d1"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement markup="styled">
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emp No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="6" width="163" height="12" uuid="715a00ef-8741-46dc-800c-2cfa660a1874">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f7aea6fb-f300-4bdd-9ab4-683f9ec25407"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Full Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="273" y="6" width="66" height="12" uuid="c561efc9-c89f-408a-8375-4e5f620045c8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0ac4bb71-0048-43b3-80f5-daaa47453890"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sex]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="339" y="6" width="101" height="12" uuid="d5d57906-18c1-4cad-93ca-b8ef3b304cb7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3f246a2a-0a96-4c4f-bfa8-177f7a19261d"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employment Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="440" y="6" width="115" height="12" uuid="72fae8dd-e9c6-493f-8967-5eb37684238d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="79c0f6a8-63d6-4076-b0c3-2ab236824182"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Position]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="40" y="0" width="71" height="15" uuid="d3786145-2b6f-42eb-8ddc-5f67c7bce468">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cfd2de0-ee5b-4b70-8f6e-33aa4297e5d1"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Emp No.}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="0" width="163" height="15" uuid="78ffd6a1-deb4-43b1-a418-18fff3d1a292">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f7aea6fb-f300-4bdd-9ab4-683f9ec25407"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Full Name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="273" y="0" width="66" height="15" uuid="a619a080-2175-4941-9112-5463460b3800">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0ac4bb71-0048-43b3-80f5-daaa47453890"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SEX}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="0" width="100" height="15" uuid="faa810e7-9316-4097-b641-91fb299bc392">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3f246a2a-0a96-4c4f-bfa8-177f7a19261d"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYMENT_STATUS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="440" y="0" width="115" height="15" uuid="60583b07-8edf-4b76-a494-b4d9c678ea4d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="79c0f6a8-63d6-4076-b0c3-2ab236824182"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Position}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="34" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="15" width="553" height="15" uuid="19f7839e-8f5d-4c52-8c42-b030868c8fb7"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="554" height="15" forecolor="#999999" backcolor="#999999" uuid="9659d69c-374b-4f7b-87a7-efb8e8024981"/>
+				<textField evaluationTime="Report">
+					<reportElement x="511" y="0" width="40" height="15" uuid="26c581f0-2ae9-40af-aa48-8c2286538323"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="431" y="0" width="80" height="15" uuid="6774dfe5-deda-42b5-93da-12e91e5a9a23"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE, MMMMM, dd  yyyy">
+					<reportElement x="0" y="0" width="279" height="15" uuid="04c96ff8-e378-4e7f-945f-2198d447b5ac"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

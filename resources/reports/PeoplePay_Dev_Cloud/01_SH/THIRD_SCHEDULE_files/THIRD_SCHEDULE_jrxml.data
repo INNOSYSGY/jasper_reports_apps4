@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Third Schedule" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d853c529-01a9-4a40-b1d8-20adb7e84c53">
+	<property name="ireport.zoom" value="1.2100000000000026"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="266"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/01_SH/THIRD_SCHEDULE"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/01_SH/THIRD_SCHEDULE_files/THIRD_SCHEDULE_jrxml"/>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+  a.id,
+  a.incident_id,
+  a.emp_id,
+  c.org_id,
+  d.surname,
+  d.first_name,
+  null middle_initials,
+  d.cell_phone,
+  b.incident_location,
+  c.emp_company_no,
+  c.date_employed,
+  d.dob,
+  PKG_GLOBAL_FNTS.FN_CALCAGE(in_dob => d.dob,in_date => a.entry_date) || ' years' age,
+  case extract(year from a.entry_date) - extract(year from c.date_employed)
+        when 0 then round(months_between(a.entry_date, c.date_employed)) || ' months'
+        else extract(year from a.entry_date) - extract(year from c.date_employed) || ' years'
+        end period_employed,
+  a.employee_position,
+  (select x.value_description from table(pkg_global_fnts.get_lookup_value('TBLEMPLOYMENTCLASS')) x where x.id=a.employment_type) employment_type,
+  case nvl(a.contractor_name,'N') when 'Y' then 'Yes' else 'No' end contractor,
+  e.organisation_name, a.site_name,(Pkg_Global_Fnts.Fn_Address('HOME',d.Id,'LOT',Sysdate)||' '||PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',d.ID,'STREET',SYSDATE)||' ' ||decode(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',d.ID,'VILLAGE_WARD',SYSDATE),null,' ',
+  PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',d.ID,'VILLAGE_WARD',SYSDATE)||' ')||nvl(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',d.ID,'COUNTY',SYSDATE),' ')) AS ADDRESS,  d.SEX_CODE, a.incident_date,case a.injury_type when 'Fatality' then 'Yes' else 'No' end is_fatal, a.DAYS_LOST,e.address orgaddress
+from hr_hs_detail a
+join hr_hs_incident b on b.id=a.incident_id
+join hr_rcm_employee c on c.id=a.emp_id
+join hr_rcm_individual d on d.id=c.ind_id
+join hr_hcf_organisation e on e.id=c.org_id
+where a.id=$P{ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="INCIDENT_ID" class="java.math.BigDecimal"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="SURNAME" class="java.lang.String"/>
+	<field name="FIRST_NAME" class="java.lang.String"/>
+	<field name="MIDDLE_INITIALS" class="java.lang.String"/>
+	<field name="CELL_PHONE" class="java.lang.String"/>
+	<field name="INCIDENT_LOCATION" class="java.lang.String"/>
+	<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp"/>
+	<field name="DOB" class="java.sql.Timestamp"/>
+	<field name="AGE" class="java.lang.String"/>
+	<field name="PERIOD_EMPLOYED" class="java.lang.String"/>
+	<field name="EMPLOYEE_POSITION" class="java.lang.String"/>
+	<field name="EMPLOYMENT_TYPE" class="java.lang.String"/>
+	<field name="CONTRACTOR" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="SITE_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="SEX_CODE" class="java.lang.String"/>
+	<field name="INCIDENT_DATE" class="java.sql.Timestamp"/>
+	<field name="IS_FATAL" class="java.lang.String"/>
+	<field name="DAYS_LOST" class="java.lang.String"/>
+	<field name="ORGADDRESS" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="40" splitType="Stretch">
+			<staticText>
+				<reportElement x="212" y="0" width="143" height="20" uuid="eb80dc9f-9ec2-4af9-a630-ea5ab520460d"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[THIRD SCHEDULE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="455" y="20" width="100" height="20" uuid="52ffcff3-ca67-4968-adf5-f4a89a89b2ad"/>
+				<text><![CDATA[S.70(3)]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="373" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="18" width="100" height="20" uuid="055249a0-04e5-4d19-beb8-1e1346017b9b"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="100" y="18" width="227" height="20" uuid="88f68c89-66fd-43d8-8b82-735eb4e5b262"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="326" y="18" width="228" height="20" uuid="14698420-c0dd-4185-9064-e3217bc8b7a7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="100" y="38" width="227" height="40" uuid="a562077d-2777-4915-a5b9-52d1f61c5013"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="100" y="78" width="227" height="55" uuid="4a82244c-a80b-4a0e-9924-5392b28093e1"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="327" y="78" width="227" height="55" uuid="af0f437c-05e3-49a3-a511-1c077d90bbeb"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="100" y="133" width="227" height="38" uuid="1a9f6c14-7d3c-4a47-b99c-401f57ed9c05"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="327" y="133" width="227" height="38" uuid="77ad2bc4-abf5-4a76-8dee-459e4fa7f487"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="100" y="171" width="227" height="33" uuid="f92a6ad8-7393-43c2-8714-ac245a1054d8"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="327" y="171" width="227" height="33" uuid="f339a415-3c55-4c01-b92e-4b38a4fa030e"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="100" y="204" width="227" height="20" uuid="cb2b1781-c9f8-4afa-815b-64795da4af42"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="327" y="204" width="227" height="20" uuid="ef8bd720-755a-48f4-aefd-f0715365448a"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="100" y="224" width="227" height="20" uuid="83938a1a-f9f1-4730-87c3-67834b717f47"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="38" width="100" height="206" uuid="f82e1279-42dd-4cb2-aae3-502995133a44"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="244" width="100" height="115" uuid="70b39a46-abbf-4f54-b20b-fbe5a5e76c87"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="326" y="38" width="228" height="40" uuid="0e3dfd6a-3f2c-48ef-bbd7-0b3e9bb2734a"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="103" y="18" width="127" height="20" uuid="1b4e95ed-de8c-4a20-9088-85b4842bf27e"/>
+				<text><![CDATA[1. Name of Employer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="113" width="100" height="20" uuid="1c358f8b-e6c0-414a-8c7d-9ceb0f629bd2"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Works]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="269" width="100" height="20" uuid="36185985-6499-45db-b2cc-295e614b2fb5"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Person Affected]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="102" y="38" width="227" height="40" uuid="3a536c6a-8920-4e5b-8e9b-216e46bc6e92"/>
+				<text><![CDATA[2. Address of place of employment.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="103" y="78" width="227" height="55" uuid="28f43389-a03b-4bbd-b2ea-a085f957f2d8"/>
+				<text><![CDATA[3. Address of office: (if work on the place of employment is only temporary).]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="103" y="133" width="227" height="38" uuid="63152ab8-487a-4618-9003-0eee089b3432"/>
+				<text><![CDATA[4. Nature of industry, occupation or business]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="102" y="171" width="227" height="33" uuid="803c2a6a-d99e-4efe-8bfc-3b8a39387ec9"/>
+				<text><![CDATA[5. Nature of Occupational disease.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="103" y="204" width="100" height="20" uuid="4cf1ada7-0f9f-4cae-9eea-6e77512de504"/>
+				<text><![CDATA[6. a. Surname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="102" y="224" width="100" height="20" uuid="98ebbedd-ef77-4069-987f-71a7ef67e532"/>
+				<text><![CDATA[     b. Other Names]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="327" y="224" width="227" height="20" uuid="a0266bd4-5eb6-4bdf-8dc2-7a44152e4ba6"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="100" y="244" width="227" height="20" uuid="84e19009-a3fc-4857-8cda-cdb4cb240ce6"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="105" y="244" width="155" height="20" uuid="78c22b75-6393-42f1-870c-454db3256ae1"/>
+				<text><![CDATA[7. Address (permanent)]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="100" y="264" width="227" height="20" uuid="167fe8fb-5d67-4651-8ac8-29da08134074"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="104" y="264" width="155" height="20" uuid="bd88a71f-69e1-49ad-b298-184441cd7d3a"/>
+				<text><![CDATA[8. Temporary address (if any)]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="100" y="284" width="227" height="20" uuid="78c71bdf-38fa-438e-a009-d4599a50e9de"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="104" y="284" width="142" height="20" uuid="9f68d06d-3e0d-4030-b75b-68043375113e"/>
+				<text><![CDATA[9. a. Sex]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="100" y="304" width="227" height="20" uuid="22200e4e-12d1-43dd-86a1-c38b6d868dea"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="104" y="304" width="142" height="20" uuid="ad6b71a9-ee70-4d5f-8b81-4efc24966e3b"/>
+				<text><![CDATA[     b. Age last birthday]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="100" y="324" width="227" height="35" uuid="2eef7983-f3ad-476a-b7ca-4cc85f4aa79c"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="102" y="323" width="213" height="36" uuid="8f824b77-d28d-4966-8616-84966954c32d"/>
+				<text><![CDATA[10. Precise Occupation: (avoid the term "Labourer" where possible)]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="327" y="244" width="227" height="20" uuid="41cca14d-8239-44c8-a589-f534c50495ec"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="327" y="264" width="227" height="20" uuid="b1089ff1-025a-4139-beec-8718f078d217"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="327" y="284" width="227" height="20" uuid="b1f33e9b-0f35-4562-bfe6-6e926ccda5f2"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="327" y="304" width="227" height="20" uuid="bdde784e-39a7-4755-9df7-557772999f78"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="327" y="324" width="227" height="35" uuid="7adc0b51-14e2-4572-ac1f-85c7b61448e8"/>
+			</rectangle>
+			<textField>
+				<reportElement x="327" y="244" width="226" height="20" uuid="addf5676-4f08-44e6-9bfd-9b223563799d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="328" y="204" width="225" height="20" uuid="0845b679-473e-4192-8a8c-95cd0bce83a4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="328" y="224" width="226" height="20" uuid="c7328de7-32c6-4fee-834b-ce8a67757054"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="328" y="324" width="226" height="35" uuid="86a14abf-9e09-401e-a592-410205fe85b4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_POSITION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="328" y="284" width="226" height="20" uuid="ee3b6052-714a-491b-b526-aefc1daf2a06"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{SEX_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="327" y="303" width="227" height="20" uuid="742d76f4-8b34-4dec-aed2-c198c3cac3ed"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{AGE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="327" y="38" width="226" height="40" uuid="74e19f65-9017-4c90-a059-a7b1e4f6b257"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ORGADDRESS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="328" y="133" width="225" height="38" uuid="f576dc10-6d95-4cd2-9656-c264117ea5e9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[UTILIITY COMPANY (WATER)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="328" y="20" width="212" height="15" uuid="78b65118-fd9a-4ee2-a3a3-3fac302c4909"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="194" splitType="Stretch">
+			<staticText>
+				<reportElement x="3" y="13" width="32" height="20" uuid="613dc95d-afcb-4969-9371-3a9241e13077"/>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="39" width="181" height="20" uuid="626aa870-e925-4df6-8b86-243418b5b4aa"/>
+				<text><![CDATA[Signature of Employer or Agent:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="342" y="12" width="69" height="20" uuid="56c28e8f-b01f-4e0f-bea1-76758eea9489"/>
+				<text><![CDATA[Name(Print):]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="267" y="82" width="273" height="102" uuid="3d9deeb2-9a77-4491-aa50-f9e47d9835d6"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="303" y="91" width="208" height="32" uuid="0a65a34c-697f-43c6-bb02-2a709efa6850"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Affix Human Resources STAMP here]]></text>
+			</staticText>
+			<line>
+				<reportElement x="183" y="67" width="245" height="1" uuid="d6452d4a-615b-4e7d-a070-9aea92a08e87"/>
+			</line>
+			<line>
+				<reportElement x="416" y="27" width="137" height="1" uuid="f8ad303c-64f3-4731-b27a-5a60e6cdf821"/>
+			</line>
+			<line>
+				<reportElement x="41" y="25" width="155" height="1" uuid="7df6f40e-65d1-48db-8f77-e2d4eb8d7650"/>
+				<graphicElement>
+					<pen lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageFooter>
+</jasperReport>

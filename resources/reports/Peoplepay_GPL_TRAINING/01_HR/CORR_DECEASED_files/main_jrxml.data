@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.0.final using JasperReports Library version 6.21.0-4f56c4f36cd19e17675219a9ac4692d5f0f13b06  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CORR_RESIGNATION_LETTER" pageWidth="612" pageHeight="792" columnWidth="468" leftMargin="72" rightMargin="72" topMargin="20" bottomMargin="20" uuid="c0e94081-f59c-40a3-ab6e-c47093bb856a">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="AppsTester"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="icarter"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Correia_Test/01_HR/CORR_DECEASED"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Correia_Test/01_HR/CORR_DECEASED_files/main_jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="258"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="737"/>
+	<subDataset name="BENEFITS" uuid="3316bf59-bb38-4470-b55a-f4cea001a9d2">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Correia Prod"/>
+		<parameter name="SEP_ID" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[select 
+    spdtl.pk_sep_key, 
+    '- '||'Payment for <b>' || 
+                    pkg_global_fnts.fn_num_towords(trunc(mov_quantity/8)) || '(' || 
+                    trunc(mov_quantity/8) || case when trunc(mov_quantity/8) = 1 then ') day</b> of ' else 
+                    ') days</b> of ' end || 
+                    case 
+                        when substr(ent.income_describ, -3, 3) = '(T)' then 
+                            substr(ent.income_describ, 1, length(ent.income_describ) - 3)
+                        when substr(ent.income_describ, -3, 3) = 'NT)' then 
+                            substr(ent.income_describ, 1, length(ent.income_describ) - 4)  
+                        else 
+                            ent.income_describ
+                    end || 
+                    ' in the sum of ' || to_char(spdtl.amount, 'FML999G999G999G999G990D00') remarks
+from 
+    hr_mov_separationbenefitdetail spdtl 
+    join vw_empentitle ent on ent.add_income_id = spdtl.benefit_type
+where spdtl.pk_sep_key = $P{SEP_ID}]]>
+		</queryString>
+		<field name="PK_SEP_KEY" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="PK_SEP_KEY"/>
+			<property name="com.jaspersoft.studio.field.label" value="PK_SEP_KEY"/>
+		</field>
+		<field name="REMARKS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="REMARKS"/>
+			<property name="com.jaspersoft.studio.field.label" value="REMARKS"/>
+		</field>
+	</subDataset>
+	<subDataset name="LIABILITIES" uuid="8d345a31-7126-4259-a284-59f585323ac5">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Correia Prod"/>
+		<parameter name="SEP_ID" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[select
+    spdeddtl.pk_sep_key, 
+    '- '||dcode.description || 
+                case 
+                    when upper(dcode.expense_code) in ('LON') then 
+                        ' for <b>' || pkg_global_fnts.fn_num_towords(trunc(mov_quantity_ded/8)) || 
+                        '(' || trunc(mov_quantity_ded/8) || case when trunc(mov_quantity_ded/8) = 1 then ') day</b>  in the sum of ' else 
+                    ') days</b> in the sum of ' end 
+                    else ' in the sum of  '
+                end || to_char(spdeddtl.deduction_amount, 'FML999G999G999G999G990D00') remarks
+from 
+    hr_mov_separationdeductiondetail spdeddtl
+    join pa_pcf_deductioncode dcode on dcode.id = spdeddtl.expense_id
+where 
+    spdeddtl.pk_sep_key =  $P{SEP_ID} --:sep_id]]>
+		</queryString>
+		<field name="PK_SEP_KEY" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="PK_SEP_KEY"/>
+			<property name="com.jaspersoft.studio.field.label" value="PK_SEP_KEY"/>
+		</field>
+		<field name="REMARKS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="REMARKS"/>
+			<property name="com.jaspersoft.studio.field.label" value="REMARKS"/>
+		</field>
+	</subDataset>
+	<parameter name="EMP_ID" class="java.lang.Integer"/>
+	<parameter name="ORG_ID" class="java.lang.Integer"/>
+	<parameter name="SEP_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT
+    A.*,
+    'This letter serves to confirm your separation from the position of <b>' || a.position_name  || '</b> with effect from <b>' || a.date_separated ||  '</b>, due to the unfortunate 
+    occurrence of your passing.' par1,
+    'Your terminal benefits will include: ' par2,
+    '- Salary up to and inclusive of ' || a.date_separated || ';' par3, 
+    a.allowance_remarks par3_1,
+    'Your terminal liabilities will include: ' par2_1,
+    a.ded_remarks par3_1_1,
+    'Trust Company will refund your Pension Contributions. See instructions attached.' par4,
+    'The Management of the <b>' || a.organisation_name || '</b> would like to express their gratitude for your tenure with the Company, and convey our deepest condolences to all family members.' par5,
+    'Arrangements will be made to have necessary property returned to <b>' || nvl(a.report_to_func, 'Insert Report to Functional') ||'</b> or relevant family members.' par6,
+    'Sincerely <br><br><br>……………………….…...............<br><b>' || nvl(a.report_to_admin, 'Insert Report to Admin') || '</b>' par7,
+    'Cc: Accounts Manager <br>Personnel File' par8
+FROM
+    ( SELECT
+    to_char(sep.approved_date, 'fmMonth fmDD, YYYY') date_prepared,
+    to_char(sep.date_separated, 'fmMonth fmDD, YYYY') date_separated,
+    case when ind.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || ind.first_name ||' ' || ind.surname name,
+    case when ind.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || ind.surname surname,
+    adr.lot || ' ' || 
+    nvl(adr.street ||case when adr.street is not null then '<br>' else null end, null) || 
+    nvl(adr.village_ward || case when adr.village_ward is not null then'<br>' else null end,null) || 
+    nvl(adr.town || case when adr.town is not null then '<br>' else null end, null) || 
+    nvl(adr.county, null) ind_address,        
+    sep.org_id sep_org_id,
+    org.*,sep.id sep_id,
+    sep.separation_type,
+    pos.position_name,
+    nvl(sep.remarks_payment, '') remarks_payment,
+    (select 
+            case when inda.sex_code = 'M' then 'Mr. ' else 'Ms. ' end ||  inda.first_name ||' ' || inda.surname ||',<br> ' || posa.position_name
+        from tblapprovalhistory apphist 
+        join tbluser userapp on upper(userapp.user_name) = upper(apphist.created_by)
+        join hr_rcm_employee empa on userapp.employee_no = empa.id
+        join hr_rcm_individual inda on empa.ind_id = inda.id 
+        join hr_hcf_position posa on empa.position_id = posa.id
+        where apphist.table_name_key = sep.id
+		and apphist.table_name = 'HR_MOV_SEPARATIONBENEFIT'
+		and apphist.action = 'APPROVAL'
+		and apphist.id = (select min(a.id) from tblapprovalhistory a where a.table_name_key = sep.id and a.table_name = 'HR_MOV_SEPARATIONBENEFIT')
+        and rownum = 1
+    ) report_to_admin,
+    (select 
+        case when indf.sex_code = 'M' then 'Mr. ' else 'Ms. ' end ||  indf.first_name ||' ' || indf.surname ||', ' || posf.position_name
+    from hr_rcm_employee empf
+    join hr_rcm_individual indf on empf.ind_id = indf.id 
+    join hr_hcf_position posf on empf.position_id = posf.id
+    where empf.id = emp.report_to_functional) report_to_func,
+    (select 
+            inda.sig_photo
+        from tblapprovalhistory apphist 
+        join tbluser userapp on upper(userapp.user_name) = upper(apphist.created_by)
+        join hr_rcm_employee empa on userapp.employee_no = empa.id
+        join hr_rcm_individual inda on empa.ind_id = inda.id 
+        join hr_hcf_position posa on empa.position_id = posa.id
+        where apphist.table_name_key = sep.id
+		and apphist.table_name = 'HR_MOV_SEPARATIONBENEFIT'
+		and apphist.action = 'APPROVAL'
+		and apphist.id = (select min(a.id) from tblapprovalhistory a where a.table_name_key = sep.id and a.table_name = 'HR_MOV_SEPARATIONBENEFIT')
+        and rownum = 1
+    ) report_to_admin_sign,
+    case 
+        when sep.approved_by is null then 'NOT APPROVED'
+        else
+            case 
+                when sep.verified_by is null then  'NOT VERIFIED'
+                else ' '
+            end
+    end as movement_status,
+    dtl.remarks allowance_remarks,
+    deddtl.remarks ded_remarks
+FROM
+         hr_mov_separationbenefit sep
+    JOIN hr_rcm_employee emp on emp.id = sep.emp_id
+    JOIN hr_rcm_individual ind on ind.id = emp.ind_id
+    JOIN hr_rcm_address adr on (adr.ind_id = ind.id and upper(adr.address_type) = upper('HOME') and (adr.end_date is null or adr.end_date > trunc(sysdate)))
+    JOIN (select id, letter_head_logo, letter_footer_logo, organisation_name, address, telnum, faxnum, email, website  from hr_hcf_organisation) org on org.id =emp.org_id	
+    JOIN hr_hcf_position pos on emp.position_id = pos.id
+        LEFT JOIN (select 
+                                spdtl.pk_sep_key, 
+                                listagg('- '||'Payment for <b>' || 
+                                                pkg_global_fnts.fn_num_towords(trunc(mov_quantity/8)) || '(' || 
+                                                trunc(mov_quantity/8) || case when trunc(mov_quantity/8) = 1 then ') day</b> of ' else 
+                                                ') days</b> of ' end || 
+                                                case 
+                                                    when substr(ent.income_describ, -3, 3) = '(T)' then 
+                                                        substr(ent.income_describ, 1, length(ent.income_describ) - 3)
+                                                    when substr(ent.income_describ, -3, 3) = 'NT)' then 
+                                                        substr(ent.income_describ, 1, length(ent.income_describ) - 4)  
+                                                    else 
+                                                        ent.income_describ
+                                                end || 
+                                                ' in the sum of <b>' || to_char(spdtl.amount, 'FML999G999G999G999G990D00'), '</b>;<br>') within group (order by spdtl.amount) remarks
+                from 
+                    hr_mov_separationbenefitdetail spdtl 
+                    join vw_empentitle ent on ent.add_income_id = spdtl.benefit_type
+                group by 
+                    spdtl.pk_sep_key) dtl on dtl.pk_sep_key = sep.id
+    LEFT JOIN (select
+                                spdeddtl.pk_sep_key, 
+                                listagg('- '||dcode.description || 
+                                            case 
+                                                when upper(dcode.expense_code) in ('LON') then 
+                                                    ' for <b>' || pkg_global_fnts.fn_num_towords(trunc(mov_quantity_ded/8)) || 
+                                                    '(' || trunc(mov_quantity_ded/8) || case when trunc(mov_quantity_ded/8) = 1 then ') day</b> of ' else 
+                                                ') days</b> of ' end 
+                                                else 'in the sum of  <b>'|| to_char(spdeddtl.deduction_amount, 'FML999G999G999G999G990D00')
+                                            end, '</b>;<br>') within group (order by spdeddtl.deduction_amount) remarks
+                            from 
+                                hr_mov_separationdeductiondetail spdeddtl
+                                join pa_pcf_deductioncode dcode on dcode.id = spdeddtl.expense_id
+                            group by 
+                                spdeddtl.pk_sep_key) deddtl on deddtl.pk_sep_key = sep.id
+WHERE
+    SEP.ID = $P{SEP_ID} 
+    AND EXISTS (
+        SELECT
+            1
+        FROM
+            hr_rcm_employee a
+        WHERE
+            id = sep.emp_id
+            and id =$P{EMP_ID} 
+            and org_id = $P{ORG_ID} 
+            --and separated_status is not null
+    )) A]]>
+	</queryString>
+	<field name="DATE_PREPARED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_PREPARED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_PREPARED"/>
+	</field>
+	<field name="DATE_SEPARATED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_SEPARATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_SEPARATED"/>
+	</field>
+	<field name="NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="IND_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="IND_ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_ADDRESS"/>
+	</field>
+	<field name="SEP_ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SEP_ORG_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="SEP_ORG_ID"/>
+	</field>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="LETTER_HEAD_LOGO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="LETTER_HEAD_LOGO"/>
+		<property name="com.jaspersoft.studio.field.label" value="LETTER_HEAD_LOGO"/>
+	</field>
+	<field name="LETTER_FOOTER_LOGO" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="LETTER_FOOTER_LOGO"/>
+		<property name="com.jaspersoft.studio.field.label" value="LETTER_FOOTER_LOGO"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TELNUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="FAXNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FAXNUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
+	</field>
+	<field name="EMAIL" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMAIL"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMAIL"/>
+	</field>
+	<field name="WEBSITE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WEBSITE"/>
+		<property name="com.jaspersoft.studio.field.label" value="WEBSITE"/>
+	</field>
+	<field name="SEP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SEP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="SEP_ID"/>
+	</field>
+	<field name="SEPARATION_TYPE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SEPARATION_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SEPARATION_TYPE"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="REMARKS_PAYMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REMARKS_PAYMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="REMARKS_PAYMENT"/>
+	</field>
+	<field name="REPORT_TO_ADMIN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_ADMIN"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_ADMIN"/>
+	</field>
+	<field name="REPORT_TO_FUNC" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_FUNC"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_FUNC"/>
+	</field>
+	<field name="REPORT_TO_ADMIN_SIGN" class="java.io.InputStream">
+		<property name="com.jaspersoft.studio.field.name" value="REPORT_TO_ADMIN_SIGN"/>
+		<property name="com.jaspersoft.studio.field.label" value="REPORT_TO_ADMIN_SIGN"/>
+	</field>
+	<field name="MOVEMENT_STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="MOVEMENT_STATUS"/>
+		<property name="com.jaspersoft.studio.field.label" value="MOVEMENT_STATUS"/>
+	</field>
+	<field name="ALLOWANCE_REMARKS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ALLOWANCE_REMARKS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ALLOWANCE_REMARKS"/>
+	</field>
+	<field name="DED_REMARKS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DED_REMARKS"/>
+		<property name="com.jaspersoft.studio.field.label" value="DED_REMARKS"/>
+	</field>
+	<field name="PAR1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR1"/>
+	</field>
+	<field name="PAR2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR2"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR2"/>
+	</field>
+	<field name="PAR3" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR3"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR3"/>
+	</field>
+	<field name="PAR3_1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR3_1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR3_1"/>
+	</field>
+	<field name="PAR2_1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR2_1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR2_1"/>
+	</field>
+	<field name="PAR3_1_1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR3_1_1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR3_1_1"/>
+	</field>
+	<field name="PAR4" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR4"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR4"/>
+	</field>
+	<field name="PAR5" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR5"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR5"/>
+	</field>
+	<field name="PAR6" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR6"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR6"/>
+	</field>
+	<field name="PAR7" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR7"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR7"/>
+	</field>
+	<field name="PAR8" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR8"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR8"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="590">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<image scaleImage="RealSize" onErrorType="Blank">
+				<reportElement x="-73" y="-20" width="612" height="560" uuid="3a4b3f78-1481-4098-9796-50967722d3e5"/>
+				<imageExpression><![CDATA[$F{LETTER_HEAD_LOGO}]]></imageExpression>
+			</image>
+			<image scaleImage="RealSize" onErrorType="Blank">
+				<reportElement x="-72" y="540" width="612" height="50" uuid="e4d4efb2-cc94-4da7-bfdc-47a7386b6396"/>
+				<imageExpression><![CDATA[$F{LETTER_FOOTER_LOGO}]]></imageExpression>
+			</image>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" isPrintRepeatedValues="false" x="0" y="130" width="468" height="15" uuid="d0dfe331-79c0-450d-85fd-0c62526b3f0d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="10" isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_PREPARED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" isPrintRepeatedValues="false" x="0" y="149" width="468" height="15" uuid="463b6366-90de-44ae-bdc3-d7efaf6e4d3b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="10" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" isPrintRepeatedValues="false" x="0" y="168" width="468" height="15" uuid="c78e824b-30ad-4e71-9a98-e7f79b7b1329"/>
+				<textElement markup="html">
+					<font size="10" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IND_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="199" width="468" height="15" uuid="335815e3-ccfd-46a9-be72-5d3634e644a7">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dear "+$F{SURNAME} + ","]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="237" width="468" height="15" uuid="6cd5d692-f8f6-47cf-994b-a27d14fc2982"/>
+				<textElement markup="html">
+					<font pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR1}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="258" width="468" height="15" uuid="febb04c2-cdf0-4e42-b2a7-017f6c92e585"/>
+				<textElement markup="html">
+					<font pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR2}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="68" y="278" width="400" height="15" uuid="77c9d564-a383-426f-bdae-cef037e6fad4"/>
+				<textElement markup="html">
+					<font pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR3}]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement positionType="Float" x="0" y="299" width="468" height="220" uuid="930b57a2-4431-456e-95cb-945112e57652"/>
+				<frame>
+					<reportElement x="0" y="0" width="468" height="20" isRemoveLineWhenBlank="true" uuid="a3ad06b6-b06f-4d73-8b0b-22c1ce058873">
+						<printWhenExpression><![CDATA[new Boolean($F{ALLOWANCE_REMARKS} != null)]]></printWhenExpression>
+					</reportElement>
+					<componentElement>
+						<reportElement isPrintRepeatedValues="false" x="68" y="0" width="399" height="20" isRemoveLineWhenBlank="true" uuid="3a43c532-00a3-4dd0-9cff-d5f060911d57">
+							<property name="com.jaspersoft.studio.unit.CONTENTS.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<printWhenExpression><![CDATA[new Boolean($F{ALLOWANCE_REMARKS} != null)]]></printWhenExpression>
+						</reportElement>
+						<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+							<datasetRun subDataset="BENEFITS" uuid="b739b7c2-eac2-48f4-96c9-e8b49c806b7f">
+								<datasetParameter name="SEP_ID">
+									<datasetParameterExpression><![CDATA[$F{SEP_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+							<jr:listContents height="20" width="399">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="398" height="20" isRemoveLineWhenBlank="true" uuid="114466e6-bffc-4728-8e40-fcd29da494c6">
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<textElement markup="html">
+										<font pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{REMARKS}]]></textFieldExpression>
+								</textField>
+							</jr:listContents>
+						</jr:list>
+					</componentElement>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" isPrintRepeatedValues="false" x="0" y="21" width="468" height="36" isRemoveLineWhenBlank="true" uuid="d6588728-ffa4-491b-a82c-b45ef70279f6">
+						<printWhenExpression><![CDATA[new Boolean($F{DED_REMARKS} != null)]]></printWhenExpression>
+					</reportElement>
+					<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+						<reportElement positionType="Float" isPrintRepeatedValues="false" x="0" y="0" width="468" height="15" isRemoveLineWhenBlank="true" uuid="5bdb98ad-a1ab-4eb4-8c03-6a194016a2ad">
+							<printWhenExpression><![CDATA[new Boolean($F{DED_REMARKS} != null)]]></printWhenExpression>
+						</reportElement>
+						<textElement markup="html">
+							<font pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{PAR2_1}]]></textFieldExpression>
+					</textField>
+					<componentElement>
+						<reportElement x="68" y="15" width="399" height="20" isRemoveLineWhenBlank="true" uuid="061ecc4b-31ab-4218-8ec9-c6d0e6749deb">
+							<property name="com.jaspersoft.studio.unit.CONTENTS.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<printWhenExpression><![CDATA[new Boolean($F{DED_REMARKS} != null)]]></printWhenExpression>
+						</reportElement>
+						<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+							<datasetRun subDataset="LIABILITIES" uuid="9ec6bc10-a612-42d2-a8e4-942a23d263fa">
+								<datasetParameter name="SEP_ID">
+									<datasetParameterExpression><![CDATA[$F{SEP_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+							<jr:listContents height="20" width="399">
+								<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="399" height="20" isRemoveLineWhenBlank="true" uuid="c75879f2-b298-4d5d-9a58-8165d7397c3d">
+										<property name="com.jaspersoft.studio.unit.height" value="px"/>
+									</reportElement>
+									<textElement markup="html">
+										<font pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{REMARKS}]]></textFieldExpression>
+								</textField>
+							</jr:listContents>
+						</jr:list>
+					</componentElement>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="62" width="467" height="168" uuid="dc7365f8-03cc-483a-ad80-5e9ef97cf1b5"/>
+					<textField textAdjust="StretchHeight">
+						<reportElement positionType="Float" x="0" y="0" width="467" height="15" uuid="638153fa-8a4d-4023-a589-bfa8dab6624c"/>
+						<textElement markup="html">
+							<font pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{PAR4}]]></textFieldExpression>
+					</textField>
+					<textField textAdjust="StretchHeight">
+						<reportElement positionType="Float" x="0" y="21" width="467" height="15" uuid="2cce8fc9-0ec1-4d20-b8c3-a49833684579"/>
+						<textElement markup="html">
+							<font pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{PAR5}]]></textFieldExpression>
+					</textField>
+					<textField textAdjust="StretchHeight">
+						<reportElement positionType="Float" x="0" y="42" width="467" height="15" uuid="0e2dbbe9-d39d-40cc-a29d-85f652831871"/>
+						<textElement markup="html">
+							<font pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{PAR6}]]></textFieldExpression>
+					</textField>
+					<textField textAdjust="StretchHeight">
+						<reportElement positionType="Float" x="0" y="153" width="467" height="15" uuid="908cbd36-9641-4719-9baf-67fdac7ea7ae">
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						</reportElement>
+						<textElement markup="html">
+							<font pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{PAR8}]]></textFieldExpression>
+					</textField>
+					<frame>
+						<reportElement positionType="Float" x="0" y="70" width="467" height="80" uuid="b05477ab-7a79-46c5-a74f-905c5c2afbc8"/>
+						<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+							<reportElement x="0" y="65" width="467" height="15" uuid="7ca383cd-fb61-498e-b0ed-daaa5abd345f"/>
+							<textElement markup="html">
+								<font isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[UPPER($F{REPORT_TO_ADMIN})]]></textFieldExpression>
+						</textField>
+						<image scaleImage="FillFrame">
+							<reportElement x="0" y="15" width="130" height="50" isRemoveLineWhenBlank="true" uuid="b58f4656-798a-445d-a3c5-e49b398ad771">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</reportElement>
+							<imageExpression><![CDATA[$F{REPORT_TO_ADMIN_SIGN}]]></imageExpression>
+						</image>
+						<staticText>
+							<reportElement x="0" y="0" width="467" height="65" uuid="c6ae83f2-8280-4ced-81e4-f6192dc7971a">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<textElement>
+								<font pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+							</textElement>
+							<text><![CDATA[Sincerely, 
+
+
+
+..........................................]]></text>
+						</staticText>
+					</frame>
+				</frame>
+			</frame>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="218" width="468" height="15" uuid="ec32e35d-8a5b-4e07-ad08-c9c37494f43d"/>
+				<textElement textAlignment="Center" markup="html">
+					<font isBold="true" isUnderline="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["BEREAVEMENT SEPARATION"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

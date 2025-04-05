@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="asset_missing" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d436e3c2-4d16-4dfa-95a6-fd916dc6b1da">
+	<property name="ireport.zoom" value="0.9090909090909095"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/ASSET/Variance_Report_Asset_Register"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="P_REPORT_NAME" class="java.lang.String"/>
+	<parameter name="P_REPORT_TITLE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select b.ASSET_ID,a.asset_reg_id, a.DESCRIPTION, c.DEPRECIATION OLD_DEPRECIATION, a.DEPRECIATION_ACC AS NEW_DEPREICATION,
+C.CURRENT_VALUE OLD_CURRENT_VAL, a.current_value NEW_CURRENT_VAL, C.PURCHASE_PRICE OLD_PURCHASE_PRICE,
+a.purchase_price NEW_PURCHASE_PRICE, C.DEPRECIATION - B.DEPRECIATION AS OLD_Current_Depreciation,
+a.DEPRECIATION_CURRENT NEW_DEPREICATION_CURRENT
+from tblassetmisctransdetail a
+join ASSET_SEPT_2016 b on b.asset_id = get_asset_no_types('ASSET_REG_ID',a.asset_reg_id)
+join ASSET_OCT_2016 c on c.asset_id =  get_asset_no_types('ASSET_REG_ID',a.asset_reg_id)
+where match = 'N'
+]]>
+	</queryString>
+	<field name="ASSET_ID" class="java.math.BigDecimal"/>
+	<field name="ASSET_REG_ID" class="java.math.BigDecimal"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="OLD_DEPRECIATION" class="java.math.BigDecimal"/>
+	<field name="NEW_DEPREICATION" class="java.math.BigDecimal"/>
+	<field name="OLD_CURRENT_VAL" class="java.math.BigDecimal"/>
+	<field name="NEW_CURRENT_VAL" class="java.math.BigDecimal"/>
+	<field name="OLD_PURCHASE_PRICE" class="java.math.BigDecimal"/>
+	<field name="NEW_PURCHASE_PRICE" class="java.math.BigDecimal"/>
+	<field name="OLD_CURRENT_DEPRECIATION" class="java.math.BigDecimal"/>
+	<field name="NEW_DEPREICATION_CURRENT" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="85" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="968" height="85" uuid="3ecfe13e-3fc0-43f4-b115-dbb35783819c"/>
+				<subreportParameter name="P_REPORT_NAME">
+					<subreportParameterExpression><![CDATA["ASSET VARIANCE REPORT"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/MedSys/RESOURCE/LETTER_HEAD_LEGAL_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement x="21" y="0" width="93" height="19" uuid="5f6db9c2-d350-4f4f-9035-78901bcd006c"/>
+				<textElement>
+					<font isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Asset Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="114" y="0" width="115" height="19" uuid="caa024aa-7583-454a-915f-a192da36ed92"/>
+				<textElement>
+					<font isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Description of Assets]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="21" height="19" uuid="cec3b3a0-ce9c-40b0-be82-562195f95215"/>
+				<textElement>
+					<font isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="339" y="0" width="97" height="19" uuid="0d76eeef-f816-4d5a-9617-073a8d477b8e"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[New Purchase $]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="229" y="0" width="110" height="19" uuid="13d87481-4ff4-4803-9a65-11387ccfc8c4"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Old Purchase $]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="436" y="0" width="79" height="19" uuid="4c1e01e1-a17c-4a84-89ca-0cc4664ae77c"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Old Depreication]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="515" y="0" width="94" height="19" uuid="489ef8f2-6348-4ce4-92ff-e507cac5ab96"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[New Depreication]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="609" y="0" width="68" height="19" uuid="b6ebd056-92b3-4584-832b-c67bf6f179b9"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Old Current $]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="677" y="0" width="68" height="19" uuid="82bf9ceb-e7ce-481b-9e81-af181e4f914c"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[New Current $]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="745" y="0" width="111" height="19" uuid="bdd97ae0-a357-4271-8867-cb2a7a9fcb28"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Old Current Depre.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="856" y="0" width="112" height="19" uuid="ffffe0ee-2db7-40ca-a67b-f1a25dbe1d72"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[New Current Depre.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="339" y="2" width="97" height="20" uuid="8c6e9075-7118-484c-8940-dd29b9d439ea"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{NEW_PURCHASE_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="114" y="0" width="115" height="20" uuid="bd482f31-6e56-46c7-a349-9dc0942777f0"/>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="21" y="0" width="93" height="20" uuid="24f86e6d-bbbd-4a72-9229-9a798e5cec2a"/>
+				<textFieldExpression><![CDATA[$F{ASSET_ID}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="229" y="0" width="110" height="20" uuid="39057086-5094-4e23-86ea-8c98290ada55"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{OLD_PURCHASE_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="436" y="0" width="79" height="20" uuid="c250c922-9826-4cc5-89b3-e96efacf6977"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{OLD_DEPRECIATION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="515" y="0" width="94" height="20" uuid="6f4973d4-8d53-4d5d-aa64-d110f6d29211"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{NEW_DEPREICATION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="609" y="0" width="68" height="20" uuid="5502931d-2d5b-4d03-a7ad-2f7adcab73bf"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{OLD_CURRENT_VAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="677" y="0" width="68" height="20" uuid="e94c3cbf-9fe0-4688-8542-e244578a9feb"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{NEW_CURRENT_VAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="745" y="0" width="111" height="20" uuid="13ef79c0-d94d-4543-9abc-d148cb3ea087"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{OLD_CURRENT_DEPRECIATION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="856" y="0" width="112" height="20" uuid="a336230d-dc88-47e9-99b5-895bc2ab297d"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{NEW_DEPREICATION_CURRENT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="2" width="19" height="20" uuid="027afa6f-c86d-4a3e-85d9-15f554b5ecc6"/>
+				<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="23" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="2" width="968" height="20" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="286bfe42-61ab-4b72-b322-9780f8e0d791"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="1" width="968" height="20" uuid="47703a7d-6261-46be-8bc2-0d2e96d27457"/>
+				<textElement textAlignment="Center">
+					<font size="14" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[SCMS by INNOSYS]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="847" y="1" width="80" height="20" uuid="f075c972-5917-4541-b25c-065c37b788c8"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="927" y="1" width="40" height="20" uuid="07db5150-e359-4237-a18a-bc1477cc5d08"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd, MMMMM, yyyy      hh:mm aaa">
+				<reportElement x="2" y="6" width="243" height="16" uuid="ef3b2732-f7c0-4d67-8465-3a319ad4088a"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="30" splitType="Stretch"/>
+	</summary>
+</jasperReport>

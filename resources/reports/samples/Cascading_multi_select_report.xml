@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reportUnit exportedWithPermissions="true">
+    <folder>/reports/samples</folder>
+    <name>Cascading_multi_select_report</name>
+    <version>0</version>
+    <label>Cascading multi select example report</label>
+    <description>Example report with Cascading multi select input controls</description>
+    <creationDate>2021-11-12T17:14:00.681-04:00</creationDate>
+    <updateDate>2013-10-21T15:26:09.747-04:00</updateDate>
+    <mainReport>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false"
+            dataFile="Cascading_multi_select_report.data" xsi:type="fileResource">
+            <folder>/reports/samples/Cascading_multi_select_report_files</folder>
+            <name>Cascading_multi_select_report</name>
+            <version>0</version>
+            <label>Cascading multi select example report</label>
+            <description>Shows cascading input controls. Multi-select and single select queries</description>
+            <creationDate>2021-11-12T17:14:00.681-04:00</creationDate>
+            <updateDate>2013-10-21T15:26:09.747-04:00</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </mainReport>
+    <dataSource>
+        <uri>/themes/datasources/JServerJNDIDS</uri>
+    </dataSource>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/reports/samples/Cascading_multi_select_report_files</folder>
+            <name>Country_multi_select</name>
+            <version>0</version>
+            <label>Country multi select</label>
+            <description>Country multi select</description>
+            <creationDate>2021-11-12T17:14:00.681-04:00</creationDate>
+            <updateDate>2013-10-21T15:26:09.747-04:00</updateDate>
+            <type>7</type>
+            <mandatory>true</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/reports/samples/Cascading_multi_select_report_files/Country_multi_select_files</folder>
+                    <name>country_query</name>
+                    <version>0</version>
+                    <label>Country Query</label>
+                    <creationDate>2021-11-12T17:14:00.681-04:00</creationDate>
+                    <updateDate>2013-10-21T15:26:09.747-04:00</updateDate>
+                    <language>sql</language>
+                    <queryString>select distinct billing_address_country from accounts order by billing_address_country</queryString>
+                    <dataSource>
+                        <uri>/themes/datasources/JServerJNDIDS</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>billing_address_country</queryVisibleColumn>
+            <queryValueColumn>billing_address_country</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/reports/samples/Cascading_multi_select_report_files</folder>
+            <name>Cascading_state_multi_select</name>
+            <version>0</version>
+            <label>Cascading state multi select control</label>
+            <description>Cascading state multi select control</description>
+            <creationDate>2021-11-12T17:14:00.681-04:00</creationDate>
+            <updateDate>2013-10-21T15:26:09.747-04:00</updateDate>
+            <type>7</type>
+            <mandatory>true</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/reports/samples/Cascading_multi_select_report_files/Cascading_state_multi_select_files</folder>
+                    <name>Cascading_state_query</name>
+                    <version>0</version>
+                    <label>Cascading state query</label>
+                    <creationDate>2021-11-12T17:14:00.681-04:00</creationDate>
+                    <updateDate>2013-10-21T15:26:09.747-04:00</updateDate>
+                    <language>sql</language>
+                    <queryString>select distinct billing_address_state, billing_address_country from accounts where $X{IN, billing_address_country, Country_multi_select} order by billing_address_country, billing_address_state</queryString>
+                    <dataSource>
+                        <uri>/themes/datasources/JServerJNDIDS</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>billing_address_country</queryVisibleColumn>
+            <queryVisibleColumn>billing_address_state</queryVisibleColumn>
+            <queryValueColumn>billing_address_state</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/reports/samples/Cascading_multi_select_report_files</folder>
+            <name>Cascading_name_single_select</name>
+            <version>0</version>
+            <label>Cascading name single select</label>
+            <description>Cascading name single select</description>
+            <creationDate>2021-11-12T17:14:00.681-04:00</creationDate>
+            <updateDate>2013-10-21T15:26:09.747-04:00</updateDate>
+            <type>4</type>
+            <mandatory>true</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/reports/samples/Cascading_multi_select_report_files/Cascading_name_single_select_files</folder>
+                    <name>country_state_to_name</name>
+                    <version>0</version>
+                    <label>Country State to Name</label>
+                    <creationDate>2021-11-12T17:14:00.681-04:00</creationDate>
+                    <updateDate>2013-10-21T15:26:09.747-04:00</updateDate>
+                    <language>sql</language>
+                    <queryString>select name from accounts where $X{IN, billing_address_country, Country_multi_select} and $X{IN, billing_address_state, Cascading_state_multi_select} order by name</queryString>
+                    <dataSource>
+                        <uri>/themes/datasources/JServerJNDIDS</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>name</queryVisibleColumn>
+            <queryValueColumn>name</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false"
+            dataFile="RightArrow.png.data" xsi:type="fileResource">
+            <folder>/reports/samples/Cascading_multi_select_report_files</folder>
+            <name>RightArrow.png</name>
+            <version>0</version>
+            <label>RightArrow.png Label</label>
+            <description>RightArrow.png description</description>
+            <creationDate>2021-11-12T17:14:00.681-04:00</creationDate>
+            <updateDate>2013-10-21T15:26:09.747-04:00</updateDate>
+            <fileType>img</fileType>
+        </localResource>
+    </resource>
+    <resource>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false"
+            dataFile="js_samples.png.data" xsi:type="fileResource">
+            <folder>/reports/samples/Cascading_multi_select_report_files</folder>
+            <name>js_samples.png</name>
+            <version>0</version>
+            <label>js_samples.png Label</label>
+            <description>js_samples.png description</description>
+            <creationDate>2021-11-12T17:14:00.681-04:00</creationDate>
+            <updateDate>2013-10-21T15:26:09.747-04:00</updateDate>
+            <fileType>img</fileType>
+        </localResource>
+    </resource>
+    <alwaysPromptControls>false</alwaysPromptControls>
+    <controlsLayout>4</controlsLayout>
+</reportUnit>

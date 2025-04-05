@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Monthly Contributions for Employee and Employer" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="icarter"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/Sterling_Pension_Management_System/Monthly_Contributions_for_Employee_and_Employer_ytd_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Sterling_Pension_Management_System/Monthly_Contributions_for_Employee_and_Employer_ytd"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Contributions for Employee and Employer by Year"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="STERLING_PROD"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
+	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true"/>
+	<style name="Detail" mode="Transparent" fontName="Times New Roman"/>
+	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style mode="Opaque" backcolor="#EEEFF0"/>
+		</conditionalStyle>
+	</style>
+	<style name="Table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+			<topPen lineWidth="1.0" lineColor="#000000"/>
+			<leftPen lineWidth="1.0" lineColor="#000000"/>
+			<bottomPen lineWidth="1.0" lineColor="#000000"/>
+			<rightPen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#CACED0">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#D8D8D8"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="tableDataset" uuid="f13e6d36-5148-4ecc-bbe3-3035def80980">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+	</subDataset>
+	<parameter name="year" class="java.math.BigDecimal"/>
+	<parameter name="Month" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+    a.*,
+    round(ytd_cont*((select distinct (emp_cont_intr_per_ann/100)/12 from organiztaion_pen_config 
+    where a.cont_date BETWEEN start_date and nvl(end_date,a.cont_date))* $P{Month}   ),12) ytd_int,
+    round(a.empr_ytd_cont*((select distinct (emp_cont_intr_per_ann/100)/12 from organiztaion_pen_config 
+    where a.cont_date BETWEEN start_date and nvl(end_date,a.cont_date))*  $P{Month}  ),12) empr_ytd_int,
+    TO_CHAR(last_day(to_date( '1/'||  $P{Month}  ||'/'||  $P{year}  , 'DD-MM-YYYY')), 'fmMonth fmDD, YYYY') date_prepared
+from( 
+    SELECT
+        first_name,
+        last_name,
+        abs(fund_no) fund_no,
+        sex,
+        abs(sum(contr.employee_contribution))ytd_cont,
+        abs(sum(contr.employer_contribution)) empr_ytd_cont,
+        nvl(emp_total_prv_yrs_cont, 0) prev_yrs_cont,
+        nvl(emp_total_prv_yrs_int,0)prev_yrs_cont_int,
+        max(contr.cont_date) cont_date
+    FROM
+        tbl_contributor con
+        join TBL_PENSION_CONTRIBUTION contr on con.id= contr.contri_id
+        left join (
+            select 
+                contri_id, 
+                year,
+                nvl(emp_total_prev_yrs_cont,0) + nvl(emp_curr_yrs_cont,0)  emp_total_prv_yrs_cont,
+                nvl(emp_curr_yrs_intr,0) emp_total_prv_yrs_int,
+                nvl(emplr_total_prev_yrs_cont,0) + nvl(emplr_curr_yrs_cont,0) emplr_total_prv_yrs_cont,
+                nvl(emplr_curr_yrs_intr,0) emplr_total_prv_yrs_int
+            from 
+                tbl_pension_contr_annual
+            where
+                year = ($P{year} -1)) pen_ann on con.id = pen_ann.contri_id
+    where 
+        extract(month from cont_date)<=  $P{Month} 
+        and extract(year from cont_date)=    $P{year} 
+    group by
+        first_name,
+        last_name,
+        abs(fund_no),
+        sex,
+        nvl(emp_total_prv_yrs_cont, 0),
+        nvl(emp_total_prv_yrs_int,0)
+)a]]>
+	</queryString>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FIRST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="LAST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LAST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="LAST_NAME"/>
+	</field>
+	<field name="FUND_NO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="FUND_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="FUND_NO"/>
+	</field>
+	<field name="SEX" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SEX"/>
+		<property name="com.jaspersoft.studio.field.label" value="SEX"/>
+	</field>
+	<field name="YTD_CONT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="YTD_CONT"/>
+		<property name="com.jaspersoft.studio.field.label" value="YTD_CONT"/>
+	</field>
+	<field name="EMPR_YTD_CONT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPR_YTD_CONT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPR_YTD_CONT"/>
+	</field>
+	<field name="PREV_YRS_CONT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PREV_YRS_CONT"/>
+		<property name="com.jaspersoft.studio.field.label" value="PREV_YRS_CONT"/>
+	</field>
+	<field name="PREV_YRS_CONT_INT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PREV_YRS_CONT_INT"/>
+		<property name="com.jaspersoft.studio.field.label" value="PREV_YRS_CONT_INT"/>
+	</field>
+	<field name="CONT_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="CONT_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONT_DATE"/>
+	</field>
+	<field name="YTD_INT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="YTD_INT"/>
+		<property name="com.jaspersoft.studio.field.label" value="YTD_INT"/>
+	</field>
+	<field name="EMPR_YTD_INT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPR_YTD_INT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPR_YTD_INT"/>
+	</field>
+	<field name="DATE_PREPARED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_PREPARED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_PREPARED"/>
+	</field>
+	<sortField name="FIRST_NAME"/>
+	<variable name="row_count" class="java.math.BigDecimal" calculation="Count">
+		<variableExpression><![CDATA[$F{FIRST_NAME}]]></variableExpression>
+	</variable>
+	<variable name="Basic Salary" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PREV_YRS_CONT_INT}]]></variableExpression>
+	</variable>
+	<variable name="Employee Cont" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{YTD_CONT}]]></variableExpression>
+	</variable>
+	<variable name="Employer Cont" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{YTD_INT}]]></variableExpression>
+	</variable>
+	<variable name="Total Act" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPR_YTD_CONT}+$F{YTD_CONT}+$F{YTD_INT}+$F{PREV_YRS_CONT}+$F{PREV_YRS_CONT_INT}+$F{EMPR_YTD_INT}]]></variableExpression>
+	</variable>
+	<variable name="total_prev_yr_cont" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PREV_YRS_CONT}]]></variableExpression>
+	</variable>
+	<variable name="Sum empr Cont" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPR_YTD_CONT}]]></variableExpression>
+	</variable>
+	<variable name="Variable_1" class="java.lang.String"/>
+	<variable name="sum Empr int" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPR_YTD_INT}]]></variableExpression>
+	</variable>
+	<title>
+		<band height="138" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="117" width="555" height="1" uuid="806ce5df-1219-4876-ae0c-ca7405b1f246">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<rectangle>
+				<reportElement x="1" y="0" width="159" height="50" backcolor="#298F0A" uuid="54419b5b-8a14-4e12-9a1c-0af224b3c319">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</rectangle>
+			<textField>
+				<reportElement x="0" y="101" width="970" height="16" uuid="65fac6cb-ae63-4494-adb7-b10b1a1d8ea1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Monthly Interest Report for " +$F{DATE_PREPARED}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="1" y="0" width="156" height="50" uuid="e0cb6949-889d-4c5e-a00e-671c29d31fce">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA["repo:spl_logo_white_1.png"]]></imageExpression>
+			</image>
+			<line>
+				<reportElement x="450" y="117" width="555" height="1" uuid="cafafca2-fb90-47e9-b383-a4a7451610a4">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30">
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="188" y="0" width="56" height="15" forecolor="#000000" uuid="a81a2a9a-e99a-4a31-9600-209af008e554">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fund No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="27" y="0" width="78" height="15" forecolor="#000000" uuid="c7dd5327-0272-4bd4-b140-dfc5cf2bccd9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="efa2c29f-f91c-4ff4-9ee3-010cdea751f2"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[First Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="105" y="0" width="83" height="15" forecolor="#000000" uuid="13a7a39d-f53d-4519-859b-b23c40969976">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6a845b0b-39e9-45b5-91ef-8f022ae2e1c8"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Last Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="244" y="0" width="36" height="15" forecolor="#000000" uuid="97731a5a-253d-446b-a007-f1cd553f3a3a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sex]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="280" y="0" width="100" height="30" forecolor="#000000" uuid="dfdbeac6-f523-4e49-b661-f7e874bd001d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emp YTD Cont]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="380" y="0" width="115" height="30" forecolor="#000000" uuid="27e9f993-be4d-4d41-aa88-4d5171e65a3b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emp YTD Int]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="670" y="0" width="85" height="30" forecolor="#000000" uuid="ac72cc5e-2a1b-4fcb-81f7-8e855e0d746c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Prev Yrs Cont]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="755" y="0" width="115" height="30" forecolor="#000000" uuid="5255c87a-c251-47cb-9c55-f88853a35809">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Prev Yrs Int]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="870" y="0" width="115" height="30" forecolor="#000000" uuid="aa1cf4d4-a667-4780-9ef7-0783d75342a6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Act to Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="500" y="0" width="80" height="30" uuid="b23dc15f-a9f8-445b-8903-853d9f59318a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7151194e-3e51-4ece-90aa-2faa949ea02e"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Empr YTD Cont]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="580" y="0" width="90" height="30" uuid="bbecdf37-8ef8-4ba0-8813-0a4e2f65057d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a64b6992-e32d-408b-b7b7-9579cf220d5d"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Empr YTD Int]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="188" y="0" width="56" height="15" uuid="5eeb6481-af93-46fb-be69-fe4738aaf590">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FUND_NO}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="27" y="0" width="78" height="15" uuid="5e5a2399-091c-4ccc-8c48-9c7c7f94e96f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="efa2c29f-f91c-4ff4-9ee3-010cdea751f2"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="105" y="0" width="83" height="15" uuid="3753d619-9d7e-41f3-84f1-a5e20e6c9e37">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6a845b0b-39e9-45b5-91ef-8f022ae2e1c8"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LAST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="26" height="15" uuid="ded76efd-4455-49df-8936-533484879262">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$V{row_count}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="#,##0.###;#,##0.###" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="244" y="0" width="36" height="15" uuid="46af3926-f04d-4251-9ac0-f9b33a7555df">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SEX}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="#,##0.#" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="280" y="0" width="100" height="15" uuid="1af3e5bf-a2fa-4517-923c-f569df2cdff6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{YTD_CONT}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="380" y="0" width="115" height="15" uuid="f5ce0e47-2e07-411e-b9d5-0224f671d5de">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{YTD_INT}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="#,##0.###;#,##0.###" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="670" y="0" width="85" height="15" uuid="484e69bf-f824-4b05-adf6-dcfaad988dcf">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PREV_YRS_CONT}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="#,##0.###;#,##0.###" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="755" y="0" width="115" height="15" uuid="f01505d2-c520-4375-86db-2045572e10d2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PREV_YRS_CONT_INT}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="870" y="0" width="115" height="15" uuid="1cfb1b44-9c61-415d-bfa5-16d55a901fd9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{YTD_CONT}+$F{PREV_YRS_CONT_INT}+$F{YTD_INT}+$F{PREV_YRS_CONT}+$F{EMPR_YTD_CONT}+$F{EMPR_YTD_INT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.#">
+				<reportElement x="495" y="0" width="84" height="15" uuid="fd19fb06-0aa4-4c15-9c79-16e751bcc1be">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7151194e-3e51-4ece-90aa-2faa949ea02e"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPR_YTD_CONT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.0">
+				<reportElement x="580" y="0" width="90" height="15" uuid="b8a11156-0620-4a1b-a798-64ef65aed530">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a64b6992-e32d-408b-b7b7-9579cf220d5d"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{EMPR_YTD_INT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="837" y="0" width="43" height="20" uuid="79d3a270-50b7-459c-bd93-d65582523627">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="271" y="0" width="428" height="20" uuid="056760e0-7716-4fd7-8cdb-aa5219a59429">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Sterling Pension Management System"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="880" y="0" width="30" height="20" uuid="667e12ba-1f64-4bfa-9f23-9839c020597c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="938" y="0" width="30" height="20" uuid="0b1c3945-3043-4823-bc80-3b2e84001f61">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="910" y="0" width="28" height="20" uuid="3e353e85-951d-4bd3-b32a-2ec9b1d3061b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" of "]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMM d, yyyy">
+				<reportElement x="0" y="0" width="99" height="20" uuid="a554ddb3-db9f-4f80-9baa-d3f4a293dfc1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date:" +NOW()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="40">
+			<staticText>
+				<reportElement x="26" y="2" width="100" height="15" uuid="815ff0f4-f823-42f6-bc7b-3043c03778c3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total:]]></text>
+			</staticText>
+			<textField pattern="#,##0.###;#,##0.###">
+				<reportElement x="280" y="3" width="100" height="15" uuid="f695cb4b-5d20-4381-b4f9-1e5bc583bfad"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Employee Cont}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.###;#,##0.###">
+				<reportElement x="381" y="3" width="114" height="15" uuid="bdd23533-1dcd-4e92-877a-31a3a5401ca5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Employer Cont}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="755" y="2" width="115" height="15" uuid="dcae3086-2b16-4139-a871-308cb992ae83"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Basic Salary}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="873" y="2" width="115" height="15" uuid="859114b6-4fcf-4a43-a2bd-d8ea7d1e88fc"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total Act}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="670" y="3" width="85" height="15" uuid="8194c561-3724-454d-8410-96d9b5b6f4da"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_prev_yr_cont}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.0##;#,##0.0##-">
+				<reportElement x="495" y="2" width="84" height="16" uuid="994bafcc-dc2a-496d-9dc6-621843d19300"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Sum empr Cont}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.0##;#,##0.0##-">
+				<reportElement x="580" y="2" width="90" height="16" uuid="49a3d74a-9c36-41ff-94ef-0a2ceb8b06a8"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sum Empr int}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

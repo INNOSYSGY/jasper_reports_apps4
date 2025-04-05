@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WP" pageWidth="752" pageHeight="572" orientation="Landscape" columnWidth="680" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="248632d4-3be1-457b-a257-eb0a1210f35b">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="corriea"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="656"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="330"/>
+	<property name="com.jaspersoft.studio.unit." value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="inch"/>
+	<subDataset name="Details" uuid="0f635c3d-5fc1-4b76-83e7-23c6d52d0875">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="CORREIA"/>
+		<parameter name="ORG_ID" class="java.lang.String"/>
+		<parameter name="START_PERIOD" class="java.lang.String"/>
+		<parameter name="END_PERIOD" class="java.lang.String"/>
+		<parameter name="DEPARTMENT" class="java.lang.String"/>
+		<parameter name="WORKPLAN_ID" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT 
+    dt.id, 
+    dt.course_desc,
+    dt.objectives,
+    dt.facilitators,
+    dt.duration,
+    dt.proposed_date,
+    listagg(dt.target_group, '; '|| chr(10)) within group (order by dt.target_group) target_group,
+    dt.org_id,
+    dt.full_name,
+    dt.department
+FROM (
+SELECT DISTINCT
+    wp_dt.id,
+    wp_dt.course_desc,
+    wp_dt.objectives,
+    wp_dt.facilitators,
+    p.position_name      target_group,
+    wp_dt.duration,
+    wp_dt.proposed_date,
+    wp_dt.org_id,
+    org_struct.unit_name department,
+    emp_att.full_name
+FROM
+         (
+        SELECT DISTINCT
+            wp.id,
+            wp.course_desc,
+            wp.objectives,
+            wp.facilitators,
+            regexp_substr(wp.target_group, '[^:]+', 1, level) target_group,
+            wp.duration,
+            wp.proposed_date,
+            wp.org_id
+        FROM
+            hr_att_workplan wp
+        WHERE
+            wp.id IN (
+                SELECT
+                    id
+                FROM
+                    hr_att_workplan
+            )
+        CONNECT BY
+            level <= length(wp.target_group) - length(replace(wp.target_group, ':')) + 1
+    ) wp_dt
+    JOIN hr_hcf_position        p ON wp_dt.target_group = p.id
+    JOIN hr_hcf_orgstructuredtl org_struct ON p.orgdtl_id = org_struct.id
+    left outer JOIN (
+        SELECT
+            listagg(aa.surname_hist
+            || ', '
+            || aa.first_name_hist, '; '|| chr(10)) within group(order by aa.surname_hist || ', ' || aa.first_name_hist) full_name,
+            wp.id id
+        FROM
+                 hr_att_workplan wp
+            JOIN hr_att_activity           a ON wp.id = a.workplan_id
+            JOIN hr_att_activityattendance aa ON a.id = aa.activity_id
+        WHERE
+            wp.id IN (
+                SELECT
+                    id
+                FROM
+                    hr_att_workplan
+            )
+            GROUP BY wp.id
+    )                      emp_att ON emp_att.id = wp_dt.id 
+) dt
+WHERE
+    dt.org_id = $P{ORG_ID} 
+    AND dt.id= $P{WORKPLAN_ID} 
+    AND dt.department = INITCAP($P{DEPARTMENT})
+    AND dt.proposed_date BETWEEN $P{START_PERIOD}   AND $P{END_PERIOD} 
+    GROUP BY 
+        dt.id, 
+    dt.course_desc,
+    dt.objectives,
+    dt.facilitators,
+    dt.duration,
+    dt.proposed_date,
+    dt.org_id,
+    dt.full_name,
+    dt.department]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="ID"/>
+		</field>
+		<field name="COURSE_DESC" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="COURSE_DESC"/>
+		</field>
+		<field name="OBJECTIVES" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="OBJECTIVES"/>
+		</field>
+		<field name="FACILITATORS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="FACILITATORS"/>
+		</field>
+		<field name="DURATION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="DURATION"/>
+		</field>
+		<field name="PROPOSED_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="PROPOSED_DATE"/>
+		</field>
+		<field name="TARGET_GROUP" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="TARGET_GROUP"/>
+		</field>
+		<field name="ORG_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+		</field>
+		<field name="FULL_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="FULL_NAME"/>
+		</field>
+		<field name="DEPARTMENT" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+		</field>
+	</subDataset>
+	<parameter name="ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="START_DATE" class="java.lang.String"/>
+	<parameter name="END_DATE" class="java.lang.String"/>
+	<parameter name="DEPARTMENT" class="java.lang.String"/>
+	<parameter name="WORKPLAN_ID" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+    dt.id, 
+    dt.course_desc,
+    dt.objectives,
+    dt.facilitators,
+    dt.duration,
+    dt.proposed_date,
+    listagg(dt.target_group, '; '|| chr(10)) within group (order by dt.target_group) target_group,
+    dt.org_id,
+    dt.full_name,
+    dt.department
+FROM (
+SELECT DISTINCT
+    wp_dt.id,
+    wp_dt.course_desc,
+    wp_dt.objectives,
+    wp_dt.facilitators,
+    p.position_name      target_group,
+    wp_dt.duration,
+    wp_dt.proposed_date,
+    wp_dt.org_id,
+    org_struct.unit_name department,
+    emp_att.full_name
+FROM
+         (
+        SELECT DISTINCT
+            wp.id,
+            wp.course_desc,
+            wp.objectives,
+            wp.facilitators,
+            regexp_substr(wp.target_group, '[^:]+', 1, level) target_group,
+            wp.duration,
+            wp.proposed_date,
+            wp.org_id
+        FROM
+            hr_att_workplan wp
+        WHERE
+            wp.id IN (
+                SELECT
+                    id
+                FROM
+                    hr_att_workplan
+            )
+        CONNECT BY
+            level <= length(wp.target_group) - length(replace(wp.target_group, ':')) + 1
+    ) wp_dt
+    JOIN hr_hcf_position        p ON wp_dt.target_group = p.id
+    JOIN hr_hcf_orgstructuredtl org_struct ON p.orgdtl_id = org_struct.id
+    left outer JOIN (
+        SELECT
+            listagg(aa.surname_hist
+            || ', '
+            || aa.first_name_hist, '; '|| chr(10)) within group(order by aa.surname_hist || ', ' || aa.first_name_hist) full_name,
+            wp.id id
+        FROM
+                 hr_att_workplan wp
+            JOIN hr_att_activity           a ON wp.id = a.workplan_id
+            JOIN hr_att_activityattendance aa ON a.id = aa.activity_id
+        WHERE
+            wp.id IN (
+                SELECT
+                    id
+                FROM
+                    hr_att_workplan
+            )
+            GROUP BY wp.id
+    )                      emp_att ON emp_att.id = wp_dt.id 
+) dt
+WHERE
+    dt.org_id =  $P{ORG_ID} 
+    AND dt.id=  $P{WORKPLAN_ID} 
+    AND dt.department = INITCAP( $P{DEPARTMENT} )
+    AND dt.proposed_date BETWEEN  $P{START_DATE}  AND  $P{END_DATE} 
+    GROUP BY 
+        dt.id, 
+    dt.course_desc,
+    dt.objectives,
+    dt.facilitators,
+    dt.duration,
+    dt.proposed_date,
+    dt.org_id,
+    dt.full_name,
+    dt.department]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="COURSE_DESC" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COURSE_DESC"/>
+	</field>
+	<field name="OBJECTIVES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="OBJECTIVES"/>
+	</field>
+	<field name="FACILITATORS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FACILITATORS"/>
+	</field>
+	<field name="DURATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DURATION"/>
+	</field>
+	<field name="PROPOSED_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PROPOSED_DATE"/>
+	</field>
+	<field name="TARGET_GROUP" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TARGET_GROUP"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="FULL_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FULL_NAME"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<sortField name="DEPARTMENT"/>
+	<sortField name="COURSE_DESC"/>
+	<sortField name="OBJECTIVES"/>
+	<sortField name="FULL_NAME"/>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{COURSE_DESC}]]></groupExpression>
+		<groupHeader>
+			<band height="30">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<textField isStretchWithOverflow="true">
+					<reportElement x="150" y="0" width="530" height="20" uuid="acc15a7d-540b-4cfb-8943-d940c2ff6d86">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3ee46c2e-ec50-4ac6-b570-bb40c1c1efd5"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box leftPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Times New Roman&#xD;&#xA;" size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{COURSE_DESC}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="1" y="0" width="149" height="20" uuid="d55ff1d6-ffd9-4cfa-a655-d37ca2aeb629">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box leftPadding="10"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Times New Roman&#xD;&#xA;" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[WORKPLAN NAME:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="Group2">
+		<groupExpression><![CDATA[$F{DEPARTMENT}]]></groupExpression>
+		<groupHeader>
+			<band height="30">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<textField isStretchWithOverflow="true">
+					<reportElement x="150" y="0" width="530" height="20" uuid="8120f14b-db48-4355-b3f6-1332a249fa3b">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c9987f39-9e4c-4357-a2f9-4f57bf8b5bb8"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box leftPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Times New Roman&#xD;&#xA;" size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="150" height="20" uuid="56c4f075-71ee-4ced-a589-1a481d8d0809">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box leftPadding="10"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Times New Roman&#xD;&#xA;" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[DEPARTMENT: ]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="680" height="80" uuid="cdc4a01a-0546-4ee2-8d3b-301426a38190"/>
+				<subreportParameter name="ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:Header.jrxml"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<detail>
+		<band height="100" splitType="Stretch">
+			<subreport isUsingCache="true" runToBottom="true">
+				<reportElement x="0" y="0" width="680" height="100" uuid="b1b41e13-dd69-418f-8960-179cf29dee55"/>
+				<subreportParameter name="ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WORKPLAN_ID">
+					<subreportParameterExpression><![CDATA[$F{ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DEPARTMENT">
+					<subreportParameterExpression><![CDATA[$F{DEPARTMENT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="START_PERIOD">
+					<subreportParameterExpression><![CDATA[$P{START_DATE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="END_PERIOD">
+					<subreportParameterExpression><![CDATA[$P{END_DATE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:Workplan_Details.jrxml"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

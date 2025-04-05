@@ -1,0 +1,959 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.0.final using JasperReports Library version 6.21.0-4f56c4f36cd19e17675219a9ac4692d5f0f13b06  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Actuarial Report yearly" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="STERLING_PROD"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="icarter"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/Sterling_Pension_Management_System/Pension_Scheme_Leavers_Report_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Sterling_Pension_Management_System/Pension_Scheme_Leavers_Report"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="636"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="354"/>
+	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
+	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true"/>
+	<style name="Detail" mode="Transparent" fontName="Times New Roman"/>
+	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style mode="Opaque" backcolor="#EEEFF0"/>
+		</conditionalStyle>
+	</style>
+	<style name="Table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+			<topPen lineWidth="1.0" lineColor="#000000"/>
+			<leftPen lineWidth="1.0" lineColor="#000000"/>
+			<bottomPen lineWidth="1.0" lineColor="#000000"/>
+			<rightPen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#CACED0">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#D8D8D8"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="tableDataset" uuid="f13e6d36-5148-4ecc-bbe3-3035def80980">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+	</subDataset>
+	<parameter name="year" class="java.lang.Integer"/>
+	<parameter name="month" class="java.lang.Integer"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+    a.first_name, 
+    a.last_name, 
+    a.fund_no,
+    a.sex, 
+    a.doe, 
+    a.date_joined, 
+    a.end_date,
+    a.pre_yrs_contr, 
+    a.prev_yrs_int, 
+    a.current_year_contr, 
+    a.Cont_int_prev_yr, 
+    a.Int_on_Int_prev_yr, 
+    a.curr_yr_int, 
+    a.emplr_pre_yrs_contr * a.ent_pct emplr_pre_yrs_contr,
+    a.emplr_prev_yrs_int * a.ent_pct emplr_prev_yrs_int,
+    a.emplr_current_year_contr * a.ent_pct emplr_current_year_contr,
+    a.emplr_Cont_int_prev_yr * a.ent_pct emplr_Cont_int_prev_yr, 
+    a.emplr_Int_on_Int_prev_yr * a.ent_pct emplr_Int_on_Int_prev_yr,
+    a.emplr_curr_yr_int * a.ent_pct emplr_curr_yr_int,
+    nvl(a.pre_yrs_contr+a.prev_yrs_int+a.current_year_contr+a.Cont_int_prev_yr+a.Int_on_Int_prev_yr+a.curr_yr_int, 0)  + 
+    (nvl(a.emplr_pre_yrs_contr+a.emplr_prev_yrs_int+a.emplr_current_year_contr+a.emplr_Cont_int_prev_yr+a.emplr_Int_on_Int_prev_yr+a.emplr_curr_yr_int, 0) * a.ent_pct) Act_to_date 
+from (
+    select 
+        first_name,
+        last_name, 
+        fund_no,
+        sex, 
+        doe, 
+        date_joined, 
+        end_date,
+        ent_pct,
+        nvl(sum(pre_yrs_contr),0) pre_yrs_contr,
+        nvL(sum(prev_yrs_int),0) prev_yrs_int,
+        nvl(sum(current_year_contr),0) current_year_contr,
+        nvl(sum(pre_yrs_contr * interest_percent),0) Cont_int_prev_yr, 
+        nvl(sum(prev_yrs_int * interest_percent),0) Int_on_Int_prev_yr,
+        nvl(sum(curr_yr_int * contr_count),0) curr_yr_int,
+        nvl(sum(emplr_pre_yrs_contr),0) emplr_pre_yrs_contr,
+        nvL(sum(emplr_prev_yrs_int),0) emplr_prev_yrs_int,
+        nvl(sum(emplr_current_year_contr),0) emplr_current_year_contr,
+        nvl(sum(emplr_pre_yrs_contr * interest_percent),0) emplr_Cont_int_prev_yr, 
+        nvl(sum(emplr_prev_yrs_int * interest_percent),0) emplr_Int_on_Int_prev_yr,
+        nvl(sum(emplr_curr_yr_int * contr_count),0)  emplr_curr_yr_int
+    from(
+        select 
+            tbl_con.first_name,
+            tbl_con.last_name, 
+            tbl_con.fund_no,
+            tbl_con.sex, 
+            tbl_con.doe, 
+            tbl_con.date_joined, 
+            tbl_con.end_date,
+            nvl(opc.emp_cont_intr_per_ann/100, 0) interest_percent,
+            tbl_cont_ann.emp_total_prv_yrs_cont pre_yrs_contr, 
+            tbl_cont_ann.emp_total_prv_yrs_int prev_yrs_int, 
+            tbl_cont_ann.emplr_total_prv_yrs_cont emplr_pre_yrs_contr, 
+            tbl_cont_ann.emplr_total_prv_yrs_int emplr_prev_yrs_int, 
+            sum(tbl_contr.employee_contribution) as current_year_contr,
+            sum(tbl_contr.employer_contribution) as emplr_current_year_contr,
+			count(1) contr_count,
+            sum(tbl_contr.employee_contribution * ((EMP_CONT_INTR_PER_ANN/100)/12)) curr_yr_int, 
+            sum(tbl_contr.employer_contribution * ((EMP_CONT_INTR_PER_ANN/100)/12)) emplr_curr_yr_int,
+            max(case 
+        	        when months_between(last_day(to_date('01/'||$P{month}||'/'||$P{year}, 'DD/MM/YYYY')), tbl_con.date_joined) /12 < 5 then 0
+        	        when months_between(last_day(to_date('01/'||$P{month}||'/'||$P{year}, 'DD/MM/YYYY')), tbl_con.date_joined) /12 between 5 and 7.5 then 0.25
+        	        when months_between(last_day(to_date('01/'||$P{month}||'/'||$P{year}, 'DD/MM/YYYY')), tbl_con.date_joined) /12 between 7.5 and 10 then 0.5
+        	        when months_between(last_day(to_date('01/'||$P{month}||'/'||$P{year}, 'DD/MM/YYYY')), tbl_con.date_joined) /12 between 10 and 12.5 then 0.75
+        	        when months_between(last_day(to_date('01/'||$P{month}||'/'||$P{year}, 'DD/MM/YYYY')), tbl_con.date_joined) /12 > 12.5 then 1
+        	    end) ent_pct
+        from
+            TBL_CONTRIBUTOR tbl_con
+            join TBL_PENSION_CONTRIBUTION tbl_contr on tbl_contr.contri_id=tbl_con.id
+            left join ORGANIZTAION_PEN_CONFIG opc on (floor(months_between(last_day(to_date( $P{month}  || '/01/'|| $P{year}  , 'MM/DD/YYYY')),tbl_con.dob) /12) between opc.AGE_LOWER_LIMIT and opc.AGE_UPPER_LIMIT and opc.end_date is null)
+            left join (
+                select 
+                    contri_id, 
+                    year,
+                    nvl(emp_total_prev_yrs_cont,0) + nvl(emp_curr_yrs_cont,0)  emp_total_prv_yrs_cont,
+                    nvl(emp_curr_yrs_intr,0) emp_total_prv_yrs_int,
+                    nvl(emplr_total_prev_yrs_cont,0) + nvl(emplr_curr_yrs_cont,0) emplr_total_prv_yrs_cont,
+                    nvl(emplr_curr_yrs_intr,0) emplr_total_prv_yrs_int
+                from 
+                    tbl_pension_contr_annual
+                where
+                    year =  $P{year}   - 1) tbl_cont_ann on tbl_cont_ann.contri_id = tbl_con.id 
+        where
+            extract(year from tbl_contr.CONT_DATE)=   $P{year}     
+            and extract(month from CONT_DATE) <= $P{month}     
+        group by 
+            tbl_con.first_name,
+            tbl_con.last_name, 
+            tbl_con.fund_no,
+            tbl_con.sex, 
+            tbl_con.doe, 
+            tbl_con.date_joined, 
+            tbl_con.end_date,
+            nvl(opc.emp_cont_intr_per_ann/100, 0),
+            tbl_cont_ann.emp_total_prv_yrs_cont, 
+            tbl_cont_ann.emp_total_prv_yrs_int,
+            tbl_cont_ann.emplr_total_prv_yrs_cont, 
+            tbl_cont_ann.emplr_total_prv_yrs_int       
+    )
+    group by first_name,last_name, fund_no,sex, doe, date_joined, end_date, ent_pct
+) A
+where 
+	a.end_date is not null 
+	and a.end_date between to_date('01/01/'||  $P{year}     , 'DD/MM/YYYY') and last_day(to_date('01/'||  $P{month}    ||'/'||  $P{year}   , 'DD/MM/YYYY'))]]>
+	</queryString>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FIRST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="LAST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LAST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="LAST_NAME"/>
+	</field>
+	<field name="FUND_NO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="FUND_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="FUND_NO"/>
+	</field>
+	<field name="SEX" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SEX"/>
+		<property name="com.jaspersoft.studio.field.label" value="SEX"/>
+	</field>
+	<field name="DOE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="DOE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DOE"/>
+	</field>
+	<field name="DATE_JOINED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_JOINED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_JOINED"/>
+	</field>
+	<field name="END_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="END_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="END_DATE"/>
+	</field>
+	<field name="PRE_YRS_CONTR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PRE_YRS_CONTR"/>
+		<property name="com.jaspersoft.studio.field.label" value="PRE_YRS_CONTR"/>
+	</field>
+	<field name="PREV_YRS_INT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PREV_YRS_INT"/>
+		<property name="com.jaspersoft.studio.field.label" value="PREV_YRS_INT"/>
+	</field>
+	<field name="CURRENT_YEAR_CONTR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CURRENT_YEAR_CONTR"/>
+		<property name="com.jaspersoft.studio.field.label" value="CURRENT_YEAR_CONTR"/>
+	</field>
+	<field name="CONT_INT_PREV_YR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CONT_INT_PREV_YR"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONT_INT_PREV_YR"/>
+	</field>
+	<field name="INT_ON_INT_PREV_YR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="INT_ON_INT_PREV_YR"/>
+		<property name="com.jaspersoft.studio.field.label" value="INT_ON_INT_PREV_YR"/>
+	</field>
+	<field name="CURR_YR_INT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CURR_YR_INT"/>
+		<property name="com.jaspersoft.studio.field.label" value="CURR_YR_INT"/>
+	</field>
+	<field name="EMPLR_PRE_YRS_CONTR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLR_PRE_YRS_CONTR"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLR_PRE_YRS_CONTR"/>
+	</field>
+	<field name="EMPLR_PREV_YRS_INT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLR_PREV_YRS_INT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLR_PREV_YRS_INT"/>
+	</field>
+	<field name="EMPLR_CURRENT_YEAR_CONTR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLR_CURRENT_YEAR_CONTR"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLR_CURRENT_YEAR_CONTR"/>
+	</field>
+	<field name="EMPLR_CONT_INT_PREV_YR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLR_CONT_INT_PREV_YR"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLR_CONT_INT_PREV_YR"/>
+	</field>
+	<field name="EMPLR_INT_ON_INT_PREV_YR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLR_INT_ON_INT_PREV_YR"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLR_INT_ON_INT_PREV_YR"/>
+	</field>
+	<field name="EMPLR_CURR_YR_INT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLR_CURR_YR_INT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLR_CURR_YR_INT"/>
+	</field>
+	<field name="ACT_TO_DATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ACT_TO_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ACT_TO_DATE"/>
+	</field>
+	<variable name="V_Prev_yrs_Cont." class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PRE_YRS_CONTR}]]></variableExpression>
+	</variable>
+	<variable name="V_Prev_yrs_Int." class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PREV_YRS_INT}]]></variableExpression>
+	</variable>
+	<variable name="V_Curr_yr_Cont." class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CURRENT_YEAR_CONTR}]]></variableExpression>
+	</variable>
+	<variable name="V_Cont_Int" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CONT_INT_PREV_YR}]]></variableExpression>
+	</variable>
+	<variable name="V_Int_On" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{INT_ON_INT_PREV_YR}]]></variableExpression>
+	</variable>
+	<variable name="V_Curr_Yr" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CURR_YR_INT}]]></variableExpression>
+	</variable>
+	<variable name="row_count" class="java.math.BigDecimal" calculation="Count">
+		<variableExpression><![CDATA[$F{FIRST_NAME}]]></variableExpression>
+	</variable>
+	<variable name="V_Total_Cont" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ACT_TO_DATE}]]></variableExpression>
+	</variable>
+	<variable name="V_Emplr_Prev_yrs_Cont" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLR_PRE_YRS_CONTR}]]></variableExpression>
+	</variable>
+	<variable name="V_Emplr_Prev_yrs_Int" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLR_PREV_YRS_INT}]]></variableExpression>
+	</variable>
+	<variable name="V_Emplr_Curr_yr_Cont" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLR_CURRENT_YEAR_CONTR}]]></variableExpression>
+	</variable>
+	<variable name="V_Emplr_Cont_Int" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLR_CONT_INT_PREV_YR}]]></variableExpression>
+	</variable>
+	<variable name="V_Emplr_Int_On" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLR_INT_ON_INT_PREV_YR}]]></variableExpression>
+	</variable>
+	<variable name="V_Emplr_Curr_Yr" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLR_CURR_YR_INT}]]></variableExpression>
+	</variable>
+	<title>
+		<band height="121" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="107" width="968" height="1" uuid="806ce5df-1219-4876-ae0c-ca7405b1f246">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<rectangle>
+				<reportElement x="1" y="0" width="159" height="50" backcolor="#298F0A" uuid="54419b5b-8a14-4e12-9a1c-0af224b3c319">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</rectangle>
+			<textField>
+				<reportElement x="0" y="87" width="968" height="16" uuid="65fac6cb-ae63-4494-adb7-b10b1a1d8ea1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Pension Plan Leavers Report For The Year " +$P{year}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="1" y="0" width="156" height="50" uuid="e0cb6949-889d-4c5e-a00e-671c29d31fce">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA["repo:spl_logo_white_1.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30">
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="0" y="0" width="20" height="30" forecolor="#000000" uuid="a81a2a9a-e99a-4a31-9600-209af008e554">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fund No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="22" y="0" width="50" height="30" forecolor="#000000" uuid="c7dd5327-0272-4bd4-b140-dfc5cf2bccd9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="efa2c29f-f91c-4ff4-9ee3-010cdea751f2"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[First Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="74" y="0" width="50" height="30" forecolor="#000000" uuid="13a7a39d-f53d-4519-859b-b23c40969976">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6a845b0b-39e9-45b5-91ef-8f022ae2e1c8"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Last name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="302" y="0" width="50" height="30" uuid="edd14016-bca3-4164-8c0e-340879e84238">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4937ce7a-c337-4a93-80bd-5ba239a48ff4"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee Prev. Yrs Cont.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="352" y="0" width="50" height="30" uuid="ed92337e-3c6b-4327-82c0-413c5c71f45e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2f089b45-7869-42bc-bfac-3a6571b7a33d"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee Prev Yrs. 
+Int.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="402" y="0" width="50" height="30" uuid="8b09d24c-b666-44c0-bbe4-8c19d3f0d056">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2e55e9af-16b8-4f74-bf4d-2a98b8e8ecb1"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee Curr. Yr. Cont.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="452" y="0" width="50" height="30" uuid="39f2e303-781c-4c56-ba68-18c34332eaa9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce9be580-3cd1-4943-aa07-443ddec6b247"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee Cont. Int. (Prev. Yr.)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="510" y="0" width="50" height="30" uuid="db0cdb1d-3389-43f8-beaa-ac256a50b3cb">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="eca2ed5c-2a6f-45c3-a1a8-bff7e7b67d4b"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee Int on Int. (Prev. Yr.)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="560" y="0" width="50" height="30" uuid="656c3cb2-a8fb-440f-980b-ca24fbfb4ce6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d785fb47-7d7d-42f2-8629-71a315ea886d"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee Cont. Curr. Yr. Int.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="910" y="0" width="55" height="30" uuid="caa2709c-38b8-482e-b5c5-0aa87236fd16">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3d0d49b2-e87b-401c-9d6f-273058ada3e1"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Cont. Payable]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" x="126" y="0" width="18" height="30" forecolor="#000000" uuid="9fd9f5bb-60f7-444b-9409-9fd281adddc0">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6a845b0b-39e9-45b5-91ef-8f022ae2e1c8"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sex]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="146" y="0" width="50" height="30" uuid="bc874c76-6be6-41fd-a1b1-31901bc4cb1d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4937ce7a-c337-4a93-80bd-5ba239a48ff4"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date
+Hired]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="198" y="0" width="50" height="30" uuid="8cb24f6f-4bed-434d-b478-f2560dd3c1d0">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4937ce7a-c337-4a93-80bd-5ba239a48ff4"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date En.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="250" y="0" width="50" height="30" uuid="4751fcc4-c383-4254-9d0a-4478d2e67c37">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4937ce7a-c337-4a93-80bd-5ba239a48ff4"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date
+Closed]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="760" y="0" width="50" height="30" uuid="91a93289-2947-4632-bde4-84be3aec9258">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce9be580-3cd1-4943-aa07-443ddec6b247"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emplr Cont. Int.
+(Prev.)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="610" y="0" width="50" height="30" uuid="a71b9589-d695-45db-83ee-47f0f2a2cdb5">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4937ce7a-c337-4a93-80bd-5ba239a48ff4"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emplr Prev. Yrs
+Cont.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="860" y="0" width="50" height="30" uuid="7c3de7cd-ac79-4c78-9f28-9818420a0ebb">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d785fb47-7d7d-42f2-8629-71a315ea886d"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emplr Curr yr Int.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="810" y="0" width="50" height="30" uuid="510ffcd6-39ed-4323-be9f-9cc2d2e7ab02">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="eca2ed5c-2a6f-45c3-a1a8-bff7e7b67d4b"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emplr Int on Int.
+(Prev.)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="660" y="0" width="50" height="30" uuid="4d836084-b10f-4cf6-9237-7eeae366d766">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2f089b45-7869-42bc-bfac-3a6571b7a33d"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emplr Prev Yrs. Int.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="710" y="0" width="50" height="30" uuid="7483c5e8-2532-41b1-a3c2-ba1a8ea96402">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2e55e9af-16b8-4f74-bf4d-2a98b8e8ecb1"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emplr Curr. Yr.
+Cont.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="0" y="0" width="20" height="15" uuid="5eeb6481-af93-46fb-be69-fe4738aaf590">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="960be957-08d5-4dfb-9fd8-36a800fbc714"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FUND_NO}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="22" y="0" width="50" height="15" uuid="5e5a2399-091c-4ccc-8c48-9c7c7f94e96f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="efa2c29f-f91c-4ff4-9ee3-010cdea751f2"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="74" y="0" width="50" height="15" uuid="3753d619-9d7e-41f3-84f1-a5e20e6c9e37">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6a845b0b-39e9-45b5-91ef-8f022ae2e1c8"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LAST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="302" y="0" width="50" height="15" uuid="fd52c798-93db-4803-a55e-38eae645b654">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4937ce7a-c337-4a93-80bd-5ba239a48ff4"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRE_YRS_CONTR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="352" y="0" width="50" height="15" uuid="8a0819fb-eb11-4335-a197-f21b20d13fc7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2f089b45-7869-42bc-bfac-3a6571b7a33d"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PREV_YRS_INT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="402" y="0" width="50" height="15" uuid="a0cf6c24-e0e3-41d1-90b5-a73a1f95628f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2e55e9af-16b8-4f74-bf4d-2a98b8e8ecb1"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CURRENT_YEAR_CONTR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="452" y="0" width="50" height="15" uuid="2a3dbef5-2c16-4f69-aad5-0bf2c78d5e8c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce9be580-3cd1-4943-aa07-443ddec6b247"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONT_INT_PREV_YR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="510" y="0" width="50" height="15" uuid="725bebbb-e244-41a6-ada8-53169e070504">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="eca2ed5c-2a6f-45c3-a1a8-bff7e7b67d4b"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INT_ON_INT_PREV_YR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="560" y="0" width="50" height="15" uuid="89f789be-73d3-4c7a-b639-790d345d6c35">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d785fb47-7d7d-42f2-8629-71a315ea886d"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CURR_YR_INT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="910" y="0" width="55" height="15" uuid="d914f18d-11ad-4be7-b316-2bc1ff294e0b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3d0d49b2-e87b-401c-9d6f-273058ada3e1"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACT_TO_DATE}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="126" y="0" width="18" height="15" uuid="218f22a4-1765-4c9d-9afa-b2a3653d4872">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6a845b0b-39e9-45b5-91ef-8f022ae2e1c8"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SEX}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="dd-MMM-yy" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="146" y="0" width="50" height="15" uuid="d2dae6ea-bcf7-4472-a133-7d33beb69036">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6a845b0b-39e9-45b5-91ef-8f022ae2e1c8"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DOE}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="dd-MMM-yy" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="198" y="0" width="50" height="15" uuid="85281edc-4f2e-4de5-a755-3f70a513d3ac">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6a845b0b-39e9-45b5-91ef-8f022ae2e1c8"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_JOINED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="dd-MMM-yy" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="250" y="0" width="50" height="15" uuid="9bdf4902-f5b3-4ee0-9f37-ccdaf180750b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6a845b0b-39e9-45b5-91ef-8f022ae2e1c8"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{END_DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="760" y="0" width="50" height="15" uuid="4e1078ee-7678-4466-841b-aa7e5894d4b6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce9be580-3cd1-4943-aa07-443ddec6b247"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLR_CONT_INT_PREV_YR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="660" y="0" width="50" height="15" uuid="70d851b7-9aef-42d6-80a5-fd8184eec8fe">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2f089b45-7869-42bc-bfac-3a6571b7a33d"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLR_PREV_YRS_INT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="860" y="0" width="50" height="15" uuid="1ea378b1-bb90-4cec-a7ac-bc8e49d3580d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d785fb47-7d7d-42f2-8629-71a315ea886d"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLR_CURR_YR_INT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="710" y="0" width="50" height="15" uuid="af4164b6-785e-4e8e-b468-79ab7272e34c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2e55e9af-16b8-4f74-bf4d-2a98b8e8ecb1"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLR_CURRENT_YEAR_CONTR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="810" y="0" width="50" height="15" uuid="37c9e385-71f9-4b7e-9d3c-7d7b00fe03b8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="eca2ed5c-2a6f-45c3-a1a8-bff7e7b67d4b"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLR_INT_ON_INT_PREV_YR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="610" y="0" width="50" height="15" uuid="3d4312ef-b23f-485c-af2f-1f3957fe9119">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4937ce7a-c337-4a93-80bd-5ba239a48ff4"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLR_PRE_YRS_CONTR}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="833" y="0" width="43" height="20" uuid="f423d992-7001-4d88-b0a3-e15c735a5c59">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="390" y="0" width="188" height="20" uuid="712d6140-54b5-4925-aea8-6dc86873b7b5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Sterling Pension Management System"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="876" y="0" width="30" height="20" uuid="c4b8e64d-396a-4756-9c7a-144078b62304">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="936" y="0" width="32" height="20" uuid="cc6a65f7-0617-4d5f-a9a5-9d009cea61ba">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="906" y="0" width="30" height="20" uuid="8e4bb72c-d326-48a0-97b6-7b5e6a4b3b33">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" of "]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMM d, yyyy">
+				<reportElement x="0" y="0" width="99" height="20" uuid="f80162e8-0386-4690-b02d-275a3868c32e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date:" +NOW()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="16">
+			<textField>
+				<reportElement x="302" y="1" width="50" height="15" uuid="af61ae56-3cdd-4bbd-a4d2-dde89722b9a1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Prev_yrs_Cont.}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="352" y="1" width="50" height="15" uuid="916ca1a1-0576-4da1-b17a-162d66819d7d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Prev_yrs_Int.}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="402" y="1" width="50" height="15" uuid="74e78554-ae7d-4fac-9ede-989d943a1050">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Curr_yr_Cont.}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="910" y="1" width="55" height="15" uuid="78ed090d-d597-49f3-b99c-6115447f9945">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Total_Cont}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="510" y="1" width="50" height="15" uuid="09469d50-df9a-429c-b144-f0a4aaf39b39">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Int_On}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="560" y="1" width="50" height="15" uuid="df6dd5d5-ceb3-4bda-b604-aa07f2b82ccb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Curr_Yr}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="452" y="1" width="50" height="15" uuid="be0cb413-e353-4ffa-aed8-e718927b46a9">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Cont_Int}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="0" width="100" height="15" uuid="815ff0f4-f823-42f6-bc7b-3043c03778c3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="610" y="1" width="50" height="15" uuid="a58a7686-e90b-4a23-9771-ae6f023ec0f8">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Emplr_Prev_yrs_Cont}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="760" y="1" width="50" height="15" uuid="b48322cf-3fc0-4d79-a33e-2337d6223c64">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Emplr_Cont_Int}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="710" y="1" width="50" height="15" uuid="808efa8d-2e5e-4873-a75a-1d333f4b3016">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Emplr_Curr_yr_Cont}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="660" y="1" width="50" height="15" uuid="f7947f96-0301-4538-85c9-b3ed8b7a44c5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Emplr_Prev_yrs_Int}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="860" y="1" width="50" height="15" uuid="6227cc31-2491-434a-8d26-9ad59e6cd412">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Emplr_Curr_Yr}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="810" y="1" width="50" height="15" uuid="803edbce-0ffd-495d-95c3-d40b4b9d68d2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_Emplr_Int_On}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

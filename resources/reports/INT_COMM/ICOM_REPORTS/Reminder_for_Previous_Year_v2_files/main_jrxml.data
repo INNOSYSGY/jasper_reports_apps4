@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Reminder for Previous Year" pageWidth="612" pageHeight="1008" columnWidth="542" leftMargin="35" rightMargin="35" topMargin="28" bottomMargin="12" uuid="b88caf06-1351-4f16-ae76-96d2a58bcc1f">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ICOM"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="icarter"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/INT_COMM/ICOM_REPORTS/Reminder_for_Previous_Year_v2_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/INT_COMM/ICOM_REPORTS/Reminder_for_Previous_Year_v2"/>
+	<parameter name="ADDR_TYPE" class="java.lang.Integer"/>
+	<parameter name="IND_ID" class="java.lang.Integer"/>
+	<parameter name="DECPERIOD_ID" class="java.lang.Integer"/>
+	<parameter name="END_DATE" class="java.lang.String"/>
+	<parameter name="ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="DATE_PREPARED" class="java.lang.String"/>
+	<parameter name="OPT" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT
+    'The Integrity Commission of Guyana reminds you of your statutory obligation as a Specified Person in Public Life as per Schedule 1 of the Integrity Commission Act. <b>Section 13 of the Integrity Commission Act, No. 20 of 1997, CAP 26:01 of the Laws of Guyana</b> requires you to file an <b>Annual Declaration</b> (as per <b>Form 2 of the Commission’s Act</b>) with the Commission in the capacity of <b>'|| a.positions ||'</b>.' par1,
+    'Kindly note, the records at the Integrity Commission reflect that your Declaration of Assets and Liabilities are outstanding for the following period:<ul><li><b>'|| a.declaration_period ||'</b></li></ul>' par2,
+    'Please submit the said declaration and any other outstanding declarations with the <b>Supporting Documentations</b> as specified in the attached <b>'|| a.opt ||'</b> to the Commission, on or before <b>'|| a.submission_date ||'</b>. This includes a Declaration of Assets and Liabilities for the relevant period as it relates to your Spouse, Children and associated person who may possesses assets within and outside of Guyana.<br><br> 
+    Your failure to comply with this notice is contrary to <b>Sections 13 and 18 of the Integrity Commission Act, No. 20 of 1997. The Integrity Commission hereby notifies you to rectify this outstanding status of your Declaration and any other outstanding Declaration(s) forthwith upon receipt of this correspondence</b>.<br><br> 
+    The Commission reminds you that your failure to file your declaration or furnish particulars will be subjected to <b>Section 19 of the Commission’s Act, No. 20 of 1997 which stipulates 
+    your name to be </b>published <b>in the Gazette and a daily newspaper.</b> Failure to file also constitutes an offence as per <b>Section 22 of the Commission’s Act, No. 20 of 1997. </b>
+    The offence stipulates in <b>Section 22</b> a fine of <b>twenty-five thousand Guyana Dollars (GYD $25,000) together with six (6) months nor more than one-year imprisonment term. </b>
+    Further failure constitutes a continuing offence and the person will be <b>fined ten thousand Guyana Dollars (GYD $10,000) for each day the offence continues.</b><br><br>
+    All for your information and guidance.<br><br>Respectfully yours,<br><br><br>___________________________ <br><b>Dr. Amanda Jaisingh<br>Secretary</b>' par3, 
+    a.*
+FROM(SELECT 
+(SELECT distinct
+        b.custom_field
+    FROM
+        intgrt_ref_lookup b
+    where upper(b.table_value)  = upper('IC')
+	) org_details,
+    a.id,
+    case when a.sex_code = 'M' then 'Mr. ' when a.sex_code = 'F' then 'Ms. ' end || ' ' || a.first_name ||' ' || a.surname declarant_name,
+    case when a.sex_code = 'M' then 'Mr. ' when a.sex_code = 'F' then 'Ms. ' end || a.surname salutation,
+    case  
+        when $P{ADDR_TYPE}  = 1 then 
+            f.custom_field 
+        else
+            b.lot || ' ' || 
+            nvl(b.street ||case when b.street is not null then '<br>' else null end, null) || 
+            nvl(b.village_ward || case when b.village_ward is not null then'<br>' else null end,null) || 
+            nvl(b.town || case when b.town is not null then '<br>' else null end, null) || 
+            nvl(b.county, null)
+    end as address,
+    to_char(d.income_state_start, 'fmMonth dd, yyyy') || ' to ' ||  to_char(d.income_state_end, 'fmMonth dd, yyyy')   declaration_period,
+    e.position_held || ' of the ' || e.organisation positions,
+    TO_CHAR(to_date($P{DATE_PREPARED}, 'dd-MON-yyyy'), 'fmMonth fmDD, YYYY') date_prepared,
+    TO_CHAR(to_date($P{END_DATE}, 'dd-MON-yyyy'), 'fmMonth fmDD, YYYY') submission_date,
+    case  --
+        when $P{OPT}  = 1 then 'Brochure'
+        else 'Checklist'
+    end as opt
+FROM
+         intgrt_ref_individual a
+    JOIN intgrt_ref_address       b ON a.id = b.ind_id
+    JOIN intgrt_dyn_declarehd     c ON a.id = c.ind_id
+    JOIN intgrt_ref_decperiod     d ON c.decperiod_id = d.id
+    JOIN intgrt_ref_indemphistory e ON a.id = e.ind_id
+    JOIN intgrt_ref_lookup f  on e.org_id = f.id
+WHERE
+    (b.end_date is null or b.end_date > trunc(sysdate))
+    AND e.to_date IS NULL
+    AND a.id = $P{IND_ID} 
+    AND e.org_id = $P{ORG_ID} 
+    --AND c.date_submitted IS NULL
+    AND c.decperiod_id =$P{DECPERIOD_ID} 
+ORDER BY
+    1) a]]>
+	</queryString>
+	<field name="PAR1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR1"/>
+	</field>
+	<field name="PAR2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR2"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR2"/>
+	</field>
+	<field name="PAR3" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR3"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR3"/>
+	</field>
+	<field name="ORG_DETAILS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_DETAILS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_DETAILS"/>
+	</field>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="DECLARANT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DECLARANT_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="DECLARANT_NAME"/>
+	</field>
+	<field name="SALUTATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALUTATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALUTATION"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="DECLARATION_PERIOD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DECLARATION_PERIOD"/>
+		<property name="com.jaspersoft.studio.field.label" value="DECLARATION_PERIOD"/>
+	</field>
+	<field name="POSITIONS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITIONS"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITIONS"/>
+	</field>
+	<field name="DATE_PREPARED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_PREPARED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_PREPARED"/>
+	</field>
+	<field name="SUBMISSION_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUBMISSION_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUBMISSION_DATE"/>
+	</field>
+	<field name="OPT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="OPT"/>
+		<property name="com.jaspersoft.studio.field.label" value="OPT"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="370">
+			<image>
+				<reportElement x="0" y="0" width="320" height="98" uuid="64da8cad-7009-4181-9bb2-8bff33454b1a"/>
+				<imageExpression><![CDATA["repo:icom_logo.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="110" width="540" height="21" forecolor="#FF0905" uuid="e8b90eae-3d23-479e-a5c4-7a5bfeb5dba1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[PRIVATE & CONFIDENTIAL]]></text>
+			</staticText>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="320" y="2" width="220" height="110" uuid="efd4ead6-3c19-4ff0-8a21-ac070f8cbda8"/>
+				<textElement markup="html">
+					<font size="12" isBold="true" isItalic="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_DETAILS}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="MMMMM dd, yyyy">
+				<reportElement positionType="Float" x="1" y="213" width="540" height="20" uuid="86adb9fa-ccd1-4a8c-8434-c1319aad72f1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="12" isBold="false" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_PREPARED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="1" y="350" width="540" height="20" uuid="1e7db957-848f-4c25-89bd-f5a228920cdd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="Single" lineSpacingSize="2.0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR3}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="1" y="163" width="540" height="20" uuid="57f8176a-a4bb-432a-96f1-5707b3851544">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="12" isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DECLARANT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="1" y="288" width="540" height="20" uuid="720df4df-42d0-42dd-8888-c3f98b47c3f9">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="Single" lineSpacingSize="2.0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR1}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="1" y="263" width="540" height="20" uuid="e56ed8e4-7d0a-47b8-811a-356f8f2878d0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" markup="html">
+					<font size="12" isBold="true" isUnderline="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Reminder Notice"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="1" y="238" width="540" height="20" uuid="58c33bc2-5e4b-469a-89c9-1cd06cfdb0eb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="12" isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dear "+$F{DECLARANT_NAME} + ","]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="1" y="313" width="540" height="20" uuid="1936df0d-e4c2-4d7b-9056-659f4e8db70a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" markup="html">
+					<font size="12" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="Single" lineSpacingSize="2.0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR2}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="1" y="188" width="540" height="20" uuid="d8e6a448-9a9a-4fc1-b78e-ea327e9401c3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="12" isBold="true" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="40">
+			<image>
+				<reportElement x="0" y="0" width="540" height="40" uuid="c3ba67c2-a190-4283-92c3-d2a09a794099"/>
+				<imageExpression><![CDATA["repo:icom_footer.png"]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+</jasperReport>

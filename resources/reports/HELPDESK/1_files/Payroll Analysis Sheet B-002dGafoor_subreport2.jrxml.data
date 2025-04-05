@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll Analysis Sheet B-Gafoor_subreport2" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="0d0075d0-04a6-4bf2-8ff4-da8d7a29d8fb">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/1"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/02_PAYROLL/1_files/Payroll Analysis Sheet B-Gafoor_subreport2.jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="Emp_id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Pay_slip_id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SALARY_CURRENCY" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select description, 
+    case when SALARY_CURRENCY='GYD' or SALARY_CURRENCY is null then round(sum(pd.Amount_deducted),0) else round(pkg_global_fnts.fn_curr_convert(pa.org_id,sum(pd.Amount_deducted), 'NO_TO_BASE',  'GYD',  SALARY_CURRENCY),2) end Amount_deducted
+	from PA_PMG_PAYROLLDEDUCTION pd join PA_PCF_ADMINDEDUCTION adm ON adm.id = pd.adm_deduction_id
+	join PA_PCF_DEDUCTIONCODE ded ON adm.expense_id = ded.id
+    join pa_pmg_payrolldtl pa on pa.id=pd.pay_slipno
+    left join hr_rcm_salary s on s.id=pa.salary_id
+	where
+	 (upper(ded.Who_Pays) ='EMPLOYEE' or upper(adm.Deduction_Type)='EMPLOYEE')
+        and pd.pay_slipno=$P{Pay_slip_id}
+and  ded.org_id=$P{P_ORG_ID}
+	group by description, SALARY_CURRENCY, pa.org_id]]>
+	</queryString>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DEDUCTED"/>
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="7" y="0" width="80" height="15" uuid="acaa7327-9056-42f7-b150-4b62c59d7652"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#">
+				<reportElement stretchType="RelativeToBandHeight" x="87" y="0" width="55" height="15" uuid="6e34ce01-a0ee-4e94-be6c-ddc57efe314b">
+					<printWhenExpression><![CDATA[$P{SALARY_CURRENCY}.equals("GYD")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;¤-#,##0.00">
+				<reportElement stretchType="RelativeToBandHeight" x="87" y="0" width="55" height="15" uuid="cde6d5f3-e016-4ab1-b677-2062f6443357">
+					<printWhenExpression><![CDATA[!$P{SALARY_CURRENCY}.equals("GYD")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

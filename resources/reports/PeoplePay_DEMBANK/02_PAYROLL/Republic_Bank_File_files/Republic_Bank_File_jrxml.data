@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Employee Bank Payments" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6a8be228-8acb-4049-bd0c-2dd0ff04b118">
+	<property name="ireport.zoom" value="1.3310000000000006"/>
+	<property name="ireport.x" value="13"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/Republic_Bank_File"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BANK" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[Select  to_char(e.period_start,'ddth fmMonth, yyyy') as period_start,
+ to_char(e.period_end,'ddth fmMonth, yyyy') as period_end,
+e.Emp_Company_No_Hist,
+initcap(e.Surname_Hist) Surname_Hist,
+upper(e.First_Name_Hist),
+ e.org_id,
+First_Name_Hist,
+G.End_Date,
+E.Net_Pay,
+replace(e.Bank_Account_No_HIST,'-','') Bank_Account_No_HIST,
+e.Org_Structure,
+E.ORG_ID,
+(Select Upper(BANK_ACCOUNT_NO)
+    From Hr_Hcf_Org_Rule
+    Where Org_Id=E.Org_Id
+    AND END_DATE IS NULL OR TRUNC(PERIOD_START) BETWEEN TRUNC(START_DATE) AND TRUNC(END_DATE)) salary_Account,
+    CASE WHEN
+        (select organisation_name
+        from hr_hcf_organisation o
+        where o.id = ( select o.parent_org_id from hr_hcf_organisation o where n.bank_branch_id = o.id)) is null
+        THEN 'Republic Bank Guyana Ltd'
+        WHEN (select organisation_name
+        from hr_hcf_organisation o
+        where o.id = ( select o.parent_org_id from hr_hcf_organisation o where n.bank_branch_id = o.id)) is not null
+        THEN
+        'Republic Bank Guyana Ltd'
+--        (select organisation_name
+--        from hr_hcf_organisation o
+--        where o.id = ( select o.parent_org_id from hr_hcf_organisation o where n.bank_branch_id = o.id))
+        end bank_branch_name
+
+
+
+
+
+
+    From Pa_Pmg_Payrolldtl E Join	Pa_Pcf_Earningperiod G On G.Id=E.Earnings_Period_Id
+    join hr_rcm_employee emp on e.emp_id=emp.id
+    join hr_rcm_individual n on emp.ind_id=n.id
+    WHERE E.PAY_STATUS IN ('CR','AR')
+    And upper(E.EARNINGS_PERIOD_ID)=$P{EARNINGS_PERIOD_ID}
+    AND upper(E.PAYMENT_MODE_HIST)='BANK'
+
+
+    and n.bank_branch_id
+    in (
+
+    select ID
+    from hr_hcf_organisation
+    where organisation_type='BANK'
+    and short_name like 'RBGL%'
+    and id=CASE WHEN $P{BANK}=9999 THEN n.bank_branch_id ELSE  $P{BANK} END
+
+    )]]>
+	</queryString>
+	<field name="PERIOD_START" class="java.lang.String"/>
+	<field name="PERIOD_END" class="java.lang.String"/>
+	<field name="EMP_COMPANY_NO_HIST" class="java.lang.String"/>
+	<field name="SURNAME_HIST" class="java.lang.String"/>
+	<field name="UPPER(E.FIRST_NAME_HIST)" class="java.lang.String"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="FIRST_NAME_HIST" class="java.lang.String"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="NET_PAY" class="java.math.BigDecimal"/>
+	<field name="BANK_ACCOUNT_NO_HIST" class="java.lang.String"/>
+	<field name="ORG_STRUCTURE" class="java.lang.String"/>
+	<field name="SALARY_ACCOUNT" class="java.lang.String"/>
+	<field name="BANK_BRANCH_NAME" class="java.lang.String"/>
+	<sortField name="SURNAME_HIST"/>
+	<sortField name="FIRST_NAME_HIST"/>
+	<variable name="Total_netpay" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{NET_PAY}]]></variableExpression>
+		<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+	</variable>
+	<variable name="Seq" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[1.0]]></variableExpression>
+		<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="97" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="57" uuid="405e9e39-8df7-437e-9bc3-56f1679b0ef7"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement x="0" y="57" width="555" height="20" uuid="cd6caa10-bad8-44fe-b015-e54e6a1266a5"/>
+				<textElement textAlignment="Center" markup="html">
+					<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Payroll Period: " + $F{PERIOD_START}+" to "+$F{PERIOD_END}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="77" width="555" height="20" uuid="242e6252-caf1-4269-9117-4151b8452fb5"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BANK_BRANCH_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="151" height="15" uuid="18ffe70f-b1c9-4e98-befe-af65eb643b4c"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Employee Last Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="151" y="0" width="123" height="15" uuid="5ee56140-68ca-4a4c-a915-87255d71031d"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Employee First Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="274" y="0" width="121" height="15" uuid="d8330b94-b783-4c22-9aa5-53480a274013"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="25"/>
+				</textElement>
+				<text><![CDATA[RBGL Account]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="395" y="0" width="160" height="15" uuid="24c80a59-bec1-48bc-8c4a-cf852e3c349a"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Net Pay]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="151" height="15" isRemoveLineWhenBlank="true" uuid="0ef15c16-7e7f-4a02-b79b-62eb02fbbad6"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SURNAME_HIST}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="151" y="0" width="123" height="15" uuid="8a036a50-f6a8-4296-b50a-d83a7d6f20a1"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME_HIST}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="274" y="0" width="121" height="15" uuid="2bffb422-99c6-42d1-af28-6ab1453f4e92"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10"/>
+					<paragraph rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BANK_ACCOUNT_NO_HIST}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="395" y="0" width="160" height="15" uuid="ed530d5b-909b-44e1-bb1e-6ec7c4c50d0a"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NET_PAY}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="97" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="274" y="0" width="121" height="15" uuid="edda9a85-994c-48f0-b40c-21d995c879e4"/>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Total Salary"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="395" y="0" width="160" height="15" uuid="1d26d25a-b913-42f5-804b-359b87bc5d38"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_netpay}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="264" y="15" width="242" height="1" uuid="af643811-21e1-4b46-9e34-ac8234b6edbe"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="67" width="151" height="15" uuid="63b47c72-9c27-413e-8fdd-8cece9457414"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[...................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="404" y="67" width="151" height="15" uuid="ecd17aff-2edd-43a0-8284-72c0bd26fd3d"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[...................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="39" width="151" height="15" uuid="a3e6aef3-8fbc-472a-8bb4-52959a8fa802"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Prepared By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="395" y="39" width="160" height="15" uuid="e34ba731-66a7-438c-8e12-18a816bf6c6d"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Approved By]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

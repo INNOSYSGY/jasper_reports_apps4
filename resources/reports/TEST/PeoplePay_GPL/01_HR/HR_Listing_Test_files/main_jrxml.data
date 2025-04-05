@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR Listing" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0a8de01a-212c-4a1a-901d-d9db1a9d92ae">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="gpl_peoplepay_cloud"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GPL/01_HR/HR_Listing_Test_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GPL/01_HR/HR_Listing_Test"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Testing Report Creation showing Listing of Employes-Parameter Employment Class"/>
+	<parameter name="Employment_Class" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT 
+A.ORG_ID,
+B.FIRST_NAME,B.SURNAME ,
+DECODE(B.FIRST_NAME,NULL,B.SURNAME,B.FIRST_NAME||' '||B.SURNAME) FULL_NAME,
+DECODE(B.SEX_CODE,'F','FEMALE','M','MALE','NO SEX') SEX,POSITION_NAME
+FROM HR_RCM_EMPLOYEE A
+JOIN hr_rcm_individual B ON A.IND_ID=B.ID
+WHERE UPPER(REPLACE(A.EMPLOYMENT_CLASS,' ','')) LIKE '%'||UPPER($P{Employment_Class})||'%']]>
+	</queryString>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="FULL_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FULL_NAME"/>
+	</field>
+	<field name="SEX" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SEX"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<sortField name="SEX"/>
+	<sortField name="SURNAME"/>
+	<sortField name="FIRST_NAME"/>
+	<variable name="FULL_NAME1" class="java.lang.Integer" resetType="Group" resetGroup="Gender1" calculation="DistinctCount">
+		<variableExpression><![CDATA[$F{FULL_NAME}]]></variableExpression>
+	</variable>
+	<variable name="FULL_NAME2" class="java.lang.Integer" calculation="DistinctCount">
+		<variableExpression><![CDATA[$F{FULL_NAME}]]></variableExpression>
+	</variable>
+	<group name="Gender1" isStartNewPage="true" isReprintHeaderOnEachPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{SEX}]]></groupExpression>
+		<groupHeader>
+			<band height="36">
+				<textField>
+					<reportElement x="30" y="0" width="100" height="30" uuid="10fc6eb9-a9af-4411-8e8f-97c6e5b4e7a7"/>
+					<textFieldExpression><![CDATA[$F{SEX}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="37">
+				<textField>
+					<reportElement x="270" y="0" width="100" height="30" uuid="abb4924a-1f9f-4548-a3f0-f9d6fb8f75b7"/>
+					<textFieldExpression><![CDATA[$V{FULL_NAME1}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="130" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="560" height="60" uuid="b29a4c45-7768-46dc-aa7c-e328a1ea6984"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement x="330" y="90" width="230" height="30" uuid="25519286-002b-42fd-8224-109ffe97b488"/>
+				<textFieldExpression><![CDATA["Employment Class"+$P{Employment_Class}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="16" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="30" uuid="481a9734-8675-436d-9dfb-8650fdc12f71">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4ed12a95-75ea-41bc-b4ef-def3355c6f92"/>
+				</reportElement>
+				<text><![CDATA[FULL_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="140" y="0" width="100" height="30" uuid="ff235fd5-9b64-4582-bfff-ecdcadd20f44">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bf26a56d-f0f7-4fdf-8460-8cf62ffc3a18"/>
+				</reportElement>
+				<text><![CDATA[POSITION_NAME]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="35" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="0" y="0" width="140" height="15" uuid="d501999e-c8d3-4e6a-923e-c9d0f075ead2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4ed12a95-75ea-41bc-b4ef-def3355c6f92"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FULL_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="140" y="0" width="180" height="15" isPrintWhenDetailOverflows="true" uuid="4d2d4671-badf-4ef0-8e4b-8de05a222f18">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bf26a56d-f0f7-4fdf-8460-8cf62ffc3a18"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="371" y="5" width="189" height="30" uuid="7698a034-4ed0-46f3-8f2b-c5eb856ee536"/>
+				<textFieldExpression><![CDATA[($F{SURNAME}+" "+$F{FIRST_NAME}).toUpperCase()+" Sex-"+$F{SEX}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="6">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="545" height="1" uuid="402d2db8-83f4-4621-be45-ab9a3731ca0c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch">
+			<textField>
+				<reportElement x="273" y="12" width="100" height="30" uuid="ba7dd36a-e4ca-4e79-b824-130c817da40b"/>
+				<textFieldExpression><![CDATA[$V{FULL_NAME2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

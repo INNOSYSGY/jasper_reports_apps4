@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Job Desc" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2bcdda60-6038-448b-b896-00b056f50f88">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="24"/>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+job_code,initcap(description) description,
+start_date,end_date,
+initcap(job_classification) job_classification,
+initcap(designation_category)designation_category,
+initcap(job_description) job_description,
+required_skill,
+org_address,faxnum, telnum, nis_reg_no, tax_reg_no,
+organisation_name,
+ho.photo org_photo
+from hr_hcf_job j
+cross join ( select ho.address org_address, ho.faxnum, ho.telnum, nis_reg_no, tax_reg_no,
+ho.organisation_name,photo
+from vw_main_software_org ho
+) ho
+where j.id=$P{ID}]]>
+	</queryString>
+	<field name="JOB_CODE" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="START_DATE" class="java.sql.Timestamp"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="JOB_CLASSIFICATION" class="java.lang.String"/>
+	<field name="DESIGNATION_CATEGORY" class="java.lang.String"/>
+	<field name="JOB_DESCRIPTION" class="java.lang.String"/>
+	<field name="REQUIRED_SKILL" class="java.lang.String"/>
+	<field name="ORG_ADDRESS" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="NIS_REG_NO" class="java.lang.String"/>
+	<field name="TAX_REG_NO" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="ORG_PHOTO" class="java.io.InputStream"/>
+	<group name="Job" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{JOB_CODE}]]></groupExpression>
+		<groupHeader>
+			<band height="79">
+				<textField>
+					<reportElement uuid="32be0381-d110-4fc7-b475-c5372e2e3001" x="0" y="15" width="572" height="15"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ORG_ADDRESS}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="cc7064b9-2913-4c9a-9b72-6c5a03de2e4e" x="0" y="45" width="572" height="15"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Fax No. '+ $F{FAXNUM}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="e07f54fa-8960-4507-b1a6-678d4c839a52" x="0" y="0" width="572" height="15"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="cd580fa8-9d13-4220-908d-95267d767b3a" x="0" y="30" width="572" height="15"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Tel No. '+  $F{TELNUM}]]></textFieldExpression>
+				</textField>
+				<image scaleImage="FillFrame" hAlign="Left" onErrorType="Blank">
+					<reportElement uuid="508e479c-3e68-4120-abcd-6416dc296f2e" x="0" y="0" width="173" height="74"/>
+					<imageExpression><![CDATA[$F{ORG_PHOTO}]]></imageExpression>
+				</image>
+				<line>
+					<reportElement uuid="a7bd4b85-e93e-467e-955e-81c9137800ac" x="0" y="75" width="572" height="1"/>
+					<graphicElement>
+						<pen lineWidth="2.0"/>
+					</graphicElement>
+				</line>
+			</band>
+			<band height="45">
+				<staticText>
+					<reportElement uuid="089b847c-5467-4574-9df6-9d312e83bd7e" x="0" y="20" width="60" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Code:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="04bc5a8b-158e-4b3d-9bc5-818ff58e0d07" x="281" y="0" width="100" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Classification:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="ec32b43a-c69d-46de-92ef-da29bf971888" x="0" y="0" width="60" height="20"/>
+					<textElement verticalAlignment="Middle" markup="none">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Job Name:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="5b2d9e17-5a0c-4f71-8ade-7d87c765fe95" x="281" y="20" width="100" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Category:]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="0f679772-8ef6-4bc5-bb95-0cbcc68bad60" x="381" y="0" width="174" height="20"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{JOB_CLASSIFICATION}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="487a610f-10c0-4a9d-809f-ecab1441ae7e" x="381" y="20" width="174" height="20"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{DESIGNATION_CATEGORY}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="ad38077f-1a5c-4ef5-8044-6346921bbc8c" x="60" y="0" width="221" height="20"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="b6529d57-9087-4731-a934-491291c34669" x="60" y="20" width="221" height="20"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{JOB_CODE}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="102">
+				<staticText>
+					<reportElement uuid="2f7b78d0-f872-471b-a9ea-f6e2086762e2" x="0" y="0" width="100" height="20"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Description:]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="8dd79fe9-11c4-4758-92fd-b4be85c8570a" x="0" y="20" width="572" height="74" isPrintWhenDetailOverflows="true"/>
+					<textElement textAlignment="Justified" markup="html">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{JOB_DESCRIPTION}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="165">
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="a0c90faf-d59a-48d0-acd6-e996168199b8" x="0" y="36" width="572" height="128"/>
+					<textElement textAlignment="Justified" markup="html">
+						<font fontName="Arial" size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{REQUIRED_SKILL}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="d8437ce8-061b-4f1f-b6b7-2f205ca204d1" x="0" y="8" width="100" height="20"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Required Skills:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf" x="1" y="2" width="571" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC"/>
+			</rectangle>
+			<textField evaluationTime="Report">
+				<reportElement uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0" x="509" y="2" width="63" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="d542132f-c136-4dc8-8760-3f15164318a0" x="1" y="2" width="161" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="b2a773d7-a277-4610-901a-ea782d2775b0" x="1" y="17" width="571" height="15"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9" x="409" y="2" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

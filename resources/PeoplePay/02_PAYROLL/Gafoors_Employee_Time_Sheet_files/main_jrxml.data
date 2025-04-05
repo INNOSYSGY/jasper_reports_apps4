@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Gafoors Employee Time Sheet" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5060fc96-3fa2-4b99-ad96-8a2ee2adfe7a">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<subDataset name="test" uuid="124e3c80-1f45-4b3b-ba8a-623167541348">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors"/>
+		<queryString language="SQL">
+			<![CDATA[select tu.emp_id
+, tu.emp_company_no
+, tu.full_name
+, fro.position_name
+, tu.work_location_name Departments
+, wl.location_description
+, tu.payroll_hours Regular_Hours
+, tu.total_hours
+, tu.over_time
+, tu.double_time
+, tu.time_lost
+from hr_att_timeclock_upload tu
+join hr_rcm_employee emp on tu.emp_id=emp.id
+join hr_hcf_worklocation wl on emp.position_location_id= wl.id
+join hr_hcf_worklocationposition F on wl.id= F.id
+join hr_hcf_position fro on F.position_id=fro.id
+order by emp_company_no asc]]>
+		</queryString>
+		<field name="EMP_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+		</field>
+		<field name="EMP_COMPANY_NO" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+		</field>
+		<field name="FULL_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="FULL_NAME"/>
+		</field>
+		<field name="POSITION_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+		</field>
+		<field name="DEPARTMENTS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="DEPARTMENTS"/>
+		</field>
+		<field name="LOCATION_DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="LOCATION_DESCRIPTION"/>
+		</field>
+		<field name="REGULAR_HOURS" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="REGULAR_HOURS"/>
+		</field>
+		<field name="TOTAL_HOURS" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="TOTAL_HOURS"/>
+		</field>
+		<field name="OVER_TIME" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="OVER_TIME"/>
+		</field>
+		<field name="DOUBLE_TIME" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="DOUBLE_TIME"/>
+		</field>
+		<field name="TIME_LOST" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="TIME_LOST"/>
+		</field>
+		<group name="EMP_ID">
+			<groupExpression><![CDATA[$F{EMP_ID}]]></groupExpression>
+		</group>
+		<group name="EMP_COMPANY_NO">
+			<groupExpression><![CDATA[$F{EMP_COMPANY_NO}]]></groupExpression>
+		</group>
+		<group name="FULL_NAME">
+			<groupExpression><![CDATA[$F{FULL_NAME}]]></groupExpression>
+		</group>
+		<group name="POSITION_NAME">
+			<groupExpression><![CDATA[$F{POSITION_NAME}]]></groupExpression>
+		</group>
+		<group name="DEPARTMENTS">
+			<groupExpression><![CDATA[$F{DEPARTMENTS}]]></groupExpression>
+		</group>
+		<group name="LOCATION_DESCRIPTION">
+			<groupExpression><![CDATA[$F{LOCATION_DESCRIPTION}]]></groupExpression>
+		</group>
+		<group name="REGULAR_HOURS">
+			<groupExpression><![CDATA[$F{REGULAR_HOURS}]]></groupExpression>
+		</group>
+		<group name="TOTAL_HOURS">
+			<groupExpression><![CDATA[$F{TOTAL_HOURS}]]></groupExpression>
+		</group>
+		<group name="OVER_TIME">
+			<groupExpression><![CDATA[$F{OVER_TIME}]]></groupExpression>
+		</group>
+		<group name="DOUBLE_TIME">
+			<groupExpression><![CDATA[$F{DOUBLE_TIME}]]></groupExpression>
+		</group>
+		<group name="TIME_LOST">
+			<groupExpression><![CDATA[$F{TIME_LOST}]]></groupExpression>
+		</group>
+	</subDataset>
+	<subDataset name="Dataset1" uuid="be2276c3-b664-4553-ae62-6ac0e3956b2a">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors"/>
+		<queryString language="SQL">
+			<![CDATA[select tu.emp_id, rownum
+, tu.emp_company_no
+, tu.full_name
+, fro.position_name
+,tu.work_date
+, tu.work_location_name Departments
+, wl.location_description
+, tu.payroll_hours Regular_Hours
+, tu.total_hours
+, tu.over_time
+, tu.double_time
+, tu.time_lost
+from hr_att_timeclock_upload tu
+join hr_rcm_employee emp on tu.emp_id=emp.id
+join hr_hcf_worklocation wl on emp.position_location_id= wl.id
+join hr_hcf_worklocationposition F on wl.id= F.id
+join hr_hcf_position fro on F.position_id=fro.id
+order by emp_company_no asc]]>
+		</queryString>
+		<field name="ROWNUM" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+		<field name="EMP_COMPANY_NO" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+		</field>
+		<field name="FULL_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="FULL_NAME"/>
+		</field>
+		<field name="POSITION_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+		</field>
+		<field name="WORK_DATE" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.label" value="WORK_DATE"/>
+		</field>
+		<field name="DEPARTMENTS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="DEPARTMENTS"/>
+		</field>
+		<field name="LOCATION_DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="LOCATION_DESCRIPTION"/>
+		</field>
+		<field name="REGULAR_HOURS" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="REGULAR_HOURS"/>
+		</field>
+		<field name="TOTAL_HOURS" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="TOTAL_HOURS"/>
+		</field>
+		<field name="OVER_TIME" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="OVER_TIME"/>
+		</field>
+		<field name="DOUBLE_TIME" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="DOUBLE_TIME"/>
+		</field>
+		<field name="TIME_LOST" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="TIME_LOST"/>
+		</field>
+		<field name="EMP_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+		</field>
+		<group name="ROWNUM">
+			<groupExpression><![CDATA[$F{ROWNUM}]]></groupExpression>
+		</group>
+		<group name="FULL_NAME">
+			<groupExpression><![CDATA[$F{FULL_NAME}]]></groupExpression>
+		</group>
+		<group name="POSITION_NAME">
+			<groupExpression><![CDATA[$F{POSITION_NAME}]]></groupExpression>
+		</group>
+		<group name="WORK_DATE">
+			<groupExpression><![CDATA[$F{WORK_DATE}]]></groupExpression>
+		</group>
+		<group name="REGULAR_HOURS">
+			<groupExpression><![CDATA[$F{REGULAR_HOURS}]]></groupExpression>
+		</group>
+		<group name="OVER_TIME">
+			<groupExpression><![CDATA[$F{OVER_TIME}]]></groupExpression>
+		</group>
+		<group name="DOUBLE_TIME">
+			<groupExpression><![CDATA[$F{DOUBLE_TIME}]]></groupExpression>
+		</group>
+		<group name="TIME_LOST">
+			<groupExpression><![CDATA[$F{TIME_LOST}]]></groupExpression>
+		</group>
+	</subDataset>
+	<parameter name="FROM " class="java.lang.String"/>
+	<parameter name="TO" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select
+rownum
+,emp.emp_company_no AS Employee_No
+, tu.full_name Employee_Name
+,sum(case when tu.time_in is not null then 1 else 0 end) Days_Worked
+,max( fro.position_name) Designation
+, max(tu.work_location_name) Departments
+, sum(tu.payroll_hours)Total_Hours
+, sum(tu.over_time)Total_Overtime
+, sum(tu.double_time)Total_Doubletime
+,sum(tu.time_lost)Total_Absent_Hours
+from hr_att_timeclock_upload tu
+join hr_rcm_employee emp on tu.emp_id=emp.id
+join hr_hcf_worklocation wl on emp.position_location_id= wl.id
+join hr_hcf_worklocationposition F on wl.id= F.id
+join hr_hcf_position fro on F.position_id=fro.id
+--where tu.emp_id= 14562
+--where tu.full_name like '%&Username%'--(case when '&Username' is not null then tu.full_name else '&Username' end)
+--and emp.emp_company_no =(case when emp.emp_company_no is not null then  &emp_company_no. else emp.emp_company_no end)
+--and tu.work_location_name =(case when emp_company_no is null then &Department else emp_company_no end)
+group by emp.emp_company_no, rownum,
+tu.full_name
+order by rownum
+--tu.work_date--, emp.emp_company_no||'('||tu.emp_id||')', '(', tu.emp_id, ')',
+--'(', tu.emp_id, ')', '(', tu.emp_id,
+--')', '(', tu.emp_id, ')', tu.full_name,
+--fro.position_name, tu.work_location_name]]>
+	</queryString>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="ROWNUM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="FULL_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FULL_NAME"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="WORK_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="WORK_DATE"/>
+	</field>
+	<field name="DEPARTMENTS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENTS"/>
+	</field>
+	<field name="LOCATION_DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LOCATION_DESCRIPTION"/>
+	</field>
+	<field name="REGULAR_HOURS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="REGULAR_HOURS"/>
+	</field>
+	<field name="TOTAL_HOURS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_HOURS"/>
+	</field>
+	<field name="OVER_TIME" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="OVER_TIME"/>
+	</field>
+	<field name="DOUBLE_TIME" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DOUBLE_TIME"/>
+	</field>
+	<field name="TIME_LOST" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TIME_LOST"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="22" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="99" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="5" width="802" height="25" uuid="49e67e0d-83a6-43e3-8c94-27a155ac0e7b"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[GAFSONS INDUSTRIES LIMITED ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="24" width="802" height="25" uuid="b088fb3f-4e64-480b-95d6-70416f21fbbf"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[EMPLOYEE SUMMARY TIME SHEET]]></text>
+			</staticText>
+			<textField pattern="MMM d, yyyy">
+				<reportElement x="317" y="60" width="113" height="30" uuid="3e208716-ba18-4ea8-8538-f987abbb464b"/>
+				<textFieldExpression><![CDATA[$P{FROM }]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMM d, yyyy">
+				<reportElement x="471" y="60" width="109" height="30" uuid="e59745a6-b6ac-4b54-b755-3ff634059665"/>
+				<textFieldExpression><![CDATA[$P{TO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="283" y="60" width="65" height="31" uuid="60eba6d3-b1c2-40c4-b8b3-f30666f231c7"/>
+				<text><![CDATA[FROM:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="452" y="60" width="65" height="31" uuid="0c9a704d-49f2-45af-898b-a9901eb6c35c"/>
+				<text><![CDATA[TO:]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="133" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="800" height="1" uuid="2c32142d-81ca-45ba-b6f3-6840c8cb1b18"/>
+			</line>
+			<line>
+				<reportElement x="0" y="45" width="800" height="1" uuid="3ab7fab1-24f6-488e-9de8-e94ecada6fdf"/>
+			</line>
+			<line>
+				<reportElement x="50" y="1" width="1" height="45" uuid="3bb816ee-ed0e-439b-b2ad-137f0816cfc1"/>
+			</line>
+			<line>
+				<reportElement x="125" y="1" width="1" height="45" uuid="38e66736-4dec-4aee-b000-f2eb17a5071c"/>
+			</line>
+			<line>
+				<reportElement x="362" y="0" width="1" height="45" uuid="49ced2c1-29b0-42ec-a11e-824c74d2b8b8"/>
+			</line>
+			<line>
+				<reportElement x="439" y="0" width="1" height="45" uuid="9eef9f6e-924d-464c-a10d-0ce8cfd3eae0"/>
+			</line>
+			<line>
+				<reportElement x="620" y="0" width="1" height="45" uuid="49a80653-ae04-4a04-bb90-04a1d7f86dd4"/>
+			</line>
+			<line>
+				<reportElement x="800" y="0" width="1" height="45" uuid="237b41cf-7408-4b23-983f-7a16e1f52f6b"/>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="1" height="45" uuid="414bce32-c59a-4eb3-a467-14c75ecc2fea"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="1" width="50" height="44" uuid="dd90ed00-469e-468f-b98e-a320762aa0e3"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="1" width="75" height="44" uuid="1baa4f6d-ab7a-427d-87e9-1021dc89d2f7"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emp #:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="256" y="0" width="106" height="44" uuid="2381846b-9a4c-47d1-9b2a-c00f588889b7"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Designation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="359" y="0" width="80" height="44" uuid="ee85184d-ac97-4e38-a029-f5de354fdda0"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Days Worked]]></text>
+			</staticText>
+			<line>
+				<reportElement x="439" y="19" width="181" height="1" uuid="aae6651c-0d1b-4e7d-946f-51fee3f7202d"/>
+			</line>
+			<line>
+				<reportElement x="621" y="19" width="179" height="1" uuid="1bb2387b-aed6-4700-abf8-86ced0abfc5b"/>
+			</line>
+			<line>
+				<reportElement x="256" y="1" width="1" height="45" uuid="befd12cf-8352-4905-9ef9-168be3940234"/>
+			</line>
+			<staticText>
+				<reportElement x="126" y="1" width="127" height="44" uuid="27cbd107-0814-4ba7-a8da-bf0a2d79d17a"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee Name ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="560" y="20" width="1" height="25" uuid="57348a1b-5e52-410f-8967-146490fbf02e"/>
+			</line>
+			<line>
+				<reportElement x="500" y="19" width="1" height="26" uuid="6cb6d75c-897e-4d42-b8f6-0825ec86640c"/>
+			</line>
+			<staticText>
+				<reportElement x="440" y="2" width="180" height="20" uuid="a0fa55fd-fa5a-4e9b-b227-3736b1ed38a6"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Hrs]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="620" y="0" width="180" height="20" uuid="d2ccb406-7adf-426d-a472-747211623dd1"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Hrs. Deducted ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="440" y="21" width="60" height="22" uuid="d124d058-3880-40a3-9113-15aedb2d6fc2"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Reg.Hrs]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="621" y="22" width="179" height="22" uuid="0c83d6fa-9a84-4423-bed2-ba8e4ce440de"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Absence]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="47" width="170" height="22" uuid="1871e1bc-37df-4640-be5b-58fc6a73c93c"/>
+				<text><![CDATA[WORK LOCATION: ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="68" width="170" height="22" uuid="316600a8-7e6f-4873-a2ea-6f07196137f0"/>
+				<text><![CDATA[DEPARTMENT:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="90" width="800" height="1" uuid="71b352f9-587d-4879-9077-3a91dac6ca57"/>
+			</line>
+			<line>
+				<reportElement x="50" y="91" width="1" height="34" uuid="75ea185d-be84-4ce9-aac8-6161c85f62cb"/>
+			</line>
+			<line>
+				<reportElement x="125" y="90" width="1" height="34" uuid="c0641d19-9acb-4af4-a65b-68df97ed55a0"/>
+			</line>
+			<line>
+				<reportElement x="439" y="90" width="1" height="33" uuid="b22a471e-d441-42bf-8858-aed193517319"/>
+			</line>
+			<line>
+				<reportElement x="362" y="90" width="1" height="33" uuid="b604be9d-9ee7-4183-a0c5-da7507abfe06"/>
+			</line>
+			<line>
+				<reportElement x="258" y="90" width="1" height="33" uuid="0237cf1f-5249-464e-a7c5-e16e73af4003"/>
+			</line>
+			<line>
+				<reportElement x="621" y="90" width="1" height="33" uuid="dc778ccd-9d66-4517-8f55-407cee5f4941"/>
+			</line>
+			<line>
+				<reportElement x="501" y="90" width="1" height="34" uuid="328bdc37-5d17-4c90-89c2-82311eaaa29b"/>
+			</line>
+			<line>
+				<reportElement x="560" y="90" width="1" height="34" uuid="8896d048-fe47-43d1-a7d3-c41e3fe91bea"/>
+			</line>
+			<line>
+				<reportElement x="800" y="90" width="1" height="34" uuid="d8004634-fa91-4d46-8c28-3d4692dc13f9"/>
+			</line>
+			<line>
+				<reportElement x="0" y="123" width="799" height="1" uuid="ffb52d0d-5b9d-4d0e-9fe1-2b16694c643b"/>
+			</line>
+			<line>
+				<reportElement x="0" y="91" width="1" height="32" uuid="99ddf827-db9a-4c9e-8571-d9d02a8d0685"/>
+			</line>
+			<textField>
+				<reportElement x="55" y="93" width="62" height="30" uuid="617658fe-c33b-47f9-bad2-262f5e86ced5"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{EMP_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="105" y="93" width="16" height="14" uuid="76ec0d17-8bd5-4f5c-840a-1d8c65c04eb9"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{ROWNUM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="107" y="92" width="20" height="24" uuid="d6dabe06-100c-4784-aa1c-34bb39978c30"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[(   )]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="128" y="91" width="128" height="30" uuid="09d82c64-675b-40dd-ae5a-aa6a37c7d5af"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{FULL_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="76" y="68" width="100" height="21" uuid="fe9413b0-107d-435b-bb3e-2516064d13b2"/>
+				<textFieldExpression><![CDATA[$F{DEPARTMENTS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="47" width="168" height="13" uuid="c1bf6bc0-22bd-48a9-9b2b-09b6567823b9"/>
+				<textFieldExpression><![CDATA[$F{LOCATION_DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="256" y="93" width="111" height="30" uuid="2dcc4be4-23ea-498e-84b8-87da848bd1b1"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="365" y="93" width="75" height="30" uuid="a6278994-b455-47b9-94ec-90d0fc32b7e0"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{WORK_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="440" y="93" width="60" height="28" uuid="2cc4010d-3057-4670-bdbd-59f831581d5b"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{REGULAR_HOURS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="92" width="50" height="30" uuid="ecd16299-4249-47bb-9d8b-faa9cc90fc68"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{ROWNUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="622" y="91" width="178" height="30" uuid="55666e3c-424c-4dde-b324-eb0675c9ba29"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{TIME_LOST}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="500" y="91" width="60" height="32" uuid="7228a465-f9fc-4d50-9842-36b9ddcb1964"/>
+				<textFieldExpression><![CDATA[$F{OVER_TIME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="500" y="21" width="60" height="24" uuid="fa235d64-da06-4b90-9459-fbe7569ea422"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[HR*1.5]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="560" y="92" width="61" height="30" uuid="75c06b2e-0e7c-4ea1-b255-f6a9fa407572"/>
+				<textFieldExpression><![CDATA[$F{DOUBLE_TIME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="560" y="21" width="60" height="22" uuid="538cc61e-b42d-4a20-96ce-85fb1152636b"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[HR*2]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="20" width="802" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="9eebb105-4fd9-46ae-ae81-af9335d8c220"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="35" width="802" height="15" uuid="6b473fce-793f-42b6-849f-35dd5dad4ab0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="720" y="21" width="50" height="13" uuid="1710a9f8-51c3-4ed2-a1ce-3329c079d974"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="769" y="21" width="31" height="13" uuid="9aaa04ee-ba57-4dc1-9b2e-7e8e9f83b04d"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="5" y="20" width="162" height="13" uuid="309dfa2f-1518-49e7-930c-cbfa397047dd"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Requision To Purchase (RTP)" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="04e4b646-e28a-403e-aa11-d4990131f38b">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/RTP_01"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="5c5fa56f-63ee-4e41-a7e2-0115d2ac6195"/>
+	<parameter name="P_PURCHASE_REQ_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT RP.PURCHASE_REQ_ID,RPO.LINE_ID,RPO.QUANTITY_REQUESTED,RPO.RTP_COST,RPO.REMARKS,
+RPO.DESCRIPTION ITEM_DESCRIPTION,RPO.DRUG_STRENGTH,
+DECODE(RPO.DRUG_STRENGTH,NULL,RPO.DESCRIPTION ,RPO.DESCRIPTION||' '||RPO.DRUG_STRENGTH) ALTERNATIVE_DESCRIPTION,
+RPO.UOM,RPO.MARKET_PRICE,rtp_cost,
+RPO.ORGANIZATION_ID,RPO.INVENTORY_ITEM_ID,RP.PRE_APPROVED_AMT,'EX-CODE' EXPENSE_ACCOUNT,
+(SELECT UNIT_NAME
+FROM VW_ORGANISATION_STRUCTURE R
+where r.id=RP.DEPARTMENT_NAME) Department_name,
+(SELECT FULL_USER_NAME
+FROM VW_USER_NAME
+where employee_no=RP.REQUESTER)
+REQUESTER,
+RP.REQUISITION_DATE,RP.STATUS,
+COMPANY_NAME,VILLAGE_TOWN||', '||DISTRICT||', '||COUNTRY ADDRESS,EMAIL,
+                        'Tel# '||TELEPHONE_NOS Telphone, 'Fax # '||FAX_NOS FAX
+FROM TBLPURCHASEREQ RP
+INNER JOIN TBLPURCHASEREQLINES RPO ON RP.PURCHASE_REQ_ID=RPO.PURCHASE_REQ_ID
+CROSS JOIN TBLSYSTEMCONFIGURATION
+where RP.PURCHASE_REQ_ID=$P{P_PURCHASE_REQ_ID}]]>
+	</queryString>
+	<field name="PURCHASE_REQ_ID" class="java.math.BigDecimal"/>
+	<field name="LINE_ID" class="java.math.BigDecimal"/>
+	<field name="QUANTITY_REQUESTED" class="java.math.BigDecimal"/>
+	<field name="RTP_COST" class="java.math.BigDecimal"/>
+	<field name="REMARKS" class="java.lang.String"/>
+	<field name="ITEM_DESCRIPTION" class="java.lang.String"/>
+	<field name="DRUG_STRENGTH" class="java.lang.String"/>
+	<field name="ALTERNATIVE_DESCRIPTION" class="java.lang.String"/>
+	<field name="UOM" class="java.lang.String"/>
+	<field name="MARKET_PRICE" class="java.math.BigDecimal"/>
+	<field name="ORGANIZATION_ID" class="java.math.BigDecimal"/>
+	<field name="INVENTORY_ITEM_ID" class="java.math.BigDecimal"/>
+	<field name="PRE_APPROVED_AMT" class="java.math.BigDecimal"/>
+	<field name="EXPENSE_ACCOUNT" class="java.lang.String"/>
+	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
+	<field name="REQUESTER" class="java.lang.String"/>
+	<field name="REQUISITION_DATE" class="java.sql.Timestamp"/>
+	<field name="STATUS" class="java.lang.String"/>
+	<field name="COMPANY_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="TELPHONE" class="java.lang.String"/>
+	<field name="FAX" class="java.lang.String"/>
+	<variable name="Total_Requisition_Cost" class="java.lang.Number" resetType="Group" resetGroup="Requisition" calculation="Sum">
+		<variableExpression><![CDATA[$F{RTP_COST}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<group name="Requisition" isStartNewPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{PURCHASE_REQ_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<staticText>
+					<reportElement x="0" y="0" width="32" height="20" uuid="6d3eec37-0864-4a95-bb67-1968099c8d67"/>
+					<box>
+						<pen lineWidth="0.25"/>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="12"/>
+					</textElement>
+					<text><![CDATA[No.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="32" y="0" width="79" height="20" uuid="e918d7ce-6e2c-426d-8f31-f4c963a862cd"/>
+					<box>
+						<pen lineWidth="0.25"/>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="12"/>
+					</textElement>
+					<text><![CDATA[Quantity]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="111" y="0" width="324" height="20" uuid="80b03e89-ab7a-4ada-b1bf-45cc616555d7"/>
+					<box>
+						<pen lineWidth="0.25"/>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="12"/>
+					</textElement>
+					<text><![CDATA[Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="435" y="0" width="118" height="20" uuid="f4c76ba7-b0b7-4f1a-b654-ec090d23697d"/>
+					<box>
+						<pen lineWidth="0.25"/>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="12"/>
+					</textElement>
+					<text><![CDATA[  $ Amount]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="187">
+				<rectangle>
+					<reportElement x="0" y="121" width="555" height="20" uuid="0ea10235-f41a-46cb-8e06-d19cb946748a"/>
+				</rectangle>
+				<staticText>
+					<reportElement x="2" y="20" width="285" height="15" uuid="7090dac0-75cc-475a-9493-a96b4c0bf323"/>
+					<textElement>
+						<font fontName="Arial" size="12"/>
+					</textElement>
+					<text><![CDATA[Date:......................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="40" width="550" height="15" uuid="ecc479a7-2f50-4c50-9104-63778fa55cb9"/>
+					<textElement>
+						<font fontName="Arial" size="12"/>
+					</textElement>
+					<text><![CDATA[I CERTIFY THAT THE MATERIALS REQUESTED ARE REQUIRED FOR OFFICAL USE.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="61" width="552" height="20" uuid="7678054e-2cc4-42e2-9faf-e7dbda0e0074"/>
+					<textElement>
+						<font fontName="Arial" size="12"/>
+					</textElement>
+					<text><![CDATA[Purchasing Coordinator:................................................................................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="81" width="552" height="20" uuid="9c6de052-0eb3-4791-b278-982319b61354"/>
+					<textElement>
+						<font fontName="Arial" size="12"/>
+					</textElement>
+					<text><![CDATA[Date:.................................................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="101" width="551" height="20" uuid="8f567e6f-f2cf-450d-ab29-c9f67e9ddae1"/>
+					<textElement>
+						<font fontName="Arial" size="12"/>
+					</textElement>
+					<text><![CDATA[I CERTIFY THAT THE MATERIALS REQUESTED ARE NOT IN STOCK.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="121" width="55" height="20" uuid="3bd5245c-d612-4c61-9c80-2ffcda6b89cf"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="11"/>
+					</textElement>
+					<text><![CDATA[Account #:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="145" y="121" width="86" height="20" uuid="8d441b2f-3f17-4265-8be3-30b8cc397472"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="11"/>
+					</textElement>
+					<text><![CDATA[Pre-Approved $:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="318" y="164" width="237" height="20" uuid="4b0e78bd-dc55-4341-a506-81e6216fb7d0"/>
+					<textElement>
+						<font fontName="Arial" size="11"/>
+					</textElement>
+					<text><![CDATA[Sign & Date by Budget:........................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="144" width="384" height="20" uuid="0b762e6c-7cf4-4002-852f-c07c4058152b"/>
+					<textElement>
+						<font fontName="Arial" size="11"/>
+					</textElement>
+					<text><![CDATA[Director of Finance:.................................................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="382" y="144" width="170" height="20" uuid="880d692f-d645-4192-9ec0-27f0cd4f70ef"/>
+					<textElement>
+						<font fontName="Arial" size="11"/>
+					</textElement>
+					<text><![CDATA[Date:..........................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="164" width="385" height="20" uuid="92aff222-51ca-45c1-96da-89e4581770e2"/>
+					<textElement>
+						<font fontName="Arial" size="11"/>
+					</textElement>
+					<text><![CDATA[Chief Executive Officer:.....................................................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="382" y="124" width="170" height="17" uuid="eb5bd5ac-b853-49b0-861f-a35292293b25"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="11"/>
+					</textElement>
+					<text><![CDATA[Date:..........................................]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="232" y="121" width="86" height="20" uuid="16594bd8-9dfb-4888-87ee-7ae8f05ac39c"/>
+					<textElement verticalAlignment="Bottom"/>
+					<textFieldExpression><![CDATA[$F{PRE_APPROVED_AMT}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="2" y="5" width="432" height="15" uuid="1b841911-1003-4fc6-b106-fb26fca0b122"/>
+					<textElement>
+						<font fontName="Arial" size="12"/>
+					</textElement>
+					<text><![CDATA[Head of User Department:..........................................................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="435" y="0" width="37" height="21" uuid="ff2386ae-caaa-452f-a00e-da4e3031a6df"/>
+					<box>
+						<pen lineWidth="0.25"/>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement>
+						<font fontName="Arial" size="12"/>
+						<paragraph leftIndent="2"/>
+					</textElement>
+					<text><![CDATA[$]]></text>
+				</staticText>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="472" y="0" width="81" height="21" uuid="3426cb56-1d6e-4ff5-82b3-97d20dd1de04"/>
+					<box>
+						<pen lineWidth="0.25"/>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Right">
+						<paragraph leftIndent="2" rightIndent="5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Total_Requisition_Cost}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="2" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="225" splitType="Stretch">
+			<staticText>
+				<reportElement x="3" y="193" width="107" height="15" uuid="f78ad661-54e7-4801-8df8-cce65f05ec5a"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Requisition Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="329" y="193" width="92" height="15" uuid="6f2990d9-3565-424a-9cf5-b9bde94e446b"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Requisition By:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="208" width="106" height="15" uuid="81cdc145-af61-4387-a3f7-c9288015b4ee"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[Department:]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="112" y="193" width="205" height="15" uuid="2d9118a1-9d0a-4671-a015-90a0201eb65b"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REQUISITION_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="421" y="193" width="120" height="15" uuid="13e5bab1-f4a3-4762-ba3a-032296e7470a"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REQUESTER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="112" y="208" width="205" height="15" uuid="ff8d41aa-6f99-4380-a293-3a83e4f92f61"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="116" width="259" height="20" uuid="c840277d-9170-4989-9a9b-e9c6f53fe1c8"/>
+				<textElement>
+					<font fontName="Arial" size="9" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[It will be the requester's responsibility to:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="136" width="552" height="15" uuid="f787d5c1-29b5-4550-9813-12a6f96e81ed"/>
+				<textElement>
+					<font fontName="Arial" size="9" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[. Fill out ALL sections of the Requisition to Purchase from and foward to the Purchasing Department]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="151" width="550" height="16" uuid="9577e38e-786e-4be8-99eb-242a34fe194d"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[. Please notify the Purchasing Department immediatly when there are any discrepancies.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="167" width="549" height="14" uuid="a52c7820-8a3a-48ba-84fe-b0937b346487"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[. Please notify the Finance Department if ANY aspect of this purchase was less than satisfactory.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="60" width="524" height="56" uuid="c1112b4e-0678-43b7-9228-6a6bf3a3d4df"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[   The Purchasing Department will analyze the requisition in a timely fashionand if appropriate, investigate alternatives necessary to make selections of optimal products, suppliers, price and terms of purchase. Any pertinent variance from your initial request will be communicated for your pre-approval.]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="118" y="0" width="338" height="20" uuid="98c4fe12-af58-4360-a44d-4fa924168f63"/>
+				<textElement textAlignment="Center" markup="none">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPANY_NAME}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="118" y="20" width="338" height="20" uuid="08446d2b-5691-44a3-87fc-5333b868adaf"/>
+				<textElement textAlignment="Center" markup="none">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="118" y="40" width="338" height="20" uuid="a3f23224-2326-4f17-b2a7-1805eed4a8ef"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REQUISITION TO PURCHASE (RTP)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="0" width="32" height="20" uuid="32fc3d6b-d7da-4f48-80f8-68c76ba05c33"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right">
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LINE_ID}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="32" y="0" width="79" height="20" uuid="b7c06768-61ad-4739-a9de-2df3eeed78de"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right">
+					<paragraph leftIndent="2" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QUANTITY_REQUESTED}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="111" y="0" width="324" height="20" uuid="f12f47a0-6e1d-4ce0-b7fa-aa6bb5c114b5"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ALTERNATIVE_DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="435" y="0" width="118" height="20" uuid="20dbb49b-b8d1-476d-9899-2c2a32b44761"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right">
+					<paragraph leftIndent="2" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RTP_COST}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="1" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

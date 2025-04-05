@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d5a81d76-8a48-4aec-8620-16b70163c3d4">
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Standard_Letters/Leave_Approval_Form_IPED"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="472"/>
+	<parameter name="EMP_NO" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+L.id LEAVE_ID,
+b.org_id,
+(case when a.SEX_CODE='F' then 'Ms.' when a.SEX_CODE='M' then 'Mr.' end
+    || TRIM(NVL(A.FIRST_NAME,'')||' '||NVL(SURNAME,''))) ADDRESSE,
+(case when a.SEX_CODE='F' then 'Ms.' when a.SEX_CODE='M' then 'Mr.' end
+    ||NVL(SURNAME,'')) SURNAME_ADDRESS,
+NVL(ADJUSTED_FROMDATE,FROMDATE) DATE_FROM,
+nvl(Adjusted_ToDate,ToDate) date_to,
+FROMDATE,
+ADJUSTED_FROMDATE,ADJUSTED_TODATE,TODATE,
+INITCAP(P.POSITION_NAME)POSITION_NAME,
+replace(INITCAP(L.LEAVE_TYPE),'Leave','') LEAVE_TYPE,
+TO_CHAR(DAYS_TAKEN) DAYS_TAKEN,
+apps.pkg_global_fnts.fn_num_towords(DAYS_TAKEN)||' ('||TO_CHAR(DAYS_TAKEN)||')'
+||' '||
+(case when DAYS_TAKEN>1 then 'days' else 'day' end)
+DAY_OR_DAYS,
+L.ENTRY_DATE,
+NVL(L.APPROVED_DATE,sysdate) LETTER_DATE,
+NVL(RESUMPTION_DATE,apps.PKG_REPORTS.GET_WEEK_DAY(TODATE +1)) Required_Return_date,
+ HO.ADDRESS ORG_ADDRESS, HO.FAXNUM, HO.TELNUM, NIS_REG_NO, TAX_REG_NO,
+ho.organisation_name, G.UNIT_NAME,
+(SELECT v.EMPLOYEE_NAME  FROM apps.vw_position_location_v3 v WHERE v.EMP_ID = t.employee_no) AS signature,
+(SELECT v.POSITION_NAME FROM apps.vw_position_location_v3 v WHERE v.EMP_ID = t.employee_no) POSITION_OF_APPROVER
+from APPS.HR_LV_LEAVEHISTORY L
+join APPS.HR_RCM_EMPLOYEE B ON L.EMP_ID=B.id
+join APPS.HR_RCM_INDIVIDUAL A ON B.IND_ID=A.ID
+join APPS.VW_ORG_WORKLOCATION_POSITION P on L.POSITION_LOCATION_ID=P.id
+join APPS.VW_ORGANISATION_STRUCTURE G on P.ORGDTL_ID=G.id
+join APPS.HR_HCF_ORGANISATION HO on g.org_id=ho.id
+join apps.tbluser t on t.employee_no = b.id
+where (b.id=$P{EMP_NO}
+or L.id=$P{ID})
+order by NVL(L.APPROVED_DATE,sysdate)]]>
+	</queryString>
+	<field name="LEAVE_ID" class="java.math.BigDecimal"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="ADDRESSE" class="java.lang.String"/>
+	<field name="SURNAME_ADDRESS" class="java.lang.String"/>
+	<field name="DATE_FROM" class="java.sql.Timestamp"/>
+	<field name="DATE_TO" class="java.sql.Timestamp"/>
+	<field name="FROMDATE" class="java.sql.Timestamp"/>
+	<field name="ADJUSTED_FROMDATE" class="java.sql.Timestamp"/>
+	<field name="ADJUSTED_TODATE" class="java.sql.Timestamp"/>
+	<field name="TODATE" class="java.sql.Timestamp"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="LEAVE_TYPE" class="java.lang.String"/>
+	<field name="DAYS_TAKEN" class="java.lang.String"/>
+	<field name="DAY_OR_DAYS" class="java.lang.String"/>
+	<field name="ENTRY_DATE" class="java.sql.Timestamp"/>
+	<field name="LETTER_DATE" class="java.sql.Timestamp"/>
+	<field name="REQUIRED_RETURN_DATE" class="java.sql.Timestamp"/>
+	<field name="ORG_ADDRESS" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="NIS_REG_NO" class="java.lang.String"/>
+	<field name="TAX_REG_NO" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="UNIT_NAME" class="java.lang.String"/>
+	<field name="SIGNATURE" class="java.lang.String"/>
+	<field name="POSITION_OF_APPROVER" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<detail>
+		<band height="607" splitType="Stretch">
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="36" y="0" width="100" height="20" uuid="8141d0a2-2a37-4dbc-871b-52547444e4c8"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="36" y="49" width="100" height="20" uuid="a1ced08d-43ba-4659-b5c7-1fba46622790"/>
+				<textFieldExpression><![CDATA[$F{ADDRESSE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="36" y="69" width="100" height="20" uuid="208ea75f-a076-4fcf-9b1a-ce16fb4d68ea"/>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="102" y="159" width="100" height="20" uuid="4df0e5a4-15a5-4173-900c-bc17447155ed"/>
+				<textFieldExpression><![CDATA[$F{SURNAME_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="36" y="89" width="100" height="20" uuid="602f2277-6de8-45db-8bdc-a99ef15a4e19"/>
+				<textFieldExpression><![CDATA[$F{UNIT_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="36" y="159" width="66" height="20" uuid="1965e6a6-f122-471d-875b-358ab05cf3ef"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Dear]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="36" y="200" width="491" height="52" uuid="db0b53dc-b59d-47d2-9d11-38b516bac30b"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA["Please be informed that approval has been granted for you to proceed on"+$F{DAY_OR_DAYS}+" of "+ $F{LEAVE_TYPE} + " from "+$F{FROMDATE} +" to "+$F{TODATE}+". You are o resume duties on"+$F{REQUIRED_RETURN_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="36" y="270" width="491" height="21" uuid="cf2ba485-b272-4e0b-a381-c5d363a541df"/>
+				<text><![CDATA[Management takes this opportunity to wish you all the best.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="36" y="303" width="327" height="20" uuid="c7f4567c-9d93-4962-8c6f-56a687ff8dc2"/>
+				<text><![CDATA[Yours faithfully,]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="36" y="323" width="327" height="20" uuid="74744be5-d785-4947-a5f7-521e287664fb"/>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="36" y="424" width="351" height="1" uuid="2be04838-fd94-4c0a-9b94-02cc01aa729b"/>
+				<graphicElement>
+					<pen lineWidth="1.5" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

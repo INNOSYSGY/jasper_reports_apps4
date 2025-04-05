@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" uuid="f7735fce-fd8c-41d6-9c50-3f781b9b8cf3">
+	<property name="ireport.zoom" value="4.177248169415659"/>
+	<property name="ireport.x" value="77"/>
+	<property name="ireport.y" value="109"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/PROPERTY/Delinquency_Report_by_Wards"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.18:8081/jasperserver/services/repository"/>
+	<parameter name="PROPERTY_TYPE" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT NAME, (SELECT REFERENCE_VALUE FROM REFERENCES WHERE ID=OWNER_TYPE) OWNER_TYPE,  TRUNC(E.START_DATE), E.END_DATE,
+a.ARREARS_AMOUNT,a.AMOUNT_PAID, a.ARREARS_AMOUNT-a.AMOUNT_PAID BALANCE, (SELECT REFERENCE_VALUE FROM REFERENCES WHERE ID=PROPERTY_TYPE) PROPERTY_TYPE
+FROM PROPERTY_DEMAND_ARREARS A JOIN PROPERTY B ON A.PROPERTY_ID=B.ID
+JOIN PROPERTY_OWNER C ON C.PROPERTY_ID=B.ID
+JOIN OWNER D ON D.ID=C.OWNER_ID
+JOIN PROPERTY_DEMAND E ON E.ID=A.PROPERTY_DEMAND_ID
+WHERE A.ARREARS_AMOUNT-A.AMOUNT_PAID>0 AND property_type = CASE WHEN $P{PROPERTY_TYPE} = '999' THEN property_type ELSE $P{PROPERTY_TYPE} END
+order by a.ARREARS_AMOUNT desc,name]]>
+	</queryString>
+	<field name="NAME" class="java.lang.String"/>
+	<field name="OWNER_TYPE" class="java.lang.String"/>
+	<field name="TRUNC(E.START_DATE)" class="java.sql.Timestamp"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="ARREARS_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="AMOUNT_PAID" class="java.math.BigDecimal"/>
+	<field name="BALANCE" class="java.math.BigDecimal"/>
+	<field name="PROPERTY_TYPE" class="java.lang.String"/>
+	<variable name="GRAND_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{BALANCE}]]></variableExpression>
+	</variable>
+	<variable name="AMOUNT_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMOUNT_PAID}]]></variableExpression>
+	</variable>
+	<variable name="ARREARS_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ARREARS_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="COUNT" class="java.math.BigDecimal" calculation="Count">
+		<variableExpression><![CDATA[$F{NAME}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="79" uuid="002b4e3f-7d2b-451c-b121-ff91808327dd"/>
+				<subreportParameter name="department">
+					<subreportParameterExpression><![CDATA["Delinquency Report By Property Type"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA["For "+ $F{PROPERTY_TYPE} +" Properties"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LETTER_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="17" splitType="Stretch">
+			<staticText>
+				<reportElement x="26" y="0" width="110" height="17" uuid="5d836ba8-633e-4ef1-a54d-4ac1ca18340a"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="297" y="0" width="59" height="17" uuid="5124d417-a9f6-4f10-b088-09515abfc7ba"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[End Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="356" y="0" width="64" height="17" uuid="0915275e-6436-41c4-b20b-4fdbeb798c58"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="11" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Arrears]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="420" y="0" width="72" height="17" uuid="1b3c99d1-0956-41f5-815d-16eb79372c57"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="11" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Amount Paid]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="492" y="0" width="80" height="17" uuid="2f07471f-f69c-4cab-96a1-1b8811a04971"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="11" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Balance]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="221" y="0" width="76" height="17" uuid="53d2012b-3426-4a96-a393-dd902cbca1ba"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Start Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="0" width="85" height="17" uuid="c1144e1b-e761-4fae-b802-0444917faa47"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Owner Type]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="16" width="572" height="1" uuid="0f4f2a16-9039-4b9e-860e-9989f18d467a"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="0" width="26" height="17" uuid="53332bb0-74e9-4b77-b03b-a14171903c2a"/>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="24" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="136" y="0" width="85" height="20" uuid="9544c1ef-cb56-42e5-94eb-806c9cf1fc6a"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OWNER_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="221" y="0" width="76" height="20" uuid="1b18e552-9574-4ff9-991f-83fd84340831"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRUNC(E.START_DATE)}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="297" y="0" width="59" height="20" uuid="636e3224-2734-4294-936d-d5a310f00d12"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{END_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0">
+				<reportElement x="356" y="0" width="64" height="20" uuid="f2547460-e2c4-408b-b2d1-2c64d75dfb7b"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ARREARS_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0">
+				<reportElement x="420" y="0" width="72" height="20" uuid="b961d015-7437-4f95-b2ff-2583109bc05a"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMOUNT_PAID}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0">
+				<reportElement x="492" y="0" width="80" height="20" uuid="e2fd87ac-b862-4e42-b73b-5817c5989c85"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BALANCE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="26" y="0" width="110" height="20" uuid="f76b3429-e3a1-4de6-86db-3eb56c7f5248"/>
+				<textElement>
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="0" width="26" height="20" uuid="d8b0aaec-2265-45c2-bd5f-153f3282df20"/>
+				<textFieldExpression><![CDATA[$V{COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="17" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="14" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="0" width="572" height="14" backcolor="#CCCCCC" uuid="caec98fa-1540-4a96-b420-3a166d1dd004"/>
+			</rectangle>
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="0" y="0" width="100" height="14" uuid="2113058b-6e65-4118-9d7a-4053e8f91cde"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="452" y="0" width="80" height="14" backcolor="#CCCCCC" uuid="07d7e07e-f01d-4931-96b3-3bf3c14d371c"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="532" y="0" width="40" height="14" backcolor="#CCCCCC" uuid="fbcc3848-42d7-4d24-925c-bb80aa4c7c0f"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="245" y="0" width="100" height="14" uuid="13800d81-7097-4edf-8666-e3fe86d31383"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[RCFMS By InnoSyS]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="20">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="19" uuid="2b28381d-2517-433e-827f-436ba26cfc33"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" isItalic="true" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0">
+				<reportElement x="492" y="0" width="80" height="19" uuid="ef2988db-10f0-4744-9cb2-883e69f88f19"/>
+				<textElement textAlignment="Right">
+					<font isBold="false" isItalic="false" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0">
+				<reportElement x="420" y="1" width="72" height="19" uuid="229b926f-e3fd-4226-affc-b3f84e53cafb"/>
+				<textElement textAlignment="Right">
+					<font isBold="false" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{AMOUNT_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0">
+				<reportElement x="356" y="1" width="64" height="18" uuid="c376b23e-8c92-4da8-b27f-fdd943a38097"/>
+				<textElement textAlignment="Right">
+					<font isBold="false" isUnderline="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ARREARS_TOTAL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

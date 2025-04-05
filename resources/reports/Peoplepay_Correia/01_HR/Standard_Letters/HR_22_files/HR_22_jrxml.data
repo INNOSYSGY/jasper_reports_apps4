@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Leave Approval Letter" language="groovy" pageWidth="612" pageHeight="792" columnWidth="552" leftMargin="40" rightMargin="20" topMargin="20" bottomMargin="20" uuid="60d5e491-53bc-42fa-9eed-c896cf8bdc48">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Standard_Letters/HR_22"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<parameter name="EMP_NO" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+L.id LEAVE_ID,
+b.org_id,
+(case when a.SEX_CODE='F' then 'Ms.' when a.SEX_CODE='M' then 'Mr.' end
+    || TRIM(NVL(FIRST_NAME,'')||' '||NVL(SURNAME,''))) ADDRESSE,
+(case when a.SEX_CODE='F' then 'Ms.' when a.SEX_CODE='M' then 'Mr.' end
+    ||NVL(SURNAME,'')) SURNAME_ADDRESS,
+NVL(ADJUSTED_FROMDATE,FROMDATE) DATE_FROM,
+nvl(Adjusted_ToDate,ToDate) date_to,
+ FROMDATE,
+ADJUSTED_FROMDATE,ADJUSTED_TODATE,TODATE,
+INITCAP(P.POSITION_NAME)POSITION_NAME,
+replace(INITCAP(L.LEAVE_TYPE),'Leave','') LEAVE_TYPE,
+TO_CHAR(DAYS_TAKEN-l.holidays) DAYS_TAKEN,
+'('||
+TO_CHAR(DAYS_TAKEN-l.holidays)||')'
+||' '||
+(case when (DAYS_TAKEN-l.holidays)>1 then 'days' else 'day' end)
+DAY_OR_DAYS,
+L.ENTRY_DATE,
+NVL(L.APPROVED_DATE,sysdate) LETTER_DATE,
+case when NVL(ADJUSTED_TODATE,TODATE)+1=sysdate then NVL(ADJUSTED_TODATE,TODATE)+3
+else
+NVL(ADJUSTED_TODATE,TODATE)+1
+end Required_Return_date,
+ HO.ADDRESS ORG_ADDRESS, HO.FAXNUM, HO.TELNUM, NIS_REG_NO, TAX_REG_NO,
+ho.organisation_name,
+l.holidays, case
+    when (to_char(todate,'fmday')) LIKE 'saturday' then TODATE + 2
+    when (to_char(adjusted_todate,'fmday')) LIKE 'saturday' then adjusted_todate + 2
+    WHEN (to_char(todate,'fmday')) LIKE 'sunday' THEN TODATE + 1
+    WHEN (to_char(adjusted_todate,'fmday')) LIKE 'sunday' THEN ADJUSTED_TODATE + 1
+    else todate
+
+    END AS TRIAL
+from HR_LV_LEAVEHISTORY L
+join HR_RCM_EMPLOYEE B ON L.EMP_ID=B.id
+join HR_RCM_INDIVIDUAL A ON B.IND_ID=A.ID
+join VW_ORG_WORKLOCATION_POSITION P on L.POSITION_LOCATION_ID=P.id
+join VW_ORGANISATION_STRUCTURE G on P.ORGDTL_ID=G.id
+join HR_HCF_ORGANISATION HO on g.org_id=ho.id
+where (b.id=$P{EMP_NO}
+or L.id=$P{ID})
+order by NVL(L.APPROVED_DATE,sysdate)]]>
+	</queryString>
+	<field name="LEAVE_ID" class="java.math.BigDecimal"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="ADDRESSE" class="java.lang.String"/>
+	<field name="SURNAME_ADDRESS" class="java.lang.String"/>
+	<field name="DATE_FROM" class="java.sql.Timestamp"/>
+	<field name="DATE_TO" class="java.sql.Timestamp"/>
+	<field name="FROMDATE" class="java.sql.Timestamp"/>
+	<field name="ADJUSTED_FROMDATE" class="java.sql.Timestamp"/>
+	<field name="ADJUSTED_TODATE" class="java.sql.Timestamp"/>
+	<field name="TODATE" class="java.sql.Timestamp"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="LEAVE_TYPE" class="java.lang.String"/>
+	<field name="DAYS_TAKEN" class="java.lang.String"/>
+	<field name="DAY_OR_DAYS" class="java.lang.String"/>
+	<field name="ENTRY_DATE" class="java.sql.Timestamp"/>
+	<field name="LETTER_DATE" class="java.sql.Timestamp"/>
+	<field name="REQUIRED_RETURN_DATE" class="java.sql.Timestamp"/>
+	<field name="ORG_ADDRESS" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="NIS_REG_NO" class="java.lang.String"/>
+	<field name="TAX_REG_NO" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="HOLIDAYS" class="java.math.BigDecimal"/>
+	<field name="TRIAL" class="java.sql.Timestamp"/>
+	<group name="Leave" isStartNewPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{LEAVE_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="77">
+				<subreport>
+					<reportElement x="0" y="0" width="552" height="77" uuid="04c0a510-6610-4537-96c1-9748873a9b88"/>
+					<subreportParameter name="P_IN_ORG_ID">
+						<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/MEMO_HEADER"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="101">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="34" width="319" height="20" uuid="cb5947b2-a01b-437a-b9f9-30d3a2e22fc3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial Narrow" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ADDRESSE}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="49" width="319" height="20" uuid="bad412ed-ea8e-4dcb-b77b-e2d9d839ec09"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial Narrow" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="64" width="319" height="20" uuid="624742ef-af64-4ced-95f0-64f542ada404"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial Narrow" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="79" width="319" height="20" uuid="647e8318-7b91-4501-a0eb-f8287ddad0c4"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial Narrow" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Thru’ Administrative Director']]></textFieldExpression>
+				</textField>
+				<textField pattern="MMMMM dd, yyyy" isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="231" height="20" uuid="f8936811-a750-4ea7-a9bb-7f31a9c3eb9b"/>
+					<textElement>
+						<font fontName="Arial Narrow" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LETTER_DATE}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="186">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="552" height="21" uuid="6ec923f2-bb7a-47e4-8005-2c400cc937a3"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial Narrow" size="12" isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Re: '+$F{LEAVE_TYPE}+' Leave']]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="231" height="20" uuid="248c9f3a-f256-4e1d-9a79-1b3570fb60d9"/>
+					<textElement>
+						<font fontName="Arial Narrow" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Dear '+$F{SURNAME_ADDRESS}+',']]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="45" width="552" height="22" uuid="7fcb4ed3-c301-406b-b6e9-22f16e9f2cf6"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial Narrow" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA['With reference to your application for '+$F{LEAVE_TYPE} +' leave dated '+
+new SimpleDateFormat('MMMMM dd, yyyy').format($F{ENTRY_DATE})+', please be advised that approval has been granted for you to proceed on '+$F{DAY_OR_DAYS}+' '+$F{LEAVE_TYPE} +' leave to be taken during the period '+new SimpleDateFormat('MMMMM dd').format($F{DATE_FROM})+' - '+new SimpleDateFormat('MMMMM dd, yyyy').format($F{DATE_TO})+'.']]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="148" width="100" height="20" uuid="0d68ee06-9770-4344-891f-3306b3822406"/>
+					<text><![CDATA[Regards]]></text>
+				</staticText>
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="0" y="104" width="552" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="90142f21-c2da-4288-a4d9-3e624325302d"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="Arial Narrow" size="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA['You are required to promptly resume duties at 08:00 h on '+new SimpleDateFormat('MMMMM dd,yyyy').format($F{REQUIRED_RETURN_DATE})+'.']]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="47">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="231" height="15" uuid="f97c8fe3-eb03-4f38-8924-d5efae044cab"/>
+					<textElement>
+						<font fontName="Arial Narrow" size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[null]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="15" width="231" height="15" uuid="52141161-4025-46b0-b5ae-961bc5cac394"/>
+					<textElement>
+						<font fontName="Arial Narrow" size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[null]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="0" width="231" height="1" uuid="105de090-c9ba-4df5-b0b2-a76f2bbc6423"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Prevent"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="27" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="552" height="15" uuid="b3cb021d-5772-47ad-8b10-6ac9d0fe53df"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial Narrow" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="10" width="552" height="15" uuid="01a76163-6f05-4f0e-91c4-f5ca8d6514a0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA['Tel.:'+$F{TELNUM}+' Fax: '+$F{FAXNUM}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="552" height="1" backcolor="#CCCCCC" uuid="068bfd78-2dc0-4519-a0f7-dd7e859e4fd1"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Stock On Hand" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="95c53139-5d96-406e-93e3-3006b0b19378">
+	<property name="ireport.zoom" value="1.6105100000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/Listing_of_Drugs"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<queryString>
+		<![CDATA[SELECT
+T.INVENTORY_ITEM_ID,
+              (select value_description a
+              FROM TABLE(PKG_GLOBAL_FNTS.GET_LOOKUP_VALUE('TBLPHARMACOPOEIA'))
+              WHERE id=T.PHARMACOPOEIA) PHARMACOPOEIA,
+T.DRUG_STRENGTH,
+T.ORG_ITEM_DESCRIPTION,
+T.GENERIC_NAME,
+T.BRAND_NAME,
+              (select value_description a
+              FROM TABLE(PKG_GLOBAL_FNTS.GET_LOOKUP_VALUE('TBLDRUGFAMILY'))
+              where id=T.DRUG_FAMILY)DRUG_FAMILY,
+          (SELECT VALUE_DESCRIPTION A
+          FROM TABLE(PKG_GLOBAL_FNTS.GET_LOOKUP_VALUE('TBLDRUGCLASS'))
+          where id=T.INDICATIONS_CLASSIFICATION) INDICATIONS_CLASSIFICATION,
+T.INDICATIONS,
+T.CAUTIONS,
+T.DOSE_ADULT,
+T.DOSE_CHILD,
+T.DOSAGE_FORM,
+T.CONTRA_INDICATIONS,
+T.SIDE_EFFECTS,
+ COMPANY_NAME,VILLAGE_TOWN||', '||DISTRICT||', '||COUNTRY ADDRESS,EMAIL,
+                        'Tel# '||TELEPHONE_NOS Telphone, 'Fax # '||FAX_NOS FAX
+FROM TBLINVENTORYITEM T
+CROSS JOIN TBLSYSTEMCONFIGURATION
+where organization_id=122]]>
+	</queryString>
+	<field name="INVENTORY_ITEM_ID" class="java.math.BigDecimal"/>
+	<field name="PHARMACOPOEIA" class="java.lang.String"/>
+	<field name="DRUG_STRENGTH" class="java.lang.String"/>
+	<field name="ORG_ITEM_DESCRIPTION" class="java.lang.String"/>
+	<field name="GENERIC_NAME" class="java.lang.String"/>
+	<field name="BRAND_NAME" class="java.lang.String"/>
+	<field name="DRUG_FAMILY" class="java.lang.String"/>
+	<field name="INDICATIONS_CLASSIFICATION" class="java.lang.String"/>
+	<field name="INDICATIONS" class="java.lang.String"/>
+	<field name="CAUTIONS" class="java.lang.String"/>
+	<field name="DOSE_ADULT" class="java.lang.String"/>
+	<field name="DOSE_CHILD" class="java.lang.String"/>
+	<field name="DOSAGE_FORM" class="java.lang.String"/>
+	<field name="CONTRA_INDICATIONS" class="java.lang.String"/>
+	<field name="SIDE_EFFECTS" class="java.lang.String"/>
+	<field name="COMPANY_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="TELPHONE" class="java.lang.String"/>
+	<field name="FAX" class="java.lang.String"/>
+	<sortField name="ORG_ITEM_DESCRIPTION"/>
+	<variable name="No" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[1.0]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="66" splitType="Stretch">
+			<subreport>
+				<reportElement x="2" y="0" width="966" height="66" uuid="789c01a3-8f54-4436-9cdc-32f7d278b11a"/>
+				<subreportParameter name="P_REPORT_NAME">
+					<subreportParameterExpression><![CDATA["Listing of Items"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/MedSys/RESOURCE/LETTER_HEAD_LEGAL_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="21" y="0" width="247" height="15" isPrintWhenDetailOverflows="true" uuid="6d3a4718-cfed-49a7-847c-74cec4898ecc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Item Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="667" y="0" width="152" height="15" isPrintWhenDetailOverflows="true" uuid="5f3442fe-0bd6-4de0-9eec-a8e33c85b1dc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Brand Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="502" y="0" width="165" height="15" uuid="a036491c-fe5d-45c2-a07b-47e3e678b6f5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Generic Name]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="968" height="1" uuid="eee808b9-6a64-4bc2-87b3-05040d7a8497"/>
+			</line>
+			<staticText>
+				<reportElement x="268" y="0" width="120" height="15" uuid="861b831e-d6ee-44c4-999b-ced08d793423"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Strength]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="21" height="15" uuid="523430c2-0c14-4733-a09f-5140f934e050"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="388" y="0" width="114" height="15" isPrintWhenDetailOverflows="true" uuid="7a868360-cc38-4ae9-8c62-6b0826c9f60c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Dosage Form]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="819" y="0" width="145" height="15" isPrintWhenDetailOverflows="true" uuid="5f3442fe-0bd6-4de0-9eec-a8e33c85b1dc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Family Name]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="15" width="968" height="1" forecolor="#999999" uuid="d2221893-dd58-4f34-a1c0-881e06756ddf"/>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="667" y="0" width="152" height="15" uuid="6a68d079-5eb8-49b9-8cc2-42be4bc812d4"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BRAND_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="502" y="0" width="165" height="15" uuid="f20321fe-7cce-4b07-b498-e31a43e4956a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GENERIC_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="21" y="0" width="247" height="15" uuid="d2e08ec3-acc7-4a24-97f0-4d6533e983a0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_ITEM_DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="268" y="0" width="120" height="15" uuid="492fd659-72ea-46c6-9b89-d9ef05ac83d6"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DRUG_STRENGTH}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="21" height="15" uuid="38e3c1f7-9c91-4fe4-8912-d3e9e7206090"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{No}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="388" y="0" width="114" height="15" uuid="31b92b4b-515f-4b63-bf00-8b8b5753ff80"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DOSAGE_FORM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="819" y="0" width="145" height="15" uuid="6a68d079-5eb8-49b9-8cc2-42be4bc812d4"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DRUG_FAMILY}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="16" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Opaque" x="2" y="0" width="966" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<textField>
+				<reportElement x="842" y="0" width="102" height="13" uuid="3393b061-7d07-468f-997f-4cded61b8d0d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="944" y="0" width="18" height="13" uuid="4d8264ca-885c-4795-94d0-72f1bd428dc4"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE, MMMMM dd, yyyy h.mm a" isBlankWhenNull="true">
+				<reportElement x="2" y="0" width="172" height="15" uuid="aefd0541-a2ad-40d2-b601-cdb65e54d0b8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="2" y="0" width="966" height="16" uuid="aadc7cbd-88ea-4125-83f8-05e97fd395b8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[SCMS By INNOSYS Inc]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

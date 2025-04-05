@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Employee Entitlement" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c2b5bd8f-f393-4e0b-801e-44e2a8911876">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Employee_Entitlement"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EMP_CLASS" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ALLOWANCE_TYPE" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select a.*
+from VW_EMPENTITLE a
+where ORG_ID=$P{IN_ORG_ID}
+AND upper(replace(a.description,' ')) like upper($P{ALLOWANCE_TYPE})
+and a.employment_class_id=$P{EMP_CLASS}]]>
+	</queryString>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="EMPLOYEE" class="java.lang.String"/>
+	<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+	<field name="EMPLOYMENT_CLASS_ID" class="java.math.BigDecimal"/>
+	<field name="EMPLOYMENT_CLASS" class="java.lang.String"/>
+	<field name="FREQUENCY" class="java.lang.String"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="DATE_SEPARATED" class="java.sql.Timestamp"/>
+	<field name="ADD_INCOME_ID" class="java.math.BigDecimal"/>
+	<field name="INCOME_TYPE" class="java.lang.String"/>
+	<field name="INCOME_CODE" class="java.math.BigDecimal"/>
+	<field name="TAXABLE" class="java.lang.String"/>
+	<field name="NIS_DEDUCTION" class="java.lang.String"/>
+	<field name="AMOUNT" class="java.math.BigDecimal"/>
+	<field name="ADMIN_STATUS" class="java.lang.String"/>
+	<field name="PERCENTAGE" class="java.math.BigDecimal"/>
+	<field name="QUICK_ENTRY" class="java.math.BigDecimal"/>
+	<field name="DATE_EFFECTIVE" class="java.sql.Timestamp"/>
+	<field name="DATE_EFFECTIVE_END" class="java.sql.Timestamp"/>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<sortField name="DESCRIPTION"/>
+	<sortField name="DATE_EFFECTIVE"/>
+	<variable name="DESCRIPTION_1" class="java.lang.Integer" resetType="Group" resetGroup="Entitlement" calculation="Count">
+		<variableExpression><![CDATA[$F{DESCRIPTION}]]></variableExpression>
+	</variable>
+	<variable name="Count" class="java.math.BigDecimal" calculation="Count">
+		<variableExpression><![CDATA[1.0]]></variableExpression>
+		<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+	</variable>
+	<group name="Entitlement">
+		<groupExpression><![CDATA[$F{DESCRIPTION}]]></groupExpression>
+		<groupHeader>
+			<band height="21">
+				<textField>
+					<reportElement x="0" y="0" width="119" height="20" uuid="fb107abe-13f8-4ff5-bc7e-ada9c700ebfa"/>
+					<textElement>
+						<font isBold="true" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="15"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="2" y="0" width="552" height="79" uuid="7f966042-2dbc-4598-9d78-28a6be542d91"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement x="2" y="0" width="552" height="20" uuid="8455d5a5-1298-42dd-bf66-52add551179f"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Listing of Employee's Additional Remuneration ]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="34" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="19" height="14" uuid="bc12f6e0-161a-4cba-a07d-4e547df39a12"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="179" y="15" width="73" height="14" uuid="4946bb78-bad1-42f8-8936-87d2b76db343"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Income Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="249" y="15" width="45" height="14" uuid="8945334a-bb31-48a7-ac07-60c13b365236"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Taxable]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="294" y="15" width="32" height="14" uuid="3d114b79-0bb6-49dc-a81d-f24a1a953b50"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NIS  ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="326" y="15" width="114" height="14" uuid="2f4cc4dc-ffee-44b1-b52d-83c9cfb7aea5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date Effective ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="440" y="15" width="115" height="14" uuid="03b99052-9112-46a3-8091-9c3df6141b8e"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date Effective End]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="19" y="15" width="160" height="14" uuid="15efff6e-54fa-4aca-bae1-f51b533cadfc"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="179" y="0" width="73" height="15" uuid="cd72e06f-3be6-4a57-8427-766a9d57a7da"/>
+				<textFieldExpression><![CDATA[$F{INCOME_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="249" y="0" width="45" height="15" uuid="fd9a44d8-bcb6-486e-9e54-fd46374e9058"/>
+				<textFieldExpression><![CDATA[$F{TAXABLE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="294" y="0" width="32" height="15" uuid="5d210c07-7b8c-4dce-960a-c9168f93937a"/>
+				<textFieldExpression><![CDATA[$F{NIS_DEDUCTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MMM/yyyy h:mm a">
+				<reportElement x="326" y="0" width="114" height="15" uuid="ecb06322-7510-40d7-827c-73abd42e79ff"/>
+				<textFieldExpression><![CDATA[$F{DATE_EFFECTIVE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MMM/yyyy h:mm a" isBlankWhenNull="true">
+				<reportElement x="440" y="0" width="115" height="15" uuid="4a3048c3-94d4-4a85-a7ae-4c18185102f8"/>
+				<textFieldExpression><![CDATA[$F{DATE_EFFECTIVE_END}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="19" y="0" width="160" height="15" uuid="06077874-7010-4c4a-ad95-b10287d1528b"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="0" width="18" height="15" uuid="138707b7-405b-4467-bb17-54d7b6c928d3"/>
+				<textFieldExpression><![CDATA[$V{Count}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="31" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="7" y="3" width="162" height="13" uuid="ecc58fd7-e845-4e4e-9b86-3bc61c3213ee"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="450" y="3" width="102" height="13" uuid="a8feb50d-dd66-4819-80f1-faa6a944df9d"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="1" width="555" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="d42bbb48-6332-4228-bc0a-e3bd22855667"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="16" width="555" height="15" uuid="a468573f-5f38-4e7c-aab4-da9b91bd8ea4"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="450" y="0" width="62" height="16" uuid="d2444db9-edfd-4154-afe6-f90179ec1953"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="512" y="0" width="40" height="16" uuid="2abf4a7e-1962-40e4-8b2f-00051cb42ac3"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="2" width="162" height="13" uuid="1b7d0683-1ac3-474d-b082-9711e205d2a6"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

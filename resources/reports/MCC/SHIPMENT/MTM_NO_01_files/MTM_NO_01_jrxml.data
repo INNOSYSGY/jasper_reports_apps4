@@ -1,0 +1,860 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Mark to Mark Open Hedge No Funding" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="984" leftMargin="12" rightMargin="12" topMargin="20" bottomMargin="20" uuid="3595fc67-e88e-4f2f-a0e5-45704c75ed6e">
+	<property name="ireport.zoom" value="1.0000000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MCC/SHIPMENT/MTM_NO_01"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.56.101:8081/jasperserver/services/repository"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Future Prices" uuid="8570ce8c-edee-46c7-b00a-b816121cb115">
+		<parameter name="P_DATE" class="java.util.Date">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select element_name,month,TO_CHAR(TO_DATE(month, 'MM'), 'MON')||''''||year Month_Name,price,year
+From Vw_Element_Price_Future F
+where exists
+(
+            select 1
+            from shipment s
+            join agreement a on a.id = s.agreement_id
+            join vw_hedge h on s.id=h.shipment_id
+            join vw_hedge_details hd  on h.id=hd.hedge_id
+            where  not exists (select 1 from shipment_funding sf where sf.shipment_id=s.id)
+            and (
+            trunc($P{P_DATE})<nvl(to_date(hd.sell_price_period_end,'yyyy-mm-dd'),$P{P_DATE}+1)
+            or
+            Trunc($P{P_DATE})<Nvl(To_Date(Hd.Buy_Price_Period_End,'yyyy-mm-dd'),$P{P_DATE}+1)
+            )
+              and h.element=f.element
+              And (
+              (F.Start_Date Between To_Date(Hd.Sell_Price_Period_Start,'yyyy-mm-dd') And To_Date(Hd.Sell_Price_Period_End,'yyyy-mm-dd'))
+              or (F.Start_Date between to_date(hd.buy_price_period_start,'yyyy-mm-dd') and to_date(hd.buy_price_period_end,'yyyy-mm-dd'))
+              )
+
+)]]>
+		</queryString>
+		<field name="ELEMENT_NAME" class="java.lang.String"/>
+		<field name="MONTH" class="java.math.BigDecimal"/>
+		<field name="MONTH_NAME" class="java.lang.String"/>
+		<field name="PRICE" class="java.math.BigDecimal"/>
+		<field name="YEAR" class="java.math.BigDecimal"/>
+		<sortField name="MONTH"/>
+	</subDataset>
+	<parameter name="DATE_AS" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+  a.reference_number||'-'||s.shipment_number mcc_nft_ref_no,
+  a.product_description,
+  case
+  when (select net_weight from shipment_weight where shipment_id = s.id and weight_source='BUYER') is null then
+    (select net_weight from shipment_weight where shipment_id = s.id and weight_source='SUPPLIER')
+  else
+    (select net_weight from shipment_weight where shipment_id = s.id and weight_source='BUYER')
+  end tons,
+  (select name from contact where id= s.supplier) supplier,
+  (select name from contact where id= s.buyer) sold_to,
+   s.bl_date,
+   s.vessel_identifier,
+   nvl(s.origin,'Unknown') origin,
+   nvl(s.loading_port,'Unknown') loading_port,
+   nvl(s.destination,'Unknown') destination_port,
+  h.id hedge_id,
+  h.element,
+(select code
+from vw_element_price_source e
+where e.element_price_source_id=h.price_source_id) price_source,
+  hd.quantity,
+  hd.quantity_mnt_code,
+  hd.sell_date real_sell_date,
+  pkg_mcc.get_qp_display(to_date(hd.sell_price_period_start,'yyyy-mm-dd'),to_date(hd.sell_price_period_end,'yyyy-mm-dd')) sell_date,
+  hd.sell_price,
+  pkg_mcc.get_qp_display(to_date(hd.buy_price_period_start,'yyyy-mm-dd'),to_date(hd.buy_price_period_end,'yyyy-mm-dd')) buy_date,
+  hd.buy_price,
+  round(hd.outcome,4) outcome,
+  hd.buy_price_period_end,
+pkg_mcc.f_get_qp_future_price(upper(h.element),to_date(hd.buy_price_period_start,'yyyy-mm-dd'),to_date(hd.buy_price_period_end,'yyyy-mm-dd'))
+as future_price,
+case when (hd.buy_price is null or hd.buy_price=0) then
+(pkg_mcc.f_get_qp_future_price(upper(h.element),to_date(hd.buy_price_period_start,'yyyy-mm-dd'),to_date(hd.buy_price_period_end,'yyyy-mm-dd'))
+-
+hd.sell_price)*hd.quantity
+else
+( hd.buy_price-hd.sell_price)*hd.quantity end future_outcome
+from shipment s
+join agreement a on a.id = s.agreement_id
+join vw_hedge h on s.id=h.shipment_id
+join vw_hedge_details hd  on h.id=hd.hedge_id
+where  not exists (select 1 from shipment_funding sf where sf.shipment_id=s.id)
+and (
+trunc($P{DATE_AS})<nvl(to_date(hd.sell_price_period_end,'yyyy-mm-dd'),$P{DATE_AS}+1)
+or
+trunc($P{DATE_AS})<nvl(to_date(hd.buy_price_period_end,'yyyy-mm-dd'),$P{DATE_AS}+1)
+)]]>
+	</queryString>
+	<field name="MCC_NFT_REF_NO" class="java.lang.String"/>
+	<field name="PRODUCT_DESCRIPTION" class="java.lang.String"/>
+	<field name="TONS" class="java.math.BigDecimal"/>
+	<field name="SUPPLIER" class="java.lang.String"/>
+	<field name="SOLD_TO" class="java.lang.String"/>
+	<field name="BL_DATE" class="java.sql.Timestamp"/>
+	<field name="VESSEL_IDENTIFIER" class="java.lang.String"/>
+	<field name="ORIGIN" class="java.lang.String"/>
+	<field name="LOADING_PORT" class="java.lang.String"/>
+	<field name="DESTINATION_PORT" class="java.lang.String"/>
+	<field name="HEDGE_ID" class="java.math.BigDecimal"/>
+	<field name="ELEMENT" class="java.lang.String"/>
+	<field name="PRICE_SOURCE" class="java.lang.String"/>
+	<field name="QUANTITY" class="java.math.BigDecimal"/>
+	<field name="QUANTITY_MNT_CODE" class="java.lang.String"/>
+	<field name="REAL_SELL_DATE" class="java.sql.Timestamp"/>
+	<field name="SELL_DATE" class="java.lang.String"/>
+	<field name="SELL_PRICE" class="java.math.BigDecimal"/>
+	<field name="BUY_DATE" class="java.lang.String"/>
+	<field name="BUY_PRICE" class="java.math.BigDecimal"/>
+	<field name="OUTCOME" class="java.math.BigDecimal"/>
+	<field name="BUY_PRICE_PERIOD_END" class="java.lang.String"/>
+	<field name="FUTURE_PRICE" class="java.math.BigDecimal"/>
+	<field name="FUTURE_OUTCOME" class="java.math.BigDecimal"/>
+	<sortField name="MCC_NFT_REF_NO"/>
+	<variable name="Group_Count" class="java.lang.Number" resetType="Group" resetGroup="MCC Shipment Ref" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="Group_Total_outcom" class="java.math.BigDecimal" resetType="Group" resetGroup="MCC Shipment Ref" calculation="Sum">
+		<variableExpression><![CDATA[$F{FUTURE_OUTCOME}]]></variableExpression>
+	</variable>
+	<variable name="Grand_Total_outcome" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{FUTURE_OUTCOME}]]></variableExpression>
+	</variable>
+	<group name="MCC Shipment Ref">
+		<groupExpression><![CDATA[$F{MCC_NFT_REF_NO}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="15">
+				<frame>
+					<reportElement mode="Opaque" x="0" y="0" width="984" height="15" backcolor="#CCCCCC" uuid="05846150-a1e2-4621-809a-e7de68be965e"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</frame>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="76" splitType="Stretch">
+			<line>
+				<reportElement x="175" y="73" width="809" height="1" uuid="9b5999e7-0513-4bcd-8b92-d40e3db972df"/>
+				<graphicElement>
+					<pen lineWidth="2.5" lineColor="#990033"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="175" y="18" width="809" height="33" uuid="258c0d35-064b-4356-a9f4-dce411ab70c7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[VERMILLION MARK TO MARKET ON OPEN HEDGE  POSITIONS WITH NO FUNDING]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="0" width="293" height="69" uuid="480bc32a-b1c1-46d8-8a5e-393b7f5e8df6"/>
+				<imageExpression><![CDATA["repo:/reports/MCC/Image/logo"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="22" splitType="Stretch">
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="1" y="0" width="983" height="20" uuid="e664dd3d-54a5-429a-a476-10e6534fd11c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["VERMILLION MARK TO MARKET ON OPEN HEDGE POSITIONS - AS of "+new SimpleDateFormat("MMMMM dd, yyyy").format($P{DATE_AS})]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="45" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="56" height="30" uuid="9f513496-efc9-4123-b78e-c22581c0c9b6"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[MCC NFT Ref No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="56" y="0" width="68" height="30" uuid="ca864a3c-3c26-44f2-9617-2e89655bcff1"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Product]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="155" y="0" width="128" height="30" uuid="18a62cb2-02a0-4bb5-99dc-baf08d9dfdd3"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Supplier]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="411" y="15" width="78" height="15" uuid="0a4acdbc-ecaf-4aba-b95b-60141523c9f2"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Commodity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="489" y="15" width="50" height="15" uuid="d8ff0ccc-91c7-4322-81cf-77d23f673352"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Qty]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="573" y="15" width="52" height="15" uuid="737da4fd-acd9-4b3d-8b28-4c9ae898db62"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Sell]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="625" y="15" width="65" height="15" uuid="77cc0e56-6279-417f-ab63-c0c1fa0b86c0"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Execution]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="690" y="15" width="62" height="15" uuid="14ce217c-ed25-4b2c-a270-dba370ea7804"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[BUYBACK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="752" y="15" width="68" height="15" uuid="d707a1f7-7400-4409-aa2f-657946240b4c"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Execution]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="820" y="0" width="81" height="30" uuid="dc99fcbc-93ae-4a0d-bf22-e9d65dd30ee7"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Valuation ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="411" y="0" width="409" height="15" uuid="f65936b3-ebd6-4068-a56e-2725d00da335"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Hedges]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="984" height="15" uuid="ba979cc8-f581-4dce-b430-f124b83e0d85"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="539" y="15" width="34" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="03eb8989-3740-4919-b052-9bea9c144cc6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="Single" leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Unit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="124" y="0" width="30" height="30" uuid="c7d902ce-9a0d-458f-83f1-89d4fbb2558c"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Ton]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="283" y="0" width="128" height="30" uuid="584b3581-e278-4b81-a2ca-e2140a33615f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Sold To]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="56" height="15" uuid="95101424-e77a-4508-97f6-3aba2d51221b"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Group_Count}==1 ? $F{MCC_NFT_REF_NO}:'']]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="56" y="0" width="68" height="15" uuid="7d7d6db0-345e-4e35-a97b-e4448fbe9245"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Group_Count}==1 ? $F{PRODUCT_DESCRIPTION}:'']]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="124" y="0" width="30" height="15" uuid="30a5f1fe-49e2-402c-a079-f4cca19d1c0a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Group_Count}==1 ? $F{TONS}:'']]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="155" y="0" width="128" height="15" uuid="4e5c85f0-d394-4aba-a4a5-8b1c0766c924"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Group_Count}==1 ? $F{SUPPLIER}:'']]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="411" y="0" width="21" height="15" uuid="c4e52659-b973-4da5-a008-ad1b56a7730a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ELEMENT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="489" y="0" width="49" height="15" uuid="4939be07-62e3-434f-ba0b-ca835ab436ae"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QUANTITY}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yy" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="572" y="0" width="52" height="15" uuid="bcc832b5-2f25-4aee-b9fb-dbe6a3d98dbe"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SELL_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="$   #,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="624" y="0" width="65" height="15" uuid="2643f2bc-f639-4876-ba8a-7398f6cd0117"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SELL_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yy" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="690" y="0" width="62" height="15" uuid="2b0cba01-da71-419c-b371-d7d54435f4bd"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BUY_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="$   #,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="752" y="0" width="68" height="15" uuid="6aaf6272-4fa3-4dca-9740-ddd6ae2e9583"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BUY_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="538" y="0" width="34" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="068f8733-d443-4dad-9bf3-94f867529c7a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QUANTITY_MNT_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="432" y="0" width="57" height="15" uuid="c4e52659-b973-4da5-a008-ad1b56a7730a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRICE_SOURCE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="$   #,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="820" y="0" width="81" height="15" uuid="fa619fbf-18e1-4c99-9291-8b3924d69aef"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FUTURE_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="$   #,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="901" y="0" width="83" height="15" uuid="fa619fbf-18e1-4c99-9291-8b3924d69aef"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FUTURE_OUTCOME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="283" y="0" width="128" height="15" uuid="9bc721dc-63ad-4222-ad4d-eee3096e24eb"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Group_Count}==1 ? $F{SOLD_TO}:'']]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="34" splitType="Stretch">
+			<rectangle>
+				<reportElement x="1" y="1" width="983" height="15" forecolor="#CCCCCC" backcolor="#CC0033" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+				<graphicElement>
+					<pen lineColor="#990033"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="1" y="18" width="995" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Innovative Systems Inc®]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="703" y="0" width="234" height="15" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="EEEEE dd MMMMM yyyy" isBlankWhenNull="true">
+				<reportElement x="9" y="0" width="227" height="15" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" evaluationTime="Report" pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="938" y="0" width="27" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="bf29d155-322a-4ed6-887e-85e4736d1c5a"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="67" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="984" height="15" backcolor="#CCCCCC" uuid="05846150-a1e2-4621-809a-e7de68be965e"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement x="1" y="0" width="521" height="15" uuid="e664dd3d-54a5-429a-a476-10e6534fd11c"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA["VERMILLION MARK TO MARKET ON OPEN HEDGE POSITIONS - AS of "+new SimpleDateFormat("MMMMM dd, yyyy").format($P{DATE_AS})]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="$   #,##0.00" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToTallestObject" x="901" y="0" width="83" height="15" uuid="fa619fbf-18e1-4c99-9291-8b3924d69aef"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9"/>
+						<paragraph leftIndent="2" rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Grand_Total_outcome}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<crosstab>
+				<reportElement x="1" y="31" width="880" height="36" uuid="05ea0d63-a37c-45f6-9fa7-fea8506fdc48"/>
+				<crosstabDataset>
+					<dataset>
+						<datasetRun subDataset="Future Prices" uuid="fff0423c-3314-4a48-801c-5f093a5b5922">
+							<datasetParameter name="P_DATE">
+								<datasetParameterExpression><![CDATA[$P{DATE_AS}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+					</dataset>
+				</crosstabDataset>
+				<rowGroup name="ELEMENT_NAME" width="70">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{ELEMENT_NAME}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="70" height="15" uuid="71355943-6444-4eed-951f-3e904194ca7e"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+									<paragraph leftIndent="2" rightIndent="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{ELEMENT_NAME}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="MONTH_NAME" height="0">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{MONTH}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<columnGroup name="group1" height="15">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{MONTH_NAME}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="57" height="15" uuid="0ab188a4-bd4b-4d7a-8566-16ab6ec07c26"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{group1}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="PRICEMeasure" class="java.math.BigDecimal" calculation="Average">
+					<measureExpression><![CDATA[$F{PRICE}]]></measureExpression>
+				</measure>
+				<crosstabCell width="57" height="15">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="$ #,##0.00" isBlankWhenNull="true">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="57" height="15" uuid="5cc1d4ee-5020-4b2d-bb3c-cf7fabd1b16d"/>
+							<textElement textAlignment="Right" verticalAlignment="Middle">
+								<font fontName="Arial" size="9"/>
+								<paragraph leftIndent="2" rightIndent="3"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{PRICEMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell height="25" rowTotalGroup="ELEMENT_NAME">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="207f659a-ecee-47e5-b21a-b0c3df62424e"/>
+							<textFieldExpression><![CDATA[$V{PRICEMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="50" columnTotalGroup="MONTH_NAME">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="b35b5162-8d3f-4c89-9f5a-275048981efa"/>
+							<textFieldExpression><![CDATA[$V{PRICEMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="ELEMENT_NAME" columnTotalGroup="MONTH_NAME">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="fc692c2a-5bf9-4575-a421-896bc6989d86"/>
+							<textFieldExpression><![CDATA[$V{PRICEMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell columnTotalGroup="group1">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="ELEMENT_NAME" columnTotalGroup="group1">
+					<cellContents/>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

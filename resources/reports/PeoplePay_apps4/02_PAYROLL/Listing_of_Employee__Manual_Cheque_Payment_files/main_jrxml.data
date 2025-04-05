@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PAYROLL CHEQUE PAYMENTS" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1ea78755-1a22-4647-a538-a5f9cbb4da20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/Listing_of_Employee__Manual_Cheque_Payment"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Listing of Employee Cheque Payment"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT_PROD"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/02_PAYROLL/Listing_of_Employee__Manual_Cheque_Payment_files/main_jrxml"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+	c.first_name,
+	c.surname,
+    a.cheque_no,
+    to_char(a.cheque_date,'DD-MON-YYYY') cheque_date,
+    a.salary_id,
+    a.emp_id,
+    a.payslip_no,
+   nvl((select net_pay from pa_pmg_payrolldtl
+where id =a.payslip_no),0) check_amount,
+    to_char((select payroll_date from pa_pmg_payrollhd where earnings_period_id =a.earnings_period_id),'MON-YYYY') payroll_date,
+    a.entry_date,
+    a.entered_by,
+    a.last_changed_by,
+    a.last_changed_date,
+     (select to_char(start_date,'dd-MON-yyyy')||' - '||to_char(end_date,'dd-MON-yyyy')  from pa_pcf_earningperiod
+where id = a.earnings_period_id) earnings_period,
+    b.org_id
+FROM pa_pmg_payrollsupchecks a
+join
+hr_rcm_employee b
+on 
+b.id = a.emp_id
+join
+hr_rcm_individual c on 
+c.id = b.ind_id
+where  a.earnings_period_id = $P{EARNINGS_PERIOD_ID}]]>
+	</queryString>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="CHEQUE_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CHEQUE_NO"/>
+	</field>
+	<field name="CHEQUE_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CHEQUE_DATE"/>
+	</field>
+	<field name="SALARY_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="SALARY_ID"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="PAYSLIP_NO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PAYSLIP_NO"/>
+	</field>
+	<field name="CHECK_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="CHECK_AMOUNT"/>
+	</field>
+	<field name="PAYROLL_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PAYROLL_DATE"/>
+	</field>
+	<field name="ENTRY_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="ENTRY_DATE"/>
+	</field>
+	<field name="ENTERED_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ENTERED_BY"/>
+	</field>
+	<field name="LAST_CHANGED_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LAST_CHANGED_BY"/>
+	</field>
+	<field name="LAST_CHANGED_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="LAST_CHANGED_DATE"/>
+	</field>
+	<field name="EARNINGS_PERIOD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EARNINGS_PERIOD"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<variable name="Total_netpay" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CHECK_AMOUNT}]]></variableExpression>
+		<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+	</variable>
+	<variable name="emp_count" class="java.math.BigDecimal" calculation="Count">
+		<variableExpression><![CDATA[$F{EMP_ID}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="54" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="54" uuid="0a847007-2a64-4b50-a103-59777a6c8148"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="23" splitType="Stretch">
+			<textField pattern="MMMMM dd, yyyy" isBlankWhenNull="true">
+				<reportElement x="89" y="0" width="429" height="20" uuid="676821f0-7f7f-4398-aaae-26dc7a377b93"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Manual Cheque Payments For Employees Ending: ('+ $F{EARNINGS_PERIOD} +' )']]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<staticText>
+				<reportElement x="12" y="0" width="30" height="15" uuid="697f1e58-67eb-4857-baad-c0a72902c41d"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="42" y="0" width="128" height="15" uuid="be752935-3da7-49ab-ae3c-27a6aba6ed9c"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Last Name]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="555" height="1" uuid="30544c95-f13a-4b04-bd78-bdefbd290334"/>
+			</line>
+			<staticText>
+				<reportElement x="142" y="0" width="98" height="15" uuid="8b139867-4c9d-43ec-8b26-eb0a53afa242"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Firstname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="240" y="4" width="100" height="15" uuid="596d80a5-1a06-4526-8df5-d9dd725e1cb1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3f3c879e-cd3b-43bc-8275-8783a1cb392e"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cheque Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="348" y="2" width="100" height="16" uuid="5f0ccb77-801c-47b6-b788-404226a7dc38">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6a40751f-b3fe-4ffe-ac66-fad5e309e4bb"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cheque Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="444" y="3" width="100" height="16" uuid="ab305dc0-ea29-48d8-a75c-ea09377f6c50">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4394c4d1-2ac9-4b0b-8dd6-54e641d8464c"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Check Amount]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="43" splitType="Stretch">
+			<textField>
+				<reportElement x="141" y="0" width="100" height="15" uuid="05a8cd41-148f-4ed1-8025-882eac47e013">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2759fd1f-fc4b-4461-b828-7e41d5e59314"/>
+				</reportElement>
+				<textElement>
+					<font size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="42" y="0" width="100" height="15" uuid="5052fb8a-ade6-4b82-a384-9dd9e5eba83f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f438049a-9519-4431-bad1-224a835059e6"/>
+				</reportElement>
+				<textElement>
+					<font size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="250" y="0" width="100" height="15" uuid="ea629a5d-c2e2-492d-b0f0-7995ca1ba356">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3f3c879e-cd3b-43bc-8275-8783a1cb392e"/>
+				</reportElement>
+				<textElement>
+					<font size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHEQUE_NO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.##;¤-#,##0.##">
+				<reportElement x="448" y="-1" width="100" height="16" uuid="170a7ef8-e645-4c94-ba62-73432bba4c6f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4394c4d1-2ac9-4b0b-8dd6-54e641d8464c"/>
+				</reportElement>
+				<textElement>
+					<font size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHECK_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="350" y="-1" width="100" height="16" uuid="49f7819c-65f9-41b9-ac09-c2202ced48be">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7ae1c40e-efcf-4414-91f7-e30b9f4d8f65"/>
+				</reportElement>
+				<textElement>
+					<font size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHEQUE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="-1" width="30" height="16" uuid="255c9114-8cca-4fb9-b028-989e44aa69bf"/>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{emp_count}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="31" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="555" height="15" uuid="880a7434-cb67-4dd5-bd74-53b5df31bf48"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="15" forecolor="#999999" backcolor="#999999" uuid="2fbf1d24-63ca-42b9-9ad2-9e9dcd260d3f"/>
+				<textField evaluationTime="Report">
+					<reportElement x="528" y="0" width="27" height="15" uuid="e0242c8b-2b6e-4de9-9820-25b2f230ca94"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="448" y="0" width="80" height="15" uuid="589fec73-a00b-44e8-bbc6-024d4c5ce4b0"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE, MMMMM, dd  yyyy">
+					<reportElement x="0" y="0" width="279" height="15" uuid="f77b7bbd-1e7b-4a58-a7f5-753eb71be77f"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="18" splitType="Stretch">
+			<staticText>
+				<reportElement x="289" y="0" width="100" height="15" uuid="cfb68901-c4b6-4f97-945a-d23eda9b8040"/>
+				<textElement>
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern="$  #,##0">
+				<reportElement x="389" y="0" width="100" height="15" uuid="c1071433-a080-4b77-ab29-706fd613cc54"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_netpay}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="289" y="0" width="200" height="1" uuid="a2b53a43-d3fb-4117-8278-dfc9cff02fb1"/>
+			</line>
+			<line>
+				<reportElement x="289" y="15" width="200" height="1" uuid="a470fff3-19c1-4cc1-bb2a-db79e090b47b"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

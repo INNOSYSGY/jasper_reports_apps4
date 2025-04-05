@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="NDMA NIS" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="418b6d64-243b-4ebf-83eb-ae5fbcf97023">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/PeoplePay/02_PAYROLL/NDMAMedical"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<queryString>
+		<![CDATA[SELECT
+o.org_structure_id,
+  A.PAY_BATCH_ID,
+  initcap(b.deduction_type) deduction_type,
+  A.ORG_ID,
+  A.PERIOD_START,
+  A.PERIOD_END,
+  EMP_COMPANY_NO,
+  CONCAT(A.FIRST_NAME_HIST,A.SURNAME_HIST) "Name",
+  (CASE WHEN L.SURNAME_HIST IS NULL THEN A.SURNAME_HIST ELSE A.SURNAME_HIST END||', '||CASE WHEN       L.FIRST_NAME_HIST IS NULL THEN A.FIRST_NAME_HIST ELSE A.FIRST_NAME_HIST END) AS ENAME
+, initcap(A.POSITION_NAME_HIST) AS DESIGNATION, A.PAYMENT_TYPE_HIST AS PAYTYPE,
+    A.DEPARTMENT_NAME_HIST AS DEPARTMENT,
+    o.UNIT_NAME Worklocation,
+    H.ORGANISATION_NAME AS COMPANY, ROUND(AMOUNT_OWING,0) AS AMOUNT_OWING, PERIOD,J.EXPENSE_CODE,J.DESCRIPTION EXPENSE,
+    L.interest_rate,B.STATUS_CODE status,date_close,L.approved_date,B.id deduction_id, round(B.Amount_Deducted,0) as deduction_amount,
+    amount_owing-(select sum(amount_deducted)
+                  FROM PA_PMG_PAYROLLDEDUCTION PD
+                  WHERE PD.ADM_DEDUCTION_ID = L.ID) BALANCE, L.CURRENT_BALANCE,DATESTART START_DATE--start_date
+                  	,A.EMPLOYMENT_CLASS_HIST,initcap(B.DEDUCTION_NO) DEDUCTION_NO,WHO_PAYS,
+                     h.address,h.telnum,h.faxnum
+	FROM PA_PMG_PAYROLLDEDUCTION B JOIN PA_PMG_PAYROLLDTL A ON A.ID=B.PAY_SLIPNO
+    inner join HR_RCM_EMPLOYEE E ON E.ID = a.Emp_ID
+	JOIN PA_PCF_ADMINDEDUCTION L ON L.ID=B.ADM_DEDUCTION_ID
+    JOIN PA_PCF_DEDUCTIONCODE J ON J.ID=L.EXPENSE_ID
+    JOIN HR_HCF_ORGANISATION H ON A.ORG_ID=H.ID
+    join VW_ORGANISATION_STRUCTURE o on a.orgdtl_id=o.id
+
+	  WHERE A.earnings_period_id =6615
+   and UPPER(j.EXPENSE_CODE) in ('GPSCCU','GPSU')--(case when upper(to_nchar($P{EXPENSE_CODE}))=to_nchar('ALL') or upper(to_nchar($P{EXPENSE_CODE}))=to_nchar('%') then UPPER(to_nchar(j.id)) else upper(to_nchar($P{EXPENSE_CODE})) end)   AND UPPER(WHO_PAYS) IN ('EMPLOYEE','BOTH')
+
+	AND B.AMOUNT_DEDUCTED>0
+ORDER BY  o.UNIT_NAME,A.EMPLOYMENT_CLASS_HIST,A.SURNAME_HIST,A.FIRST_NAME_HIST]]>
+	</queryString>
+	<field name="FIRST_NAME_HIST" class="java.lang.String"/>
+	<field name="SURNAME_HIST" class="java.lang.String"/>
+	<field name="CURRENT_BALANCE" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="33" splitType="Stretch">
+			<staticText>
+				<reportElement x="131" y="0" width="321" height="20" uuid="a41aeebb-55d1-4325-a127-418b561d2c7a"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Group Medical - Hand-inHand Group Insurance Co. Ltd.]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="33" y="0" width="165" height="20" uuid="4ab42300-bb17-4084-adab-7a0a9acdc5d2"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="198" y="0" width="117" height="20" uuid="b4c9b29f-95a0-4dcf-87a8-0ae6cf98e59e"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Employee's Contribution]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="315" y="0" width="109" height="20" uuid="e9c31a5a-8ea6-49db-a14d-edb451229d61"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Employer's Contribution]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="424" y="0" width="108" height="20" uuid="ec396095-fe3d-4c3c-b066-e4ce07bfe86a"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch">
+			<textField>
+				<reportElement x="508" y="9" width="80" height="20" uuid="e12f326c-20e0-45d3-8d76-5cd359007cfe"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement x="452" y="0" width="80" height="20" uuid="7af6851e-b96b-4321-b58e-de6e7bd8fef1"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="532" y="0" width="40" height="20" uuid="42a29a34-b101-4f93-98f9-f607daf05742"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="112" height="20" uuid="f052ac3b-17c8-41de-8f2b-97427cf09009"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

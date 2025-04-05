@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="May 2018 Sal_letters" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c4f59e87-1577-44a4-abe4-3523ad82d590">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="45"/>
+	<parameter name="ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="CHEQ_NUMBER" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BANK_BRANCH_ID_PMG" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select sum(net_pay), bank_branch_id_pmg, end_paid_for,
+(select organisation_name from apps.hr_hcf_organisation where id =$P{BANK_BRANCH_ID_PMG} ) ORG_NAME,
+(select address from apps.hr_hcf_organisation where id =$P{BANK_BRANCH_ID_PMG} ) ORG_ADDRESS,
+'The Manager', 'Dear Sir/Madam,',
+(select short_name from apps.hr_hcf_organisation where id =$P{ORG_ID} )short,
+apps.pkg_global_fnts.fn_num_towords(sum(net_pay))words,
+trim(to_char(sum(net_pay),'$999,999,999,999,999.999'))no_words,
+to_char(end_paid_for,'Month dd,yyyy') as end_date,
+'Mr. Nigel Niles' supe,
+'Director of Corporate Services' supe_pos
+from apps.pa_pmg_payrolldtl pdl
+join apps.pa_pcf_earningperiod ep
+on pdl.EARNINGS_PERIOD_ID = ep.ID
+where end_paid_for = '31_MAY_18' AND pdl.org_id =$P{ORG_ID}  AND bank_branch_id_pmg = $P{BANK_BRANCH_ID_PMG}
+group by bank_branch_id_pmg, end_paid_for]]>
+	</queryString>
+	<field name="SUM(NET_PAY)" class="java.math.BigDecimal"/>
+	<field name="BANK_BRANCH_ID_PMG" class="java.math.BigDecimal"/>
+	<field name="END_PAID_FOR" class="java.sql.Timestamp"/>
+	<field name="ORG_NAME" class="java.lang.String"/>
+	<field name="ORG_ADDRESS" class="java.lang.String"/>
+	<field name="&apos;THEMANAGER&apos;" class="java.lang.String"/>
+	<field name="&apos;DEARSIR/MADAM,&apos;" class="java.lang.String"/>
+	<field name="SHORT" class="java.lang.String"/>
+	<field name="WORDS" class="java.lang.String"/>
+	<field name="NO_WORDS" class="java.lang.String"/>
+	<field name="END_DATE" class="java.lang.String"/>
+	<field name="SUPE" class="java.lang.String"/>
+	<field name="SUPE_POS" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<detail>
+		<band height="425" splitType="Stretch">
+			<staticText>
+				<reportElement x="8" y="177" width="299" height="20" uuid="621facc6-a676-45b0-beac-7651e3163c36"/>
+				<textElement>
+					<font fontName="Times New Roman" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SALARY PAYMENTS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="327" width="520" height="20" uuid="5f656f6e-9fc1-45b3-9645-fc10cc970fb6"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[Yours Faithfully,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="347" width="520" height="20" uuid="26e645a6-fa32-4abd-8e08-9bb53e86f587"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[....................................................................................]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="8" y="208" width="470" height="51" uuid="a97a824d-2b5a-4918-b73c-10bdf917811c"/>
+				<textElement markup="html">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Please find enclosed "+"<b>"+$F{SHORT}+"</b>"+ " Cheque # "+"<b>"+$P{CHEQ_NUMBER}+"</b>"+" for the sum of "+$F{WORDS}+" ( "+"<b>"+$F{NO_WORDS}+"</b>"+" ) for allocation in accordance with the details and the names appended."]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="8" y="274" width="470" height="20" uuid="c71cb8a0-483c-4937-8f70-5f7c8c3542e9"/>
+				<textElement markup="html">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Please note that salaries wouold be paid on "+"<b>"+$F{END_DATE}+"</b>"]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="8" y="10" width="299" height="20" uuid="18319d74-b193-45c5-8382-b59681502748"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="8" y="30" width="299" height="20" uuid="2deea59c-d8e5-4b0c-863d-e2c53f390ece"/>
+				<textElement>
+					<font fontName="Times New Roman" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{'THEMANAGER'}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="8" y="50" width="299" height="20" uuid="4acc3ab5-80cb-4798-b6ee-e0084c539946"/>
+				<textElement>
+					<font fontName="Times New Roman" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="8" y="70" width="299" height="20" uuid="e053977a-7af6-46b2-8997-56c71ef9aaa5"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="8" y="137" width="299" height="20" uuid="11966657-ea0d-47af-9bd1-00359ad6fafc"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{'DEARSIR/MADAM,'}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="8" y="367" width="520" height="20" uuid="73ad8a6b-95c8-4651-bf52-6ce0b50dc62f"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUPE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="8" y="387" width="520" height="20" uuid="e1e8e5bf-456a-4626-adde-511eda3a2b19"/>
+				<textElement>
+					<font fontName="Times New Roman" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUPE_POS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

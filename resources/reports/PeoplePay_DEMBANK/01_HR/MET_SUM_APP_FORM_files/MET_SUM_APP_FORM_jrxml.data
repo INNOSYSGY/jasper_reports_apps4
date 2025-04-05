@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Metro Summary Apprasail Form" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a02102d1-4684-4b00-b616-fc080701cc1f">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/MET_SUM_APP_FORM"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<parameter name="ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="START_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="END_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    initcap(nvl(first_name,'')||' '||nvl(surname,'')) name,
+    (select initcap(nvl(first_name,'')||' '||nvl(surname,''))
+    from  hr_rcm_employee b
+    join hr_rcm_individual a  on a.id=b.ind_id
+    where b.id=appraiser) appraiser,
+    initcap(A.APPRAISER_CLASSIFICATION) APPRAISAL_CLASSIFICATION,
+    A.DEDUCTION_PERCENT,
+    A.BONUS,
+    a.EMPLOYEE_POINTS,
+    a.MANAGEMENT_POINTS,
+    A.EMPLOYEE_PERCENT,
+    a.MANAGEMENT_PERCENT,
+    a.recommend_promotion
+
+FROM
+     hr_app_meritincrement a
+join hr_rcm_employee b on a.emp_id=b.id
+JOIN HR_RCM_INDIVIDUAL ind  ON ind.ID=B.IND_ID
+JOIN HR_HCF_ORGANISATION M ON M.ID = B.ORG_ID
+WHERE B.ORG_ID = $P{ORG_ID}
+AND A.APPRAISAL_END_PERIOD BETWEEN $P{START_DATE} AND $P{END_DATE}]]>
+	</queryString>
+	<field name="NAME" class="java.lang.String"/>
+	<field name="APPRAISER" class="java.lang.String"/>
+	<field name="APPRAISAL_CLASSIFICATION" class="java.lang.String"/>
+	<field name="DEDUCTION_PERCENT" class="java.math.BigDecimal"/>
+	<field name="BONUS" class="java.math.BigDecimal"/>
+	<field name="EMPLOYEE_POINTS" class="java.math.BigDecimal"/>
+	<field name="MANAGEMENT_POINTS" class="java.math.BigDecimal"/>
+	<field name="EMPLOYEE_PERCENT" class="java.math.BigDecimal"/>
+	<field name="MANAGEMENT_PERCENT" class="java.math.BigDecimal"/>
+	<field name="RECOMMEND_PROMOTION" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="121" splitType="Stretch">
+			<textField>
+				<reportElement x="86" y="0" width="100" height="20" uuid="2d9cf6e0-8a66-4797-89b3-60ea9859f21c"/>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="86" height="20" uuid="87a5a2d9-ae93-42b9-bea9-17615b139ede"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee Name:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="403" y="0" width="100" height="20" uuid="79f0a3a6-065a-42aa-ad7c-e6452112c784"/>
+				<textFieldExpression><![CDATA[$F{APPRAISER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="351" y="0" width="52" height="20" uuid="6cfabef6-c54a-4761-a312-68686466d766"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reviewer:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="555" height="20" uuid="efe6aa42-574a-468f-ac1a-5e50f3670b22"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Appraisal Score]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="41" width="48" height="20" uuid="1bb59277-2b5d-4527-a0c0-6a578a60d4b0"/>
+				<textFieldExpression><![CDATA[$F{APPRAISAL_CLASSIFICATION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="41" width="100" height="20" uuid="81c82553-b447-49ce-9b47-52876818f57d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Classification:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="61" width="48" height="20" uuid="85ffef11-c5f8-476d-86db-7724043abed5"/>
+				<textFieldExpression><![CDATA[$F{DEDUCTION_PERCENT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="61" width="100" height="20" uuid="006861e0-0602-48ca-8f98-25671fbf7cfc"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Deduction Percent:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="81" width="48" height="20" uuid="2fea1af2-1543-48f5-b828-2305fb86403a"/>
+				<textFieldExpression><![CDATA[$F{BONUS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="81" width="100" height="20" uuid="3d30fcc6-132f-4852-8dfc-dbca9a440b20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bonus:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="278" y="41" width="42" height="20" uuid="a8908d54-17b2-468e-836a-9eea1e9b219d"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_POINTS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="178" y="41" width="100" height="20" uuid="445c7edc-2097-4175-a19c-e50f23d2634d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee Points:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="278" y="61" width="42" height="20" uuid="1ba09fe9-8efb-4724-97b1-439a2c670dfe"/>
+				<textFieldExpression><![CDATA[$F{MANAGEMENT_POINTS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="178" y="61" width="100" height="20" uuid="ec1a571c-f3d3-4413-866d-b62012c5702c"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Management Points:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="461" y="41" width="66" height="20" uuid="b6a37989-8d18-4281-a7c2-8406fef5556e"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_PERCENT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="351" y="41" width="110" height="20" uuid="650f241e-d36a-4721-9cf2-0b52bbb08247"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee Percent:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="461" y="61" width="66" height="20" uuid="aa1587e5-583f-46ac-a18a-d41ac661f6e1"/>
+				<textFieldExpression><![CDATA[$F{MANAGEMENT_PERCENT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="351" y="61" width="110" height="20" uuid="75808489-e689-4fad-a66d-f4f4b029eb7c"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Management Percent:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="178" y="81" width="142" height="20" uuid="d92592dd-1513-4bd4-ad86-6def0b5418e9"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Promotion Recommended]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="178" y="101" width="33" height="20" uuid="bc0dfbd7-768f-4a2b-b9c9-17ab47510571"/>
+				<text><![CDATA[Yes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="265" y="101" width="27" height="20" uuid="74bf6616-8150-4013-9700-cd6eb56b0ea3"/>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="211" y="101" width="24" height="20" uuid="92c60700-70c6-47de-b5fd-579e8f070a93"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{RECOMMEND_PROMOTION}=='Y' ?  "X":""]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="292" y="101" width="28" height="20" uuid="fb93b001-9261-4cd8-b819-9f8d9da05219"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{RECOMMEND_PROMOTION}=='N' ?  "X":""]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

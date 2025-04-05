@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Pay Change" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0dfae0ff-43d5-4ed6-ba60-89c704818afd">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT *
+FROM TABLE(PKG_REPORTS.SP_PAYCHANGERPT($P{EARNINGS_PERIOD_ID},'wewew','wewew'))
+order by org_structure]]>
+	</queryString>
+	<field name="EMPLOYEE" class="java.lang.String"/>
+	<field name="ACCOUNT_CODE" class="java.lang.String"/>
+	<field name="PAID" class="java.lang.String"/>
+	<field name="AMOUNT_PAID" class="java.math.BigDecimal"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="PERSONAL_RATE" class="java.math.BigDecimal"/>
+	<field name="START_DATE" class="java.sql.Timestamp"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="LAST_CHANGED_DATE" class="java.sql.Timestamp"/>
+	<field name="HOURLY_RATE" class="java.math.BigDecimal"/>
+	<field name="POSITION_LOCATION_ID" class="java.math.BigDecimal"/>
+	<field name="DESIGNATION" class="java.lang.String"/>
+	<field name="ORG_STRUCTURE" class="java.lang.String"/>
+	<variable name="Employee" class="java.lang.String"/>
+	<variable name="Total_Deduction_Employee" class="java.math.BigDecimal" resetType="Group" resetGroup="Name" calculation="Sum">
+		<variableExpression><![CDATA[$F{PAID}=='D' ? $F{AMOUNT_PAID}:0]]></variableExpression>
+	</variable>
+	<variable name="Total_Payment_Employee" class="java.math.BigDecimal" resetType="Group" resetGroup="Name" calculation="Sum">
+		<variableExpression><![CDATA[$F{PAID}=='P' ?$F{AMOUNT_PAID}:0]]></variableExpression>
+	</variable>
+	<variable name="GT_Deduction" class="java.math.BigDecimal" incrementType="Group" incrementGroup="Name" calculation="Sum">
+		<variableExpression><![CDATA[$F{PAID}=='D' ? $F{AMOUNT_PAID}:0]]></variableExpression>
+	</variable>
+	<variable name="Record_count" class="java.math.BigDecimal" incrementType="Group" incrementGroup="Name" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="GT_Payment" class="java.math.BigDecimal" incrementType="Group" incrementGroup="Name" calculation="Sum">
+		<variableExpression><![CDATA[$F{PAID}=='P' ? $F{AMOUNT_PAID}:0]]></variableExpression>
+	</variable>
+	<group name="Department" isStartNewPage="true" isReprintHeaderOnEachPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{ORG_STRUCTURE}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<staticText>
+					<reportElement uuid="144b9d07-44bd-4ba6-8192-974ac1882793" x="0" y="0" width="100" height="20"/>
+					<textElement/>
+					<text><![CDATA[Department:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="Name" keepTogether="true">
+		<groupExpression><![CDATA[$F{EMPLOYEE}]]></groupExpression>
+		<groupHeader>
+			<band height="19">
+				<textField>
+					<reportElement uuid="0f588e87-105c-471d-b8b6-9d5211d351fd" x="65" y="2" width="167" height="17"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[$F{EMPLOYEE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="63f82b6d-1435-4af8-aefd-b77fd68c8278" x="23" y="2" width="42" height="17"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[$F{EMP_ID}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="Name" pattern="###0" isBlankWhenNull="true">
+					<reportElement uuid="1340c009-486c-4861-ba16-ac49d8207013" x="1" y="2" width="21" height="17"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[$V{Record_count}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="33">
+				<staticText>
+					<reportElement uuid="6914d67f-167d-48c8-9814-147208ded13d" x="321" y="10" width="103" height="20"/>
+					<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+					<text><![CDATA[Total Payments:]]></text>
+				</staticText>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement uuid="e9ff4d94-e687-49b7-a294-af35aaa257c2" x="423" y="10" width="69" height="21"/>
+					<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+					<textFieldExpression><![CDATA[$V{Total_Payment_Employee}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement uuid="898874ad-8575-4411-b8fe-a9bc70af4718" x="1" y="31" width="555" height="1"/>
+				</line>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement uuid="94642eff-e38a-4361-a52e-ffddaef95a04" x="425" y="0" width="67" height="20"/>
+					<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+					<textFieldExpression><![CDATA[$V{Total_Deduction_Employee}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="1a2e90b2-3382-469b-bbc7-f789f991918e" x="321" y="0" width="103" height="20"/>
+					<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+					<text><![CDATA[Total Deductions:]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="52" splitType="Stretch">
+			<textField>
+				<reportElement uuid="27b180b0-e1d7-480f-a7e7-0ab5029eb874" x="1" y="0" width="554" height="20"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="3e92ca17-ecc6-4e09-b6bc-4ec94d0dd628" x="1" y="15" width="554" height="20"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="9c67b7b4-bcd7-4c00-9b46-7758fd16aa21" x="0" y="31" width="555" height="20"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TELNUM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="36" splitType="Stretch">
+			<textField>
+				<reportElement uuid="af355c21-3a15-4fb8-981f-133f75b07501" x="1" y="0" width="554" height="20"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Payroll Processing for Period Ending ']]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="9ab025d7-3f21-47ef-85de-6648bfc17da8" x="1" y="16" width="555" height="20"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Non Statutory Deduction]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="82dbf8f4-d289-46c9-b003-2551875063ca" x="0" y="0" width="22" height="20"/>
+				<textElement verticalAlignment="Bottom"/>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7835c74b-b80d-4fd0-851e-67bb249884d8" x="22" y="0" width="42" height="20"/>
+				<textElement verticalAlignment="Bottom"/>
+				<text><![CDATA[Emp#]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7fb1343b-9e8c-4fb9-a1e4-8d03eec84d4d" x="64" y="0" width="49" height="20"/>
+				<textElement verticalAlignment="Bottom"/>
+				<text><![CDATA[Employee]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="99e7ccc4-6bb4-4141-9ea8-22ff014c09d2" x="145" y="0" width="45" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom"/>
+				<text><![CDATA[Account]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="52d82dfb-d6d9-4b38-ba77-dca8c091066b" x="346" y="0" width="70" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dfd9601b-da40-41f4-be2d-64990f8ccd5d" x="495" y="0" width="60" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<text><![CDATA[Hourly Rate]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c33f2b5d-745c-4e4e-8c69-a9681bd44ef3" x="416" y="0" width="79" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<text><![CDATA[Basic Rate]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="4303552c-6fd5-48ac-8fd0-33a9dd5bb016" x="1" y="20" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="ff7d79d1-5a4a-4ff8-b49b-d9e1c1985d7e" x="113" y="0" width="32" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom"/>
+				<text><![CDATA[P/D]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3492fa4b-bce9-4d1d-a905-d0b5a987d65b" x="243" y="0" width="103" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<text><![CDATA[Transaction]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement uuid="d4cdd86c-f420-49ec-b1a0-d93a4e31791c" x="506" y="2" width="50" height="16"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{HOURLY_RATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0d0db3ee-9eb0-4287-8b40-3aa592341de9" x="145" y="2" width="43" height="16"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{ACCOUNT_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="97c4a9e6-a11f-404e-8877-be0a91d74e82" x="117" y="2" width="23" height="16"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{PAID}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement uuid="940db02d-369c-4c18-870e-09c3e68d5ef4" x="424" y="2" width="68" height="16"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{PERSONAL_RATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f9111fbb-3029-4403-9713-e3f7b1466960" x="193" y="2" width="153" height="16"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement uuid="4982d9fb-665c-4ae7-927a-fd63734b3327" x="358" y="2" width="57" height="16"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{AMOUNT_PAID}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="46" splitType="Stretch">
+			<rectangle>
+				<reportElement uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf" x="1" y="2" width="554" height="20" forecolor="#CCCCCC" backcolor="#CCCCCC"/>
+			</rectangle>
+			<textField evaluationTime="Report">
+				<reportElement uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0" x="492" y="4" width="63" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="d542132f-c136-4dc8-8760-3f15164318a0" x="6" y="4" width="162" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9" x="392" y="4" width="100" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="b2a773d7-a277-4610-901a-ea782d2775b0" x="1" y="26" width="554" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="31" splitType="Stretch">
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement uuid="cf2b301e-999c-4a00-9d82-2dd4208ae6b8" x="425" y="0" width="67" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$V{GT_Deduction}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement uuid="d535878c-66f9-4b90-ac7f-3f75d25590b9" x="425" y="10" width="67" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$V{GT_Payment}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="1a2e90b2-3382-469b-bbc7-f789f991918e" x="259" y="1" width="165" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<text><![CDATA[Grand Total Deductions:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1a2e90b2-3382-469b-bbc7-f789f991918e" x="260" y="11" width="165" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<text><![CDATA[Grand Total Payments:]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GWI_1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0a586ae-93e6-4f99-ab44-6e05f8045489">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/Training/GWI_1"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="dataset1" uuid="b1ebb0bc-0aa6-4f53-8e3c-91d7293bd3ec">
+		<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="START_DATE" class="java.util.Date">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="END_DATE" class="java.util.Date">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT
+(FIRST_NAME||' '||MIDDLE_NAME||' '||SURNAME) emp_name
+FROM hr_rcm_individual a join hr_rcm_employee b on b.ind_id = a.id
+where org_id = $P{P_IN_ORG_ID} and DATE_SEPARATED between $P{START_DATE} and $P{END_DATE}]]>
+		</queryString>
+		<field name="EMP_NAME" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="START_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="END_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+'Please be advised that employees listed below are no longer employed at '|| organisation_name  LINE1
+FROM hr_hcf_organisation
+where id = $P{P_IN_ORG_ID} AND start_date < $P{START_DATE} AND start_date < $P{END_DATE}]]>
+	</queryString>
+	<field name="LINE1" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="19" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="16" splitType="Stretch"/>
+	</pageHeader>
+	<detail>
+		<band height="325" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="21" y="248" width="535" height="20" uuid="86eb376d-f082-4006-b57d-4fd55bb6c01f"/>
+				<textFieldExpression><![CDATA[$F{LINE1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="21" y="228" width="359" height="20" uuid="12f13596-a8f7-48f7-8d95-ed74b838ac7f"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RE: Employees no longer in the Employ at GWI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="193" width="113" height="20" uuid="f4d5d587-44cd-48be-a02a-db02bc7b5086"/>
+				<text><![CDATA[Dear Ms. Ramdhan,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="137" width="113" height="20" uuid="7946b055-66f3-43ff-9dca-9363fbe3c2e5"/>
+				<text><![CDATA[Georgetown]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="39" width="113" height="18" uuid="22276fde-5f04-43ee-9177-069c039ed88f"/>
+				<text><![CDATA[Ms. Malini Ramdhan   ]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="21" y="0" width="100" height="20" uuid="5bd6948f-a860-4d10-82aa-34ee87935f3e"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="21" y="57" width="113" height="20" uuid="11109df4-d221-4bfa-9d46-af1fc9875a9e"/>
+				<text><![CDATA[Assistant Supervisor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="77" width="113" height="20" uuid="8752c6e9-bf35-405a-83a9-22e4cf587b42"/>
+				<text><![CDATA[ASSURIA Life Inc. (GY)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="97" width="113" height="20" uuid="7246a635-c21f-424d-9291-8223d8f4e119"/>
+				<text><![CDATA[ Lot 78 Church Street]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="117" width="113" height="20" uuid="b52570eb-fb63-4541-bbfa-740be7715e8b"/>
+				<text><![CDATA[South Cummingsburg]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table" stretchType="RelativeToTallestObject" x="21" y="268" width="275" height="57" forecolor="#FFFFFF" uuid="59056ae9-e49f-4fcd-b05c-9e2319f6f6ff"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="dataset1" uuid="d8d186dc-ab82-4ead-954f-529ed298c612">
+						<datasetParameter name="P_IN_ORG_ID">
+							<datasetParameterExpression><![CDATA[$P{P_IN_ORG_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="START_DATE">
+							<datasetParameterExpression><![CDATA[$P{START_DATE}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="END_DATE">
+							<datasetParameterExpression><![CDATA[$P{END_DATE}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="26" uuid="1bf661b9-bf36-4d82-8ca6-e93719b9d392">
+						<jr:tableFooter height="8" rowSpan="1"/>
+						<jr:detailCell height="18" rowSpan="1">
+							<textField>
+								<reportElement x="0" y="0" width="26" height="18" uuid="72c28b42-5991-4686-9a15-974825c3a9cf"/>
+								<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="dec383cc-14f6-44af-95e7-ea9871af7fae">
+						<jr:detailCell height="18" rowSpan="1">
+							<textField>
+								<reportElement mode="Transparent" x="0" y="0" width="90" height="18" uuid="227bb8ad-7210-409e-9fc1-2374890046ea"/>
+								<textFieldExpression><![CDATA[$F{EMP_NAME}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="135">
+			<staticText>
+				<reportElement x="21" y="14" width="496" height="20" isPrintWhenDetailOverflows="true" uuid="42ff089e-6047-49da-814e-104516866e93"/>
+				<text><![CDATA[Please remove them from the Pension Scheme and prepare reinbursement from Pension Scheme.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="34" width="278" height="20" uuid="db866b9b-3c9b-43e7-9ad2-a6161672f636"/>
+				<text><![CDATA[For your information and guidance.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="75" width="145" height="20" uuid="bab12047-7ccd-4aca-8140-98c442dc0d5b"/>
+				<text><![CDATA[Yours sincerely,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="95" width="217" height="20" uuid="2e1109c1-e0d3-49d0-a36d-ad5403aad9b7"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[S. Jacobs]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="115" width="217" height="20" uuid="59324121-0941-4970-b9ad-73722402d61a"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Human Resources Manager]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="17" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="11" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="8" splitType="Stretch"/>
+	</summary>
+</jasperReport>

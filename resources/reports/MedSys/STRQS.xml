@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reportUnit exportedWithPermissions="true">
+    <folder>/reports/MedSys</folder>
+    <name>STRQS</name>
+    <version>0</version>
+    <label>Stores Requisition</label>
+    <description>Stores Requisition</description>
+    <creationDate>2021-11-12T17:13:59.977-04:00</creationDate>
+    <updateDate>2018-07-18T10:00:22.681-04:00</updateDate>
+    <mainReport>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" dataFile="STRQS_jrxml.data" xsi:type="fileResource">
+            <folder>/reports/MedSys/STRQS_files</folder>
+            <name>STRQS_jrxml</name>
+            <version>0</version>
+            <label>Main jrxml</label>
+            <description>Main jrxml</description>
+            <creationDate>2021-11-12T17:13:59.977-04:00</creationDate>
+            <updateDate>2013-10-22T16:26:50.969-04:00</updateDate>
+            <fileType>jrxml</fileType>
+        </localResource>
+    </mainReport>
+    <dataSource>
+        <uri>/themes/datasources/SCMSTEST</uri>
+    </dataSource>
+    <inputControl>
+        <localResource
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            exportedWithPermissions="false" xsi:type="inputControl">
+            <folder>/reports/MedSys/STRQS_files</folder>
+            <name>STORES_REQ_NO</name>
+            <version>0</version>
+            <label>Stores Requisition No</label>
+            <creationDate>2021-11-12T17:13:59.977-04:00</creationDate>
+            <updateDate>2013-10-22T17:18:11.702-04:00</updateDate>
+            <type>4</type>
+            <mandatory>true</mandatory>
+            <readOnly>false</readOnly>
+            <visible>true</visible>
+            <query>
+                <localResource exportedWithPermissions="false" xsi:type="query">
+                    <folder>/reports/MedSys/STRQS_files/STORES_REQ_NO_files</folder>
+                    <name>STORES_REQ_NO</name>
+                    <version>0</version>
+                    <label>STORES_REQ_NO</label>
+                    <creationDate>2021-11-12T17:13:59.977-04:00</creationDate>
+                    <updateDate>2013-10-22T17:18:11.702-04:00</updateDate>
+                    <language>sql</language>
+                    <queryString>select STORES_REQ_NO,O.ORGANIZATION_CODE||' - '||S.REQUISITION_DATE||' '||NVL(S.DESCRIPTION,'') DESCRIPTION
+from TBLSTORESREQ S
+join TBLORGANIZATION O on O.ORGANIZATION_ID=S.ORGANIZATION_ID
+order by s.REQUISITION_DATE,o.organization_code</queryString>
+                    <dataSource>
+                        <uri>/themes/datasources/PeoplePay</uri>
+                    </dataSource>
+                </localResource>
+            </query>
+            <queryVisibleColumn>DESCRIPTION</queryVisibleColumn>
+            <queryValueColumn>STORES_REQ_NO</queryValueColumn>
+        </localResource>
+    </inputControl>
+    <alwaysPromptControls>false</alwaysPromptControls>
+    <controlsLayout>1</controlsLayout>
+</reportUnit>

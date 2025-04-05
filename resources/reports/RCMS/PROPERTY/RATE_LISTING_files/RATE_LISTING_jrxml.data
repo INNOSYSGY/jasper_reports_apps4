@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Daily Receipt" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fbe2f7f4-6f3a-4e93-8a22-0ecf850753bb">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/PROPERTY/RATE_LISTING"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.18:8081/jasperserver/services/repository"/>
+	<parameter name="department" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="report_name" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE_START" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE_END" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\Steffon Assing\\Dropbox\\Mayor and City Council\\Revenue Collection System Restart\\reports\\headers\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WARD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+CASE WHEN $P{WARD_ID}=9999 OR REPLACE($P{WARD_ID},' ','') IS NULL THEN
+'All Wards' ELSE
+(select initcap(reference_value)||' Ward' from REFERENCES where id=$P{WARD_ID})
+ END Report_title,
+assessment_number, initcap(trim(p.lot
+    ||' '
+    ||p.street
+    ||' '
+    ||
+    (SELECT reference_value FROM REFERENCES WHERE id= p.ward
+    )) )address,
+    (select initcap(reference_value) from references where id=p.ward) ward,
+    (select initcap(reference_value) from references where id=p.property_category) category,
+    (select initcap(reference_value) from references where id=p.property_type) purpose,
+    initcap(pkg_property.f_get_owners(p.id,'Y')) owners,
+    PKG_PROPERTY.F_GET_DEMAND_DUE_CURRENT(p.id) CUR_DEMAND
+from property p
+WHERE WARD= CASE WHEN $P{WARD_ID}=9999 OR REPLACE($P{WARD_ID},' ','') IS NULL THEN
+WARD ELSE $P{WARD_ID} END]]>
+	</queryString>
+	<field name="REPORT_TITLE" class="java.lang.String"/>
+	<field name="ASSESSMENT_NUMBER" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="WARD" class="java.lang.String"/>
+	<field name="CATEGORY" class="java.lang.String"/>
+	<field name="PURPOSE" class="java.lang.String"/>
+	<field name="OWNERS" class="java.lang.String"/>
+	<field name="CUR_DEMAND" class="java.math.BigDecimal"/>
+	<sortField name="WARD"/>
+	<sortField name="ASSESSMENT_NUMBER"/>
+	<variable name="Ward_total" class="java.math.BigDecimal" resetType="Group" resetGroup="Ward" calculation="Sum">
+		<variableExpression><![CDATA[$F{CUR_DEMAND}]]></variableExpression>
+	</variable>
+	<group name="Ward">
+		<groupExpression><![CDATA[$F{WARD}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField>
+					<reportElement x="29" y="0" width="421" height="15" uuid="cfcd7aee-5862-4777-9dd8-71d54648d3d5"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{WARD}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="29" height="15" uuid="5fd8d0e9-ff9c-43e9-b7c5-1311254d634c"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Ward:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="15">
+				<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+					<reportElement x="652" y="0" width="100" height="15" uuid="4520f79e-40f5-4942-908c-5322f11de22c"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Ward_total}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="100" height="15" uuid="79af77d0-731d-4ad4-893c-bc6c0581fc2c"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Ward Total]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="53" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="752" height="45" uuid="138fa772-1f76-414a-94f6-f2e2dfd6dfb5"/>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA["Listing of Property Valuation"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="period">
+					<subreportParameterExpression><![CDATA[$F{REPORT_TITLE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LANDSCAPE_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="18" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="3" width="70" height="15" uuid="06a102a9-5bd8-4594-87fc-c82e64333836"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Assessment #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="3" width="172" height="15" uuid="94b3fa80-0b64-4ff4-aee5-083227e1bf38"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Owners]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="3" width="191" height="15" uuid="055e6ce6-8f80-4709-96e9-9542ab3fda05"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Address]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="433" y="3" width="132" height="15" uuid="4bf9a117-2bb9-49e5-a866-95ef896b8ca0"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Purpose]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="565" y="3" width="87" height="15" uuid="8f8f37cc-244e-477c-8f53-1b25be4b9b91"/>
+				<textElement>
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Category]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="652" y="3" width="100" height="15" uuid="1f8ec8c8-9e43-4ae2-9504-e1a0c817ae03"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Current Demand]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="752" height="1" uuid="d63b4b94-03c9-49dc-8fc4-d372393bf7cb"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="70" height="15" uuid="8e0b6600-ac14-4020-af66-ac1ecbfbe16b"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ASSESSMENT_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="70" y="0" width="172" height="15" uuid="7edaa63d-71ef-49b1-8f3d-88e00cce08c4"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OWNERS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="242" y="0" width="191" height="15" uuid="8f2088f2-fb91-4d9b-8183-854865b98f57"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="433" y="0" width="132" height="15" uuid="a2788754-bcc0-4ba7-8e9a-2f454a898028"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PURPOSE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="565" y="0" width="87" height="15" uuid="6893f59d-b054-4427-931f-69ebb89c2cd8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CATEGORY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="652" y="0" width="100" height="15" uuid="3d5d9182-fecf-4825-a27e-76f4581fb8ed"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CUR_DEMAND}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="752" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="4c6ce1e0-646b-42fe-934a-91cdd704fea9"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="752" height="15" uuid="e2e12cad-afd3-4220-b3be-849f8692eb20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="2" y="0" width="162" height="13" uuid="a7658643-d617-4daa-89f5-b621254a0413"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="632" y="0" width="80" height="13" uuid="8d4c7a1b-7a37-42ae-9fa3-0238b0a13f07"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="712" y="0" width="40" height="13" uuid="341e2711-681c-48de-8142-dae944c4b1e3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

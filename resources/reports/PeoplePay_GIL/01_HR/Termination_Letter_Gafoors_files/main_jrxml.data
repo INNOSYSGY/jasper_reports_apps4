@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Termination Letter" pageWidth="612" pageHeight="792" columnWidth="468" leftMargin="72" rightMargin="72" topMargin="20" bottomMargin="20" uuid="9ad1cc46-f38d-4e53-9edb-d81c3e55865f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors_Cloud_Development"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/01_HR/Termination_Letter_Gafoors"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/01_HR/Termination_Letter_Gafoors_files/main_jrxml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<subDataset name="ENTITLEMENTS" uuid="fb881a82-2465-4627-b2b8-72f1d6e6745b">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors Prod"/>
+		<parameter name="IN_EMP_ID" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[select 
+    ent_curr.emp_id, inc_curr.description, to_char(sum(ent_curr.amount), 'FML999G999G999G999G990D00') amount
+from
+    hr_rcm_empentitle ent_curr
+    join pa_pcf_incomecode inc_curr on ent_curr.income_code_id = inc_curr.id 
+where
+    ent_curr.emp_id = $P{IN_EMP_ID} 
+    and ent_curr.admin_status = 'SYS'
+    and (ent_curr.end_date >= trunc(sysdate) or ent_curr.end_date is null)
+    and inc_curr.income_code != 'CUMMALL'
+    group by ent_curr.emp_id, inc_curr.description]]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="AMOUNT" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="AMOUNT"/>
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT"/>
+		</field>
+	</subDataset>
+	<subDataset name="CC_TO" uuid="558be187-55ec-4f48-91b9-f304b3643c24">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors_Cloud_Development"/>
+		<parameter name="IN_SESSION_ID" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[select 
+    emp.id emp_id,
+    emp.ind_id,
+    case when ind.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || ind.first_name ||' ' || ind.surname name,
+    (select initcap(position_name) from hr_hcf_position where id = wkpos.position_id) position_name,
+    (select initcap(unit_name) from hr_hcf_position pos join hr_hcf_orgstructuredtl org on pos.orgdtl_id = org.id where pos.id = wkpos.position_id)  department,
+    (select initcap(location_description) from hr_hcf_worklocation where id = wkpos.wklocation_id) work_location
+from
+        hr_rcm_employee emp 
+        left join hr_rcm_individual ind on emp.ind_id = ind. id
+        left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+        left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+where
+    exists(select 1 from rpt_parameter where session_id = $P{IN_SESSION_ID}   and option_name = 'CC_TO' and option_value = emp.id)]]>
+		</queryString>
+		<field name="NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="NAME"/>
+			<property name="com.jaspersoft.studio.field.label" value="NAME"/>
+		</field>
+		<field name="POSITION_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME"/>
+			<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+		</field>
+	</subDataset>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_ALL_EMPLOYEES" class="java.math.BigDecimal"/>
+	<parameter name="IN_SESSION_ID" class="java.math.BigDecimal"/>
+	<parameter name="IN_SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="IN_SIGNATURE" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+    'Management regrets to inform you that with immediate effect, your services are no longer required.' par1,
+    'All monies owed to you will be paid '  || initcap(pkg_global_fnts.fn_num_towords(a.termination_notice_days))  || ' ('|| a.termination_notice_days ||') business days from the date of this letter.' par2,
+    'Please note that all items in your possession belonging to the Company must be returned before any processing of final payments can be completed.' par3,
+    'I hereby acknowledge that I have Received, Read and Understood the above.' par4,
+    a.*
+from(select
+	to_char(trunc(sysdate), 'fmMonth fmDD, YYYY') date_prepared,
+    emp.id,
+    emp.ind_id,
+     case when ind.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || ind.first_name ||' ' || ind.surname name,
+    case when ind.sex_code = 'M' then 'Mr. ' else 'Ms. ' end || ind.surname surname,
+    emp.emp_company_no,
+    (select initcap(position_name) from hr_hcf_position where id = wkpos.position_id) position_name,
+    (select initcap(unit_name) from hr_hcf_position pos join hr_hcf_orgstructuredtl org on pos.orgdtl_id = org.id where pos.id = wkpos.position_id)  department,
+    (select initcap(location_description) from hr_hcf_worklocation where id = wkpos.wklocation_id) work_location,
+    emp.payment_type,
+    (select to_char(start_time,'HH:MI PM')||' to '||to_char(end_time,'HH:MI PM') 
+        from HR_ATT_SHIFT where id = emp.shift_id) normal_shift,
+    (select to_char(start_time,'HH:MI PM')||' to '||to_char(end_time,'HH:MI PM')
+        from HR_ATT_SHIFT a where is_saturday = 1 and id = emp.saturday_shift_id) saturday_shift,
+    emp.orgdtl_id orgdtl_id,
+    emp.position_location_id position_location_id,
+    wk.id work_location_id,
+    emp.org_id org_id,
+    emp.date_employed,
+    (select ind.first_name ||' ' || ind.surname  ||'<br>' || initcap(pos.position_name)
+from 
+    HR_HCF_WORKLOCATIONPOSITION  wkp
+    left join hr_hcf_position pos on wkp.position_id = pos.id
+    left join hr_rcm_employee emp on emp.position_location_id = wkp.id
+    left join hr_rcm_individual ind on ind.id = emp.ind_id
+where 
+    emp.id =  $P{IN_SIGNATURE} 
+    and (emp.date_separated is null or emp.date_separated > trunc(sysdate))
+    and rownum = 1) signature,
+    o.termination_notice_days
+from
+    hr_rcm_employee emp
+    left join hr_rcm_individual ind on emp.ind_id = ind. id
+    left join hr_hcf_worklocationposition wkpos on emp.position_location_id = wkpos.id
+    left join hr_hcf_worklocation wk on wk.id = wkpos.wklocation_id
+    left join hr_att_shift shift on shift.id = emp.shift_id
+    left join hr_att_shift sat_shift on sat_shift.id = emp.saturday_shift_id
+    left join hr_hcf_org_rule o on o.org_id = emp.org_id
+where
+    emp.org_id = $P{IN_ORG_ID} 
+    and (emp.separated_status_id is null or emp.date_separated is null)
+    and ( $P{IN_ALL_EMPLOYEES} = 1 or
+    	exists (SELECT 
+    					1
+    				FROM 
+    					RPT_PARAMETER W1
+    				WHERE 
+    					W1.SESSION_ID = $P{IN_SESSION_ID} 
+    				AND 
+    					option_value=case when option_name = $P{IN_SEARCH_OPTION}  and option_name ='EMPLOYEE' then to_char(emp.id)
+						when option_name =  $P{IN_SEARCH_OPTION}  and option_name = 'ORG_STRUCT_LEVEL' then to_char(emp.orgdtl_id)
+						when option_name =  $P{IN_SEARCH_OPTION} and option_name = 'EMPLOYMENT_CLASS' then to_char(emp.employment_class_id)
+                        when option_name =  $P{IN_SEARCH_OPTION} and option_name = 'POSITION_LOCATION' then to_char(emp.position_location_id)
+                        when option_name = $P{IN_SEARCH_OPTION}  and option_name = 'WORK_LOCATION' then to_char(wk.id)
+						end
+    				)
+    )) a]]>
+	</queryString>
+	<field name="PAR1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR1"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR1"/>
+	</field>
+	<field name="PAR2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR2"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR2"/>
+	</field>
+	<field name="PAR3" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR3"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR3"/>
+	</field>
+	<field name="PAR4" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAR4"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAR4"/>
+	</field>
+	<field name="DATE_PREPARED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_PREPARED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_PREPARED"/>
+	</field>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="IND_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="IND_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_ID"/>
+	</field>
+	<field name="NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SURNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_COMPANY_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="WORK_LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_LOCATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION"/>
+	</field>
+	<field name="PAYMENT_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAYMENT_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_TYPE"/>
+	</field>
+	<field name="NORMAL_SHIFT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NORMAL_SHIFT"/>
+		<property name="com.jaspersoft.studio.field.label" value="NORMAL_SHIFT"/>
+	</field>
+	<field name="SATURDAY_SHIFT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SATURDAY_SHIFT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SATURDAY_SHIFT"/>
+	</field>
+	<field name="ORGDTL_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORGDTL_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGDTL_ID"/>
+	</field>
+	<field name="POSITION_LOCATION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_LOCATION_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_LOCATION_ID"/>
+	</field>
+	<field name="WORK_LOCATION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_LOCATION_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION_ID"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_EMPLOYED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="SIGNATURE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SIGNATURE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SIGNATURE"/>
+	</field>
+	<field name="TERMINATION_NOTICE_DAYS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TERMINATION_NOTICE_DAYS"/>
+		<property name="com.jaspersoft.studio.field.label" value="TERMINATION_NOTICE_DAYS"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="70">
+			<subreport>
+				<reportElement x="0" y="0" width="468" height="70" uuid="7880fde5-c418-4ba1-80e8-077b2bcf7d20">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="682" splitType="Stretch">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="0" y="5" width="468" height="15" uuid="fe38f281-3d54-4e4e-90bb-35025270796c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" isBold="true" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATE_PREPARED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="25" width="468" height="15" uuid="5278a136-96db-4078-947a-daa4e193501f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" isBold="true" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="40" width="468" height="15" uuid="6d8b6cbe-f6ed-4476-96f6-b85664a7e7ec">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" isBold="true" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="55" width="468" height="15" uuid="44145821-3883-4c9d-8112-a265d012d524">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" isBold="true" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="70" width="468" height="15" uuid="c04bc4bc-8ba3-440b-a3b4-256cc316c303">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" isBold="true" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WORK_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="90" width="468" height="15" uuid="db4cdeaa-4fdd-498a-ad5c-0e11d3626eed">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" markup="html">
+					<font size="9" isBold="true" isUnderline="true" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["RE: TERMINATION"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="110" width="468" height="15" uuid="88b72847-f258-4ba6-b89c-f5ad71f609d4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dear "+$F{SURNAME}+","]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="130" width="468" height="15" uuid="9d9ed5a2-a5e6-4f23-b6ef-cb6c9c91ede1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR1}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="150" width="468" height="15" uuid="566baebe-0b85-4491-bd27-b5c15b8b3ed3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR2}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="170" width="468" height="15" uuid="7c6d4944-f4b2-41e4-8441-f1b1e4ef41b3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR3}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="200" width="468" height="20" uuid="497337de-6613-4248-a368-d2f79c934a3f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Regards,</b><br><br><br>...........................................<br><b>"+$F{SIGNATURE}+"</b>"]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement positionType="Float" x="30" y="230" width="309" height="20" uuid="d38a7a7c-9ebd-4b17-800c-9dcca3905a17"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="CC_TO" uuid="271f8da7-bf7c-4a32-b621-70b389398e1b">
+						<datasetParameter name="IN_SESSION_ID">
+							<datasetParameterExpression><![CDATA[$P{IN_SESSION_ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="20" width="309">
+						<textField>
+							<reportElement positionType="Float" x="0" y="0" width="120" height="20" uuid="3114140b-4607-4e80-8346-91571ce496d8">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<textElement verticalAlignment="Middle">
+								<font size="9" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement positionType="Float" x="160" y="0" width="148" height="20" uuid="5d9d6eaf-a63c-4dc8-bd1d-48e1fa71a3c5">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<textElement verticalAlignment="Middle">
+								<font size="9" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+						</textField>
+						<line>
+							<reportElement x="120" y="10" width="5" height="1" uuid="b8570a18-0162-48d3-8300-582d3d22d691">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</reportElement>
+						</line>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<textField>
+				<reportElement positionType="Float" x="0" y="230" width="30" height="20" uuid="9a7352cc-832a-4ffd-bee9-e51085c9e5a3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="9" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Cc:"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="260" width="468" height="15" uuid="c1155676-a41a-4ab0-9a31-b6bc827fa99d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAR4}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="40" y="310" width="129" height="22" uuid="7ccc9e7c-fbdd-4132-817f-0941bcbaa3b8">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.75" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Bottom" markup="html">
+					<font size="9" isBold="true" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="300" y="310" width="129" height="22" uuid="5804e1a7-8fca-4a85-af93-d1f791dccd5f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.75" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Bottom" markup="html">
+					<font size="9" isBold="true" pdfFontName="Times-Roman" pdfEncoding="" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

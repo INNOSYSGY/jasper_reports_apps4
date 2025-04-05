@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Employee Job Letter" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85bcab7d-a21c-457c-8b26-54349766927e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/01_HR/Standard_Letters/HR_03"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="lmorales"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Employee Job Letter"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GAFOORS"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/01_HR/Standard_Letters/HR_03_files/HR_03_jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="258"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="735"/>
+	<subDataset name="Entitlements" uuid="ce931d9d-6809-4e53-9222-75c45c358c3b">
+		<parameter name="P_EMP_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT EMP_COMPANY_NO,initcap(income_type) income_type,to_char(sum(amount),'$999,999') amount
+FROM VW_EMPENTITLE
+WHERE
+TRUNC(SYSDATE) BETWEEN TRUNC(DATE_EFFECTIVE) AND TRUNC(NVL(DATE_EFFECTIVE_END,SYSDATE))
+and emp_id=$P{P_EMP_ID}
+group by EMP_COMPANY_NO,initcap(income_type)]]>
+		</queryString>
+		<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+		<field name="INCOME_TYPE" class="java.lang.String"/>
+		<field name="AMOUNT" class="java.lang.String"/>
+		<variable name="Seq" class="java.math.BigDecimal" calculation="Count">
+			<variableExpression><![CDATA[1.0]]></variableExpression>
+			<initialValueExpression><![CDATA[1.0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EMP_NO" class="java.math.BigDecimal"/>
+	<parameter name="ADDR" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT
+      -- FIRST_NAME||' '||SURNAME AS NAME_OF_EMPLOYEE,
+               CASE
+                 WHEN i.sex_code = 'M'  THEN 'Mr.'
+                 WHEN i.sex_code = 'F' THEN 'Mrs.'
+               END  || ' ' || FIRST_NAME || ' ' || SURNAME AS NAME_OF_EMPLOYEE,
+        e.POSITION_NAME,
+         orgdtl.UNIT_NAME Department,
+        to_char(DATE_EMPLOYED, 'fmMonth DD, YYYY') date_employed, 
+               CASE
+                 WHEN i.sex_code = 'M'  THEN 'He'
+                 WHEN i.sex_code = 'F' THEN 'She'
+               END as HE_SHE,
+               pkg_global_fnts.fn_num_towords(pkg_global_fnts.fn_personalrate(e.id, sysdate)) AS NUMTOWORDS,
+               to_char(pkg_global_fnts.fn_personalrate(e.id, sysdate), 'FML999G999G999G999G990')  AS NUM,
+               o.organisation_name,
+               o.address,
+   			 adr.LOT ||' '|| adr.STREET ||' '|| adr.VILLAGE_WARD ||' '|| adr.COUNTY AS Ind_address, 
+             o.letter_head_logo,
+             o.ID ORG_ID,
+             e.EMP_COMPANY_NO,
+             dir.id addr_id,
+             dir.LOT || ' ' ||   dir.STREET || ' ' || dir.VILLAGE_WARD addresed_adr,
+			dir.BUSINESS_ACTIVITY || ', ' || dir.BUSINESS_NAME addressed_head
+FROM hr_rcm_individual i
+JOIN hr_rcm_employee e ON e.ind_id = i.id
+--JOIN hr_hcf_position p ON p.id = e.position_location_id
+JOIN hr_hcf_organisation o ON o.id = e.org_id
+JOIN hr_hcf_orgstructuredtl orgdtl on orgdtl.id = e.orgdtl_id
+join hr_rcm_address adr on (adr.ind_id = i.id and (adr.end_date is null or adr.end_date > trunc(sysdate)))
+join dir_clients dir on dir.org_id = o.id
+WHERE o.id = $P{ORG_ID}
+AND e.id = $P{EMP_NO}
+and dir.id = $P{ADDR}]]>
+	</queryString>
+	<field name="NAME_OF_EMPLOYEE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME_OF_EMPLOYEE"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME_OF_EMPLOYEE"/>
+	</field>
+	<field name="POSITION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSITION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_EMPLOYED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="HE_SHE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="HE_SHE"/>
+		<property name="com.jaspersoft.studio.field.label" value="HE_SHE"/>
+	</field>
+	<field name="NUMTOWORDS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NUMTOWORDS"/>
+		<property name="com.jaspersoft.studio.field.label" value="NUMTOWORDS"/>
+	</field>
+	<field name="NUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="NUM"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGANISATION_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="IND_ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="IND_ADDRESS"/>
+		<property name="com.jaspersoft.studio.field.label" value="IND_ADDRESS"/>
+	</field>
+	<field name="LETTER_HEAD_LOGO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LETTER_HEAD_LOGO"/>
+		<property name="com.jaspersoft.studio.field.label" value="LETTER_HEAD_LOGO"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_COMPANY_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="ADDR_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ADDR_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDR_ID"/>
+	</field>
+	<field name="ADDRESED_ADR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESED_ADR"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESED_ADR"/>
+	</field>
+	<field name="ADDRESSED_HEAD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDRESSED_HEAD"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESSED_HEAD"/>
+	</field>
+	<group name="Employee" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{EMP_COMPANY_NO}]]></groupExpression>
+		<groupHeader>
+			<band height="80">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<staticText>
+					<reportElement x="-1" y="39" width="530" height="20" uuid="339cd43e-f3bd-4316-9493-8598451d8101"/>
+					<textElement textAlignment="Center">
+						<font fontName="Candara" size="12" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[RE: Job Letter]]></text>
+				</staticText>
+			</band>
+			<band/>
+			<band height="170">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<textField>
+					<reportElement x="0" y="5" width="580" height="124" uuid="aee548ec-c819-44ef-961d-b18554e4d54a"/>
+					<textElement markup="html">
+						<font fontName="Candara"/>
+					</textElement>
+					<textFieldExpression><![CDATA['This is to certify that <b>' + $F{NAME_OF_EMPLOYEE} + '</b> commenced employment with Gafsons Industries Limited as of ' + $F{DATE_EMPLOYED} + '.' + '<br><br><br><br> He currently holds the position as a ' + $F{POSITION_NAME} + ' attached to the ' + $F{DEPARTMENT} +  '.'+ '<br><br><br><br>He receives a gross monthly salary of ' + $F{NUM} + ' (' + $F{NUMTOWORDS} + '). ']]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="80">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="0" y="0" width="140" height="80" uuid="1e7d7576-9d2e-4920-9774-ef8af60a6e88"/>
+					<textElement markup="html">
+						<font fontName="Candara"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Regards,	 <br><br><br><br>…………...…….......<br>Savita Persaud (Ms.)<br>Senior Human Resource Clerk ']]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="1" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="70" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="70" uuid="8217f37e-7a6c-4501-bdfd-62255fb8834c"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_IN_ADDR">
+					<subreportParameterExpression><![CDATA[$F{ADDR_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

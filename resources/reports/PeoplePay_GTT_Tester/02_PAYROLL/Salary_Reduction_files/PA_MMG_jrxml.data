@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Salary reduction" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6a8be228-8acb-4049-bd0c-2dd0ff04b118">
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/Salary_Reduction"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/02_PAYROLL/Salary_Reduction_files/PA_MMG_jrxml"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="period" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select sum(ss) ss,sum(js) js, department, period from
+(select sum(AMOUNT_DEDUCTED) ss, 0 js, coa_code||' '||o.unit_name department, to_char(TRUNC(pa.period_start, 'MONTH'),'MONTH YYYY') period 
+from PA_PMG_PAYROLLDEDUCTION pd
+join pa_pmg_payrolldtl pa on pa.id=pd.PAY_SLIPNO
+join HR_HCF_ORGSTRUCTUREDTL o on o.id=pa.orgdtl_id
+where extract(year from pa.period_start)||extract(month from pa.period_start)= $P{period} 
+and upper(EMPLOYMENT_CLASS_HIST)='SENIOR STAFF'
+and (pd.expense_code='22' or pd.expense_code='NPL' or pd.expense_code='54')
+and pa.org_id =  $P{IN_ORG_ID} 
+group by coa_code||' '||o.unit_name, to_char(TRUNC(pa.period_start, 'MONTH'),'MONTH YYYY')
+union all
+select 0 ss, sum(AMOUNT_DEDUCTED) js, coa_code||' '||o.unit_name department, to_char(TRUNC(pa.period_start, 'MONTH'),'MONTH YYYY') period
+from PA_PMG_PAYROLLDEDUCTION pd
+join pa_pmg_payrolldtl pa on pa.id=pd.PAY_SLIPNO
+join HR_HCF_ORGSTRUCTUREDTL o on o.id=pa.orgdtl_id
+where extract(year from pa.period_start)||extract(month from pa.period_start)= $P{period} 
+and upper(EMPLOYMENT_CLASS_HIST)='JUNIOR STAFF'
+and (pd.expense_code='22' or pd.expense_code='NPL' or pd.expense_code='54')
+and pa.org_id = $P{IN_ORG_ID} 
+group by coa_code||' '||o.unit_name, to_char(TRUNC(pa.period_start, 'MONTH'),'MONTH YYYY'))
+group by department, period]]>
+	</queryString>
+	<field name="SS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="SS"/>
+	</field>
+	<field name="JS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="JS"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="PERIOD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD"/>
+	</field>
+	<variable name="JS_Total" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{JS}]]></variableExpression>
+	</variable>
+	<variable name="SS_Total" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{SS}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="63" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="3" width="555" height="60" uuid="588366a7-5551-4d20-8583-f1850d7d119e"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="39" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="10" width="555" height="20" uuid="2be53652-44f7-497a-bd67-3a1eb711bb98">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Salary reduction for: "+$F{PERIOD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="10" y="0" width="100" height="15" uuid="5ee56140-68ca-4a4c-a915-87255d71031d"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[JNR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="117" y="0" width="93" height="15" uuid="d8330b94-b783-4c22-9aa5-53480a274013"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[SNR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="247" y="0" width="281" height="15" uuid="24c80a59-bec1-48bc-8c4a-cf852e3c349a"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Department]]></text>
+			</staticText>
+			<line>
+				<reportElement x="5" y="15" width="549" height="1" uuid="78d4e43a-e8fe-4553-ae9e-a6a2510e9ba4"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="¤#,##0.##;¤-#,##0.##" isBlankWhenNull="true">
+				<reportElement x="10" y="0" width="100" height="15" uuid="8a036a50-f6a8-4296-b50a-d83a7d6f20a1"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{JS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.##;¤-#,##0.##" isBlankWhenNull="true">
+				<reportElement x="117" y="0" width="93" height="15" uuid="2bffb422-99c6-42d1-af28-6ab1453f4e92"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$ #,##0" isBlankWhenNull="true">
+				<reportElement x="247" y="0" width="281" height="15" uuid="ed530d5b-909b-44e1-bb1e-6ec7c4c50d0a"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<textField pattern="EEEEE, MMMMM, dd  yyyy">
+				<reportElement x="2" y="0" width="121" height="15" backcolor="#999999" uuid="4d5a66d5-2f87-4150-b66c-83638a8d8f2f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="2" y="15" width="553" height="15" uuid="1b626fc9-0f5c-4e28-b0dc-19754d96cbf8"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="528" y="0" width="27" height="15" uuid="f57525a2-72a9-4a23-bae7-5f63c94d5562"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="448" y="0" width="80" height="15" uuid="92acc45a-f63c-461c-bd02-7d30a30d86ea"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="¤#,##0.##;¤-#,##0.##" isBlankWhenNull="true">
+				<reportElement x="10" y="0" width="100" height="15" uuid="102583bc-723d-4d1f-9502-c740a8fceed7"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{JS_Total}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.##;¤-#,##0.##" isBlankWhenNull="true">
+				<reportElement x="117" y="0" width="93" height="15" uuid="882aaf04-f888-4b3a-ba2d-2b3976e4d901"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SS_Total}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="5" y="-1" width="549" height="1" uuid="335f3205-d071-4563-a6cd-4cb4447520d5"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

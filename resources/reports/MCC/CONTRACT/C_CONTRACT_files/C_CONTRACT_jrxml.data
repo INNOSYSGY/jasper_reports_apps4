@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Contract Profile" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2a5cc96b-8fd7-4192-b09d-846abdf4e31a">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="557"/>
+	<subDataset name="Product" uuid="9c3b9735-5db8-4658-95f8-fc70459d20d3">
+		<parameter name="p_contract_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select symbol,assay
+from vw_contract_assay ca
+where ca.contract_id=$P{p_contract_id}]]>
+		</queryString>
+		<field name="SYMBOL" class="java.lang.String"/>
+		<field name="ASSAY" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Payables" uuid="eb55fb76-ad00-414f-a855-81a1b912e2dd">
+		<parameter name="p_contract_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select element_code,element, null statement
+from vw_payable_condition pc
+where pc.contract_id=$P{p_contract_id}]]>
+		</queryString>
+		<field name="ELEMENT_CODE" class="java.lang.String"/>
+		<field name="ELEMENT" class="java.lang.String"/>
+		<field name="STATEMENT" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="refining_charge" uuid="711f286a-1cf9-4d09-92a8-46efd70c853d">
+		<parameter name="p_contract_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select element,element_code,refining_charge,refining_charge_unit
+from vw_refining_condition rf
+where rf.contract_id=$P{p_contract_id}]]>
+		</queryString>
+		<field name="ELEMENT" class="java.lang.String"/>
+		<field name="ELEMENT_CODE" class="java.lang.String"/>
+		<field name="REFINING_CHARGE" class="java.math.BigDecimal"/>
+		<field name="REFINING_CHARGE_UNIT" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="SplittingLimits" uuid="1da5c85d-1670-4d7b-a6ab-e3866024bc73">
+		<parameter name="p_contract_id" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select id,
+pkg_mcc.f_return_elements (elements) Elements,
+split_amount||(select lookup_code from lookup where id=split_mmt_unit) split
+from contract_assay_split
+where contract_id=$P{p_contract_id}]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="ELEMENTS" class="java.lang.String"/>
+		<field name="SPLIT" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="p_contract_id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+c.ID,
+c.AGREEMENT_ID,
+contact_id  ,
+(select name
+from vw_software_user
+where id=161) Contractor,
+cd.name contract_party,
+cd.full_address party_address,
+c.PRODUCT_DESCRIPTION,
+c.CONTRACT_TYPE,
+c.REFERENCE_NUMBER,
+c.DURATION_START,
+c.duration_end  ,
+(select lower(detail_2)
+from lookup
+where lookup_type like '%MCC_QP_TYPE%'
+and upper(lookup_code)=c.QP_TYPE) QP_DESC,
+c.QP_TYPE,
+c.qp_type_detail,
+                  case when c.qp_type_detail<='1' then
+                  c.QP_TYPE
+                  else
+                  trim(c.qp_type_detail||' '||c.QP_TYPE) end qp_type_detail_desc,
+c.QUANTITY_RANGE_START,
+c.QUANTITY_RANGE_END  ,
+(select lower(lookup_value)
+from lookup l
+where id=c.QUANTITY_MMT_UNIT) QUANTITY_MMT_UNIT,
+        (
+                select lower(lookup_value)
+                from lookup l
+                where l.id=c.title_transfer_event
+        )title_transfer_event,
+          (
+                  select lower(lookup_value)
+                  from lookup l
+                  where l.id=c.risk_transfer_event
+                ) risk_transfer_event,
+to_char(nvl(c.treatment_charge,0),'999,999,999,999.99')treatment_charge,
+nvl((
+                select lower(nvl(lookup_value,''))
+                from lookup l
+                where l.id=c.TREATMENT_CHARGE_MMT_UNIT),'') TREATMENT_CHARGE_MMT_UNIT,
+decode(c.PROVISIONAL_PAY_PERCENT,null,'',c.PROVISIONAL_PAY_PERCENT||'%')PROVISIONAL_PAY_PERCENT,
+lower(c.PROVISIONAL_PAY_EVENT) PROVISIONAL_PAY_EVENT,
+c.PROVISIONAL_PAY_EVENT_DAYS,
+c.PURCHASE_CONTRACT_ID,
+c.NUMBER_SHIPMENTS,
+c.PRICE_BASIS,
+c.price_days
+from contract c
+join vw_contact_details cd on c.contact_id=cd.id
+where c.id=$P{p_contract_id}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="AGREEMENT_ID" class="java.math.BigDecimal"/>
+	<field name="CONTACT_ID" class="java.math.BigDecimal"/>
+	<field name="CONTRACTOR" class="java.lang.String"/>
+	<field name="CONTRACT_PARTY" class="java.lang.String"/>
+	<field name="PARTY_ADDRESS" class="java.lang.String"/>
+	<field name="PRODUCT_DESCRIPTION" class="java.lang.String"/>
+	<field name="CONTRACT_TYPE" class="java.lang.String"/>
+	<field name="REFERENCE_NUMBER" class="java.lang.String"/>
+	<field name="DURATION_START" class="java.sql.Timestamp"/>
+	<field name="DURATION_END" class="java.sql.Timestamp"/>
+	<field name="QP_DESC" class="java.lang.String"/>
+	<field name="QP_TYPE" class="java.lang.String"/>
+	<field name="QP_TYPE_DETAIL" class="java.lang.String"/>
+	<field name="QP_TYPE_DETAIL_DESC" class="java.lang.String"/>
+	<field name="QUANTITY_RANGE_START" class="java.math.BigDecimal"/>
+	<field name="QUANTITY_RANGE_END" class="java.math.BigDecimal"/>
+	<field name="QUANTITY_MMT_UNIT" class="java.lang.String"/>
+	<field name="TITLE_TRANSFER_EVENT" class="java.lang.String"/>
+	<field name="RISK_TRANSFER_EVENT" class="java.lang.String"/>
+	<field name="TREATMENT_CHARGE" class="java.lang.String"/>
+	<field name="TREATMENT_CHARGE_MMT_UNIT" class="java.lang.String"/>
+	<field name="PROVISIONAL_PAY_PERCENT" class="java.lang.String"/>
+	<field name="PROVISIONAL_PAY_EVENT" class="java.lang.String"/>
+	<field name="PROVISIONAL_PAY_EVENT_DAYS" class="java.math.BigDecimal"/>
+	<field name="PURCHASE_CONTRACT_ID" class="java.math.BigDecimal"/>
+	<field name="NUMBER_SHIPMENTS" class="java.math.BigDecimal"/>
+	<field name="PRICE_BASIS" class="java.lang.String"/>
+	<field name="PRICE_DAYS" class="java.math.BigDecimal"/>
+	<group name="Contract" isStartNewPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{ID}]]></groupExpression>
+		<groupHeader>
+			<band height="70">
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="d7392499-adc3-4415-8214-5c5bd8a7cf38" x="0" y="49" width="572" height="20"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CONTRACT_TYPE}+" AGREEMENT NO."+$F{REFERENCE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<image>
+					<reportElement uuid="78edf3e1-8d75-4562-bc3f-1436884d8a20" x="0" y="0" width="572" height="49"/>
+					<imageExpression><![CDATA["repo:/reports/MCC/Image/logo"]]></imageExpression>
+				</image>
+			</band>
+			<band height="21">
+				<textField>
+					<reportElement uuid="b4c94357-1f89-4054-9257-c63a48791781" x="0" y="0" width="572" height="20"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CONTRACT_PARTY}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="16">
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="6d77dd4f-b80a-46c4-9981-591bc4a7e7a3" x="0" y="0" width="572" height="15"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["AND"]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="15">
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="6d77dd4f-b80a-46c4-9981-591bc4a7e7a3" x="0" y="0" width="572" height="15"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CONTRACTOR}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="28"/>
+			<band height="91">
+				<componentElement>
+					<reportElement uuid="37cb2f0d-c5d5-40f4-9395-6e8ac47dc872" key="table" x="31" y="40" width="180" height="51"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Product" uuid="44696469-929f-414f-81cc-601f99da0f37">
+							<datasetParameter name="p_contract_id">
+								<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column uuid="a8c69dce-827a-4acd-a9e9-d0d04d59d567" width="56">
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement uuid="465dad5e-453d-4388-8056-34f2e5e850ab" x="0" y="0" width="56" height="20"/>
+									<textElement/>
+									<textFieldExpression><![CDATA[$F{SYMBOL}+":"]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column uuid="d912f42b-5353-498a-a1a5-2689b4ad44ba" width="90">
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement uuid="666d294c-cf31-4a88-a54c-18496c4f8739" x="0" y="0" width="90" height="20"/>
+									<textElement/>
+									<textFieldExpression><![CDATA[$F{ASSAY}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+				<staticText>
+					<reportElement uuid="7109fe29-f190-470d-8661-550bf03b2177" x="16" y="0" width="100" height="20"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[1.PRODUCT]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="1ebcc6a5-b1bc-4a96-9be8-d4f886ea4565" x="31" y="20" width="504" height="20"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PRODUCT_DESCRIPTION}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="19">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+					<reportElement uuid="716c5014-9e54-49c6-ae39-a152abf39ff4" x="15" y="0" width="520" height="15" isPrintWhenDetailOverflows="true"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA["The material shall be otherwise free of constituents deleterious to the smelting and refining process and shall be free of radioactivity."]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="41">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" x="16" y="0" width="100" height="20"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[2.QUANTITY]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="fdfd81de-94af-4e31-8106-7fe25cda9a2b" x="31" y="20" width="398" height="20"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA["A total of approximately "+$F{QUANTITY_RANGE_START}+" - "+$F{QUANTITY_RANGE_END}+" "+$F{QUANTITY_MMT_UNIT}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="39">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" x="16" y="0" width="100" height="20"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[3.SHIPMENT]]></text>
+				</staticText>
+			</band>
+			<band height="42">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" x="16" y="0" width="100" height="20"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[4.DURATION]]></text>
+				</staticText>
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement uuid="98149fd9-f918-477a-a553-0e3154e6fa54" x="15" y="20" width="520" height="20"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new SimpleDateFormat("MMMMM-yyyy").format($F{DURATION_START})+" - "+new SimpleDateFormat("MMMMM dd, yyyy").format($F{DURATION_END})]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="32">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" x="16" y="0" width="100" height="20"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[5.DELIVERY]]></text>
+				</staticText>
+			</band>
+			<band height="35">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" x="16" y="0" width="100" height="20"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[6.TITLE AND RISK]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="73501726-0b83-4575-800f-1b552f26d72e" x="31" y="20" width="504" height="15"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Title shall pass "+$F{TITLE_TRANSFER_EVENT}+" receipt"]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="22">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+					<reportElement uuid="716c5014-9e54-49c6-ae39-a152abf39ff4" x="31" y="0" width="504" height="15" isPrintWhenDetailOverflows="true"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Risk shall pass "+$F{RISK_TRANSFER_EVENT}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="41">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" x="16" y="0" width="320" height="20"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[7.QUOTATIONAL PERIOD]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="1551a35e-7f0e-45c3-b62a-c895567d90ab" x="15" y="20" width="520" height="20"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA["The quotational period shall be "+$F{QP_DESC}+"("+$F{QP_TYPE_DETAIL_DESC}+")"]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="76">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" x="16" y="0" width="320" height="20"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[8.PAYABLES]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement uuid="f8b6d158-903c-4deb-9328-c7d4033ffb65" key="table" x="31" y="20" width="504" height="56"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Payables" uuid="41741806-0214-4705-9c41-af38d73d0690">
+							<datasetParameter name="p_contract_id">
+								<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column uuid="d641f6dd-e4d6-4bed-984e-803c87ecc216" width="53">
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement uuid="9b4dddb2-99fe-420a-ac69-a9d92fae1cdf" x="0" y="0" width="53" height="20"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{ELEMENT_CODE}+":"]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column uuid="07715df1-84f2-47b4-b6da-5d64ba3d8a63" width="90">
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement uuid="4464f232-46d9-4634-b17d-1e895d759083" x="0" y="0" width="90" height="20"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{STATEMENT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="38">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" mode="Transparent" x="16" y="0" width="320" height="16" forecolor="#000000" backcolor="#FFFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[9.TREATMENT CHARGE  ]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+					<reportElement uuid="0d181110-6462-47ad-9c34-bbb7f120bef8" mode="Transparent" x="16" y="16" width="519" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA["The treatment charge shall be US"+$F{TREATMENT_CHARGE}+" "+$F{TREATMENT_CHARGE_MMT_UNIT}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="44">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" mode="Transparent" x="16" y="0" width="320" height="16" forecolor="#000000" backcolor="#FFFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[10.PENALTY  ]]></text>
+				</staticText>
+			</band>
+			<band height="69">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" mode="Transparent" x="16" y="0" width="320" height="16" forecolor="#000000" backcolor="#FFFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[11.REFINING CHARGE]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement uuid="bbdd0ead-994a-4677-a9f3-3994484c7d06" key="table" x="31" y="16" width="442" height="50"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="refining_charge" uuid="f9f8acb4-0119-44b6-a4b9-7572374f949c">
+							<datasetParameter name="p_contract_id">
+								<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column uuid="a55da9e6-70d3-4920-aa03-d3f4b52e4243" width="90">
+							<jr:detailCell height="20">
+								<textField>
+									<reportElement uuid="84ecca22-d609-48c4-974a-e4ef8245f8fc" x="0" y="0" width="90" height="20"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{ELEMENT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column uuid="d70a4b36-8e56-4ba8-af22-294a3a8116fd" width="90">
+							<jr:detailCell height="20">
+								<textField isBlankWhenNull="true">
+									<reportElement uuid="f9cc1eac-2d6b-4e51-be8f-14cc6e958c74" x="0" y="0" width="90" height="20"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{REFINING_CHARGE}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="37">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" mode="Transparent" x="16" y="0" width="320" height="16" forecolor="#000000" backcolor="#FFFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[12.PAYMENT]]></text>
+				</staticText>
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement uuid="5f5ae497-1c2a-45d5-83ab-02715ccd9959" mode="Transparent" x="31" y="16" width="504" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PROVISIONAL_PAY_PERCENT}+" "+$F{PROVISIONAL_PAY_EVENT}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="68">
+				<staticText>
+					<reportElement uuid="19420b7e-c007-41fa-90fa-2cbde8b1f8fa" mode="Transparent" x="16" y="0" width="320" height="16" forecolor="#000000" backcolor="#FFFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[Splitting Limits]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement uuid="39b8089c-cd91-40bb-afb1-876d039d0842" key="table" x="31" y="16" width="385" height="50"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="SplittingLimits" uuid="0d829848-9108-4af9-a9dd-e7645ef7a228">
+							<datasetParameter name="p_contract_id">
+								<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column uuid="272a50b4-7804-4d99-8826-94a4648661b8" width="90">
+							<jr:detailCell height="20">
+								<textField>
+									<reportElement uuid="84fe717c-9d4c-4abc-b60c-3dd2bb8a1c74" x="0" y="0" width="90" height="20"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{ELEMENTS}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column uuid="bba3b2c6-4dd3-49af-b1e9-185d87799c8c" width="90">
+							<jr:detailCell height="20">
+								<textField isBlankWhenNull="true">
+									<reportElement uuid="88a94b0c-4f0e-4c82-8be1-18c719dc177b" x="0" y="0" width="90" height="20"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{SPLIT}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band height="50"/>
+		</groupHeader>
+		<groupFooter>
+			<band height="50"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

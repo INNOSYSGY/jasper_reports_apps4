@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll Analysis Sheet B-Gafoor_subreport2" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="0d0075d0-04a6-4bf2-8ff4-da8d7a29d8fb">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/Monthly_Payroll_Analysis_Summary"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/02_PAYROLL/Monthly_Payroll_Analysis_Summary_files/Payroll_Analysis_Sheet_B_Gafoor_subreport2.jrxml"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT_PROD"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Monthly Payroll Analysis Summary"/>
+	<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PERIOD_START" class="java.lang.String"/>
+	<parameter name="PERIOD_END" class="java.lang.String"/>
+	<parameter name="EMPLOYMENT_CLASS" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select description, sum(pd.Amount_deducted) Amount_deducted
+	from PA_PMG_PAYROLLDEDUCTION pd join PA_PCF_ADMINDEDUCTION adm ON adm.id = pd.adm_deduction_id
+	join PA_PCF_DEDUCTIONCODE ded ON adm.expense_id = ded.id
+	join PA_PMG_PAYROLLDTL pa on pa.id = pd.pay_slipno
+	where
+	pa.earnings_period_id in (  select ppe.id
+       from pa_pcf_earningperiod ppe
+         where to_date(to_char(ppe.START_PAID_FOR,'DD-MON-YYYY'),'DD-MON-YYYY')
+between  to_date($P{PERIOD_START},'DD-MON-YYYY') and to_date($P{PERIOD_END},'DD-MON-YYYY')  
+          and 
+          replace(upper(PKG_GLOBAL_FNTS.GET_LOOKUP_COL(ppe.employment_class_id,'VALUE_DESCRIPTION')),' ','_') = $P{EMPLOYMENT_CLASS} 
+          and ppe.org_id= $P{P_ORG_ID} )
+	and replace(pa.employment_class_hist,' ','_') =  $P{EMPLOYMENT_CLASS} 
+	and (upper(ded.Who_Pays) ='EMPLOYEE' or upper(adm.Deduction_Type)='EMPLOYEE')
+	and Amount_deducted>0
+	and  ded.org_id=$P{P_ORG_ID} 
+    group by description]]>
+	</queryString>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED"/>
+	</field>
+	<sortField name="DESCRIPTION"/>
+	<variable name="Total Deduction" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></variableExpression>
+	</variable>
+	<group name="Description">
+		<groupExpression><![CDATA[$F{DESCRIPTION}]]></groupExpression>
+		<groupFooter>
+			<band height="16">
+				<textField>
+					<reportElement x="0" y="0" width="80" height="15" uuid="36be0c77-ba4d-49e3-8218-130d0ba32444"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="80" y="0" width="60" height="15" uuid="1d79efdc-4cf2-4c0b-bc9a-46a7802df0dd"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{AMOUNT_DEDUCTED}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="16">
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="70" y="0" width="70" height="15" uuid="477f79b7-4a8b-4c7b-a1a3-7fb439bfd2d7"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total Deduction}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

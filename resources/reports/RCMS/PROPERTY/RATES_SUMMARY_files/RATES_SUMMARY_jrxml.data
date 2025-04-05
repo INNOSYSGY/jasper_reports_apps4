@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Rates By Ward" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9dc9aec9-a35d-4132-9837-b7ae319b1787">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/PROPERTY/RATES_SUMMARY"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.149:8081/jasperserver/services/repository"/>
+	<queryString>
+		<![CDATA[select
+SHORT_VALUE||' - '||initcap(reference_value) Ward_Name,
+count(distinct p.id) Total,
+sum(case when pvd.property_type='RESIDENTIAL' then pvd.value else 0 end) Residential,
+sum(case when pvd.property_type='COMMERCIAL' then pvd.value else 0 end)  Commercial,
+sum(p.total_Exemption) Exemption,
+sum(value) Assessed_value
+from vw_property p
+left outer join RCMS_DEV.PROPERTY_VALUE PV on p.id=pv.property_id
+left outer join property_value_detail pvd on pv.id=pvd.PROPERTY_VALUE_ID
+left join REFERENCES r on p.ward=r.id
+group by SHORT_VALUE||' - '||initcap(reference_value)]]>
+	</queryString>
+	<field name="WARD_NAME" class="java.lang.String"/>
+	<field name="TOTAL" class="java.math.BigDecimal"/>
+	<field name="RESIDENTIAL" class="java.math.BigDecimal"/>
+	<field name="COMMERCIAL" class="java.math.BigDecimal"/>
+	<field name="EXEMPTION" class="java.math.BigDecimal"/>
+	<field name="ASSESSED_VALUE" class="java.math.BigDecimal"/>
+	<sortField name="WARD_NAME"/>
+	<variable name="TOTAL_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL}]]></variableExpression>
+	</variable>
+	<variable name="RESIDENTIAL_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{RESIDENTIAL}]]></variableExpression>
+	</variable>
+	<variable name="COMMERCIAL_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{COMMERCIAL}]]></variableExpression>
+	</variable>
+	<variable name="EXEMPTION_1" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{EXEMPTION}]]></variableExpression>
+	</variable>
+	<variable name="ASSESSED_VALUE_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ASSESSED_VALUE}]]></variableExpression>
+	</variable>
+	<variable name="REPORT_NAME" class="java.lang.String">
+		<variableExpression><![CDATA[]]></variableExpression>
+		<initialValueExpression><![CDATA["Summary of Rates By Ward"]]></initialValueExpression>
+	</variable>
+	<variable name="Seq" class="java.math.BigDecimal" calculation="Count">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="44" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="44" uuid="10502929-939d-4a69-a4fa-470eafc5302f"/>
+				<subreportParameter name="report_name">
+					<subreportParameterExpression><![CDATA[$V{REPORT_NAME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LETTER_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<staticText>
+				<reportElement x="39" y="0" width="127" height="20" uuid="c2818321-807a-4e7b-9e7e-66281a12c735"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Ward Name]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="166" y="0" width="45" height="20" uuid="226f3413-bd5b-42b5-882a-52b25773bf3e"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom" markup="none">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Property Count"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="211" y="0" width="95" height="20" uuid="5d2b6634-06a4-40e8-bca9-b7ecc7ba8f49"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Residential]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="309" y="0" width="86" height="20" uuid="4e3e8f5a-2670-4a42-83fe-b9c561422fc6"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Commercial]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="394" y="0" width="95" height="20" uuid="37e077e3-25a1-481a-85ef-16b816a7ba9f"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Exemption]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="489" y="0" width="83" height="20" uuid="b8ef4f4e-3fc3-4ae3-9577-c2cbfbf74253"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Assesed Value]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="20" width="570" height="1" uuid="6f215494-a475-47fe-806a-f7ee755afcc9"/>
+			</line>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="1" width="39" height="20" uuid="48a734ac-28df-4aab-b5f7-195a300c4cfd"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom" markup="none">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="1" rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Seq #"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="39" y="0" width="127" height="15" uuid="b3be704d-2f9b-40c3-ba3c-569a9c7a34ed"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WARD_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="211" y="0" width="95" height="15" uuid="db0538b2-d60e-4431-a659-a1727a9c7fcf"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RESIDENTIAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="309" y="0" width="86" height="15" uuid="0026ec07-8e4a-4663-9adb-625d0fc0765b"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMMERCIAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="394" y="0" width="95" height="15" uuid="73cbe398-d7e0-40a6-a177-828387f41dbd"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EXEMPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="489" y="0" width="83" height="15" uuid="cda57ec7-a63d-4570-b73f-0fcc97440230"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ASSESSED_VALUE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="166" y="0" width="45" height="15" uuid="78a30379-762f-4fc2-afab-d39850f82a20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="39" height="15" uuid="988b2ba1-333f-40a1-97c9-ddb71751ad52"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+					<paragraph leftIndent="1" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Seq}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="18" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="17" uuid="4764f75d-f3b7-4211-9f14-96df4b019c2e"/>
+				<subreportParameter name="Page_Count">
+					<subreportParameterExpression><![CDATA[$V{PAGE_COUNT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Page_Number">
+					<subreportParameterExpression><![CDATA[$V{PAGE_NUMBER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LETTER_PORTRAIT_FOOTER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="15" splitType="Stretch">
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="166" y="0" width="50" height="15" uuid="dd4673ff-216d-45fd-b668-dd7280c20804"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="216" y="0" width="90" height="15" uuid="064e10a2-432a-4e80-b08d-51ec6d1fcb1e"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{RESIDENTIAL_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="309" y="0" width="91" height="15" uuid="68195223-b238-4b5d-a734-79ce0b8eee69"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{COMMERCIAL_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="399" y="0" width="90" height="15" uuid="01682111-000c-4f58-8be9-bb60718867e4"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{EXEMPTION_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="489" y="0" width="81" height="15" uuid="85192ecf-f313-4387-b355-f7adb907fef7"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ASSESSED_VALUE_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="166" height="15" uuid="70494903-0bae-4809-b9b0-62e1796e77b6"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="2" rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TOTAL"]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

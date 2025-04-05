@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Employee_Contribution_Statement" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="3c4dfe6b-014c-47e1-87f1-8f49a46e921f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="STERLING_PROD"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="aheadley"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/Sterling_Pension_Management_System/Employee_Contribution_Statement_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Sterling_Pension_Management_System/Employee_Contribution_Statement"/>
+	<parameter name="Contr_id" class="java.math.BigDecimal"/>
+	<parameter name="Year" class="java.math.BigDecimal"/>
+	<parameter name="Month" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[select
+    b.*,
+    b.empr_pre_yrs_contr * b.ent_pct empr_pre_yrs_contr_tenure,
+    b.employer_contr_ytd * b.ent_pct employer_contr_ytd_tenure,
+    b.emplr_curr_int * b.ent_pct emplr_curr_int_tenure
+from (
+    select 
+        a.*, 
+        (a.EMP_CONT_INTR_PER_ANN) ann_perc,
+        a.emp_total_prv_yrs_int + (a.employee_contr_int_ytd * a.contr_count) emp_curr_int, 
+        a.emplr_total_prv_yrs_int + (a.employer_contr_int_ytd * a.contr_count) emplr_curr_int
+    from (
+        select
+            fund_no,
+            tbl_contr.contri_id,
+            first_name,
+            last_name,
+            floor(months_between(sysdate,dob) /12) age,
+            upper(to_char(date_joined, 'fmMonth DD, YYYY')) date_joined,
+            sum(nvl(tbl_contr.employee_contribution, 0)) employee_contr_ytd,
+            sum(nvl(tbl_contr.employer_contribution, 0)) employer_contr_ytd,
+            sum(nvl(tbl_contr.employee_contribution, 0) * ((EMP_CONT_INTR_PER_ANN/100)/12)) employee_contr_int_ytd,
+            sum(nvl(tbl_contr.employer_contribution, 0) * ((EMP_CONT_INTR_PER_ANN/100)/12)) employer_contr_int_ytd,
+            count(1) contr_count,
+            nvl(tbl_cont_ann.emp_total_prv_yrs_cont ,0) emp_pre_yrs_contr,
+            nvl(tbl_cont_ann.emplr_total_prv_yrs_cont,0) empr_pre_yrs_contr,
+            nvl(tbl_cont_ann.emp_total_prv_yrs_int,0)emp_total_prv_yrs_int,
+            nvl(tbl_cont_ann.emplr_total_prv_yrs_int,0) emplr_total_prv_yrs_int,
+            max(upper(to_char(last_day(to_date('01-'|| $P{Month} || '-'|| $P{Year} , 'DD-MM-YYYY')), 'fmMonth DD, YYYY'))) statement_date,
+            max(case 
+    	        when months_between(last_day(to_date('01/'||$P{Month}||'/'||$P{Year}, 'DD/MM/YYYY')), tbl_con.date_joined) /12 < 5 then 0
+    	        when months_between(last_day(to_date('01/'||$P{Month}||'/'||$P{Year}, 'DD/MM/YYYY')), tbl_con.date_joined) /12 between 5 and 7.5 then 0.25
+    	        when months_between(last_day(to_date('01/'||$P{Month}||'/'||$P{Year}, 'DD/MM/YYYY')), tbl_con.date_joined) /12 between 7.5 and 10 then 0.5
+    	        when months_between(last_day(to_date('01/'||$P{Month}||'/'||$P{Year}, 'DD/MM/YYYY')), tbl_con.date_joined) /12 between 10 and 12.5 then 0.75
+    	        when months_between(last_day(to_date('01/'||$P{Month}||'/'||$P{Year}, 'DD/MM/YYYY')), tbl_con.date_joined) /12 > 12.5 then 1
+        	end) ent_pct,
+            max(EMP_CONT_INTR_PER_ANN/100) EMP_CONT_INTR_PER_ANN
+        from 
+            TBL_CONTRIBUTOR tbl_con
+            JOIN TBL_PENSION_CONTRIBUTION tbl_contr on tbl_con.id=tbl_contr.contri_id
+            LEFT JOIN ORGANIZTAION_PEN_CONFIG opc on floor(months_between(sysdate,tbl_con.dob) /12) between opc.AGE_LOWER_LIMIT and opc.AGE_UPPER_LIMIT
+            left join (
+                select 
+                    contri_id, 
+                    year,
+                    nvl(emp_total_prev_yrs_cont,0) + nvl(emp_curr_yrs_cont,0)  emp_total_prv_yrs_cont,
+                    nvl(emp_curr_yrs_intr,0) emp_total_prv_yrs_int,
+                    nvl(emplr_total_prev_yrs_cont,0) + nvl(emplr_curr_yrs_cont,0) emplr_total_prv_yrs_cont,
+                    nvl(emplr_curr_yrs_intr,0) emplr_total_prv_yrs_int
+                from 
+                    tbl_pension_contr_annual
+                where
+                    year = $P{Year} - 1) tbl_cont_ann on tbl_cont_ann.contri_id = tbl_con.id 
+        where
+            extract( month from tbl_contr.cont_date)<= $P{Month}
+            and extract( year from tbl_contr.cont_date)= $P{Year}
+            and tbl_contr.contri_id =  nvl($P{Contr_id} ,tbl_contr.contri_id)
+        group by 
+            fund_no,
+            tbl_contr.contri_id,
+            first_name,
+            last_name,
+            floor(months_between(sysdate,dob) /12),
+            upper(to_char(date_joined, 'fmMonth DD, YYYY')),
+            nvl(tbl_cont_ann.emp_total_prv_yrs_cont ,0),
+            nvl(tbl_cont_ann.emplr_total_prv_yrs_cont,0),
+            nvl(tbl_cont_ann.emp_total_prv_yrs_int,0),
+            nvl(tbl_cont_ann.emplr_total_prv_yrs_int,0)
+        )a
+    )b]]>
+	</queryString>
+	<field name="FUND_NO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="FUND_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="FUND_NO"/>
+	</field>
+	<field name="CONTRI_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CONTRI_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONTRI_ID"/>
+	</field>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FIRST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="LAST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LAST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="LAST_NAME"/>
+	</field>
+	<field name="AGE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AGE"/>
+		<property name="com.jaspersoft.studio.field.label" value="AGE"/>
+	</field>
+	<field name="DATE_JOINED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_JOINED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_JOINED"/>
+	</field>
+	<field name="EMPLOYEE_CONTR_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_CONTR_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_CONTR_YTD"/>
+	</field>
+	<field name="EMPLOYER_CONTR_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYER_CONTR_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYER_CONTR_YTD"/>
+	</field>
+	<field name="EMPLOYEE_CONTR_INT_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_CONTR_INT_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_CONTR_INT_YTD"/>
+	</field>
+	<field name="EMPLOYER_CONTR_INT_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYER_CONTR_INT_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYER_CONTR_INT_YTD"/>
+	</field>
+	<field name="CONTR_COUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CONTR_COUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONTR_COUNT"/>
+	</field>
+	<field name="EMP_PRE_YRS_CONTR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_PRE_YRS_CONTR"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_PRE_YRS_CONTR"/>
+	</field>
+	<field name="EMPR_PRE_YRS_CONTR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPR_PRE_YRS_CONTR"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPR_PRE_YRS_CONTR"/>
+	</field>
+	<field name="EMP_TOTAL_PRV_YRS_INT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_TOTAL_PRV_YRS_INT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_TOTAL_PRV_YRS_INT"/>
+	</field>
+	<field name="EMPLR_TOTAL_PRV_YRS_INT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLR_TOTAL_PRV_YRS_INT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLR_TOTAL_PRV_YRS_INT"/>
+	</field>
+	<field name="STATEMENT_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="STATEMENT_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="STATEMENT_DATE"/>
+	</field>
+	<field name="ENT_PCT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ENT_PCT"/>
+		<property name="com.jaspersoft.studio.field.label" value="ENT_PCT"/>
+	</field>
+	<field name="EMP_CONT_INTR_PER_ANN" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_CONT_INTR_PER_ANN"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_CONT_INTR_PER_ANN"/>
+	</field>
+	<field name="ANN_PERC" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ANN_PERC"/>
+		<property name="com.jaspersoft.studio.field.label" value="ANN_PERC"/>
+	</field>
+	<field name="EMP_CURR_INT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_CURR_INT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_CURR_INT"/>
+	</field>
+	<field name="EMPLR_CURR_INT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLR_CURR_INT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLR_CURR_INT"/>
+	</field>
+	<field name="EMPR_PRE_YRS_CONTR_TENURE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPR_PRE_YRS_CONTR_TENURE"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPR_PRE_YRS_CONTR_TENURE"/>
+	</field>
+	<field name="EMPLOYER_CONTR_YTD_TENURE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYER_CONTR_YTD_TENURE"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYER_CONTR_YTD_TENURE"/>
+	</field>
+	<field name="EMPLR_CURR_INT_TENURE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLR_CURR_INT_TENURE"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLR_CURR_INT_TENURE"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="91" splitType="Stretch">
+			<rectangle>
+				<reportElement x="1" y="1" width="159" height="50" backcolor="#339403" uuid="e383e49f-6220-478f-9a93-9c372151d148">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</rectangle>
+			<image>
+				<reportElement x="1" y="1" width="156" height="50" uuid="23c90471-fa04-4009-9972-ced25feb0f9a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA["repo:spl_logo_white_1.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="70" width="569" height="21" uuid="2b7352b3-32c2-49ef-bbad-b767e0d47f05"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Sterling Products Ltd.]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="52" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="31" width="570" height="21" uuid="f6c1b23c-de0c-4771-acde-32e18c133e21"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[NAME OF PLAN: STERLING PRODUCTS LTD. PENSION PLAN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="10" width="570" height="21" uuid="7ae7cfce-2b93-4320-aab2-2cfe5dfb3aac"/>
+				<textElement textAlignment="Center">
+					<font size="12" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($P{Month}.intValue() == 6 ? "HALF YEARLY" : "ANNUAL")+" STATEMENT OF MEMBER CONTRIBUTION"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="580" splitType="Stretch">
+			<image>
+				<reportElement x="444" y="494" width="76" height="46" uuid="b8054b48-1050-4c96-a4f4-078e58393acc"/>
+				<imageExpression><![CDATA["repo:Sterling_signature.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="0" y="50" width="270" height="21" uuid="07d008c9-34ec-4457-b2bc-e481e7b67b27"/>
+				<textFieldExpression><![CDATA["LAST NAME: "+$F{LAST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="81" width="270" height="21" uuid="2f350fb4-c7b4-4af3-b427-20d6bd9322b5"/>
+				<textFieldExpression><![CDATA["COMPANY NAME: " + "STERLING PRODUCTS LIMITED"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="20" width="290" height="21" uuid="60f22ce6-ede6-4812-b921-b935bf1e57fa"/>
+				<textFieldExpression><![CDATA["DATE JOINED SCHEME: "+$F{DATE_JOINED}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="50" width="289" height="21" uuid="b2a95dc8-6864-4771-9841-679d5dd0c128"/>
+				<textFieldExpression><![CDATA["FUND No: "+$F{FUND_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="81" width="290" height="21" uuid="eff138ea-c7d0-4c7b-9ee6-ee687823ce0b"/>
+				<textFieldExpression><![CDATA["EFFECTIVE DATE OF STATEMENT: "+ $F{STATEMENT_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="120" width="570" height="21" uuid="50d62d2e-3f61-4012-87d3-04d47da2af3b"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["This Statement illustrates your Pension Plan contributions (Employee and Employer) plus compoud interest per annum as at the effective date."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="150" y="150" width="260" height="21" uuid="8166203e-ca9f-47c3-852a-8f709617956d"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["EMPLOYEE CONTRIBUTIONS AND INTEREST"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="200" y="239" width="216" height="21" uuid="f2c2c53c-233e-48e5-a7de-dd37abd19a49"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_CURR_INT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="200" y="210" width="130" height="21" uuid="33177183-bedc-43fb-bf9a-60a3cdcb0dc1"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_PRE_YRS_CONTR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="200" y="180" width="130" height="21" uuid="ed4dd091-6cb0-4570-bbb3-f8c83b49efc4"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_CONTR_YTD}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="270" width="90" height="21" uuid="4fb77279-636d-416e-bce7-dccb1600395c"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["GRAND TOTAL:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="156" y="310" width="260" height="21" uuid="1f93e01d-1bd9-454b-8695-9a7ffecf09c3"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["EMPLOYER CONTRIBUTIONS AND INTEREST"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="200" y="400" width="160" height="21" uuid="50ecbb74-b0b4-414b-b016-35a949566425"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLR_CURR_INT_TENURE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="200" y="370" width="140" height="21" uuid="354a5a96-e8a5-4592-85f4-f794f4b66c65"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPR_PRE_YRS_CONTR_TENURE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="200" y="340" width="140" height="21" uuid="dcc09b72-ef4e-4080-81cc-b42259e9f16e"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYER_CONTR_YTD_TENURE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="430" width="50" height="21" uuid="19df154f-e763-4f44-a91f-df803d2a350a"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TOTAL:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="20" width="270" height="21" uuid="f9b02074-b66b-4887-9857-2d0d809d2501"/>
+				<textFieldExpression><![CDATA["FIRST NAME: "+$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="180" width="170" height="21" uuid="be370b18-8f4e-4c9c-a37e-f4b60bf19825"/>
+				<text><![CDATA[CURRENT YEAR CONTRIBUTIONS:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="210" width="190" height="21" uuid="e2fa58b4-71a3-44b4-b7a2-4aa234927d4d"/>
+				<text><![CDATA[PREVIOUS YEAR(S) CONTRIBUTIONS: ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="240" width="181" height="19" uuid="9c2c6c70-1a62-4ee0-b49b-71c22cd77048"/>
+				<text><![CDATA[TOTAL INTEREST:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="340" width="180" height="21" uuid="85a72e19-cc49-4901-8ea6-2e1f71ad723b"/>
+				<text><![CDATA[CURRENT YEAR CONTRIBUTIONS: ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="370" width="200" height="21" uuid="b0876d37-2d75-4d98-a659-c18104c83a42"/>
+				<text><![CDATA[PREVIOUS YEAR(S) CONTRIBUTIONS:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="400" width="180" height="21" uuid="85682b8a-5bba-4411-a222-fba9a8b8bb2d"/>
+				<text><![CDATA[INTEREST ON CONTRIBUTIONS:]]></text>
+			</staticText>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="200" y="270" width="240" height="21" uuid="fbcc03b7-861c-4353-b232-1138e029953f"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_CURR_INT}+$F{EMP_PRE_YRS_CONTR}+$F{EMPLOYEE_CONTR_YTD}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###;(#,###-)">
+				<reportElement x="200" y="430" width="160" height="21" uuid="a3d73423-f3b1-4e37-b9a0-c10ba08748eb"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPR_PRE_YRS_CONTR_TENURE} +$F{EMPLOYER_CONTR_YTD_TENURE}+$F{EMPLR_CURR_INT_TENURE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="25" y="460" width="550" height="21" uuid="bff3e0f1-237a-44d4-8543-c20e10083811"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["If you have any queries about your benefits or the Pension Plan in general, please contact your Administration Department"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="440" y="520" width="150" height="21" uuid="01b42460-9c15-4771-bbe5-0286a70f81e4"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["..........................................."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="442" y="540" width="108" height="21" uuid="c487acee-ce2d-4d7d-bc3c-b8701cf4fcec"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Company Secretary"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="427" y="0" width="43" height="20" uuid="84bcf728-80c9-477f-9096-6e6310a4b5e8">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="191" y="0" width="188" height="20" uuid="e649b823-12ad-4efb-a5fa-d57405c2372e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Sterling Pension Management System"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="470" y="0" width="34" height="20" uuid="65480b2b-9736-4971-9c5a-6336844e70fb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="540" y="0" width="30" height="20" uuid="fcef2150-0bd2-44e0-bb78-a930cea43f2b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="504" y="0" width="36" height="20" uuid="49ed07c1-31c3-4f46-86ad-d8dadc4c0174">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" of "]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMM d, yyyy">
+				<reportElement x="0" y="0" width="99" height="20" uuid="1395bf94-6157-4d18-ba98-be7b1c757e54">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date:" +NOW()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

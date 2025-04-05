@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1f356d1d-8a10-480d-8017-50aafbc06db5">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/SUPPLIER_COMPARISON_SHEET2"/>
+	<property name="ireport.jasperserver.url" value="http://apps.innosysgy.com:8081/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.210000000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="RFQ_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+
+(
+    SELECT SNAME
+    FROM QRY_SUPPLIER S
+    where s.SUPPLIER_ID=q.supplier_id
+
+) Supplier,
+DECODE(QL.DRUG_STRENGTH,NULL,QL.DESCRIPTION,QL.DESCRIPTION||' '||QL.DRUG_STRENGTH) ITEM_DESCRIPTION,
+ ql.total_cost PRICE_QUOTED
+
+FROM TBLQUOTATIONLINES QL
+JOIN TBLQUOTATION Q ON QL.QUOTATION_ID=Q.QUOTATION_ID
+where ql.org_id = $P{P_IN_ORG_ID} and Q.RFQ_ID=$P{RFQ_ID}]]>
+	</queryString>
+	<field name="SUPPLIER" class="java.lang.String"/>
+	<field name="ITEM_DESCRIPTION" class="java.lang.String"/>
+	<field name="PRICE_QUOTED" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="75" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="75" uuid="749eec71-6176-44d4-955f-147cc682825c"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{P_IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="19">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="19" uuid="7115f201-931b-4071-a438-84d573417196"/>
+				<text><![CDATA[SUPPLIER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="213" height="19" uuid="74d76978-82a6-465c-9818-ba170693c03c"/>
+				<text><![CDATA[ITEM_DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="313" y="0" width="118" height="19" uuid="878b9bc4-c55f-401f-ba38-88aa95e2e6a7"/>
+				<text><![CDATA[PRICE_QUOTED]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="20" uuid="0c9feac9-9737-4760-9aaf-0ca5f2025cce"/>
+				<textFieldExpression><![CDATA[$F{SUPPLIER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="0" width="213" height="20" uuid="f37631c7-3173-484b-b0bf-a3c1075bd0b6"/>
+				<textFieldExpression><![CDATA[$F{ITEM_DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="313" y="0" width="118" height="20" uuid="6c5b6eed-7f8f-4ee1-a40d-32eb99c8d045"/>
+				<textFieldExpression><![CDATA[$F{PRICE_QUOTED}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

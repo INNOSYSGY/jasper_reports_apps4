@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Letter Portrait Header" language="groovy" pageWidth="324" pageHeight="612" columnWidth="324" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="820abe5e-016a-45c0-87e3-5007c6e9f4e9">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+ho.address org_address, ho.faxnum, ho.telnum, nis_reg_no, tax_reg_no,
+HO.ORGANISATION_NAME,
+HO.PHOTO ORG_PHOTO
+FROM HR_HCF_ORGANISATION HO
+where ho.id=$P{P_IN_ORG_ID}]]>
+	</queryString>
+	<field name="ORG_ADDRESS" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="NIS_REG_NO" class="java.lang.String"/>
+	<field name="TAX_REG_NO" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="ORG_PHOTO" class="java.io.InputStream"/>
+	<title>
+		<band height="120" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="65" width="324" height="13" forecolor="#000000" backcolor="#000000" uuid="460fbdd1-654f-4223-a385-a5af6b427b30"/>
+				<textElement textAlignment="Center">
+					<font fontName="Impact" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="90" width="324" height="10" uuid="67f84a3c-29f5-4ccc-b78e-9c349b24698e"/>
+				<textElement textAlignment="Center">
+					<font fontName="Impact" size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="78" width="324" height="13" forecolor="#000000" uuid="b9b58b62-4f32-4b8b-aa37-b12be390299a"/>
+				<textElement textAlignment="Center">
+					<font fontName="Impact" size="10" isBold="true" isUnderline="false" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Corporate Office"]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Blank">
+				<reportElement x="115" y="3" width="141" height="55" uuid="5ad4f44d-95f2-48cf-a831-7c417aeb3877"/>
+				<imageExpression><![CDATA[$F{ORG_PHOTO}]]></imageExpression>
+			</image>
+			<line>
+				<reportElement x="29" y="77" width="260" height="1" forecolor="#009999" backcolor="#009999" uuid="62e81474-4ab5-4317-b5c0-073bf9355e53"/>
+			</line>
+			<textField>
+				<reportElement x="0" y="99" width="324" height="10" uuid="565225ac-df36-41b9-a3be-e4e71a9fb5ec"/>
+				<textElement textAlignment="Center">
+					<font fontName="Impact" size="7" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Email: humanresources@gbtibank.com"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="108" width="324" height="10" uuid="439d60f7-9066-4ef9-b9de-fe55b0fc8e39"/>
+				<textElement textAlignment="Center">
+					<font fontName="Impact" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Tel:"+" "+$F{TELNUM}+"   "+"Fax:"+" "+$F{FAXNUM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+</jasperReport>

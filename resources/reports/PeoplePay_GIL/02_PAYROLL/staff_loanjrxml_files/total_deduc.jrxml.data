@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="total_deduc" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b5af7ed4-dd62-4795-b09e-957ec5d59e5c">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GIL-VM"/>
+	<property name="ireport.jasperserver.url" value="http://172.17.4.191:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/02_PAYROLL/staff_loanjrxml_files/total_deduc.jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/02_PAYROLL/staff_loanjrxml"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Listing of staff loans"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<parameter name="orgid" class="java.math.BigDecimal"/>
+	<parameter name="earningid" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+    sum(B.AMOUNT_DEDUCTED)
+	FROM PA_PMG_PAYROLLDEDUCTION B 
+    JOIN PA_PMG_PAYROLLDTL A ON A.ID=B.PAY_SLIPNO
+    inner join HR_RCM_EMPLOYEE E ON E.ID = a.Emp_ID
+	JOIN PA_PCF_ADMINDEDUCTION L ON L.ID=B.ADM_DEDUCTION_ID
+    JOIN PA_PCF_DEDUCTIONCODE J ON J.ID=L.EXPENSE_ID
+    where 
+     a.EARNINGS_PERIOD_ID=  $P{earningid} 
+    and J.id=13832
+    and a.org_id=  $P{orgid} 
+    AND UPPER(WHO_PAYS) IN ('EMPLOYEE','BOTH')
+    and B.AMOUNT_DEDUCTED>0
+    and upper(B.DEDUCTION_TYPE)='EMPLOYEE'    
+    group by a.EARNINGS_PERIOD_ID]]>
+	</queryString>
+	<field name="SUM(B.AMOUNT_DEDUCTED)" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="SUM(B.AMOUNT_DEDUCTED)"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="60" splitType="Stretch">
+			<textField pattern="¤#,##0.##;¤-#,##0.##">
+				<reportElement x="0" y="10" width="600" height="50" uuid="0e51c005-3cae-461d-b3cc-ee6cb6a38643"/>
+				<textFieldExpression><![CDATA["Please acknowledge receipt of the sum of " + new DecimalFormat("$###,###").format($F{SUM(B.AMOUNT_DEDUCTED)}) +" as per cheque# _____________ dated __________attached being deductions made on behalf of the above mentioned entity from the salaries of the following employees for the month of _____________"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="IPED Suspension Letter" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="46728f3a-4733-4606-b393-7f080f0ac984">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="96"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/SUSPEN_LETT_IPED"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+      case
+          when t.sex_code = 'M' then 'Mr.'
+          when t.sex_code = 'F' then 'Mrs.'
+       end || t.employee_name as top_name,
+       t.position_name,
+      initcap(t.DEPARTMENT_NAME) AS DEPARTMENT,
+      'Dear '||
+               CASE
+                 WHEN t.sex_code = 'M'  THEN 'Mr.'
+                 WHEN t.sex_code = 'F' THEN 'Mrs.'
+               END || ' '||initcap(SURNAME)|| ',' as  GREETING,
+     to_char(d.action_start_date,'ddth fmMonth, yyyy') as action_start_date,
+     to_char(d.action_end_date,'ddth fmMonth, yyyy') as action_end_date,
+     to_char((d.action_end_date + 1),'ddth fmMonth, yyyy') as plusone,
+pkg_global_fnts.fn_num_towords(d.action_start_date - d.action_end_date) word_days,
+      (d.action_end_date - d.action_start_date) days,
+             (select CASE
+                 WHEN t.sex_code = 'M'  THEN 'Mr.'
+                 WHEN t.sex_code = 'F' THEN 'Mrs.'
+               END FROM apps.vw_position_location_v3 t where t.emp_id = d.disciplinarian_emp)||' '||
+               (select t.employee_name from apps.vw_position_location_v3 t where t.emp_id = d.disciplinarian_emp) as mrmrsenforce,
+                (select t.position_name from apps.vw_position_location_v3 t where t.emp_id = d.disciplinarian_emp) enforcer_pos,
+ (select t.employee_name from apps.vw_position_location_v3 t where  t.emp_id = e.REPORT_TO_FUNCTIONAL  ) CCTO,
+(SELECT t.position_name FROM apps.vw_position_location_v3 t where  t.emp_id = e.REPORT_TO_FUNCTIONAL  ) CCPOSITION_OF_Approver
+from apps.hr_rcm_employee e
+JOIN apps.hr_gri_disciplineemp d ON d.emp_id = e.id
+JOIN apps.hr_rcm_individual i ON i.id = e.ind_id
+JOIN apps.vw_position_location_v3 t ON t.emp_id = e.id
+JOIN apps.hr_gri_discipline g on d.discipline_id = g.id
+where e.id =$P{EMP_ID} --and  e.org_id = 7292]]>
+	</queryString>
+	<field name="TOP_NAME" class="java.lang.String"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="DEPARTMENT" class="java.lang.String"/>
+	<field name="GREETING" class="java.lang.String"/>
+	<field name="ACTION_START_DATE" class="java.lang.String"/>
+	<field name="ACTION_END_DATE" class="java.lang.String"/>
+	<field name="PLUSONE" class="java.lang.String"/>
+	<field name="WORD_DAYS" class="java.lang.String"/>
+	<field name="DAYS" class="java.math.BigDecimal"/>
+	<field name="MRMRSENFORCE" class="java.lang.String"/>
+	<field name="ENFORCER_POS" class="java.lang.String"/>
+	<field name="CCTO" class="java.lang.String"/>
+	<field name="CCPOSITION_OF_APPROVER" class="java.lang.String"/>
+	<detail>
+		<band height="607" splitType="Stretch">
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="26" y="36" width="510" height="20" uuid="cdc4b13e-c3a4-4cc1-a162-1b187421d89a"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="26" y="317" width="100" height="20" uuid="770cd7b3-0b8a-45de-a5b8-113b1201423a"/>
+				<text><![CDATA[Kindest Regards.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="349" width="100" height="20" uuid="7f901e19-80c6-4569-8f0d-772a911d6c11"/>
+				<text><![CDATA[Yours sincerely,]]></text>
+			</staticText>
+			<line>
+				<reportElement x="26" y="404" width="148" height="1" uuid="4904e641-3a8b-4eef-8a0c-a23ac35622dc"/>
+				<graphicElement>
+					<pen lineWidth="1.5" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="26" y="466" width="100" height="20" uuid="9f88f02e-9a2a-4273-a9d6-3a035330c37b"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CC:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement x="26" y="175" width="507" height="74" uuid="bd1a7846-0ffc-47af-9d05-cecc2d6a40f5"/>
+				<textElement markup="html"/>
+				<textFieldExpression><![CDATA["Based on the serious breaches of policy committed by you, you are hereby suspended without pay for "+$F{WORD_DAYS}+" ("+$F{DAYS}+") days commencing from the "+$F{ACTION_START_DATE}+" to the "+$F{ACTION_END_DATE}+". You are to return to work on the "+$F{PLUSONE}+"."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="26" y="249" width="507" height="49" isPrintWhenDetailOverflows="true" uuid="1e22e14d-ab82-4413-80db-af61c293c93b"/>
+				<text><![CDATA[Management wishes that you take this opportunity to reflect and purpose to improve upon your return.]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="26" y="405" width="507" height="20" uuid="3f591d8f-880a-45a8-830b-91a91d5a3aa1"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MRMRSENFORCE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="26" y="425" width="507" height="20" uuid="d8c37c28-c316-44eb-8a3c-3cbf52d6e7db"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENFORCER_POS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="26" y="71" width="507" height="20" uuid="d1d1c8e1-4a3f-4bfe-9059-ec82271ec232"/>
+				<textFieldExpression><![CDATA[$F{TOP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="26" y="145" width="507" height="20" uuid="41224e09-3408-4c30-9a37-0f8d86c0b871"/>
+				<textFieldExpression><![CDATA[$F{GREETING}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="26" y="91" width="507" height="20" uuid="8c9235ff-2bda-43a2-be2f-4ba120b11625"/>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="26" y="111" width="507" height="20" uuid="d4dd3541-6f6d-4a48-bbdd-65137ad55f9a"/>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="132" y="486" width="404" height="20" uuid="58083fc6-2758-4cc7-a012-f4d9e48c0a09"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CCTO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="132" y="506" width="404" height="20" uuid="e95828be-6283-472a-a9a9-df56b754bd3e"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CCPOSITION_OF_APPROVER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

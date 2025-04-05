@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll Analysis Sheet B-Gafoor_subreport1" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="77b7e9ef-3881-487f-8f44-9b112a2fd355">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Peoplepay_Correia/02_PAYROLL/1"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/Peoplepay_Correia/02_PAYROLL/1_files/Payroll_Analysis_Sheet_B_Gafoor_subreport1.jrxml"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="242"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="747"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Correia"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PAY_SLIP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT O.PAY_SLIPNO,  ROUND(O.INCOME_AMOUNT,2) INCOME_AMOUNT, INCOME_AMOUNT_YTD,
+
+    (CASE WHEN O.INCOME_CODE IN ('OT','OT1', 'NR','SF','HOL1.5','HOL2','OTH1.5','OTH2') THEN
+        ic.Description||' R: '||
+           replace(TO_CHAR( pkg_global_fnts.fn_computeentpercentof(ee.income_code_id, EE.AMOUNT,
+                                h.period_start,EE.PERCENT_OPTION,EE.EMP_ID,EE.PERCENTAGE,EE.TAXABLE),'$999,999.99') ,' ','')||
+        ' <br>('||quantity||'@'||REPLACE(TO_CHAR(o.rate,'$999,999.99'),' ','')||')'
+
+           ELSE ic.Description END) Description, o.Income_code, O.Emp_id,ic.org_id
+    FROM   PA_PMG_PAYROLLINCOME O 
+    join hr_rcm_empentitle ee on o.empent_id = ee.id
+    join PA_PMG_PAYROLLDTL  H on o.pay_slipno = h.id
+    JOIN PA_PCF_INCOMECODE IC ON O.INCOME_CODE = IC.INCOME_CODE
+    where	pay_slipno=$P{PAY_SLIP_ID}
+and ic.org_id=$P{P_ORG_ID}
+	and Income_Amount>0]]>
+	</queryString>
+	<field name="PAY_SLIPNO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PAY_SLIPNO"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAY_SLIPNO"/>
+	</field>
+	<field name="INCOME_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="INCOME_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="INCOME_AMOUNT"/>
+	</field>
+	<field name="INCOME_AMOUNT_YTD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="INCOME_AMOUNT_YTD"/>
+		<property name="com.jaspersoft.studio.field.label" value="INCOME_AMOUNT_YTD"/>
+	</field>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="INCOME_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="INCOME_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="INCOME_CODE"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ORG_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<variable name="Total Income" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{INCOME_AMOUNT}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="120" height="15" uuid="451db553-2c79-4faf-99b6-11ed5baa11ce"/>
+				<textElement markup="html">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="120" y="0" width="54" height="15" uuid="80aff1e4-dcc9-4fb8-b76d-31aabfdcb50b"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INCOME_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

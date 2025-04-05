@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="891596d6-5e82-4bfa-a6d2-093c58f3fe05">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/Training/Staff_List_April_2018_Debt_Payroll"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="HEAD_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select unit_parent, unit_name, count(1), unit_level, (select unit_name from apps.hr_hcf_orgstructuredtl d where d.id =b.id
+                                                      and exists ( select 1
+                                                                  from apps.hr_hcf_orgstructuredtl u
+                                                                  where u.id = d.id and unit_parent is null)
+                                                      and unit_name is not null) head,
+                                                      (select id from apps.hr_hcf_orgstructuredtl d where d.id =b.id
+                                                      and exists ( select 1
+                                                                  from apps.hr_hcf_orgstructuredtl u
+                                                                  where u.id = d.id and unit_parent is null)
+                                                      and unit_name is not null) head
+FROM apps.pa_pmg_payrolldtl t
+join apps.HR_HCF_WORKLOCATIONPOSITION a on a.id = t.position_location_id
+join apps.hr_hcf_position p on p.id = a.position_id
+join apps.hr_hcf_orgstructuredtl b on b.id =p.ORGDTL_ID
+WHERE t.ORG_ID = 1626 AND t.period_end = '31-MAR-18'
+AND unit_parent = $P{HEAD_ID}
+group by unit_level,unit_name, unit_parent,b.id
+order by unit_level asc]]>
+	</queryString>
+	<field name="UNIT_PARENT" class="java.math.BigDecimal"/>
+	<field name="UNIT_NAME" class="java.lang.String"/>
+	<field name="COUNT(1)" class="java.math.BigDecimal"/>
+	<field name="UNIT_LEVEL" class="java.math.BigDecimal"/>
+	<field name="HEAD" class="java.lang.String"/>
+	<variable name="COUNT_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{COUNT(1)}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="64" y="0" width="213" height="20" uuid="16012109-fda7-45ae-8827-2930e0b3cfe5"/>
+				<textElement textAlignment="Right">
+					<font fontName="Times New Roman" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{UNIT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="277" y="0" width="278" height="20" uuid="ec70800d-1e0e-41af-a9e0-fec3f18cc893"/>
+				<textElement textAlignment="Right">
+					<font fontName="Times New Roman" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COUNT(1)}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

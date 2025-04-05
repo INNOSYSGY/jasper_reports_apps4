@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Employees Admin Deduction" language="groovy" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="84eefb4c-b08e-4fe4-a91a-83b326401d1e">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="138"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/Admin_Deduct"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/02_PAYROLL/Admin_Deduct_files/Admin_Deduct_jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal"/>
+	<parameter name="EXPENSE_CODE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+o.org_structure_id,
+  A.PAY_BATCH_ID,
+  initcap(b.deduction_type) deduction_type,
+  A.ORG_ID,
+  A.PERIOD_START,
+  A.PERIOD_END,
+  EMP_COMPANY_NO,
+  A.FIRST_NAME_HIST,A.SURNAME_HIST,
+  (CASE WHEN L.SURNAME_HIST IS NULL THEN A.SURNAME_HIST ELSE A.SURNAME_HIST END||', '||CASE WHEN       L.FIRST_NAME_HIST IS NULL THEN A.FIRST_NAME_HIST ELSE A.FIRST_NAME_HIST END) AS ENAME
+, initcap(A.POSITION_NAME_HIST) AS DESIGNATION, A.PAYMENT_TYPE_HIST AS PAYTYPE,
+     A.DEPARTMENT_NAME_HIST AS DEPARTMENT,
+    case when  $P{IN_ORG_ID} = 17832 then  o.UNIT_NAME||' ('||nvl(o.coa_code,'None')||')' else  o.UNIT_NAME end Worklocation,
+    H.ORGANISATION_NAME AS COMPANY, ROUND(AMOUNT_OWING,0) AS AMOUNT_OWING, PERIOD,J.EXPENSE_CODE,J.DESCRIPTION EXPENSE,
+    L.interest_rate,B.STATUS_CODE status,date_close,L.approved_date,B.id deduction_id, round(B.Amount_Deducted,0) as deduction_amount,
+    amount_owing-(select sum(amount_deducted)
+                  FROM PA_PMG_PAYROLLDEDUCTION PD
+                  WHERE PD.ADM_DEDUCTION_ID = L.ID) BALANCE, L.CURRENT_BALANCE,DATESTART START_DATE--start_date
+                  	,A.EMPLOYMENT_CLASS_HIST, A.PAYMENT_TYPE_HIST, initcap(B.DEDUCTION_NO) DEDUCTION_NO,WHO_PAYS,
+                     h.address,h.telnum,h.faxnum
+	FROM PA_PMG_PAYROLLDEDUCTION B JOIN PA_PMG_PAYROLLDTL A ON A.ID=B.PAY_SLIPNO
+    inner join HR_RCM_EMPLOYEE E ON E.ID = a.Emp_ID
+	JOIN PA_PCF_ADMINDEDUCTION L ON L.ID=B.ADM_DEDUCTION_ID
+    JOIN PA_PCF_DEDUCTIONCODE J ON J.ID=L.EXPENSE_ID
+    JOIN HR_HCF_ORGANISATION H ON A.ORG_ID=H.ID
+    left outer join VW_ORGANISATION_STRUCTURE_ALL o on a.orgdtl_id=o.id
+
+	  WHERE A.earnings_period_id =$P{EARNINGS_PERIOD_ID}
+   and UPPER(j.id)=(case when upper(to_nchar($P{EXPENSE_CODE}))=to_nchar('-1') or upper(to_nchar($P{EXPENSE_CODE}))=to_nchar('%') then UPPER(to_nchar(j.id)) else upper(to_nchar($P{EXPENSE_CODE})) end)   AND UPPER(WHO_PAYS) IN ('EMPLOYEE','BOTH')
+   and a.org_id =  $P{IN_ORG_ID} 
+	AND B.AMOUNT_DEDUCTED>0
+ORDER BY  o.UNIT_NAME,A.EMPLOYMENT_CLASS_HIST,A.SURNAME_HIST,A.FIRST_NAME_HIST]]>
+	</queryString>
+	<field name="ORG_STRUCTURE_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_STRUCTURE_ID"/>
+	</field>
+	<field name="PAY_BATCH_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PAY_BATCH_ID"/>
+	</field>
+	<field name="DEDUCTION_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEDUCTION_TYPE"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="PERIOD_START" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_START"/>
+	</field>
+	<field name="PERIOD_END" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_END"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="FIRST_NAME_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME_HIST"/>
+	</field>
+	<field name="SURNAME_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME_HIST"/>
+	</field>
+	<field name="ENAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ENAME"/>
+	</field>
+	<field name="DESIGNATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DESIGNATION"/>
+	</field>
+	<field name="PAYTYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PAYTYPE"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="WORKLOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WORKLOCATION"/>
+	</field>
+	<field name="COMPANY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COMPANY"/>
+	</field>
+	<field name="AMOUNT_OWING" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT_OWING"/>
+	</field>
+	<field name="PERIOD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD"/>
+	</field>
+	<field name="EXPENSE_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EXPENSE_CODE"/>
+	</field>
+	<field name="EXPENSE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EXPENSE"/>
+	</field>
+	<field name="INTEREST_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="INTEREST_RATE"/>
+	</field>
+	<field name="STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="STATUS"/>
+	</field>
+	<field name="DATE_CLOSE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="DATE_CLOSE"/>
+	</field>
+	<field name="APPROVED_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="APPROVED_DATE"/>
+	</field>
+	<field name="DEDUCTION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DEDUCTION_ID"/>
+	</field>
+	<field name="DEDUCTION_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DEDUCTION_AMOUNT"/>
+	</field>
+	<field name="BALANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="BALANCE"/>
+	</field>
+	<field name="CURRENT_BALANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="CURRENT_BALANCE"/>
+	</field>
+	<field name="START_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="START_DATE"/>
+	</field>
+	<field name="EMPLOYMENT_CLASS_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS_HIST"/>
+	</field>
+	<field name="PAYMENT_TYPE_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_TYPE_HIST"/>
+	</field>
+	<field name="DEDUCTION_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEDUCTION_NO"/>
+	</field>
+	<field name="WHO_PAYS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WHO_PAYS"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="FAXNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
+	</field>
+	<sortField name="EXPENSE"/>
+	<sortField name="ENAME"/>
+	<variable name="RECORD_COUNT" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="CURRENT_BALANCE_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CURRENT_BALANCE}]]></variableExpression>
+	</variable>
+	<variable name="DEDUCTION_AMOUNT_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Expense" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEDUCTION_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="AMOUNT_OWING_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMOUNT_OWING}]]></variableExpression>
+	</variable>
+	<variable name="AMOUNT_OWING_3" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMOUNT_OWING}]]></variableExpression>
+	</variable>
+	<variable name="DEDUCTION_AMOUNT_3" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEDUCTION_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="Deduction_Sum" class="java.math.BigDecimal" resetType="Group" resetGroup="Expense" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEDUCTION_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="Deduction_Count" class="java.math.BigDecimal" resetType="Group" resetGroup="Expense" calculation="Count">
+		<variableExpression><![CDATA[$F{ENAME}]]></variableExpression>
+	</variable>
+	<variable name="CURRENT_BALANCE_3" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CURRENT_BALANCE}]]></variableExpression>
+	</variable>
+	<group name="Expense" keepTogether="true">
+		<groupExpression><![CDATA[$F{EXPENSE}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement x="1" y="1" width="279" height="15" uuid="3b2a49b3-9b22-4ef2-9c37-52ccf03f3bdc"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EXPENSE}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<staticText>
+					<reportElement x="1" y="0" width="99" height="15" uuid="7f471c0a-3418-4a86-b747-9b4c51046851"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Expense Count:]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="101" y="0" width="50" height="15" uuid="cc28a986-4c23-4401-afdc-4db35be96f2a"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Deduction_Count}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="452" y="0" width="100" height="15" uuid="ca6a79b7-1ee9-43e8-8ecd-db458de532a4"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{DEDUCTION_AMOUNT_1}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="60" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="570" height="60" uuid="279f7ca2-9c1b-444c-b763-3626df79de83"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="44" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="4" width="570" height="15" uuid="da2e0af5-a345-4427-aa35-fa31c07f173a"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA['General Employee Administrative Deduction ']]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="0" y="24" width="260" height="15" uuid="399a7b39-3cc8-431c-be90-ddb62035bc4f"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENT_TYPE_HIST} + " "+$F{EMPLOYMENT_CLASS_HIST}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="295" y="24" width="65" height="15" uuid="34b7e7fe-da3c-4946-ac3f-8fa33a75ba9d">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Period start:"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="431" y="24" width="65" height="15" uuid="0478b0d7-0e9f-42a0-8f41-c345d82511bb"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Period end:"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="360" y="24" width="70" height="15" uuid="904b2a49-07e1-40d6-90dd-ba0cc4a2a93f">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERIOD_START}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="494" y="24" width="70" height="15" uuid="7fe94489-0880-44f0-a955-3501df1500da"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERIOD_END}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="73" y="0" width="102" height="15" uuid="1be87576-8511-4cd0-8f2e-d8193c6f830f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Surname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="24" y="0" width="49" height="15" uuid="ce23ae5d-2737-4fd6-9ba0-8f9d52e58cbc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Emp #]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="570" height="1" uuid="5a8c7bca-c1c1-47e9-9752-0c151ac5eb64"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="0" width="24" height="15" uuid="9c4ea5ee-1ad3-4587-abc3-cf9016f1e465"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="452" y="0" width="100" height="15" uuid="81808c2d-cac7-4dab-9eca-32fc4156c7d3">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Installment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="175" y="0" width="175" height="15" uuid="1841effa-3ebb-4d4d-a4d7-9658ed449057"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Department]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField pattern="###0;###0-">
+				<reportElement x="0" y="0" width="24" height="15" uuid="ca05da87-986e-48f7-8890-258ae49de5ba"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{RECORD_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="24" y="0" width="39" height="15" uuid="bafae66c-40e9-464b-9564-02cc430f7742"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="63" y="0" width="112" height="15" uuid="3be5f6c1-ad74-419b-b2ac-67693d3c34ff"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="452" y="0" width="100" height="15" uuid="9e54d65b-fafd-4628-9d94-c2a77e66ad4e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEDUCTION_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="176" y="0" width="174" height="15" uuid="8c6cadb6-6e30-453e-bea2-f608a891f7d9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0bb7c11d-9a10-4df1-8b21-ddc289cd10da"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WORKLOCATION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="570" height="17" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="17" width="570" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="435" y="0" width="100" height="13" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy" isBlankWhenNull="true">
+				<reportElement x="5" y="0" width="162" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" isBlankWhenNull="true">
+				<reportElement x="535" y="0" width="20" height="13" uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="17" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="15" uuid="910567c1-eaf2-4a9f-8faa-799214802463"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<textField pattern="#,##0;(-#,##0)" isBlankWhenNull="true">
+				<reportElement x="452" y="1" width="100" height="15" uuid="7d6e784a-31bf-4636-9aeb-093708898eb7">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{DEDUCTION_AMOUNT_3}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="570" height="1" uuid="dcaf3bda-e01e-4ef6-ae60-4cb7482e4928">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

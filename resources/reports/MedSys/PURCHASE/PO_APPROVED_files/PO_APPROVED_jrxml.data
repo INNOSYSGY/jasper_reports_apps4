@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Stock On Hand" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="95c53139-5d96-406e-93e3-3006b0b19378">
+	<property name="ireport.zoom" value="1.366026910730141"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/PURCHASE/PO_APPROVED"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<parameter name="date_start" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="date_end" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+PO_HEADER_ID,
+DESCRIPTION,
+           (
+                SELECT FULL_USER_NAME
+                FROM VW_USER_NAME
+                WHERE UPPER(USER_NAME)=UPPER(PO.APPROVED_BY)
+                ) APPROVED_BY,
+APPROVED_DATE,
+'' Requester,
+      (
+      SELECT COUNT (1)
+      FROM TBLPOLINES PL
+      WHERE PL.PO_HEADER_ID=po.PO_HEADER_ID
+      ) number_of_items,
+(select sname
+from qry_supplier s
+where s.supplier_id=po.supplier_id) Supplier,
+GRAND_TOTAL_COST,
+initcap(PKG_GLOBAL_FNTS.GET_LOOKUP_COL(PO.CURRENCY,'VALUE_DESCRIPTION')) CURRENCY,
+Initcap(payment_method) Payment_method,
+ETA,
+             (SELECT DESCRIPTION
+              FROM TBLORGANIZATION G
+              WHERE G.ORGANIZATION_ID=PO.ORGANIZATION_ID) ORGANISATION,
+COMPANY_NAME,VILLAGE_TOWN||', '||DISTRICT||', '||COUNTRY ADDRESS,EMAIL,
+                        'Tel# '||TELEPHONE_NOS Telphone, 'Fax # '||FAX_NOS FAX
+
+from tblpoheader po
+cross join tblsystemconfiguration
+WHERE APPROVED_DATE IS NOT NULL
+and trunc(approved_date) between $P{date_start} and $P{date_end}]]>
+	</queryString>
+	<field name="PO_HEADER_ID" class="java.math.BigDecimal"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="APPROVED_BY" class="java.lang.String"/>
+	<field name="APPROVED_DATE" class="java.sql.Timestamp"/>
+	<field name="REQUESTER" class="java.lang.String"/>
+	<field name="NUMBER_OF_ITEMS" class="java.math.BigDecimal"/>
+	<field name="SUPPLIER" class="java.lang.String"/>
+	<field name="GRAND_TOTAL_COST" class="java.math.BigDecimal"/>
+	<field name="CURRENCY" class="java.lang.String"/>
+	<field name="PAYMENT_METHOD" class="java.lang.String"/>
+	<field name="ETA" class="java.sql.Timestamp"/>
+	<field name="ORGANISATION" class="java.lang.String"/>
+	<field name="COMPANY_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="TELPHONE" class="java.lang.String"/>
+	<field name="FAX" class="java.lang.String"/>
+	<variable name="No" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[1.0]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="REPORT_NAME" class="java.lang.String">
+		<initialValueExpression><![CDATA["Listing of Purchase Order Approved for the Period "+new SimpleDateFormat('dd-MMMMM-yyyy').format($P{date_start})
++' To '+
+new SimpleDateFormat('dd-MMMMM-yyyy').format($P{date_end})]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="41" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="966" height="41" uuid="73ec9d00-4363-4dd5-a543-4f19d4f1db25"/>
+				<subreportParameter name="P_REPORT_NAME">
+					<subreportParameterExpression><![CDATA[$V{REPORT_NAME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/MedSys/RESOURCE/LETTER_HEAD_LEGAL_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="17" y="0" width="36" height="15" isPrintWhenDetailOverflows="true" uuid="6d3a4718-cfed-49a7-847c-74cec4898ecc"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[PO ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="456" y="0" width="92" height="15" isPrintWhenDetailOverflows="true" uuid="5f3442fe-0bd6-4de0-9eec-a8e33c85b1dc"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="0" width="82" height="15" uuid="a036491c-fe5d-45c2-a07b-47e3e678b6f5"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Organisation]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="968" height="1" uuid="eee808b9-6a64-4bc2-87b3-05040d7a8497"/>
+			</line>
+			<staticText>
+				<reportElement x="55" y="0" width="159" height="15" uuid="861b831e-d6ee-44c4-999b-ced08d793423"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="15" height="15" uuid="523430c2-0c14-4733-a09f-5140f934e050"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="214" y="0" width="56" height="15" isPrintWhenDetailOverflows="true" uuid="7a868360-cc38-4ae9-8c62-6b0826c9f60c"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[No of Items]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="553" y="0" width="97" height="15" isPrintWhenDetailOverflows="true" uuid="5f3442fe-0bd6-4de0-9eec-a8e33c85b1dc"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Currency]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="653" y="0" width="71" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="980cb6f4-08d5-434f-907b-1bcf4bcbd65b"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Method]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="356" y="0" width="100" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="2b62f2a1-8d88-47c0-a370-b526d2c20fbb"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Requestor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="893" y="0" width="73" height="15" uuid="b4d666a6-f6c8-4bd2-ad3a-8c2020914d9f"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[ETA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="727" y="0" width="166" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="bcbf2343-3b2d-442c-ad8a-4c47be22a91a"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Supplier]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="15" width="968" height="1" forecolor="#999999" uuid="d2221893-dd58-4f34-a1c0-881e06756ddf"/>
+			</line>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="456" y="0" width="92" height="15" uuid="6a68d079-5eb8-49b9-8cc2-42be4bc812d4"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GRAND_TOTAL_COST}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="272" y="0" width="82" height="15" uuid="f20321fe-7cce-4b07-b498-e31a43e4956a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="17" y="0" width="36" height="15" uuid="d2e08ec3-acc7-4a24-97f0-4d6533e983a0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PO_HEADER_ID}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="55" y="0" width="159" height="15" uuid="492fd659-72ea-46c6-9b89-d9ef05ac83d6"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="15" height="15" uuid="38e3c1f7-9c91-4fe4-8912-d3e9e7206090"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{No}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="214" y="0" width="56" height="15" uuid="31b92b4b-515f-4b63-bf00-8b8b5753ff80"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+					<paragraph rightIndent="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUMBER_OF_ITEMS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="553" y="0" width="97" height="15" uuid="6a68d079-5eb8-49b9-8cc2-42be4bc812d4"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CURRENCY}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="653" y="0" width="71" height="15" uuid="a3ba44ed-15f2-4260-bf6d-de4073111e91"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENT_METHOD}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="356" y="0" width="100" height="15" uuid="c81e3f85-225e-477c-9902-0790ff94478c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REQUESTER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yy" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="893" y="0" width="73" height="15" uuid="684c0db1-cd94-4f0c-9e74-9d3bd0ba0d16"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ETA}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
+				<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="727" y="0" width="166" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="380ef565-28c9-4ebb-b3eb-355b3a1f2e90"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUPPLIER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="16" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Opaque" x="2" y="0" width="966" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<textField>
+				<reportElement x="842" y="0" width="102" height="13" uuid="3393b061-7d07-468f-997f-4cded61b8d0d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="944" y="0" width="18" height="13" uuid="4d8264ca-885c-4795-94d0-72f1bd428dc4"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="2" y="0" width="172" height="15" uuid="aefd0541-a2ad-40d2-b601-cdb65e54d0b8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="2" y="0" width="966" height="16" uuid="aadc7cbd-88ea-4125-83f8-05e97fd395b8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[SCMS By INNOSYS Inc]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

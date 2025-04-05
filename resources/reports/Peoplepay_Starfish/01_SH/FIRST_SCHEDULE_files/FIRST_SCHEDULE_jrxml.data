@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="First Schedule" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="3127fbf0-84f0-4b28-93d3-034f559f89f6">
+	<property name="ireport.zoom" value="1.4641000000000064"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="88"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Dev_Cloud/01_SH/FIRST_SCHEDULE"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="gwi-production"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#FFBFBF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Unsafe Acts" uuid="124556dd-217d-4d6d-a511-df42bf43f338">
+		<parameter name="HS_DETAIL" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select
+"ID",
+"OPTION_DESCRIPTION",
+"YES_NO"
+from "HR_HS_OPT_CHECK"
+where SECTION='Hs-Unsafe Action'
+and hs_detail_id=$P{HS_DETAIL}
+and yes_no='Y'
+order by option_description]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="OPTION_DESCRIPTION" class="java.lang.String"/>
+		<field name="YES_NO" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+  a.id,
+  A.INCIDENT_ID,
+  a.emp_id,
+  a.site_work_unit,
+  c.org_id,
+  d.surname,
+  d.first_name,
+  null middle_initials,
+  d.cell_phone,
+  b.incident_location,
+  c.emp_company_no,
+  c.date_employed,
+  d.dob,
+  PKG_GLOBAL_FNTS.FN_CALCAGE(in_dob => d.dob,in_date => a.entry_date) || ' years' age,
+  case extract(year from a.entry_date) - extract(year from c.date_employed)
+        when 0 then round(months_between(a.entry_date, c.date_employed)) || ' months'
+        else extract(year from a.entry_date) - extract(year from c.date_employed) || ' years'
+        end period_employed,
+  a.employee_position,
+  (select x.value_description from table(pkg_global_fnts.get_lookup_value('TBLEMPLOYMENTCLASS')) x where x.id=a.employment_type) employment_type,
+  case nvl(a.contractor_name,'N') when 'Y' then 'Yes' else 'No' end contractor,
+  e.organisation_name, a.site_work_unit,(Pkg_Global_Fnts.Fn_Address('HOME',d.Id,'LOT',Sysdate)||' '||PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',d.ID,'STREET',SYSDATE)||' ' ||decode(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',d.ID,'VILLAGE_WARD',SYSDATE),null,' ',
+  PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',d.ID,'VILLAGE_WARD',SYSDATE)||' ')||nvl(PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',d.ID,'COUNTY',SYSDATE),' ')) AS ADDRESS,  d.SEX_CODE, a.incident_date,case a.injury_type when 'Fatality' then 'Yes' else 'No' end is_fatal, a.DAYS_LOST,
+   extract(year from AR.ACC_DATE) || '-'||  AR.ACC_NUM
+from hr_hs_detail a
+JOIN HR_HS_INCIDENT B ON B.ID=A.INCIDENT_ID
+join hr_rcm_employee c on c.id=a.emp_id
+join hr_rcm_individual d on d.id=c.ind_id
+join HR_HS_ACCIDENT_REGISTER AR on AR.HS_INCIDENT_ID=B.id 
+JOIN HR_HCF_ORGANISATION E ON E.ID=C.ORG_ID
+where a.id=$P{ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="INCIDENT_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="INCIDENT_ID"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="SITE_WORK_UNIT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SITE_WORK_UNIT"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="MIDDLE_INITIALS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="MIDDLE_INITIALS"/>
+	</field>
+	<field name="CELL_PHONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CELL_PHONE"/>
+	</field>
+	<field name="INCIDENT_LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INCIDENT_LOCATION"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
+	</field>
+	<field name="DOB" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="DOB"/>
+	</field>
+	<field name="AGE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="AGE"/>
+	</field>
+	<field name="PERIOD_EMPLOYED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_EMPLOYED"/>
+	</field>
+	<field name="EMPLOYEE_POSITION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_POSITION"/>
+	</field>
+	<field name="EMPLOYMENT_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_TYPE"/>
+	</field>
+	<field name="CONTRACTOR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CONTRACTOR"/>
+	</field>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="COLUMN_20" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SITE_WORK_UNIT"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="SEX_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SEX_CODE"/>
+	</field>
+	<field name="INCIDENT_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="INCIDENT_DATE"/>
+	</field>
+	<field name="IS_FATAL" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="IS_FATAL"/>
+	</field>
+	<field name="DAYS_LOST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DAYS_LOST"/>
+	</field>
+	<field name="EXTRACT(YEARFROMAR.ACC_DATE)||&apos;-&apos;||AR.ACC_NUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label">
+			<![CDATA[EXTRACT(YEARFROMAR.ACC_DATE)||'-'||AR.ACC_NUM]]>
+		</property>
+	</field>
+	<title>
+		<band height="40">
+			<staticText>
+				<reportElement x="240" y="0" width="100" height="20" uuid="9bbe1111-5b9e-4e7b-91eb-067f1dde41f3"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FIRST SCHEDULE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="507" y="20" width="48" height="20" uuid="48023888-a4ab-4666-b26d-6f9fd604c9eb"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[S.69(1)]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="60" splitType="Stretch">
+			<staticText>
+				<reportElement x="216" y="0" width="148" height="20" uuid="66b73d62-3f0e-45ff-b44a-95d15a4ceb81"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NOTICE OF ACCIDENT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="167" height="20" uuid="ef121920-5682-47a4-bd0e-b8c1ee02cd99"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ACCIDENT REGISTER NUMBER:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="183" y="30" width="136" height="20" uuid="88e9bd97-e352-4528-adfd-05a1d86dfcef"/>
+				<textElement textAlignment="Center">
+					<font isBold="true" isItalic="false" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EXTRACT(YEARFROMAR.ACC_DATE)||'-'||AR.ACC_NUM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="30">
+			<staticText>
+				<reportElement x="4" y="0" width="39" height="30" uuid="05e3f7a0-d8bc-4268-8170-e15d2e1c8685"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[#]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="0" width="162" height="30" uuid="438535cd-dfc1-418a-a6da-a6d1be888d62"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="0" width="223" height="30" uuid="9e76bf6b-f950-4e5b-b373-b12fdb2e87e2"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Details]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="447" splitType="Stretch">
+			<staticText>
+				<reportElement x="15" y="0" width="28" height="32" uuid="7e73c692-2088-4b8c-857c-41eb6a550678"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="32" width="28" height="20" uuid="1f2a4db5-49e4-4e51-aefd-d4b329fd64c8"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="141" width="28" height="18" uuid="26c3430e-a7d7-42f1-bd6c-517ae32048e2"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="64" width="28" height="20" uuid="e9d9b2a8-c9f0-44ac-a417-b198108a9af0"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="101" width="28" height="20" uuid="2e4aa47c-4296-401e-84f1-7db8010cd5ba"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="214" width="28" height="20" uuid="b3b3a260-37ab-428a-a7bd-fd199bded7f2"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[6]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="274" width="28" height="20" uuid="aa6b721f-2a3f-47ce-bb8e-3a9dd2968995"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[7]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="294" width="28" height="20" uuid="c62ff775-37b3-423e-8311-e54b79a1c2b2"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[8]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="0" width="174" height="32" uuid="1bb26e30-aa33-479d-8834-5db53eb3a14f"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Name of Employer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="32" width="174" height="32" uuid="e3aac316-bd05-4a9c-a5e0-fce428c376c9"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Address of place where accident happened]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="101" width="162" height="40" uuid="874a0f48-9434-4537-94d2-4c3522eacde0"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Branch or Department and exact place where accident happened]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="141" width="162" height="18" uuid="f6572828-5cb6-48e2-befe-865b6074a4ed"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[        a. Injured person Surname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="159" width="129" height="20" uuid="8688a7bb-ff4f-4405-a3f4-6b8a6419ea6c"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[        b. Other names]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="179" width="129" height="20" uuid="bf042056-0d4e-45d4-8ac7-05f129e508d3"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[        c.Address]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="214" width="129" height="20" uuid="faa5b23b-9a47-4bd2-8a0e-158a89dc9b16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[a) Sex]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="234" width="129" height="20" uuid="91902020-f851-4d6c-ab20-e7cf5a06e688"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[b) Age (last birthday)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="254" width="129" height="20" uuid="334ad2da-b6d1-48a0-b4a7-650821a60519"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[c) Occupation of injured person]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="274" width="129" height="20" uuid="b77f52cd-d0b7-464f-83e8-f2464098e874"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Date and Time of accident]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="294" width="162" height="36" uuid="d56bfb4d-17f0-4dcd-a9c9-56de0c913b75"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[a. Cause or nature of the accident]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="330" width="129" height="20" uuid="c2077f06-2b5b-4f69-92fd-891ece2a9ff0"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[b. If caused by machinery -]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="350" width="162" height="34" uuid="d78d6c70-6292-443d-8665-33b115ed0925"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[     (i)  Give name of machine and part causing accident]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="384" width="162" height="31" uuid="60a4eee9-7f8b-476b-8eb9-acb4d2634222"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[(ii)  State whether it was worked by mechanical power at the time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="415" width="162" height="32" uuid="7c3e97ec-714c-4412-a9e8-982c331da5e9"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[c. State exactly what the injured person was doing at the time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="64" width="129" height="20" uuid="4c7b54b8-9d45-4fa8-a27d-a0933603f3ee"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Nature of Occupation]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="303" y="0" width="208" height="20" uuid="6afd7a4e-fd6e-4aef-872d-1b0f5c2ed0bb"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="32" width="198" height="20" uuid="ef507a68-0d7b-48a3-8fa3-13a40bd8e2a7"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INCIDENT_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="139" width="198" height="20" uuid="d31cafe8-e064-42bf-b123-3a6f7aff8a75"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="159" width="198" height="20" uuid="6827b919-a072-4e38-9e7f-5db0ea894aad"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="179" width="198" height="35" uuid="a9835bd1-3de2-4a2f-a8b9-4ab1c15e37fe"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="214" width="100" height="20" uuid="b58e25c6-8c46-4f0d-b548-f13a924675d5"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SEX_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="234" width="100" height="20" uuid="bc89d72f-97bf-436f-af4c-652ffd2f6a1d"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AGE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="254" width="198" height="20" uuid="b2749ca7-f9dd-4e36-aafe-c60d7317bfbf"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_POSITION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="274" width="112" height="20" uuid="80b75de9-2fdf-424e-ad72-b81fc526ede0"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INCIDENT_DATE}]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement key="table 1" x="293" y="415" width="208" height="20" uuid="02ab2567-ce88-45fa-82b4-a850f1697517"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Unsafe Acts" uuid="b9ed365c-797a-402d-bc65-7e3b0a9bbb0f">
+						<datasetParameter name="HS_DETAIL">
+							<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="208" uuid="db8b4e26-b95f-40ed-94c2-9f14eef3cd2e">
+						<jr:detailCell height="20" rowSpan="1">
+							<textField>
+								<reportElement x="0" y="0" width="208" height="20" uuid="731b025d-d411-43df-a234-2195e045c5a8"/>
+								<textFieldExpression><![CDATA[$F{OPTION_DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<textField isBlankWhenNull="true">
+				<reportElement x="304" y="106" width="176" height="20" uuid="58aa12dc-f1c9-495b-9240-8feafe5627ab"/>
+				<textFieldExpression><![CDATA[$F{SITE_WORK_UNIT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="63" width="198" height="20" uuid="6f2bac80-567b-4f53-8ad7-c28a5d5168a1"/>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_POSITION}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="401">
+			<staticText>
+				<reportElement x="15" y="45" width="28" height="20" uuid="3a81401a-7e1a-4522-a297-9121f18242a1"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[ 10]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="0" width="162" height="45" uuid="1340a23c-9fd8-4e28-af0a-3f23bc256527"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Nature and extent of injuries (e.g., fatal, loss of finger, fracture of leg, scalp, scratch followed by sepsis).]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="45" width="162" height="31" uuid="b83276fe-9f3c-4d06-bcfe-72a09389d70b"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[a. State whether the accident was fatal or not.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="76" width="174" height="70" uuid="ccbb9af0-d4b2-4007-8877-0f621e0c4350"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[b. If the accident was not fatal state the estimated period that the injured person will be unable to earn full wages at the work at which he was employed at the time of the accident.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="165" width="28" height="20" uuid="9c828a0e-c2d8-4393-9e61-82be8fa62a7c"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[11]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="68" y="160" width="162" height="31" uuid="02c5b91e-d003-40b7-b0f1-36c493fceb99"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Has the accident been entered in the Register?]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="43" y="203" width="512" height="20" uuid="d47a1860-db7e-4fce-ac53-e89505ae4ba9"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[* Occupation includes agriculture,business,commerce,industry and trade.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="0" width="28" height="20" uuid="0f086bf6-efb3-4895-b69f-62207d2dd23e"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[9]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="299" y="45" width="100" height="20" uuid="7479a27c-5250-4002-9acb-eece10c72a1d"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IS_FATAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="299" y="76" width="100" height="20" uuid="1c3023d0-ac40-4680-bfde-3cacc0c1431d"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DAYS_LOST}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="3" y="236" width="164" height="20" uuid="344a66b1-40a8-4513-a7cc-d72fdc3741b0"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Signature of Employer or Agent:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="177" y="254" width="175" height="2" uuid="fa013157-0519-4ddc-a42d-261da5d0f667"/>
+			</line>
+			<staticText>
+				<reportElement x="3" y="286" width="40" height="20" uuid="762e79ae-2aae-4247-9674-44218448e12f"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="45" y="306" width="149" height="1" uuid="85922e42-7e8a-405c-ae9e-de38724c1dad"/>
+			</line>
+			<staticText>
+				<reportElement x="356" y="236" width="55" height="20" uuid="25d01740-b4e1-4263-84cc-7a801877d819"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Name Print:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="413" y="254" width="142" height="1" uuid="e73998fd-e29d-4a06-8c77-9952fa6c8489"/>
+			</line>
+			<staticText>
+				<reportElement x="319" y="320" width="208" height="30" uuid="e3c3b7b2-a16a-49d5-9363-01765a6b5c9e"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Affix Human Resources Department STAMP here]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

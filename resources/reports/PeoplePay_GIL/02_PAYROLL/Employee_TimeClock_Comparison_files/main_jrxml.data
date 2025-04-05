@@ -1,0 +1,856 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Departmental Report" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="242d8de8-7c35-45d8-a3ea-1826e92c4a82">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors Cloud"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/02_PAYROLL/Employee_TimeClock_Comparison"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Employee Time Sheet Comparison By Dollar Value"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/02_PAYROLL/Employee_TimeClock_Comparison_files/main_jrxml"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="DEPARTMENT_ID" class="java.math.BigDecimal"/>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal"/>
+	<parameter name="WKLOCATION_ID" class="java.math.BigDecimal"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal"/>
+	<queryString language="SQL">
+		<![CDATA[select distinct tc.emp_id,
+	   round(pkg_global_fnts.fn_hourlyrate(tc.emp_id, trunc(sysdate)),2) HOURLY_RATE,
+	   round((pkg_global_fnts.fn_hourlyrate(tc.emp_id, trunc(sysdate)) * 1.5 ) * sum(nvl(tc.over_time,0)),2) T_OVERTIME, 
+       round(nvl(AHOC_OVERTIME,0),2) AHOC_OVERTIME,
+       round(pkg_global_fnts.fn_hourlyrate(tc.emp_id, trunc(sysdate)) * sum(nvl(tc.double_time,0)),2) T_DOUBLETIME,
+       round(nvl(AHOC_DOUBLETIME,0),2) AHOC_DOUBLETIME,
+       round(pkg_global_fnts.fn_hourlyrate(tc.emp_id, trunc(sysdate)) * sum(nvl(tc.total_time_lost, 0)),2) ABSENT_TIME,
+       round(nvl(ABSENT_DAYS,0),2) ABSENT_DAYS,
+       Initcap(ind.Surname) || ', ' || Initcap(ind.First_Name) || ' ' || nvl(Initcap(ind.Middle_Name),'') Name,
+       tc.emp_company_no,
+       tc.payment_type,
+       emp.position_name "Position Name",
+       dept.unit_name department,
+       tc.designation,
+       wkloc.location_description "Work Location",
+        round(((pkg_global_fnts.fn_hourlyrate(tc.emp_id, trunc(sysdate)) * 1.5 ) * sum(nvl(tc.over_time,0))+
+       	nvl(AHOC_OVERTIME,0) + nvl(AHOC_DOUBLETIME,0) +
+       	pkg_global_fnts.fn_hourlyrate(tc.emp_id, trunc(sysdate)) * sum(nvl(tc.double_time,0)) ),0) TOTAL_OT_PAY,
+       	round((pkg_global_fnts.fn_hourlyrate(tc.emp_id, trunc(sysdate)) * sum(nvl(tc.total_time_lost, 0)) +
+       	nvl(ABSENT_DAYS,0)),0) TOTAL_DEDUCTION,
+       	       	TO_CHAR(ep.start_date,'FMMonth DD, YYYY' ) ||' -- '|| TO_CHAR(ep.end_date, 'FMMonth DD, YYYY') 
+        ||'   '|| initcap(PKG_GLOBAL_FNTS.Get_Lookup_Col(emp.employment_class_id, 'VALUE_DESCRIPTION' ) ||' '||tc.payment_type) PDATE
+from hr_att_timeclock_upload tc
+join hr_rcm_employee emp on emp.id = tc.emp_id
+join pa_pcf_earningperiod ep on ep.id = tc.earnings_period_id
+join hr_rcm_individual ind on emp.ind_id = ind.id
+full join (  select distinct ah.emp_id,
+            case when i.income_code = 'OT' then nvl(ah.amount_paid,0) else 0 end AHOC_OVERTIME,
+            case when i.income_code = 'OT1' then nvl(ah.amount_paid,0) else 0 end AHOC_DOUBLETIME
+            from pa_pcf_adhocpayment ah
+            join hr_rcm_empentitle et on et.id = ah.empent_id
+            join pa_pcf_incomecode i on i.id = et.income_code_id
+            join hr_att_timeclock_upload t on t.earnings_period_id = ah.earnings_period_id
+            where i.income_code in ('OT','OT1')
+            group by i.income_code,ah.amount_paid,ah.emp_id,ah.quantity) ad on ad.emp_id = tc.emp_id
+full join ( select distinct ad.emp_id,ad.closing_earning_period,
+            case when Upper(dc.expense_code) = 'LESSDAYS' then nvl(ad.deduction_amount,0) else 0 end ABSENT_DAYS
+            from pa_pcf_admindeduction ad 
+            join pa_pcf_deductioncode dc on dc.id = ad.expense_id
+            join hr_att_timeclock_upload cl on cl.earnings_period_id = ad.closing_earning_period
+            where dc.expense_code = 'LESSDAYS'
+            group by ad.emp_id,dc.expense_code,ad.deduction_amount,ad.closing_earning_period) ded on ded.emp_id = tc.emp_id
+left outer join (select a.id,a.unit_name,wkloc.position_id,wkloc.id wkl
+                        from  Hr_Hcf_Orgstructuredtl a
+                        join  hr_hcf_position c on a.id= c.ORGDTL_ID
+                        --join Table(Pkg_Global_Fnts.Get_Lookup_Value('TBLORGSTRUCTCLASS')) x on x.id=a.CLASSIFICATION
+                        join VW_ORG_WORKLOCATION_POSITION wkloc on wkloc.POSITION_ID = c.id  
+                        group by a.id,a.unit_name,wkloc.position_id,wkloc.id) dept on dept.wkl = emp.POSITION_LOCATION_ID
+left outer join (select id, org_id, location_description
+        					from hr_hcf_worklocation
+        					group by id, org_id, location_description) wkloc on wkloc.id = tc.work_location_id
+    where tc.emp_id = nvl($P{EMP_ID},tc.emp_id) 
+    and emp.orgdtl_id = nvl($P{DEPARTMENT_ID},emp.orgdtl_id)
+    and tc.work_location_id = nvl($P{WKLOCATION_ID} ,tc.work_location_id) 
+and tc.earnings_period_id = ded.closing_earning_period 
+and tc.earnings_period_id = $P{EARNINGS_PERIOD_ID}
+and tc.org_id = $P{IN_ORG_ID} 
+group by tc.emp_id,  Initcap(ind.Surname) || ', ' || Initcap(ind.First_Name) || ' ' || nvl(Initcap(ind.Middle_Name),''), 
+tc.emp_company_no, tc.payment_type,emp.position_name, dept.unit_name, tc.designation, ep.start_date,
+AHOC_OVERTIME,AHOC_DOUBLETIME,ABSENT_DAYS,wkloc.location_description,emp.employment_class_id,ep.end_date]]>
+	</queryString>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="HOURLY_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="HOURLY_RATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="HOURLY_RATE"/>
+	</field>
+	<field name="T_OVERTIME" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="T_OVERTIME"/>
+		<property name="com.jaspersoft.studio.field.label" value="T_OVERTIME"/>
+	</field>
+	<field name="AHOC_OVERTIME" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AHOC_OVERTIME"/>
+		<property name="com.jaspersoft.studio.field.label" value="AHOC_OVERTIME"/>
+	</field>
+	<field name="T_DOUBLETIME" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="T_DOUBLETIME"/>
+		<property name="com.jaspersoft.studio.field.label" value="T_DOUBLETIME"/>
+	</field>
+	<field name="AHOC_DOUBLETIME" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AHOC_DOUBLETIME"/>
+		<property name="com.jaspersoft.studio.field.label" value="AHOC_DOUBLETIME"/>
+	</field>
+	<field name="ABSENT_TIME" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ABSENT_TIME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ABSENT_TIME"/>
+	</field>
+	<field name="ABSENT_DAYS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ABSENT_DAYS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ABSENT_DAYS"/>
+	</field>
+	<field name="NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMP_COMPANY_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="PAYMENT_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAYMENT_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_TYPE"/>
+	</field>
+	<field name="Position Name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Position Name"/>
+		<property name="com.jaspersoft.studio.field.label" value="Position Name"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="DESIGNATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESIGNATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="DESIGNATION"/>
+	</field>
+	<field name="Work Location" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Work Location"/>
+		<property name="com.jaspersoft.studio.field.label" value="Work Location"/>
+	</field>
+	<field name="TOTAL_OT_PAY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_OT_PAY"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_OT_PAY"/>
+	</field>
+	<field name="TOTAL_DEDUCTION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_DEDUCTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_DEDUCTION"/>
+	</field>
+	<field name="PDATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PDATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PDATE"/>
+	</field>
+	<sortField name="Work Location"/>
+	<sortField name="DEPARTMENT"/>
+	<sortField name="NAME"/>
+	<variable name="Department Count" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Count">
+		<variableExpression><![CDATA[$F{EMP_COMPANY_NO}]]></variableExpression>
+	</variable>
+	<variable name="WorkLocation Count" class="java.math.BigDecimal" resetType="Group" resetGroup="Work_Location" calculation="Count">
+		<variableExpression><![CDATA[$F{EMP_COMPANY_NO}]]></variableExpression>
+	</variable>
+	<variable name="Department Adhoc OT" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{AHOC_OVERTIME}]]></variableExpression>
+	</variable>
+	<variable name="Worklocation Adhoc OT" class="java.math.BigDecimal" resetType="Group" resetGroup="Work_Location" calculation="Sum">
+		<variableExpression><![CDATA[$F{AHOC_OVERTIME}]]></variableExpression>
+	</variable>
+	<variable name="Worklocation Time DT" class="java.math.BigDecimal" resetType="Group" resetGroup="Work_Location" calculation="Sum">
+		<variableExpression><![CDATA[$F{T_DOUBLETIME}]]></variableExpression>
+	</variable>
+	<variable name="Department Time DT" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{T_DOUBLETIME}]]></variableExpression>
+	</variable>
+	<variable name="Department Adhoc DT" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{AHOC_DOUBLETIME}]]></variableExpression>
+	</variable>
+	<variable name="Worklocation Adhoc DT" class="java.math.BigDecimal" resetType="Group" resetGroup="Work_Location" calculation="Sum">
+		<variableExpression><![CDATA[$F{AHOC_DOUBLETIME}]]></variableExpression>
+	</variable>
+	<variable name="Department Absent Time" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{ABSENT_TIME}]]></variableExpression>
+	</variable>
+	<variable name="Worklocation Absent Time" class="java.math.BigDecimal" resetType="Group" resetGroup="Work_Location" calculation="Sum">
+		<variableExpression><![CDATA[$F{ABSENT_TIME}]]></variableExpression>
+	</variable>
+	<variable name="Worklocation Time OT" class="java.math.BigDecimal" resetType="Group" resetGroup="Work_Location" calculation="Sum">
+		<variableExpression><![CDATA[$F{T_OVERTIME}]]></variableExpression>
+	</variable>
+	<variable name="Department Time OT" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{T_OVERTIME}]]></variableExpression>
+	</variable>
+	<variable name="Grand Total Time OT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{T_OVERTIME}]]></variableExpression>
+	</variable>
+	<variable name="Grand Adhoc OT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AHOC_OVERTIME}]]></variableExpression>
+	</variable>
+	<variable name="Grand Total Time DT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{T_DOUBLETIME}]]></variableExpression>
+	</variable>
+	<variable name="Grand Total Adhoc DT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AHOC_DOUBLETIME}]]></variableExpression>
+	</variable>
+	<variable name="Grand Total Absent Time" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ABSENT_TIME}]]></variableExpression>
+	</variable>
+	<variable name="Department Absent Day" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{ABSENT_DAYS}]]></variableExpression>
+	</variable>
+	<variable name="Worklocation Absent Day" class="java.math.BigDecimal" resetType="Group" resetGroup="Work_Location" calculation="Sum">
+		<variableExpression><![CDATA[$F{ABSENT_DAYS}]]></variableExpression>
+	</variable>
+	<variable name="Grand Total Absent Day" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ABSENT_DAYS}]]></variableExpression>
+	</variable>
+	<variable name="Department Hourly Rate" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{HOURLY_RATE}]]></variableExpression>
+	</variable>
+	<variable name="Worklocation Hourly Rate" class="java.math.BigDecimal" resetType="Group" resetGroup="Work_Location" calculation="Sum">
+		<variableExpression><![CDATA[$F{HOURLY_RATE}]]></variableExpression>
+	</variable>
+	<variable name="Grand Total Hourly Rate" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{HOURLY_RATE}]]></variableExpression>
+	</variable>
+	<variable name="Department Total OT Pay" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_OT_PAY}]]></variableExpression>
+	</variable>
+	<variable name="Worklocation Total OT Pay" class="java.math.BigDecimal" resetType="Group" resetGroup="Work_Location" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_OT_PAY}]]></variableExpression>
+	</variable>
+	<variable name="Grand Total OT Pay" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_OT_PAY}]]></variableExpression>
+	</variable>
+	<variable name="Department Total Deduction" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></variableExpression>
+	</variable>
+	<variable name="Worklocation Total Deduction" class="java.math.BigDecimal" resetType="Group" resetGroup="Work_Location" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></variableExpression>
+	</variable>
+	<variable name="Grand Total Deduction" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></variableExpression>
+	</variable>
+	<group name="Work_Location" isStartNewPage="true" isReprintHeaderOnEachPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{Work Location}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<textField>
+					<reportElement x="0" y="0" width="420" height="15" uuid="6c864a9d-3d72-43e4-9bdb-f2e7ac1251ba">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Work Location: "+$F{Work Location}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="21">
+				<textField>
+					<reportElement x="1" y="1" width="204" height="14" uuid="1449132f-54ea-4668-a736-d09285abc85c"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Work Location Count: " +$V{WorkLocation Count}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="503" y="1" width="69" height="14" uuid="333648a8-e592-4216-8f65-84d7a66f445a"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Worklocation Adhoc OT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="574" y="1" width="79" height="14" uuid="02ff6dc9-4d87-4172-8259-77f4f102c6fe"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Worklocation Time DT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="654" y="2" width="71" height="14" uuid="5a35ded7-b517-4e45-a1a1-c2698e7cf604">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Worklocation Adhoc DT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="780" y="2" width="61" height="14" uuid="fde0b6dc-14dc-4342-b5f6-d5f7a6a386fd">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Worklocation Absent Time}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="434" y="1" width="69" height="14" uuid="9914f655-12ef-40c1-98b3-e4960805131f"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Worklocation Time OT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="842" y="2" width="64" height="14" uuid="32a18aa3-7952-4238-8085-60eda668c3e4">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Worklocation Absent Day}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="379" y="1" width="55" height="14" uuid="f813d274-6ff0-48e7-b1ba-cab957964f05">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Worklocation Hourly Rate}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="725" y="2" width="54" height="14" uuid="9a105c3e-dbb7-44d6-8443-0f540d2bc525">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Worklocation Total OT Pay}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="905" y="3" width="64" height="14" uuid="57d7e2f2-c7f8-4ac1-a822-472fff9624e2">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Worklocation Total Deduction}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Department" isStartNewPage="true" isReprintHeaderOnEachPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{DEPARTMENT}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement x="0" y="0" width="420" height="15" uuid="9f0278e7-e414-4bdb-87b7-802ac73af7ac"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Department: " + $F{DEPARTMENT}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="15" width="968" height="1" uuid="bc5bd608-3c84-4ce3-9e84-5523e5b86d88"/>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="17">
+				<textField>
+					<reportElement x="1" y="1" width="204" height="15" uuid="234c3229-3b07-47d0-845c-2a2d03f7853d">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Department Count: " + $V{Department Count}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="654" y="2" width="71" height="14" uuid="de8c9477-da94-468a-a5d4-fdcf124f3830">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Department Adhoc DT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="573" y="1" width="81" height="14" uuid="680de7f3-b9cd-478e-a2e0-0e6220c56ba2">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Department Time DT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="780" y="2" width="61" height="14" uuid="0b357f29-8343-4026-acac-1552c8dec36d">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Department Absent Time}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="504" y="1" width="69" height="14" uuid="dbf72533-4f26-4154-938f-8d9b5573ad18">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Department Adhoc OT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="434" y="1" width="69" height="14" uuid="2665cdd1-e4da-46cb-89c8-e9d1dd4cfa5e"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Department Time OT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="842" y="2" width="64" height="14" uuid="5d3adaf8-977c-42bf-8fee-05d26b99b9cb">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Department Absent Day}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="379" y="1" width="55" height="14" uuid="8a6348e9-007b-4a21-a311-70de3f59f851">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Department Hourly Rate}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="725" y="2" width="54" height="14" uuid="1b91a92a-c4b7-474b-9bd2-1b0c8f80c8cf">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Department Total OT Pay}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="905" y="2" width="64" height="14" uuid="26a7d680-3722-484b-9dcb-d764186ea1a9">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Department Total Deduction}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="33" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="968" height="33" uuid="143f0c58-2c21-4bc6-a1be-36d4e3aebfd0"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_LEGAL_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="41" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="966" height="14" uuid="3d32acd4-a241-4777-9fa7-051c98c90804"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Employee Time Sheet Comparison By Dollar Value]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="280" y="18" width="401" height="15" uuid="02d1703e-d9a7-4b93-a331-e2e0593f88f6">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PDATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="37" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="0" width="49" height="30" uuid="7ae21e67-cb09-4349-a826-140d852202ec">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c5cf04da-683d-45e6-b9ac-cab3d41a333d"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emp No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="0" width="170" height="30" uuid="f4e9a51f-51ec-4c41-a633-7f2295a38d23">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f00665f5-932e-4aa7-922f-53d3f41f3058"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Full Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="0" width="158" height="30" uuid="d2632e61-25f2-453b-99bf-fc6eb734c861">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="81a721c3-f479-440e-9489-e3be25488248"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Position Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="434" y="0" width="70" height="30" uuid="5b3feea4-dede-4982-a9f3-d6358b2811ee">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="79a08bac-917d-4064-bfdd-88156f972761"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Time Clock Overtime]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="504" y="0" width="70" height="30" uuid="53749244-12eb-4b9d-910f-bb59fc119f82">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c7024aad-81fd-4201-af67-b4b39c1fa941"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Overtime Adjustment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="575" y="0" width="80" height="30" uuid="299bba53-07f6-4a41-ab84-b746dcf3815b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bafa7bc7-dc8f-42fc-a497-3521c50852cb"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Time Clock Double Time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="655" y="0" width="70" height="30" uuid="433bda72-5ee9-467f-8864-5865c0c47f0c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="83b84f45-d0a6-4078-8819-873e45b727ad"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Double Time Adjustment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="780" y="0" width="62" height="30" uuid="dee1863b-f585-4818-8769-759a5ac8d138">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d016c2f6-a53f-47ac-97e0-4adda25a1af0"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Time Clock Absent]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="30" width="968" height="1" uuid="bcfc62bd-30f5-41e1-87d0-2636e76ca7d0"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="842" y="0" width="64" height="30" uuid="cda16e38-5f76-4bb8-8fb3-97a1a80804e8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d016c2f6-a53f-47ac-97e0-4adda25a1af0"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Absent Adjustment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="379" y="0" width="55" height="30" uuid="28a3cc10-b4a2-40fa-acae-02af8d4dd78e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="79a08bac-917d-4064-bfdd-88156f972761"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hourly rate]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="725" y="0" width="55" height="30" uuid="65a45d41-0de2-4fba-b08c-ca58a5773962">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="83b84f45-d0a6-4078-8819-873e45b727ad"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total OT
+ Pay]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="906" y="0" width="62" height="30" uuid="35b12849-0add-4561-9378-65dedbf954b7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d016c2f6-a53f-47ac-97e0-4adda25a1af0"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Deduction]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="19" splitType="Prevent">
+			<textField>
+				<reportElement x="0" y="0" width="49" height="15" uuid="7ea5b995-378a-4e74-b6bc-132fcb61404a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c5cf04da-683d-45e6-b9ac-cab3d41a333d"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="50" y="0" width="170" height="15" uuid="4dfe496f-950c-47b8-9f87-4140a8917cf3">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f00665f5-932e-4aa7-922f-53d3f41f3058"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="0" width="158" height="15" uuid="0ce09dc0-0415-4803-801e-3a18267d1dc9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="81a721c3-f479-440e-9489-e3be25488248"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Position Name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="433" y="0" width="70" height="15" uuid="28f5ecb5-968a-422b-aa7b-bd9159ce3340">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="79a08bac-917d-4064-bfdd-88156f972761"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{T_OVERTIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="503" y="0" width="70" height="15" uuid="946e7d73-12a8-4e66-945c-9cb132d57ed6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c7024aad-81fd-4201-af67-b4b39c1fa941"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{AHOC_OVERTIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="574" y="0" width="80" height="15" uuid="53b19fa3-9900-4401-a67a-9ce13b6a918e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bafa7bc7-dc8f-42fc-a497-3521c50852cb"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{T_DOUBLETIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="655" y="0" width="70" height="15" uuid="fdf11592-b36b-40b5-a76f-87a39523d2f5">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="83b84f45-d0a6-4078-8819-873e45b727ad"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{AHOC_DOUBLETIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="780" y="0" width="61" height="15" uuid="91678267-3ad3-4352-822a-ce53c47a2533">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d016c2f6-a53f-47ac-97e0-4adda25a1af0"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{ABSENT_TIME}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="15" width="968" height="1" uuid="5f59b9d9-14a0-4026-adb7-7c6e8b40bbcc"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="842" y="0" width="64" height="15" uuid="b370a77f-32db-4425-963b-045ad7a36542">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d016c2f6-a53f-47ac-97e0-4adda25a1af0"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{ABSENT_DAYS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="379" y="0" width="55" height="15" uuid="18a40a62-c146-43f7-9d2c-05ed842fb442">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{HOURLY_RATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="725" y="0" width="55" height="15" uuid="e538e31b-4fcf-4ddc-96d0-ec0123028ce7">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{TOTAL_OT_PAY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="905" y="0" width="64" height="15" uuid="3a32aae2-d2a5-4c33-8c86-e0db0cc99562">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="968" height="15" forecolor="#999999" backcolor="#999999" uuid="c46f68a7-4228-4236-98b5-e556d52f14c1"/>
+				<textField evaluationTime="Report">
+					<reportElement x="921" y="0" width="40" height="15" uuid="53d4d92c-dae4-44fc-a4a3-ce505b850be0"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="841" y="0" width="80" height="15" uuid="00112682-509e-4c79-a415-79de6b009963"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE, MMMMM, dd  yyyy">
+					<reportElement x="0" y="0" width="279" height="15" uuid="8f089b03-4f09-4dd5-9ba2-89f53c3fc2c3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+			<staticText>
+				<reportElement x="1" y="15" width="966" height="15" uuid="3b001ef9-b670-48cb-bf19-c269d5f389e8"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="18" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="0" width="82" height="15" uuid="7ba0615d-0a89-4d2f-bf96-66010254e15c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c5cf04da-683d-45e6-b9ac-cab3d41a333d"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="434" y="1" width="69" height="14" uuid="f29ec025-80ad-480e-8f21-4f9bf7565ad3"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand Total Time OT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="503" y="1" width="69" height="14" uuid="c5f344ef-9226-42c7-960c-d0406956fc31"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand Adhoc OT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="574" y="1" width="79" height="14" uuid="7bada371-2777-40bc-bce9-52b8912fba6e"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand Total Time DT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="654" y="1" width="71" height="14" uuid="fcbd3e5f-2fd4-43fd-929d-ecab14364ad5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand Total Adhoc DT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="780" y="1" width="61" height="14" uuid="1aec9f5d-36d9-4f59-928c-8d579c621dc0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand Total Absent Time}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="841" y="1" width="64" height="14" uuid="768fde25-1880-4ddf-a060-581e35674df4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand Total Absent Day}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="379" y="1" width="55" height="14" uuid="7ff2bea0-3d90-4f49-9d7d-f8a73d9c5844">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand Total Hourly Rate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="725" y="1" width="54" height="14" uuid="8a44ac91-2f68-45ef-8d42-11a440a81a1d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand Total OT Pay}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="905" y="1" width="64" height="14" uuid="bc23464c-c1bb-4890-81e4-97ea8023f2bf">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand Total Deduction}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

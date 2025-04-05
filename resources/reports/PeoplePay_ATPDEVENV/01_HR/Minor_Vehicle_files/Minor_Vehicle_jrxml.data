@@ -1,0 +1,594 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Accident Investigation Report" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7228e3b2-d215-4aed-bd70-e131e5844a06">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Minor_Vehicle"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8080/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="476"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<parameter name="ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    A.ID,
+    A.INCIDENT_ID,
+    A.EMP_ID,
+    A.VEHICLE_MAKENMODEL,
+    A.VEHICLE_OWNER,
+    A.VEHICLE_REGISTRATION,
+    A.DAMAGE_CAUSED,
+    A.ESTIMATED_REPAIR_COST,
+    A.IS_RESPONSIBLE,
+    A.EMP_CELL_NUM,
+    A.EMP_DEPARTMENT,
+    A.EMP_POSITION,
+    D.SURNAME,
+    D.FIRST_NAME,
+    A.OTHER_DAMAGE,
+    A.OTHER_DRIVER_CELL_NUM,
+    A.OTHER_DRIVER_DEPT,
+    A.OTHER_DRIVER_FNAME,
+    A.OTHER_DRIVER_SNAME,
+    I.INCIDENT_LOCATION,
+    I.INCIDENT_DATE,
+    A.other_driver_position,
+    A.OTHER_RESPONSIBLE,
+    A.OTHER_VEHICLE_MAKE,
+    A.other_vehicle_reg,
+    A.OTHER_VEHICLE_OWN,
+    A.OTHER_DAMAGE,
+    A.OTHER_DAMAGE_COST,
+    A.DAMAGE_PROPERTY,
+    A.PROPERTY_COST,
+    A.OTHER_RESPONSIBLE,
+    A.CLAIM_DAMAGE,
+  (select z.surname  || ' ' || z.first_name from hr_rcm_individual z join hr_rcm_employee ze on     ze.ind_id=z.id where ze.id=a.sign_by) sign_by,
+    A.SIGN_DATE,
+    B.ORG_ID
+
+
+FROM HR_HS_MINOR_VEHICLE_ACCIDENT A
+JOIN HR_RCM_EMPLOYEE B ON B.ID=A.EMP_ID
+JOIN HR_RCM_INDIVIDUAL D ON D.ID=B.IND_ID
+JOIN HR_HCF_ORGANISATION C ON C.ID=B.ORG_ID
+JOIN HR_HS_INCIDENT I ON I.ID=A.INCIDENT_ID
+WHERE A.ID=$P{ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="INCIDENT_ID" class="java.math.BigDecimal"/>
+	<field name="EMP_ID" class="java.math.BigDecimal"/>
+	<field name="VEHICLE_MAKENMODEL" class="java.lang.String"/>
+	<field name="VEHICLE_OWNER" class="java.lang.String"/>
+	<field name="VEHICLE_REGISTRATION" class="java.lang.String"/>
+	<field name="DAMAGE_CAUSED" class="java.lang.String"/>
+	<field name="ESTIMATED_REPAIR_COST" class="java.math.BigDecimal"/>
+	<field name="IS_RESPONSIBLE" class="java.lang.String"/>
+	<field name="EMP_CELL_NUM" class="java.lang.String"/>
+	<field name="EMP_DEPARTMENT" class="java.lang.String"/>
+	<field name="EMP_POSITION" class="java.lang.String"/>
+	<field name="SURNAME" class="java.lang.String"/>
+	<field name="FIRST_NAME" class="java.lang.String"/>
+	<field name="OTHER_DAMAGE" class="java.lang.String"/>
+	<field name="OTHER_DRIVER_CELL_NUM" class="java.lang.String"/>
+	<field name="OTHER_DRIVER_DEPT" class="java.lang.String"/>
+	<field name="OTHER_DRIVER_FNAME" class="java.lang.String"/>
+	<field name="OTHER_DRIVER_SNAME" class="java.lang.String"/>
+	<field name="INCIDENT_LOCATION" class="java.lang.String"/>
+	<field name="INCIDENT_DATE" class="java.sql.Timestamp"/>
+	<field name="OTHER_DRIVER_POSITION" class="java.lang.String"/>
+	<field name="OTHER_RESPONSIBLE" class="java.lang.String"/>
+	<field name="OTHER_VEHICLE_MAKE" class="java.lang.String"/>
+	<field name="OTHER_VEHICLE_REG" class="java.lang.String"/>
+	<field name="OTHER_VEHICLE_OWN" class="java.lang.String"/>
+	<field name="OTHER_DAMAGE_COST" class="java.math.BigDecimal"/>
+	<field name="DAMAGE_PROPERTY" class="java.lang.String"/>
+	<field name="PROPERTY_COST" class="java.math.BigDecimal"/>
+	<field name="CLAIM_DAMAGE" class="java.lang.String"/>
+	<field name="SIGN_BY" class="java.lang.String"/>
+	<field name="SIGN_DATE" class="java.sql.Timestamp"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<group name="Incident">
+		<groupExpression><![CDATA[$F{ID}]]></groupExpression>
+		<groupHeader>
+			<band height="217">
+				<staticText>
+					<reportElement x="0" y="71" width="68" height="20" uuid="1eae1fb6-d308-4352-912e-35146115e622"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Last Name:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="193" y="74" width="72" height="20" uuid="5ca354e7-b293-40f1-9b4e-0feac2773b00"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[First Name:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="372" y="72" width="98" height="20" uuid="c7143606-349c-4501-8a2d-8adf5a3aeabc"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Contact Number:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="101" width="87" height="20" uuid="4e6a7311-7b3c-416f-a27c-9e34805f3ab9"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Position:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="277" y="100" width="138" height="20" uuid="98c4ed59-88b9-4ed1-a37f-74785902a84f"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Department:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="1" y="136" width="120" height="20" uuid="9d3d351c-db97-4caa-b7e7-ae9eb321d773"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Vehicle Registration:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="173" width="140" height="20" uuid="c98ce117-f2d4-49ce-a556-bd59b5b74c79"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Vehicle Owned by:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="1" width="126" height="20" uuid="46bb206c-4576-4321-ac3e-8eeb754abfc6"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Date of Accident:]]></text>
+				</staticText>
+				<rectangle>
+					<reportElement x="0" y="34" width="572" height="33" uuid="2af89a73-b5d1-493e-8e91-5a0d9999fff2"/>
+				</rectangle>
+				<staticText>
+					<reportElement x="2" y="40" width="567" height="20" uuid="2895229a-3a5c-458c-a90a-6b55973b0345"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[1. Reporting Drivers Details]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="273" y="137" width="146" height="20" uuid="0061151b-2a17-4ea1-bc2a-46b3469192d4"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Make & Model:]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="470" y="74" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="b1da4f47-6195-4993-86d2-e19a7bb7a43b"/>
+					<textFieldExpression><![CDATA[$F{EMP_CELL_NUM}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="61" y="101" width="164" height="20" isPrintWhenDetailOverflows="true" uuid="5992fc75-1b1b-42d8-8f17-7625d71f30e1"/>
+					<textFieldExpression><![CDATA[$F{EMP_POSITION}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="367" y="101" width="202" height="20" isPrintWhenDetailOverflows="true" uuid="236724c5-bdf0-4e44-bbbb-bf8d25848037"/>
+					<textFieldExpression><![CDATA[$F{EMP_DEPARTMENT}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="111" y="136" width="145" height="20" isPrintWhenDetailOverflows="true" uuid="229b7388-ebfd-4e56-9c0b-1dfac44e975d"/>
+					<textFieldExpression><![CDATA[$F{VEHICLE_REGISTRATION}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="364" y="137" width="153" height="20" isPrintWhenDetailOverflows="true" uuid="39bb7e55-cc9b-4802-b4c5-dc88b6a18349"/>
+					<textFieldExpression><![CDATA[$F{VEHICLE_MAKENMODEL}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="110" y="173" width="155" height="20" isPrintWhenDetailOverflows="true" uuid="388a4021-c941-44f1-98e1-bfffcd3fa95b"/>
+					<textFieldExpression><![CDATA[$F{VEHICLE_OWNER}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="71" y="75" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="1ad43430-291b-47f6-9d6c-6517ed23b801"/>
+					<textFieldExpression><![CDATA[$F{SURNAME}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="269" y="76" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="54192b44-e9f4-4981-a6e0-f8ba3f316346"/>
+					<textFieldExpression><![CDATA[$F{FIRST_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="383" y="1" width="189" height="33" isPrintWhenDetailOverflows="true" uuid="4b7537f6-ba63-4c28-8b4a-f5d7af3e256e"/>
+					<textFieldExpression><![CDATA[$F{INCIDENT_LOCATION}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="213" y="0" width="170" height="20" uuid="38659775-21c2-4e04-b19d-82d6a54c8693"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Location of Accident:]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="99" y="4" width="106" height="20" isPrintWhenDetailOverflows="true" uuid="85e4b1e3-1188-45b3-ab92-bdc530be5667"/>
+					<textFieldExpression><![CDATA[new SimpleDateFormat("dd MMMMM yyyy").format($F{INCIDENT_DATE})]]></textFieldExpression>
+				</textField>
+			</band>
+			<band/>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="125" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="79" width="572" height="20" uuid="0a5271ba-e48d-4c91-abdc-73d3869d77b3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Minor Vehicle Accident Report Form - 3]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="1" y="0" width="571" height="56" uuid="e06a22a5-9915-4ba8-bbe4-38dcd2d0083b"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<detail>
+		<band splitType="Stretch"/>
+		<band height="163">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="20" uuid="aae8eec0-3fa5-4d40-aeea-4d835201ceec"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="569" height="20" uuid="ee39e66c-1f9e-48c5-a969-1cc3453e8c98"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[2. Details of other Drivers involved (if property only go to below)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="26" width="65" height="20" uuid="edf99e60-759f-4530-a744-d1eaad391239"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Surname:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="217" y="26" width="80" height="20" uuid="c0892ea7-098f-4fd2-bd71-5bad2277c93d"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[First Name:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="307" y="57" width="90" height="20" uuid="1d47cbd7-fc1a-46b9-8133-1ab9e239a487"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Department:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="99" width="113" height="20" uuid="b3ab5e41-9f7f-4cfe-ba31-bb4f8735436e"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vehicle Registration:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="299" y="99" width="110" height="20" uuid="deb9677c-fa4b-4d5d-a67d-b2f017c6da1b"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Make & Model:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="140" width="120" height="20" uuid="f6694fa7-17bc-42ea-92e4-cd4405e8a8ed"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vehicle Owned by:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="402" y="26" width="91" height="20" uuid="62758e73-ce67-4ae2-ab8e-7cc409ede6c1"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Contact Number:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="57" width="65" height="20" uuid="d93c4c95-26ff-42b3-b6e6-aba1f3329ceb"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Position:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="66" y="26" width="148" height="20" isPrintWhenDetailOverflows="true" uuid="abca73aa-657b-475c-a3a2-bd7ab957fc2c"/>
+				<textFieldExpression><![CDATA[$F{OTHER_DRIVER_SNAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="297" y="26" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="32ed9554-1322-492e-8e7d-f8e2deae388f"/>
+				<textFieldExpression><![CDATA[$F{OTHER_DRIVER_FNAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="493" y="26" width="79" height="20" isPrintWhenDetailOverflows="true" uuid="ba361e69-f9ca-453d-80f7-5b645eeeff7e"/>
+				<textFieldExpression><![CDATA[$F{OTHER_DRIVER_CELL_NUM}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="397" y="57" width="152" height="20" isPrintWhenDetailOverflows="true" uuid="b336e91f-f55d-49a8-8962-fa14e8f26925"/>
+				<textFieldExpression><![CDATA[$F{OTHER_DRIVER_DEPT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="52" y="57" width="169" height="20" isPrintWhenDetailOverflows="true" uuid="d65a1b73-2400-4f3b-af22-bcdbc61b61b8"/>
+				<textFieldExpression><![CDATA[$F{OTHER_DRIVER_POSITION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="99" y="140" width="203" height="20" isPrintWhenDetailOverflows="true" uuid="d7827ea2-5b8e-4685-8712-65ad17eb6bb4"/>
+				<textFieldExpression><![CDATA[$F{OTHER_VEHICLE_OWN}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="387" y="100" width="136" height="20" isPrintWhenDetailOverflows="true" uuid="acbc395a-0834-47dc-80bf-d7cf6d200726"/>
+				<textFieldExpression><![CDATA[$F{OTHER_VEHICLE_MAKE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="107" y="99" width="175" height="20" isPrintWhenDetailOverflows="true" uuid="7a42ccb3-70f4-4140-90eb-afe3685755a6"/>
+				<textFieldExpression><![CDATA[$F{OTHER_VEHICLE_REG}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="125">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="20" uuid="926abfc0-ef28-4135-939d-7b4ecd30b547"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="4" y="0" width="554" height="20" uuid="c5c8ecdf-cefa-491f-b567-31fe691f6569"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[3. Damage caused to your vehicle including estimated coost of repair]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="7" y="37" width="198" height="20" uuid="02f815bb-6e97-4ceb-8faf-3374318a1697"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Damged caused:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="88" width="198" height="20" uuid="b2916e4f-2c86-48ef-acf8-94cd75291c6b"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Estimated repair Cost $]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="235" y="37" width="310" height="38" isPrintWhenDetailOverflows="true" uuid="505d5d3b-53d5-497b-b12b-73b5304a09a1"/>
+				<textFieldExpression><![CDATA[$F{DAMAGE_CAUSED}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="236" y="90" width="309" height="18" isPrintWhenDetailOverflows="true" uuid="4ff9386d-5028-46a9-af43-bf07da378bfe"/>
+				<textFieldExpression><![CDATA[$F{ESTIMATED_REPAIR_COST}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="101">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="20" uuid="325e17dd-f3f8-4735-86e8-595fefa0b60b"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="563" height="20" uuid="ead0b349-c5f6-44d9-8bd1-2c6385a274d3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[4. Damage caused to other vehicle (s) including estimated Cost of repair]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="27" width="198" height="20" uuid="5c762007-c737-452e-a5e0-61480748e361"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Damaged caused:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="60" width="198" height="20" uuid="5d29a008-1244-4888-9f12-84e72c39ea45"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Estimated repair Cost $]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="255" y="27" width="314" height="33" isPrintWhenDetailOverflows="true" uuid="15bc1099-fd2b-4895-a80c-01f89f9c04e7"/>
+				<textFieldExpression><![CDATA[$F{OTHER_DAMAGE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="253" y="64" width="316" height="20" isPrintWhenDetailOverflows="true" uuid="40999904-6690-4246-bcb1-e791831b6592"/>
+				<textFieldExpression><![CDATA[$F{OTHER_DAMAGE_COST}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="82">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="20" uuid="8d983211-f8da-4f94-aa35-d5d8a2c86a15"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="563" height="20" uuid="6a8ddce9-640d-45f1-9f8d-e1c06231e17a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[5. Damage caused to property include who owns the property and estimated Cost repair]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="26" width="198" height="20" uuid="dceb2d3a-ffd3-47af-a423-059ddfebd673"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Damaged caused:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="9" y="56" width="198" height="20" uuid="acce0157-937c-4dc6-bcb2-698298b6b29a"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Estimated repair Cost $]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="254" y="62" width="315" height="20" isPrintWhenDetailOverflows="true" uuid="bd0e6964-320c-4827-99d7-454c051055f4"/>
+				<textFieldExpression><![CDATA[$F{PROPERTY_COST}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="255" y="29" width="317" height="20" isPrintWhenDetailOverflows="true" uuid="17f75087-f02e-44cf-988c-90e9da7e53a9"/>
+				<textFieldExpression><![CDATA[$F{DAMAGE_PROPERTY}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="104">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="20" uuid="ccc0eafa-431a-4ef2-a9dd-cea218e408e3"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="569" height="20" uuid="7a0071d6-ff77-4ecf-b78b-c88fe8d5aee6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Responsibility]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="20" width="228" height="20" uuid="cdab06b5-e651-47d6-a451-fc0799ad2518"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Do you accept responsibility for the accident?]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="47" width="198" height="20" uuid="b098532e-bec3-4a9e-8797-2216b1275628"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[Has the other party accepted responsibility?]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="72" width="213" height="20" uuid="e3da1d8a-9cc5-4d9b-b41d-1f2c297565b9"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[Do you intend to claim damages from GWI?]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="253" y="24" width="317" height="20" isPrintWhenDetailOverflows="true" uuid="25930d76-3987-4d7b-90fc-b4082e45a234"/>
+				<textFieldExpression><![CDATA[$F{IS_RESPONSIBLE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="254" y="50" width="316" height="20" isPrintWhenDetailOverflows="true" uuid="ca5d38f7-de7a-464c-8da9-4e0bc1078475"/>
+				<textFieldExpression><![CDATA[$F{OTHER_RESPONSIBLE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="253" y="81" width="319" height="20" isPrintWhenDetailOverflows="true" uuid="3c234601-e303-4d83-acc8-daf8faa80c4a"/>
+				<textFieldExpression><![CDATA[$F{CLAIM_DAMAGE}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="58">
+			<staticText>
+				<reportElement x="9" y="18" width="105" height="20" uuid="e80a3300-2d78-435d-b861-5e2c5259b1e7"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Signature:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="302" y="14" width="85" height="20" uuid="b8b7d0e1-9504-4a07-a404-9155fe6ac8dd"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="386" y="15" width="162" height="20" isPrintWhenDetailOverflows="true" uuid="09e31c7b-da89-41d0-9ba1-47177b58f2cf"/>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd MMMMM yyyy").format($F{SIGN_DATE})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="85" y="18" width="155" height="20" isPrintWhenDetailOverflows="true" uuid="f9fbd9e9-f4a1-4153-ba5d-873445a46463"/>
+				<textFieldExpression><![CDATA[$F{SIGN_BY}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

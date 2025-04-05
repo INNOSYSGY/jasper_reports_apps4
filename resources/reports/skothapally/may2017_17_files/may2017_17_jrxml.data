@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Procurement &amp; Materials Managment Unit" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f27a2ead-9399-4210-9006-8d39a3301cd6">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MedSys/SUPPLIER_COMPARISON_SHEET"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<subDataset name="Quotation Request Lines" uuid="83357ade-4529-4ffa-b4f9-995de7dbb925">
+		<parameter name="P_RFQ_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT
+null main,
+(
+    SELECT SNAME
+    FROM QRY_SUPPLIER S
+    where s.SUPPLIER_ID=q.supplier_id
+
+) Supplier,
+DECODE(QL.DRUG_STRENGTH,NULL,QL.DESCRIPTION,QL.DESCRIPTION||' '||QL.DRUG_STRENGTH) ITEM_DESCRIPTION,
+ ql.total_cost PRICE_QUOTED
+
+FROM TBLQUOTATIONLINES QL
+JOIN TBLQUOTATION Q ON QL.QUOTATION_ID=Q.QUOTATION_ID
+where Q.RFQ_ID=$P{P_RFQ_ID} and category_id=171]]>
+		</queryString>
+		<field name="MAIN" class="java.lang.String"/>
+		<field name="SUPPLIER" class="java.lang.String"/>
+		<field name="ITEM_DESCRIPTION" class="java.lang.String"/>
+		<field name="PRICE_QUOTED" class="java.math.BigDecimal"/>
+	</subDataset>
+	<parameter name="REQ_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+COMPANY_NAME,VILLAGE_TOWN||', '||DISTRICT||', '||COUNTRY ADDRESS,EMAIL,
+                        'Tel# '||TELEPHONE_NOS TELPHONE, 'Fax # '||FAX_NOS FAX
+FROM TBLSYSTEMCONFIGURATION]]>
+	</queryString>
+	<field name="COMPANY_NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="TELPHONE" class="java.lang.String"/>
+	<field name="FAX" class="java.lang.String"/>
+	<group name="Quotation" isStartNewPage="true">
+		<groupExpression><![CDATA[1]]></groupExpression>
+		<groupHeader>
+			<band height="53">
+				<subreport>
+					<reportElement x="0" y="0" width="572" height="52" uuid="bbcf045c-94f7-4a3a-bb34-a5617ce56f6e"/>
+					<subreportParameter name="P_REPORT_NAME">
+						<subreportParameterExpression><![CDATA["SUPPLIERS COMPARISON COST SHEET"]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:/reports/MedSys/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="143">
+				<crosstab>
+					<reportElement x="0" y="0" width="572" height="143" uuid="e6165bb7-7304-4cab-b56d-004d1a7a5a3c"/>
+					<crosstabDataset>
+						<dataset>
+							<datasetRun subDataset="Quotation Request Lines" uuid="8cdf52ba-816d-4bfe-9e96-c67b0dc7ca78">
+								<datasetParameter name="P_RFQ_ID">
+									<datasetParameterExpression><![CDATA[$P{REQ_ID}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+						</dataset>
+					</crosstabDataset>
+					<rowGroup name="ITEM_DESCRIPTION" width="112">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{ITEM_DESCRIPTION}]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="112" height="15" uuid="1f20e3d3-53aa-404b-8a31-c137bdb1364e"/>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement textAlignment="Left" verticalAlignment="Middle">
+										<font fontName="Arial" size="9"/>
+										<paragraph leftIndent="4" rightIndent="2"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{ITEM_DESCRIPTION}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents/>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="SUPPLIER" height="30">
+						<bucket class="java.lang.String">
+							<bucketExpression><![CDATA[$F{SUPPLIER}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents backcolor="#FFFFFF" mode="Opaque">
+								<textField isBlankWhenNull="true">
+									<reportElement style="Crosstab Data Text" x="0" y="0" width="67" height="30" uuid="5a2fbfad-c4bd-4e96-a016-83896f80c3cc"/>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement>
+										<font fontName="Arial" size="9" isBold="true" isUnderline="false" pdfFontName="Helvetica-Bold"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{SUPPLIER}]]></textFieldExpression>
+								</textField>
+							</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents/>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="PRICE_QUOTEDMeasure" class="java.math.BigDecimal" calculation="Average">
+						<measureExpression><![CDATA[$F{PRICE_QUOTED}]]></measureExpression>
+					</measure>
+					<crosstabCell width="67" height="15">
+						<cellContents>
+							<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+								<reportElement style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="67" height="15" uuid="dea12d56-de80-4044-aefb-e92afc88e28d"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="Arial" size="9"/>
+									<paragraph rightIndent="4"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{PRICE_QUOTEDMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell height="25" rowTotalGroup="ITEM_DESCRIPTION">
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="17b3793a-f16d-4b7e-84a1-c5bc3cf3996f"/>
+								<textFieldExpression><![CDATA[$V{PRICE_QUOTEDMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell width="50" columnTotalGroup="SUPPLIER">
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="63ceb58f-c508-4362-ae16-097442c1dcb4"/>
+								<textFieldExpression><![CDATA[$V{PRICE_QUOTEDMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell rowTotalGroup="ITEM_DESCRIPTION" columnTotalGroup="SUPPLIER">
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" uuid="a2872d34-2a50-4810-9651-6b76f75318b8"/>
+								<textFieldExpression><![CDATA[$V{PRICE_QUOTEDMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+				</crosstab>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="19" splitType="Stretch">
+			<line>
+				<reportElement x="3" y="0" width="555" height="1" uuid="4746db62-5f43-4715-895e-5f0f67da0892"/>
+				<graphicElement>
+					<pen lineWidth="1.25" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="1" width="572" height="1" uuid="d3fff52c-2789-489b-b0a3-b2e12cfabb6b"/>
+				<graphicElement>
+					<pen lineWidth="1.25" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="2" width="572" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="7863435f-57c1-47e9-8e11-228ad04b38d9"/>
+			</rectangle>
+			<textField>
+				<reportElement x="452" y="1" width="102" height="13" uuid="809e19e0-9946-4b16-9208-306b4bc4a0f9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE, MMMMM dd, yyyy h.mm a" isBlankWhenNull="true">
+				<reportElement x="10" y="1" width="172" height="15" uuid="b0e832d1-c4d8-4ec1-a3aa-f5a06ecbedf6"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="1" width="572" height="16" uuid="409307a3-5cea-4794-8697-178ed7907f36"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[SCMS By INNOSYS Inc]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

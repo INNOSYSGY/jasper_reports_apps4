@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="payrol_label" language="groovy" pageWidth="612" pageHeight="792" columnWidth="587" leftMargin="5" rightMargin="20" topMargin="5" bottomMargin="5" uuid="0d5fe15e-51fe-4b8d-9cfd-aec3f5f446c0">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Cloud Production"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/PeoplePay/02_PAYROLL/payrol_label_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/PeoplePay/02_PAYROLL/payrol_label"/>
+	<parameter name="ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="EARNING_PERIOD_ID" class="java.math.BigDecimal"/>
+	<parameter name="DEPARTMENT_ID" class="java.math.BigDecimal"/>
+	<parameter name="WORKLOCATION_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[select o.ORGANISATION_NAME, nvl(v.unit_name,fn_getDepartment(PA.org_id, PA.position_location_id)) department_name_hist, emp.EMP_COMPANY_NO,
+case when ind.SEX_CODE='F' then 'Ms.' when ind.SEX_CODE='M' then 'Mr.' else '' end salutarion,
+ind.SURNAME,ind.FIRST_NAME, '(Period Ending '||to_char(pa.period_end, 'Mon dd,yyyy')||')' as Period_Name , pa.net_pay, LOCATION_DESCRIPTION
+from PA_PMG_PAYROLLDTL pa
+join HR_RCM_EMPLOYEE emp on pa.emp_id=emp.id
+join HR_RCM_INDIVIDUAL ind on ind.id=emp.ind_id
+join HR_HCF_ORGANISATION o on o.id=pa.org_id
+join HR_HCF_WORKLOCATIONPOSITION wp on wp.id=emp.POSITION_LOCATION_ID
+join hr_hcf_worklocation wl on wl.id=wp.WKLOCATION_ID
+left outer join vw_organisation_structure v on PA.orgdtl_id=v.id
+where pa.EARNINGS_PERIOD_ID= $P{EARNING_PERIOD_ID} 
+and pa.org_id= $P{ORG_ID}
+AND pa.orgdtl_id = (case when  $P{DEPARTMENT_ID} = 9999 then pa.orgdtl_id else  $P{DEPARTMENT_ID} END)
+and  wl.id = (case when   $P{WORKLOCATION_ID} =9999 THEN wl.id ELSE  $P{WORKLOCATION_ID}  END)]]>
+	</queryString>
+	<field name="ORGANISATION_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
+	</field>
+	<field name="DEPARTMENT_NAME_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT_NAME_HIST"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="SALUTARION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SALUTARION"/>
+	</field>
+	<field name="SURNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME"/>
+	</field>
+	<field name="FIRST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME"/>
+	</field>
+	<field name="PERIOD_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_NAME"/>
+	</field>
+	<field name="NET_PAY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="NET_PAY"/>
+	</field>
+	<field name="LOCATION_DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LOCATION_DESCRIPTION"/>
+	</field>
+	<sortField name="LOCATION_DESCRIPTION"/>
+	<sortField name="DEPARTMENT_NAME_HIST"/>
+	<sortField name="SURNAME"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="68" splitType="Prevent">
+			<textField>
+				<reportElement x="6" y="7" width="584" height="15" uuid="0a91188f-87d2-47b6-a45d-af4d13f53e52">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ORGANISATION_NAME}+ " - "+$F{DEPARTMENT_NAME_HIST}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="6" y="23" width="584" height="15" uuid="d66a2b92-366c-434c-9075-de8a2561c501">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}+" - "+$F{SALUTARION}+" "+$F{SURNAME}+", "+$F{FIRST_NAME}+"  "+$F{PERIOD_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00;¤-#,##0.00">
+				<reportElement x="49" y="43" width="422" height="20" uuid="e66230b0-8880-4cf3-b098-5d0f27efc822">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{NET_PAY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="6" y="43" width="40" height="20" uuid="ce5f9078-3af7-43e5-8bc1-eed876b6068d">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["Net Pay "]]></textFieldExpression>
+			</textField>
+		</band>
+		<band/>
+	</detail>
+</jasperReport>

@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Workplan" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="936" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="811abb53-211a-433d-9742-629aa06bb63a">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="corriea"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<parameter name="ORG_ID" class="java.lang.String"/>
+	<parameter name="allDepartments" class="java.lang.Boolean"/>
+	<parameter name="SESSION_ID" class="java.lang.String"/>
+	<parameter name="SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="START_PERIOD" class="java.lang.String"/>
+	<parameter name="END_PERIOD" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+    dt.id, 
+    dt.course_desc,
+    dt.objectives,
+    dt.facilitators,
+    dt.duration,
+    dt.proposed_date,
+    dt.target_group target_group,
+    dt.org_id,
+    listagg(dt.full_name, '; ' || chr(10)) within group (order by dt.full_name) full_name,
+    dt.department, 
+    dt.department_id,
+    dt.activity_type_id,
+    dt.employment_class_id,
+    dt.payment_type_hist
+FROM (
+SELECT 
+    wp_dt.id,
+    wp_dt.course_desc,
+    wp_dt.objectives,
+    wp_dt.facilitators,
+    listagg(p.position_name, '; ' || chr(10)) within group(order by p.position_name)   target_group,
+    wp_dt.duration,
+    wp_dt.proposed_date,
+    wp_dt.org_id,
+    emp_att.department department,
+    emp_att.department_id department_id,
+    emp_att.full_name,
+    emp_att.activity_type_id,
+    emp_att.employment_class_id,
+    emp_att.payment_type_hist
+FROM
+         (
+        SELECT DISTINCT
+            wp.id,
+            wp.course_desc,
+            wp.objectives,
+            wp.facilitators,
+            regexp_substr(wp.target_group, '[^:]+', 1, level) target_group,
+            wp.duration,
+            wp.proposed_date,
+            wp.org_id
+        FROM
+            hr_att_workplan wp
+        WHERE
+            wp.id IN (
+                SELECT
+                    id
+                FROM
+                    hr_att_workplan
+            )
+        CONNECT BY
+            level <= length(wp.target_group) - length(replace(wp.target_group, ':')) + 1
+    ) wp_dt
+    JOIN hr_hcf_position        p ON wp_dt.target_group = p.id
+    JOIN (
+        SELECT
+            listagg(aa.surname_hist
+            || ', '
+            || aa.first_name_hist, '; '|| chr(10)) within group(order by aa.surname_hist || ', ' || aa.first_name_hist) full_name,
+            wp.id id,
+            aa.emp_id,
+            a.activity_type_id,
+            aa.payment_type_hist,
+            aa.employment_class_id,
+            org_struct.unit_name department,
+            org_struct.id department_id
+            
+        FROM
+                 hr_att_workplan wp
+            JOIN hr_att_activity           a ON wp.id = a.workplan_id
+            JOIN hr_att_activityattendance aa ON a.id = aa.activity_id
+            JOIN hr_rcm_employee  e on e.id = aa.emp_id
+            JOIN hr_hcf_orgstructuredtl org_struct on org_struct.id = e.orgdtl_id
+        WHERE
+            wp.id IN (
+                SELECT
+                    id
+                FROM
+                    hr_att_workplan
+            )
+            GROUP BY wp.id, aa.emp_id,
+            a.activity_type_id,
+            aa.payment_type_hist,
+            aa.employment_class_id,
+            org_struct.unit_name ,
+            org_struct.id 
+    )                      emp_att ON emp_att.id = wp_dt.id 
+    GROUP BY 
+        wp_dt.id,
+    wp_dt.course_desc,
+    wp_dt.objectives,
+    wp_dt.facilitators,
+    wp_dt.duration,
+    wp_dt.proposed_date,
+    wp_dt.org_id,
+    emp_att.department ,
+    emp_att.department_id ,
+    emp_att.full_name,
+    emp_att.activity_type_id,
+    emp_att.employment_class_id,
+    emp_att.payment_type_hist
+) dt
+WHERE
+    dt.org_id = $P{ORG_ID} 
+    AND dt.proposed_date BETWEEN  $P{START_PERIOD}  AND $P{END_PERIOD} 
+    AND  ($P{allDepartments} = 1 or
+    	exists (SELECT 
+    					1
+    				FROM 
+    					RPT_PARAMETER W1
+    				WHERE 
+    					W1.SESSION_ID =  $P{SESSION_ID} 
+    				AND 
+    					option_value=case when option_name = $P{SEARCH_OPTION} and option_name ='DEPARTMENT' then to_char(dt.department_id)
+						when option_name = $P{SEARCH_OPTION} and option_name = 'ACTIVITY_TYPE' then to_char(dt.activity_type_id)
+						when option_name = $P{SEARCH_OPTION} and option_name = 'EMPLOYMENT CLASS' then to_char(dt.employment_class_id)
+						end
+    				)
+    		)
+    
+    GROUP BY 
+        dt.id, 
+    dt.course_desc,
+    dt.objectives,
+    dt.facilitators,
+    dt.duration,
+    dt.proposed_date,
+    dt.org_id,
+    dt.target_group,
+    dt.department, 
+    dt.department_id,
+    dt.activity_type_id,
+    dt.employment_class_id,
+    dt.payment_type_hist]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="COURSE_DESC" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COURSE_DESC"/>
+	</field>
+	<field name="OBJECTIVES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="OBJECTIVES"/>
+	</field>
+	<field name="FACILITATORS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FACILITATORS"/>
+	</field>
+	<field name="DURATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DURATION"/>
+	</field>
+	<field name="PROPOSED_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PROPOSED_DATE"/>
+	</field>
+	<field name="TARGET_GROUP" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TARGET_GROUP"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="FULL_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FULL_NAME"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="DEPARTMENT_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT_ID"/>
+	</field>
+	<field name="ACTIVITY_TYPE_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ACTIVITY_TYPE_ID"/>
+	</field>
+	<field name="EMPLOYMENT_CLASS_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS_ID"/>
+	</field>
+	<field name="PAYMENT_TYPE_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_TYPE_HIST"/>
+	</field>
+	<sortField name="COURSE_DESC"/>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{DEPARTMENT}]]></groupExpression>
+		<groupHeader>
+			<band height="25">
+				<staticText>
+					<reportElement x="0" y="0" width="147" height="20" uuid="8364d2ae-74e8-4ad7-a6b9-3aebb38f99e3"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[DEPARTMENT NAME:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="147" y="0" width="223" height="20" uuid="c7bbd28c-beef-48ab-a43c-a66097cdb151"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="3" y="21" width="930" height="1" uuid="5b394620-c035-42af-a40f-9c7b906bd9a7">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="10">
+				<line>
+					<reportElement x="3" y="3" width="930" height="1" uuid="3266471c-14ed-4c81-a4a0-c85d3f372774">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineWidth="2.0"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="89" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<subreport>
+				<reportElement x="3" y="0" width="930" height="80" uuid="c9ca7130-90cb-47ed-9c3d-7198b58e6f26"/>
+				<subreportParameter name="ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:Header.jrxml"]]></subreportExpression>
+			</subreport>
+			<line>
+				<reportElement x="3" y="80" width="930" height="1" uuid="3100dcc0-3f4c-4e8c-96ca-ac6758a69d50">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="29">
+			<staticText>
+				<reportElement x="0" y="0" width="138" height="20" uuid="5ae25bcd-43cf-4649-baae-d788b0558567">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="81f0b582-1ae5-486a-9df0-158132119833"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[WORKPLAN NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="138" y="0" width="133" height="20" uuid="1760b432-4d6f-4fe5-abec-6e825e0b1a06">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="be2c828f-9496-40e3-9ad7-137029892b6a"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[OBJECTIVES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="271" y="0" width="133" height="20" uuid="b9f0c08f-ca85-45cd-b004-586cf8ffb34e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="25623163-a0a1-4a16-a08e-47c9a690dde4"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[FACILITATORS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="404" y="0" width="133" height="20" uuid="57e4ddb8-816a-4cd0-9d45-30a68ce09457">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="819c86f1-483b-4229-a785-dfc0b4a38838"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DURATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="537" y="0" width="133" height="20" uuid="a6f3e6fd-808d-4ef2-8999-31cf21f90c2c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="93c20af3-f8b6-48e9-aee9-1b31f690dddf"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PROPOSED DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="670" y="0" width="133" height="20" uuid="4741d7d3-6e52-4551-958e-523475c0908d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3c685701-1e6a-4d50-a408-8588cd6984ce"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TARGET GROUP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="803" y="0" width="133" height="20" uuid="3970e8f2-c693-4462-9f2d-840fe328b17a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f010baf4-01da-4e94-9ee1-4486be093248"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ATTENDEES]]></text>
+			</staticText>
+			<line>
+				<reportElement x="3" y="23" width="930" height="1" uuid="98791d31-c33d-48a4-986b-0790b18ad498">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="26">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupBottom" x="0" y="0" width="138" height="20" uuid="e4815d97-6df5-4801-b3da-6a96ae1df855">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="81f0b582-1ae5-486a-9df0-158132119833"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{COURSE_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupBottom" x="138" y="0" width="133" height="20" uuid="16cc1d1d-544e-4dea-9a81-4d61642834de">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="be2c828f-9496-40e3-9ad7-137029892b6a"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{OBJECTIVES}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupBottom" x="271" y="0" width="133" height="20" uuid="a5487c43-de72-438f-98e6-a5bccf291254">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="25623163-a0a1-4a16-a08e-47c9a690dde4"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FACILITATORS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupBottom" x="404" y="0" width="133" height="20" uuid="ed1bb8e2-e4e6-44e2-b7a5-94be4d0cb24a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="819c86f1-483b-4229-a785-dfc0b4a38838"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{DURATION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupBottom" x="537" y="0" width="133" height="20" uuid="ed70398f-5fca-4b83-bb8d-51f064820a41">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="93c20af3-f8b6-48e9-aee9-1b31f690dddf"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PROPOSED_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupBottom" x="670" y="0" width="133" height="20" uuid="213c1394-7b6c-4e3d-8efe-15f8e0a98809">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3c685701-1e6a-4d50-a408-8588cd6984ce"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TARGET_GROUP}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupBottom" x="803" y="0" width="133" height="20" uuid="e4ca4674-eb2d-4194-954e-0c3250218fec">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f010baf4-01da-4e94-9ee1-4486be093248"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FULL_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

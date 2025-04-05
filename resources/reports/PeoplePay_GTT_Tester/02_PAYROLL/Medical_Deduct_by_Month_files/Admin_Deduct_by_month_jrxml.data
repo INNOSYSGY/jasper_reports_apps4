@@ -1,0 +1,622 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Listing of Employees Admin Deduction" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="84eefb4c-b08e-4fe4-a91a-83b326401d1e">
+	<property name="ireport.zoom" value="1.7715610000000017"/>
+	<property name="ireport.x" value="157"/>
+	<property name="ireport.y" value="96"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/Medical_Deduct_by_Month"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/02_PAYROLL/Medical_Deduct_by_Month_files/Admin_Deduct_by_month_jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Medical Deduction By Month"/>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="SUPPRESS_DETAILS" class="java.lang.String"/>
+	<parameter name="SESSION_ID" class="java.lang.String"/>
+	<parameter name="allEmployees" class="java.lang.String"/>
+	<parameter name="paymentFrecuency" class="java.lang.String"/>
+	<parameter name="deduction_id" class="java.math.BigDecimal"/>
+	<parameter name="START_PERIOD" class="java.lang.String"/>
+	<parameter name="END_PERIOD" class="java.lang.String"/>
+	<parameter name="DEPARTMENT" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[select  distinct 
+o.org_structure_id,
+  a.org_id,
+  a.period_start,
+  a.period_end,
+  emp_company_no,
+  a.first_name_hist,a.surname_hist,
+  nvl(a.surname_hist,i.surname)||', '||nvl(a.first_name_hist,i.first_name) ename,
+initcap(a.position_name_hist) as designation, a.payment_type_hist as paytype,
+    a.department_name_hist  as department,
+    nvl(a.department_name_hist,(select unit_name From hr_hcf_orgstructuredtl Where id= e.orgdtl_id)) worklocation,
+    h.organisation_name as company, 
+    period,j.expense_code,j.description expense,
+    l.interest_rate,b.status_code status,
+    sum(round(b.amount_deducted,0)) as deduction_amount
+    ,sum(amount_owing- pd.amount_deducted) balance,
+                    sum(l.current_balance) current_balance--, datestart start_date
+                  	,a.employment_class_hist,--,initcap(b.deduction_no) deduction_no,who_pays,
+                     h.address,h.telnum,h.faxnum,l.company_deduction_no,
+max(case when b.deduction_type = 'EMPLOYEE' then b.amount_deducted
+                           else 0
+                            end) employee,
+                    max(case when b.deduction_type = 'EMPLOYER' then b.amount_deducted
+                            else 0 
+                            end) employer,
+                        
+                    max(case when b.deduction_type = 'EMPLOYEE' then b.amount_deducted
+                            else 0
+                            end) +  
+                    max(case when b.deduction_type = 'EMPLOYER' then b.amount_deducted
+                            else 0 
+                            end) Total_Deduction ,                           
+                            to_char( PERIOD_START, 'Month YYYY') pMonth,
+                            'Guyana Power And Light' || '(' || INITCAP(a.EMPLOYMENT_CLASS_HIST) || ')' Title
+	from pa_pmg_payrolldeduction b join pa_pmg_payrolldtl a on a.id=b.pay_slipno
+    inner join hr_rcm_employee e on e.id = a.emp_id
+    join hr_rcm_individual i on i.id = e.ind_id
+	left join pa_pcf_admindeduction l on l.id=b.adm_deduction_id
+    join (select id, emp_id,amount_deducted,adm_deduction_id
+                  from pa_pmg_payrolldeduction
+                  group by id, emp_id,adm_deduction_id,amount_deducted) pd
+                  on pd.adm_deduction_id = l.id
+    join pa_pcf_deductioncode j on j.id=l.expense_id
+    join hr_hcf_organisation h on a.org_id=h.id
+    join hr_hcf_position w on w.id=e.position_id
+    left outer join vw_organisation_structure_all o on a.orgdtl_id=o.id
+
+	  where a.earnings_period_id in
+        (select q.id from pa_pcf_earningperiod q 
+        	where q.start_date between to_date( $P{START_PERIOD} ) and to_date( $P{END_PERIOD} )
+        )
+      and  (j.id= 13487 or j.id = 14386)
+      and upper(who_pays) in ('EMPLOYEE','BOTH')
+	and b.amount_deducted>0
+	and a.org_id =  $P{IN_ORG_ID} 
+	and a.orgdtl_id = case when  $P{DEPARTMENT}  is null then a.orgdtl_id else $P{DEPARTMENT} end
+    and e.payment_type=$P{paymentFrecuency}
+        and 
+( $P{allEmployees} = 1 or 
+exists (select 1
+                        from RPT_PARAMETER w1
+                        WHERE 
+                        W1.SESSION_ID= $P{SESSION_ID} 
+                         and
+                         option_value=case when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYEE' then to_char(E.id) 
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='GRADE_SCALE' then to_char(w.grade_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='ORG_STRUCT_LEVEL' then to_char(w.orgdtl_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='POSITION' then to_char(E.position_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='WORK_LOCATION' then to_char(E.wklocation_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='UNION' then to_char(E.union_code_id)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYMENT_TYPE' then to_char(E.EMPLOYMENT_TYPE_ID)
+                                                when option_name = $P{SEARCH_OPTION}  and option_name ='EMPLOYMENT_CLASS' then to_char(E.EMPLOYMENT_CLASS_ID)
+                                                end
+                        )
+)
+    
+group by o.org_structure_id, a.org_id, a.period_start, a.period_end, 
+emp_company_no, a.first_name_hist, a.surname_hist,a.position_name_hist, 
+a.payment_type_hist, a.department_name_hist, h.organisation_name, period, 
+j.expense_code, j.description, l.interest_rate, b.status_code,
+ h.address, h.telnum, h.faxnum, i.surname, i.first_name,
+l.company_deduction_no, a.EMPLOYMENT_CLASS_HIST,E.orgdtl_id
+
+ORDER BY A.surname_hist ASC
+
+--ORDER BY  initcap(b.deduction_type),o.UNIT_NAME,A.EMPLOYMENT_CLASS_HIST,A.SURNAME_HIST,A.FIRST_NAME_HIST]]>
+	</queryString>
+	<field name="ORG_STRUCTURE_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_STRUCTURE_ID"/>
+	</field>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="PERIOD_START" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_START"/>
+	</field>
+	<field name="PERIOD_END" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_END"/>
+	</field>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="FIRST_NAME_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FIRST_NAME_HIST"/>
+	</field>
+	<field name="SURNAME_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SURNAME_HIST"/>
+	</field>
+	<field name="ENAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ENAME"/>
+	</field>
+	<field name="DESIGNATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DESIGNATION"/>
+	</field>
+	<field name="PAYTYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PAYTYPE"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="WORKLOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WORKLOCATION"/>
+	</field>
+	<field name="COMPANY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COMPANY"/>
+	</field>
+	<field name="PERIOD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD"/>
+	</field>
+	<field name="EXPENSE_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EXPENSE_CODE"/>
+	</field>
+	<field name="EXPENSE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EXPENSE"/>
+	</field>
+	<field name="INTEREST_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="INTEREST_RATE"/>
+	</field>
+	<field name="STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="STATUS"/>
+	</field>
+	<field name="DEDUCTION_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DEDUCTION_AMOUNT"/>
+	</field>
+	<field name="BALANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="BALANCE"/>
+	</field>
+	<field name="CURRENT_BALANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="CURRENT_BALANCE"/>
+	</field>
+	<field name="EMPLOYMENT_CLASS_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS_HIST"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="TELNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
+	</field>
+	<field name="FAXNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
+	</field>
+	<field name="COMPANY_DEDUCTION_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COMPANY_DEDUCTION_NO"/>
+	</field>
+	<field name="EMPLOYEE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE"/>
+	</field>
+	<field name="EMPLOYER" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYER"/>
+	</field>
+	<field name="TOTAL_DEDUCTION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_DEDUCTION"/>
+	</field>
+	<field name="PMONTH" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PMONTH"/>
+	</field>
+	<field name="TITLE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TITLE"/>
+	</field>
+	<sortField name="WORKLOCATION"/>
+	<sortField name="ENAME"/>
+	<variable name="RECORD_COUNT" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="CURRENT_BALANCE_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{CURRENT_BALANCE}]]></variableExpression>
+	</variable>
+	<variable name="DEDUCTION_AMOUNT_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEDUCTION_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="CURRENT_BALANCE_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Employment Class" calculation="Sum">
+		<variableExpression><![CDATA[$F{CURRENT_BALANCE}]]></variableExpression>
+	</variable>
+	<variable name="DEDUCTION_AMOUNT_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Employment Class" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEDUCTION_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="DEDUCTION_AMOUNT_3" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEDUCTION_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="CURRENT_BALANCE_3" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CURRENT_BALANCE}]]></variableExpression>
+	</variable>
+	<variable name="DEDUCTION_AMOUNT_4" class="java.math.BigDecimal" resetType="Group" resetGroup="Deduction Type" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEDUCTION_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="CURRENT_BALANCE_4" class="java.math.BigDecimal" resetType="Group" resetGroup="Deduction Type" calculation="Sum">
+		<variableExpression><![CDATA[$F{CURRENT_BALANCE}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_EMPLOYEE_AMOUNT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLOYEE}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_EMPLOYER_AMOUNT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLOYER}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_DEDUCTION_AMOUNT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></variableExpression>
+	</variable>
+	<variable name="GRAND_TOTAL_AMOUNT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLOYEE}]]></variableExpression>
+	</variable>
+	<variable name="GRAND_TOTAL_AMOUNT_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLOYER}]]></variableExpression>
+	</variable>
+	<variable name="GRAND_TOTAL_AMOUNT_3" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLOYEE}+$F{EMPLOYER}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_WORKLOCATION_AMOUNT" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLOYEE}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_WORKLOCATION_AMOUNT_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLOYER}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_WORKLOCATION_AMOUNT_3" class="java.math.BigDecimal" resetType="Group" resetGroup="Department" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_EMP_CLASS_AMOUNT" class="java.math.BigDecimal" resetType="Group" resetGroup="Employment Class" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLOYEE}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_EMP_CLASS_AMOUNT_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Employment Class" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLOYER}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_EMP_CLASS_AMOUNT_3" class="java.math.BigDecimal" resetType="Group" resetGroup="Employment Class" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></variableExpression>
+	</variable>
+	<group name="Deduction Type">
+		<groupFooter>
+			<band height="16">
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="351" y="0" width="120" height="15" uuid="72dcad20-148c-42a9-8424-412abca63ff6"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_EMPLOYEE_AMOUNT}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="471" y="0" width="105" height="15" uuid="83ebb5e7-c165-427b-8e7f-7545e687a323"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_EMPLOYER_AMOUNT}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="576" y="0" width="86" height="15" uuid="2db9e050-1bfc-46e2-a6fe-acc05c57e5d6"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_DEDUCTION_AMOUNT}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Department" keepTogether="true">
+		<groupExpression><![CDATA[$F{WORKLOCATION}]]></groupExpression>
+	</group>
+	<group name="Employment Class">
+		<groupExpression><![CDATA[$F{EMPLOYMENT_CLASS_HIST}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<printWhenExpression><![CDATA[false]]></printWhenExpression>
+				<staticText>
+					<reportElement x="0" y="0" width="92" height="15" uuid="755b5079-e717-4acd-ba30-d69d4ad9b9dd"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Employment Calss]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="92" y="0" width="340" height="15" uuid="722ea113-d0bb-4e2a-9dcd-02776899f374"/>
+					<textElement>
+						<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[': '+$F{EMPLOYMENT_CLASS_HIST}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<printWhenExpression><![CDATA[false]]></printWhenExpression>
+				<staticText>
+					<reportElement x="0" y="0" width="100" height="15" uuid="73a88cfd-0875-4337-810f-c9961efe6b27"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Employement Class]]></text>
+				</staticText>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement isPrintRepeatedValues="false" mode="Transparent" x="351" y="0" width="120" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="44f4d1b3-a339-42be-ab0f-eda6c9ba0d5f"/>
+					<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_EMP_CLASS_AMOUNT}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement isPrintRepeatedValues="false" mode="Transparent" x="471" y="0" width="105" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="4565f0cc-e21d-46d6-a0f6-803ae7d2e54f"/>
+					<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_EMP_CLASS_AMOUNT_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement isPrintRepeatedValues="false" mode="Transparent" x="576" y="0" width="86" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="607f4ef2-c03d-4309-bc50-f04197670381"/>
+					<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_EMP_CLASS_AMOUNT_3}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="91" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="752" height="80" uuid="8983e059-7ccb-4f1a-a747-f26e5409290e"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="69" splitType="Stretch">
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="0" y="38" width="751" height="15" uuid="399a7b39-3cc8-431c-be90-ddb62035bc4f"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA['The following amounts represent payment due to you in respect of deductions made from Employees Salaries for the month of ' + $F{PMONTH}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="11" width="751" height="20" uuid="3bd431c3-98ab-444e-9e26-6456dab6b583"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[MONTHLY EMPLOYEES' MEDICAL DEDUCTIONS]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="19" splitType="Stretch">
+			<staticText>
+				<reportElement x="73" y="0" width="102" height="15" uuid="1be87576-8511-4cd0-8f2e-d8193c6f830f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Employee name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="24" y="0" width="49" height="15" uuid="ce23ae5d-2737-4fd6-9ba0-8f9d52e58cbc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Emp #]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="752" height="1" uuid="5a8c7bca-c1c1-47e9-9752-0c151ac5eb64"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="0" width="24" height="15" uuid="9c4ea5ee-1ad3-4587-abc3-cf9016f1e465"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="180" y="0" width="170" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="a54e2de6-ca2b-4ef5-933a-8348d5d75be9"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Department]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="575" y="0" width="87" height="15" uuid="ab85c5ab-9130-4ebd-93b1-d45d0f8241d7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Total Medical]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="470" y="0" width="105" height="15" uuid="31d19866-070f-40a8-b4ce-afcacf420dc3">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Medical Employer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="350" y="0" width="120" height="15" uuid="a5619b4d-0e7c-40f9-b786-a43a5f85e132">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Medical Employee]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Prevent">
+			<printWhenExpression><![CDATA[$P{SUPPRESS_DETAILS}=="Y" ? false:true]]></printWhenExpression>
+			<textField pattern="###0;###0-">
+				<reportElement x="0" y="0" width="24" height="15" uuid="ca05da87-986e-48f7-8890-258ae49de5ba"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{RECORD_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="24" y="0" width="39" height="15" uuid="bafae66c-40e9-464b-9564-02cc430f7742"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="63" y="0" width="112" height="15" uuid="3be5f6c1-ad74-419b-b2ac-67693d3c34ff"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="351" y="1" width="120" height="15" uuid="c6269b1c-bbfe-4555-b413-fbcc2a7a75d8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="110178e6-cf03-4c1f-8333-78c29cd1e0b2"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="471" y="1" width="105" height="15" uuid="45800a81-45e4-4de6-a83a-05e9e180aa3a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c15649af-6f53-488a-b0ed-66290666b541"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="576" y="1" width="86" height="15" uuid="e3573ff2-5c31-4f81-96e1-4802ed3bf6e4">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e77fe4d3-d68a-41dc-9767-59f243ebb54e"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="175" y="0" width="175" height="15" uuid="673da49a-1285-406b-9b2a-0ad34dc23ec5">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d4e1a822-288d-4d48-98af-8ac0f06484ba"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{WORKLOCATION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="752" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="bb8d7cc5-e2cf-4867-b0d5-30e3c1d6c2bf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="17" width="752" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="627" y="0" width="100" height="13" uuid="4c410739-e0e6-4f3f-8ce2-aa9db1023bd9"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy" isBlankWhenNull="true">
+				<reportElement x="5" y="0" width="162" height="13" uuid="d542132f-c136-4dc8-8760-3f15164318a0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" isBlankWhenNull="true">
+				<reportElement x="727" y="0" width="20" height="13" uuid="6b8702d7-04da-4a96-ad2b-4c36edeb9dd0"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="73" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="15" uuid="910567c1-eaf2-4a9f-8faa-799214802463"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="0" width="752" height="1" uuid="dcaf3bda-e01e-4ef6-ae60-4cb7482e4928"/>
+			</line>
+			<textField pattern="#,##0;(-#,##0)" isBlankWhenNull="true">
+				<reportElement x="351" y="2" width="120" height="15" uuid="392a44a6-3574-4409-b42e-67c0e164b70c">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_TOTAL_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;(-#,##0)" isBlankWhenNull="true">
+				<reportElement x="471" y="2" width="105" height="15" uuid="3964e1b4-dddb-4389-ba30-29993cf77de9">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_TOTAL_AMOUNT_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;(-#,##0)" isBlankWhenNull="true">
+				<reportElement x="576" y="2" width="84" height="15" uuid="ab75157d-198b-4f8b-9f0e-d514ab6e0f4e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_TOTAL_AMOUNT_3}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="21" width="751" height="2" uuid="a72f6331-8ed8-4061-96b2-858739e7cad0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<textField>
+				<reportElement x="0" y="27" width="590" height="15" uuid="4b83a37b-684b-405b-a76c-8be2257a8fda">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA['Please find enclose a cheque for $  ' + $V{GRAND_TOTAL_AMOUNT_3} + '.  Kindly acknowledge receipt.']]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="55" width="219" height="15" uuid="92ae7357-86e9-41e3-9cdd-3b6ca8714f3b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Date: __________________________]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="250" y="57" width="230" height="15" uuid="5c1f01d1-0d9b-4864-b649-3f86c8885920">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Signature: ___________________________]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

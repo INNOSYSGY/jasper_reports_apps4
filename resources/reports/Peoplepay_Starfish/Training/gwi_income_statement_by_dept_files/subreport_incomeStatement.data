@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="891596d6-5e82-4bfa-a6d2-093c58f3fe05">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/Training/gwi_income_statement_by_dept"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="INCOME_CODE" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select income_amount, income_code,period_end
+from APPS.vw_getallowances par
+WHERE UPPER(PAR.INCOME_CODE) = UPPER($P{INCOME_CODE})
+AND PAR.ORG_ID = $P{ORG_ID}
+]]>
+	</queryString>
+	<field name="INCOME_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="INCOME_CODE" class="java.lang.String"/>
+	<field name="PERIOD_END" class="java.sql.Timestamp"/>
+	<variable name="count" class="java.math.BigDecimal" incrementType="Column" calculation="Count">
+		<variableExpression><![CDATA[$F{INCOME_AMOUNT}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="24">
+			<staticText>
+				<reportElement x="0" y="4" width="220" height="20" uuid="6b8017f4-7b8c-401a-afd4-efe74cc1448c"/>
+				<textElement>
+					<font fontName="Times New Roman" isUnderline="true" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Income Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="4" width="335" height="20" uuid="4a62bcea-1ce1-43a6-9f09-876420ce95ac"/>
+				<textElement>
+					<font fontName="Times New Roman" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Period End]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<textField pattern="MMM-yy">
+				<reportElement x="220" y="0" width="335" height="20" uuid="d700f647-f03a-4df3-b957-b7c11d8ae857"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERIOD_END}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="220" height="20" uuid="5b649f84-6e72-4494-80be-f6f257dda273"/>
+				<textFieldExpression><![CDATA[$F{INCOME_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="50"/>
+	</columnFooter>
+</jasperReport>

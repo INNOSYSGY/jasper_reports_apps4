@@ -1,0 +1,790 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Payroll Analysis Sheet A" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cd6e5159-b897-4ff6-814e-71ac620d8dc3">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_Cloud/02_PAYROLL/Monthly_Payroll_Analysis_Summary_COPY"/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT_PROD"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_Cloud/02_PAYROLL/Monthly_Payroll_Analysis_Summary_files/1_jrxml"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="247"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="745"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Monthly Payroll Analysis Summary"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="588"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="398"/>
+	<subDataset name="Report_Title" uuid="5b83ef05-50f8-4742-a08c-a8aa3a8f7a64">
+		<queryString>
+			<![CDATA[select  id,ho.organisation_name,
+ho.address,ho.faxnum,ho.telnum,nis_reg_no,tax_reg_no
+from hr_hcf_organisation ho
+where id=208]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="ORGANISATION_NAME" class="java.lang.String"/>
+		<field name="ADDRESS" class="java.lang.String"/>
+		<field name="FAXNUM" class="java.lang.String"/>
+		<field name="TELNUM" class="java.lang.String"/>
+		<field name="NIS_REG_NO" class="java.lang.String"/>
+		<field name="TAX_REG_NO" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Disbursements" uuid="9019272f-3ca3-4ace-a160-96d86967bed2">
+		<parameter name="PAYSLIP_NO" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select a.percent_split, c.net_pay, to_char(a.percent_split * c.net_pay, '999,999,999') disb_pay,a.payment_mode_dist,c.payment_mode_hist
+from hr_rcm_disbursement a
+join hr_rcm_salary b on b.id=a.salary_id
+join pa_pmg_payrolldtl c on c.emp_id=b.emp_id
+where c.id=$P{PAYSLIP_NO}
+and sysdate between b.start_date and nvl(b.end_date,sysdate)]]>
+		</queryString>
+		<field name="PERCENT_SPLIT" class="java.math.BigDecimal"/>
+		<field name="NET_PAY" class="java.math.BigDecimal"/>
+		<field name="DISB_PAY" class="java.lang.String"/>
+		<field name="PAYMENT_MODE_DIST" class="java.lang.String"/>
+		<field name="PAYMENT_MODE_HIST" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Total Deduction" uuid="2093c49c-1e92-42cc-b646-14a865cbf5fc">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GTT"/>
+		<parameter name="PERIOD_START" class="java.lang.String"/>
+		<parameter name="PERIOD_END" class="java.lang.String"/>
+		<parameter name="EMPLOYMENT_CLASS" class="java.lang.String"/>
+		<parameter name="P_ORG_ID" class="java.math.BigDecimal"/>
+		<queryString language="SQL">
+			<![CDATA[select Initcap(ded.description) Description, round(sum(pd.Amount_deducted),0) Amount_deducted
+from PA_PMG_PAYROLLDEDUCTION pd
+join pa_pmg_payrolldtl pa on pd.pay_slipno=pa.id
+join PA_PCF_ADMINDEDUCTION adm ON adm.id = pd.adm_deduction_id
+join PA_PCF_DEDUCTIONCODE ded ON adm.expense_id = ded.id
+join hr_rcm_employee ep on pa.emp_id=ep.id
+join HR_RCM_INDIVIDUAL r on ep.ind_id=r.id
+join hr_hcf_position w on w.id=ep.position_id
+left outer join vw_organisation_structure v on pa.orgdtl_id=v.id
+where 
+pa.period_start between  $P{PERIOD_START} and  $P{PERIOD_END} 
+and replace(pa.employment_class_hist,' ','_') = $P{EMPLOYMENT_CLASS} 
+and
+  (upper(ded.Who_Pays) ='EMPLOYEE' or upper(adm.Deduction_Type)='EMPLOYEE')
+and ded.org_id=$P{P_ORG_ID}
+group by Initcap(ded.description)]]>
+		</queryString>
+		<field name="DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+		</field>
+		<field name="AMOUNT_DEDUCTED" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DEDUCTED"/>
+		</field>
+		<sortField name="DESCRIPTION"/>
+	</subDataset>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\work\\projects\\PPLERP\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SESSION_ID" class="java.lang.String"/>
+	<parameter name="SUPPRESS_DETAILS" class="java.lang.String"/>
+	<parameter name="p_Value" class="java.lang.String"/>
+	<parameter name="SEARCH_OPTION" class="java.lang.String"/>
+	<parameter name="allEmployees" class="java.math.BigDecimal"/>
+	<parameter name="PERIOD_START" class="java.lang.String"/>
+	<parameter name="PERIOD_END" class="java.lang.String"/>
+	<parameter name="EMPLOYMENT_CLASS" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select
+pa.org_id,
+pa.emp_id,
+replace(pa.employment_class_hist,' ','_') employment_class,
+pa.id pay_slip,
+to_char(pa.period_start) period_start,
+to_char(pa.period_end) period_end,
+pa.EARNINGS_PERIOD_ID EARNINGS_PERIOD ,
+payment_type_hist,
+round(sum(basic_personal_rate)) basic_personal_rate,
+sum(nvl(HOURLY_RATE,0)) hourly_rate,
+sum(case when pa.time_tax_earnings = 0 then round(basic_personal_rate) else pa.time_tax_earnings end) time_tax_earnings,
+sum(pa.gross_taxable+pa.gross_nontaxable) gross,
+sum(nvl(pa.nis_employee,0)) nis_employee,
+sum(nvl(pa.tax_amount,0)) tax_amount,
+sum(nvl(pa.total_deduction,0)) total_deduction,
+sum(nvl(pa.net_pay,0)) net_pay,
+initcap(trim(employment_class_hist))|| ' '||initcap(trim(payment_type_hist))||' '||trunc(pa.period_start)||' -- '||trunc(pa.period_end) as payroll_description
+from pa_pmg_payrolldtl pa
+JOIN PA_PMG_PAYROLLHD PH ON PA.PAY_BATCH_ID=PH.ID
+join hr_rcm_employee ep on pa.emp_id=ep.id
+left outer join HR_HCF_ORGSTRUCTUREDTL v on pa.orgdtl_id=v.id
+WHERE
+pa.earnings_period_id in (  select ppe.id
+	       from pa_pcf_earningperiod ppe
+         where to_char(ppe.START_PAID_FOR,'DD-MON-YYYY')
+between  to_char(to_date($P{PERIOD_START},'DD-MON-YYYY'),'DD-MON-YYYY')  and  to_char( to_date($P{PERIOD_END},'DD-MON-YYYY'),'DD-MON-YYYY')
+          and 
+          upper(PKG_GLOBAL_FNTS.GET_LOOKUP_COL(ppe.employment_class_id,'VALUE_DESCRIPTION')) = UPPER($P{EMPLOYMENT_CLASS} )
+          and ppe.org_id=$P{IN_ORG_ID} )
+	and replace(pa.employment_class_hist,' ','_') =  $P{EMPLOYMENT_CLASS} 
+	and pa.org_id =  $P{IN_ORG_ID} 
+and 
+(  $P{allEmployees}  = 1 or 
+exists (select 1
+                        from RPT_PARAMETER w1
+                        WHERE 
+                        W1.SESSION_ID=  $P{SESSION_ID} 
+                         and
+                         option_value=case when option_name =   $P{SEARCH_OPTION}  and option_name ='EMPLOYEE' then to_char(ep.id)                                               
+                                                when option_name =  $P{SEARCH_OPTION}   and option_name ='POSITION' then to_char(ep.position_id)
+                                                when option_name =  $P{SEARCH_OPTION}   and option_name ='WORK_LOCATION' then to_char(ep.wklocation_id)
+                                                when option_name =  $P{SEARCH_OPTION}   and option_name ='UNION' then to_char(ep.union_code_id)
+                                                when option_name =  $P{SEARCH_OPTION}   and option_name ='EMPLOYMENT_TYPE' then to_char(ep.EMPLOYMENT_TYPE_ID)
+                                                when option_name =  $P{SEARCH_OPTION}   and option_name ='ORG_STRUCT_LEVEL' then to_char(v.id)
+                                                end
+                        )
+
+)
+group by employment_class_hist,payment_type_hist,pa.period_start,pa.period_end,pa.org_id,
+				pa.id,pa.emp_id,pa.EARNINGS_PERIOD_ID]]>
+	</queryString>
+	<field name="ORG_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ORG_ID"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="EMPLOYMENT_CLASS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS"/>
+	</field>
+	<field name="PAY_SLIP" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PAY_SLIP"/>
+	</field>
+	<field name="PERIOD_START" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_START"/>
+	</field>
+	<field name="PERIOD_END" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD_END"/>
+	</field>
+	<field name="EARNINGS_PERIOD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EARNINGS_PERIOD"/>
+	</field>
+	<field name="PAYMENT_TYPE_HIST" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_TYPE_HIST"/>
+	</field>
+	<field name="BASIC_PERSONAL_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="BASIC_PERSONAL_RATE"/>
+	</field>
+	<field name="HOURLY_RATE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="HOURLY_RATE"/>
+	</field>
+	<field name="TIME_TAX_EARNINGS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TIME_TAX_EARNINGS"/>
+	</field>
+	<field name="GROSS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="GROSS"/>
+	</field>
+	<field name="NIS_EMPLOYEE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="NIS_EMPLOYEE"/>
+	</field>
+	<field name="TAX_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TAX_AMOUNT"/>
+	</field>
+	<field name="TOTAL_DEDUCTION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_DEDUCTION"/>
+	</field>
+	<field name="NET_PAY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="NET_PAY"/>
+	</field>
+	<field name="PAYROLL_DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PAYROLL_DESCRIPTION"/>
+	</field>
+	<sortField name="PAYROLL_DESCRIPTION"/>
+	<variable name="Period_PAYE" class="java.math.BigDecimal" resetType="Group" resetGroup="Earnings Period Description " calculation="Sum">
+		<variableExpression><![CDATA[$F{TAX_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="Period_NIS" class="java.lang.Float" resetType="Group" resetGroup="Earnings Period Description " calculation="Sum">
+		<variableExpression><![CDATA[$F{NIS_EMPLOYEE}]]></variableExpression>
+	</variable>
+	<variable name="Period_Gross" class="java.math.BigDecimal" resetType="Group" resetGroup="Earnings Period Description " calculation="Sum">
+		<variableExpression><![CDATA[$F{GROSS}]]></variableExpression>
+	</variable>
+	<variable name="Period_Time_Tax" class="java.math.BigDecimal" resetType="Group" resetGroup="Earnings Period Description " calculation="Sum">
+		<variableExpression><![CDATA[$F{TIME_TAX_EARNINGS}]]></variableExpression>
+	</variable>
+	<variable name="Period_Hourly_Rate" class="java.math.BigDecimal" resetType="Group" resetGroup="Earnings Period Description " calculation="Sum">
+		<variableExpression><![CDATA[$F{HOURLY_RATE}]]></variableExpression>
+	</variable>
+	<variable name="Total_NIS" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{NIS_EMPLOYEE}]]></variableExpression>
+	</variable>
+	<variable name="Total_Paye" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TAX_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="Total_Deduction" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></variableExpression>
+	</variable>
+	<variable name="Total_Net_Pay" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{NET_PAY}]]></variableExpression>
+	</variable>
+	<variable name="Total_Gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{GROSS}]]></variableExpression>
+	</variable>
+	<variable name="Total_Time_Taxable" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TIME_TAX_EARNINGS}]]></variableExpression>
+	</variable>
+	<variable name="Emp_Count" class="java.math.BigDecimal" calculation="Count">
+		<variableExpression><![CDATA[$F{EMP_ID}]]></variableExpression>
+	</variable>
+	<variable name="Total_Basic_Pay" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{BASIC_PERSONAL_RATE}]]></variableExpression>
+	</variable>
+	<variable name="V_allEmployess" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[1]]></variableExpression>
+	</variable>
+	<variable name="Period_Basic_Pay" class="java.math.BigDecimal" resetType="Group" resetGroup="Earnings Period Description " calculation="Sum">
+		<variableExpression><![CDATA[$F{BASIC_PERSONAL_RATE}]]></variableExpression>
+	</variable>
+	<variable name="Period_Net_Pay" class="java.math.BigDecimal" resetType="Group" resetGroup="Earnings Period Description " calculation="Sum">
+		<variableExpression><![CDATA[$F{NET_PAY}]]></variableExpression>
+	</variable>
+	<variable name="Period_Total_Deduction" class="java.math.BigDecimal" resetType="Group" resetGroup="Earnings Period Description " calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DEDUCTION}]]></variableExpression>
+	</variable>
+	<group name="Earnings Period Description " keepTogether="true">
+		<groupExpression><![CDATA[$F{PAYROLL_DESCRIPTION}]]></groupExpression>
+		<groupHeader>
+			<band height="17" splitType="Prevent">
+				<textField>
+					<reportElement x="0" y="0" width="380" height="15" uuid="2d824b3f-d1ef-481f-b007-cb81d4e44042"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PAYROLL_DESCRIPTION}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="17">
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="158" y="0" width="64" height="15" uuid="422cf576-8687-4421-ba05-788c9774eced"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Period_Basic_Pay}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="222" y="0" width="53" height="15" uuid="22825262-c0cd-4db0-be51-c53be197401d"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Period_Hourly_Rate}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="275" y="0" width="65" height="15" uuid="eb6a16d7-b062-4f90-9334-8f4c869d5dca"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Period_Time_Tax}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="467" y="0" width="64" height="15" uuid="40462cf0-2d49-4af6-afed-f6dbace04bc4"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Period_Gross}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="703" y="0" width="58" height="15" uuid="69d46d48-16f8-4b0d-aafa-bee00e719750"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Period_NIS}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="766" y="0" width="55" height="15" uuid="0054cf1c-7f08-449d-87f4-72a7ea1c30a6"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Period_PAYE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="844" y="0" width="60" height="15" uuid="7911b7ad-c146-4fb0-97eb-41ef364ebcad"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Period_Total_Deduction}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="906" y="0" width="61" height="15" uuid="e8d3ba4b-5721-4f04-bae8-245db5406332"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Period_Net_Pay}]]></textFieldExpression>
+				</textField>
+				<subreport runToBottom="false">
+					<reportElement stretchType="RelativeToTallestObject" x="345" y="0" width="113" height="15" uuid="364d36fa-59da-417c-aeb4-de881f22cf16">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<subreportParameter name="P_ORG_ID">
+						<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="PERIOD_START">
+						<subreportParameterExpression><![CDATA[$F{PERIOD_START}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="PERIOD_END">
+						<subreportParameterExpression><![CDATA[$F{PERIOD_END}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="EMPLOYMENT_CLASS">
+						<subreportParameterExpression><![CDATA[$F{EMPLOYMENT_CLASS}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:Payroll_Analysis_Sheet_B_Gafoor_subreport1.jrxml"]]></subreportExpression>
+				</subreport>
+				<subreport runToBottom="false">
+					<reportElement key="" stretchType="RelativeToTallestObject" x="536" y="0" width="142" height="15" uuid="e6f39193-aec4-49be-a528-f4dac29a0b95">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<subreportParameter name="P_ORG_ID">
+						<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="PERIOD_START">
+						<subreportParameterExpression><![CDATA[$F{PERIOD_START}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="PERIOD_END">
+						<subreportParameterExpression><![CDATA[$F{PERIOD_END}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="EMPLOYMENT_CLASS">
+						<subreportParameterExpression><![CDATA[$F{EMPLOYMENT_CLASS}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:Payroll_Analysis_Sheet_B_Gafoor_subreport2.jrxml"]]></subreportExpression>
+				</subreport>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="73" splitType="Prevent">
+			<subreport>
+				<reportElement x="0" y="0" width="968" height="73" uuid="676bfa8d-583e-4260-aea0-0a29bcf7d908"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_LEGAL_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Prevent">
+			<staticText>
+				<reportElement x="0" y="0" width="966" height="14" uuid="210b665d-4a5f-4a3b-b3a8-7134e1d607e8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Payroll Analysis Summary]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Prevent">
+			<staticText>
+				<reportElement x="274" y="0" width="64" height="15" isPrintInFirstWholeBand="true" uuid="b2e3c516-0896-4397-8bdb-db1b1fd11fd8">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<text><![CDATA[Time Tax.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="468" y="0" width="64" height="15" isPrintInFirstWholeBand="true" uuid="57a20bdc-0c86-44b1-8abb-33a473d9c223"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Gross Pay]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="344" y="0" width="114" height="15" isPrintInFirstWholeBand="true" uuid="2a601887-535a-42db-89f6-fc9b855fb03c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Other Income]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="537" y="0" width="137" height="15" isPrintInFirstWholeBand="true" uuid="2a33a392-524f-4006-a7fc-d5b1cbf11849"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Deductions]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="703" y="0" width="58" height="15" isPrintInFirstWholeBand="true" uuid="f2a4a40c-8b8e-4d5f-9537-893872e8e2c5"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[NIS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="765" y="0" width="56" height="15" isPrintInFirstWholeBand="true" uuid="3ab61684-5411-4ec6-b94e-aa0039a5d5cf"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[PAYE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="821" y="0" width="83" height="15" isPrintInFirstWholeBand="true" uuid="946e9000-e13f-4966-b11e-1de3c251477a"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Total Deduction]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="906" y="0" width="61" height="15" isPrintInFirstWholeBand="true" uuid="7f6109a7-d6fb-46ee-82c8-e6f55e5a2cec"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Net Pay]]></text>
+			</staticText>
+			<line>
+				<reportElement x="1" y="15" width="967" height="1" uuid="16f9be47-736a-439c-88ea-e5ce72ae0ce5"/>
+				<graphicElement>
+					<pen lineWidth="1.75"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="157" y="0" width="64" height="15" isPrintInFirstWholeBand="true" uuid="49b3690e-6f5e-41d9-aa2d-e6a8145180e2">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Basic Pay]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="221" y="-1" width="53" height="15" isPrintInFirstWholeBand="true" uuid="a5a79f78-d4ce-4b7d-906b-619a2fefce4a"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Hourly R.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="31" splitType="Prevent">
+			<staticText>
+				<reportElement x="1" y="15" width="966" height="15" uuid="276033b1-ecef-4a30-9288-5945f335c1a7"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="968" height="15" forecolor="#999999" backcolor="#999999" uuid="f1a68f00-20bb-442e-b99c-327387c36665"/>
+				<textField evaluationTime="Report">
+					<reportElement x="921" y="0" width="40" height="15" uuid="6d8f6b2b-cf01-4bfa-b088-473b9a4eb015"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="841" y="0" width="80" height="15" uuid="3a01d4f0-1a48-451f-ae1b-b733f0f8b493"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE, MMMMM, dd  yyyy">
+					<reportElement x="0" y="0" width="279" height="15" uuid="9ba68b40-15d3-4fb6-9954-160e824dc184"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="571">
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="892" y="78" width="75" height="15" uuid="bbece930-2f50-4b59-a224-9482e6dcabba">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_Net_Pay}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="818" y="78" width="73" height="15" uuid="70e2b6a4-0eac-4d04-92a0-ef10a8d0e2a3"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_Deduction}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="745" y="78" width="73" height="15" uuid="bfbdb022-ecdd-471f-a8d1-90b610c33a2c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_Paye}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="672" y="78" width="73" height="15" uuid="27cf788c-b8b4-45f5-9c4b-830447955df5">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_NIS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="448" y="78" width="84" height="15" uuid="bff820bc-0385-4310-885f-53acc2c236b4"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_Gross}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="260" y="78" width="79" height="15" uuid="6c57b3e5-5d56-45df-ae39-e98fa41a39d7"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_Time_Taxable}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="78" width="135" height="15" uuid="4f69f54b-aeee-46c2-81a2-457740d0c1c2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Grand Total:        '+$V{Emp_Count}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="2" y="1" width="963" height="1" uuid="19f7a103-7a60-49ba-a05d-9c7f7be8d09a"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="150" y="78" width="71" height="15" uuid="63514b35-299f-43fe-8f39-e972446d9045"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Total_Basic_Pay}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement stretchType="RelativeToTallestObject" x="338" y="78" width="113" height="15" uuid="070d46d6-1785-4ba4-b9b7-718e1fb2b5e0"/>
+				<subreportParameter name="P_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PERIOD_START">
+					<subreportParameterExpression><![CDATA[$F{PERIOD_START}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PERIOD_END">
+					<subreportParameterExpression><![CDATA[$F{PERIOD_END}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="EMPLOYMENT_CLASS">
+					<subreportParameterExpression><![CDATA[$F{EMPLOYMENT_CLASS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:DEPARTMENT_INCOME"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement stretchType="RelativeToTallestObject" x="536" y="78" width="142" height="15" uuid="7742c918-f983-482c-866e-702e75d65f98"/>
+				<subreportParameter name="P_ORG_ID">
+					<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PERIOD_START">
+					<subreportParameterExpression><![CDATA[$F{PERIOD_START}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PERIOD_END">
+					<subreportParameterExpression><![CDATA[$F{PERIOD_END}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="EMPLOYMENT_CLASS">
+					<subreportParameterExpression><![CDATA[$F{EMPLOYMENT_CLASS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:DEPARTMENT_SUMMARY_DEDUCTION"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement mode="Transparent" x="5" y="481" width="65" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="d75e4180-a504-49fc-ab8a-8b6eb558282a"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Prepared By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="5" y="508" width="65" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="4cec9018-edf6-4fd1-b951-58d310d9c9c3"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Checked  By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="5" y="532" width="91" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="72449d76-a550-4826-8a29-a2ac5950d59b"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Authorised  By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="96" y="481" width="229" height="15" uuid="a2effa8a-a34e-4200-a5ac-84a0e343bdc7"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="96" y="508" width="229" height="15" uuid="65daa4dd-2cf9-444a-a70c-1f804eb09993"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="96" y="532" width="229" height="15" uuid="cb666c2d-e72f-4492-8bfa-20200d2bda4e"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="16" width="967" height="16" uuid="7881bfcc-e59b-427f-9d1f-88449cb8e4d4"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Payroll Analysis]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="150" y="54" width="71" height="15" uuid="f7db1806-9178-4d3c-a76e-45f8044d0178"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Basic Pay]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="260" y="55" width="78" height="15" uuid="1cb97ba2-1aa6-4b0c-87da-e3a791f440a6"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Time Tax]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="55" width="114" height="15" uuid="34a3a0e9-2563-4621-af6f-89b89ba60288"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Other Income]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="468" y="55" width="64" height="15" uuid="8bb54668-b8bf-46a2-a333-7e5aa1a00bce"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Gross Pay]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="540" y="55" width="108" height="15" uuid="b901a6b3-0c35-4109-aece-183cc1f0a843"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Deductions]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="687" y="55" width="58" height="15" uuid="4120301f-8dfc-4e05-b7d2-bfff775a2453"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NIS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="762" y="55" width="56" height="15" uuid="7909dfa4-f7c6-464b-a40a-b3bb4265fe8a"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PAYE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="818" y="55" width="83" height="15" uuid="5c160419-5e0b-48d9-9dbe-5c00acf22916"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Deduct]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="906" y="55" width="61" height="15" uuid="add04b54-1247-468d-96f1-60a5968026e6"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Net Pay]]></text>
+			</staticText>
+			<frame>
+				<reportElement mode="Opaque" x="1" y="553" width="966" height="15" forecolor="#999999" backcolor="#999999" uuid="bed003ca-c44f-459c-b6ce-bb0a4a70fbbb"/>
+				<textField pattern="EEEEE, MMMMM, dd  yyyy">
+					<reportElement x="1" y="2" width="279" height="15" uuid="97af789b-7e76-4f3b-b629-6127a1bc802c"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="882" y="2" width="80" height="15" uuid="8c393461-263b-468b-8159-8462bfd9a01b"/>
+					<textElement>
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="923" y="2" width="40" height="15" uuid="cc80b36f-47d5-4b9b-a2b5-b348f2bfcdcb"/>
+					<textElement>
+						<font fontName="Arial" size="8" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" "+$V{PAGE_NUMBER}.sum( $V{PAGE_NUMBER}, 1 )]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</summary>
+	<noData>
+		<band height="132">
+			<subreport>
+				<reportElement x="0" y="1" width="968" height="73" uuid="96dd7336-75d4-4bfd-ad69-1d709b7adc32"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:LETTER_HEAD_LEGAL_LANDSCAPE"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="0" y="80" width="967" height="14" uuid="2d20e86f-e56e-403b-acae-ff5c2b575874"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Payroll Analysis]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="108" width="968" height="20" uuid="91925717-c055-4805-9ea7-b9d781c7b73d"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[REPORT RETURN NO DATA]]></text>
+			</staticText>
+		</band>
+	</noData>
+</jasperReport>

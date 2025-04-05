@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GWIlistingofnewemployees" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9e76ddd1-b997-4e4f-ba9b-b77f73c6b379">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/Training/GWIlisintgofemployees"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<parameter name="START_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="END_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT v.emp_id AS emp_#,EMPLOYEE_NAME as name,(APPS.Pkg_Global_Fnts.Fn_Address('HOME',i.Id,'LOT',Sysdate)||' '||APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'STREET',SYSDATE)||' ' ||decode(APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'VILLAGE_WARD',SYSDATE),null,' ',
+  APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'VILLAGE_WARD',SYSDATE)||' ')||nvl(APPS.PKG_GLOBAL_FNTS.FN_ADDRESS('HOME',i.ID,'COUNTY',SYSDATE),' ')) AS ADDRESS,DOB,DATE_EMPLOYED as EMPLOYMENT_DATE,  v.POSITION_NAME as position,
+ LOCATION as location, to_char( apps.pkg_global_fnts.fn_personalrate(e.id, sysdate), '$999,999.99') SALARY,
+apps.fn_getallowance( i.id, SYSDATE) ALLOWANCE, BANK_ACCOUNT_NO AS ACCOUNT_NO,(select organisation_name from apps.hr_hcf_organisation b where b.id = i.bank_branch_id) BRANCH,e.id, UPPER(apps.PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'TIN',SYSDATE)) TIN,
+                      UPPER(apps.PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'NATIONAL ID',SYSDATE)) NAT_ID,
+                      UPPER(apps.PKG_GLOBAL_FNTS.FN_GETCURNISTAXNO(E.IND_ID,'NIS NUMBER',SYSDATE)) NIS, DEPARTMENT_CODE, e.date_separated,
+                      DEPARTMENT_NAME, e.emp_company_no
+FROM apps.hr_rcm_employee e JOIN apps.hr_rcm_individual i ON e.ind_id = i.id
+JOIN apps.vw_position_location_v3 v ON e.id = v.emp_id
+WHERE DATE_EMPLOYED  BETWEEN $P{START_DATE} AND $P{END_DATE} AND
+org_id = 1626]]>
+	</queryString>
+	<field name="EMP_#" class="java.math.BigDecimal"/>
+	<field name="NAME" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="DOB" class="java.sql.Timestamp"/>
+	<field name="EMPLOYMENT_DATE" class="java.sql.Timestamp"/>
+	<field name="POSITION" class="java.lang.String"/>
+	<field name="LOCATION" class="java.lang.String"/>
+	<field name="SALARY" class="java.lang.String"/>
+	<field name="ALLOWANCE" class="java.math.BigDecimal"/>
+	<field name="ACCOUNT_NO" class="java.lang.String"/>
+	<field name="BRANCH" class="java.lang.String"/>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="TIN" class="java.lang.String"/>
+	<field name="NAT_ID" class="java.lang.String"/>
+	<field name="NIS" class="java.lang.String"/>
+	<field name="DEPARTMENT_CODE" class="java.lang.String"/>
+	<field name="DATE_SEPARATED" class="java.sql.Timestamp"/>
+	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
+	<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+	<sortField name="DEPARTMENT_CODE"/>
+	<group name="DEPARTMENT">
+		<groupExpression><![CDATA[$F{DEPARTMENT_CODE}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="965" height="20" uuid="995105bf-0737-421c-ad0f-0bffc75fdd09"/>
+					<textElement markup="html">
+						<font fontName="Times New Roman" size="12" isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["DEPARTMENT NAME: "+$F{DEPARTMENT_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="-77" y="-185" width="54" height="20" uuid="1312a5ee-7960-4882-a341-624cfdd5e0c7"/>
+					<textElement textAlignment="Justified">
+						<font fontName="Times New Roman"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EMP_#}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="150" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="968" height="86" uuid="5222dc50-0cd1-4506-8667-06ff17ee901f"/>
+			</subreport>
+			<textField>
+				<reportElement x="0" y="86" width="186" height="64" uuid="5296be78-44b9-4f3d-8e49-5a2dba8cc8d2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Listing of New Employees Between "]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="186" y="86" width="89" height="64" uuid="314fdbf0-dd96-4a00-b8d5-c0a22ecf780d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{START_DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="331" y="86" width="127" height="64" uuid="f21aa664-b2f1-4537-8114-8ebce52856ee"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{END_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="275" y="86" width="56" height="64" uuid="49da01c9-9d64-4d80-b338-3d462adf8709"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[and]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="47" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="54" height="20" uuid="2432b5a8-b180-4ec5-9402-ae5f9c9458e5"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EMP #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="54" y="0" width="87" height="20" uuid="904ae1d2-4592-4b6f-95b2-8058af27b6b7"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="141" y="0" width="113" height="20" uuid="93daec94-112a-44dc-8833-346a0e2382e5"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ADDRESS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="254" y="0" width="58" height="20" uuid="c1eaefa8-daaa-43aa-af13-322691638691"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DOB]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="0" width="89" height="20" uuid="c0b978b7-d242-4f78-a89e-0d044fc9822c"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[POSITION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="687" y="0" width="78" height="20" uuid="a0358d5a-9288-4b30-a08e-b146f1c4ebdf"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SALARY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="369" y="0" width="68" height="20" uuid="d8cc3f1f-1720-44a4-8909-c88043e7f3bd"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NAT ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="765" y="0" width="100" height="20" uuid="adccd9c9-0b39-454a-94f9-666d1d79fc84"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ACCOUNT NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="865" y="0" width="100" height="20" uuid="1f02e3de-e46c-4269-bcd7-fe559abbd333"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BRANCH]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="437" y="0" width="54" height="20" uuid="970d9708-469d-47a9-88a3-cfac932c5ef0"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TIN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="491" y="0" width="107" height="47" uuid="9bdc4ffc-c081-4e20-94d3-b409fa4ae3dc"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EMPLOYMENT DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="312" y="0" width="57" height="20" uuid="00aa8d57-8917-40fa-b5f0-0dd519064b41"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NIS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="54" y="0" width="87" height="20" uuid="f650668b-61b7-4e72-9816-7ba19b20941a"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="141" y="0" width="113" height="20" uuid="4ae9f0ad-be61-44ab-9735-5b6627001fe7"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yy" isBlankWhenNull="true">
+				<reportElement x="254" y="0" width="58" height="20" uuid="d652aabc-9625-4dd6-97eb-2c8bada93aeb"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DOB}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="312" y="0" width="57" height="20" uuid="a6fb17a3-9233-497c-b2c5-55da77949eeb"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NIS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="369" y="0" width="68" height="20" uuid="b585990d-b349-4bbf-bdb7-5831262adfe5"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAT_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="437" y="0" width="54" height="20" uuid="81b120a2-f911-4f5b-bb05-9ba5d1619664"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TIN}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yy">
+				<reportElement x="491" y="0" width="107" height="20" uuid="2189cfee-8312-4d00-904a-c97ba3d4635c"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYMENT_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="598" y="0" width="89" height="20" uuid="15f58b61-0066-43dc-8352-6476a307393c"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="687" y="0" width="78" height="20" uuid="4bbd279d-5c16-476d-8955-c5aa81f9dcc7"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALARY}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="765" y="0" width="100" height="20" uuid="b50bc8c3-6a20-4029-a887-ba02dc9638e5"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACCOUNT_NO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="865" y="0" width="103" height="20" uuid="47c7df1c-082b-454a-b9fe-243f7b29999d"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BRANCH}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="54" height="20" uuid="d078ef46-3583-445d-9151-e7f3c5bd8d38"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMP_COMPANY_NO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="40">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="0" y="0" width="100" height="20" uuid="25e8cf61-b14b-4b96-bec2-c8070ae78660"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="20" width="965" height="20" backcolor="#CCCCCC" uuid="6092a162-0abf-4af3-aacc-d303a3c26aa8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="848" y="0" width="80" height="20" uuid="9ae96d11-99db-438c-905d-d9ef66b991dd"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="928" y="0" width="40" height="20" uuid="dacf5406-adef-4328-b1a4-2c2b24302d8d"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

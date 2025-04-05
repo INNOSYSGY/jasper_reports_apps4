@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.11.0.final using JasperReports Library version 6.11.0-0c4056ccaa4d25a5a8c45672d2f764ea3498bebb  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Gafoors Employee Time Sheet" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5060fc96-3fa2-4b99-ad96-8a2ee2adfe7a">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://apps4.innosysgy.com:8082/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/02_PAYROLL/Gafoors_Employee_Time_Sheet"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/02_PAYROLL/Gafoors_Employee_Time_Sheet_files/main_jrxml"/>
+	<subDataset name="test" uuid="124e3c80-1f45-4b3b-ba8a-623167541348">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors"/>
+		<queryString language="SQL">
+			<![CDATA[select tu.emp_id
+, tu.emp_company_no
+, tu.full_name
+, fro.position_name
+, tu.work_location_name Departments
+, wl.location_description
+, tu.payroll_hours Regular_Hours
+, tu.total_hours
+, tu.over_time
+, tu.double_time
+, tu.time_lost
+from hr_att_timeclock_upload tu
+join hr_rcm_employee emp on tu.emp_id=emp.id
+join hr_hcf_worklocation wl on emp.position_location_id= wl.id
+join hr_hcf_worklocationposition F on wl.id= F.id
+join hr_hcf_position fro on F.position_id=fro.id
+order by emp_company_no asc]]>
+		</queryString>
+		<field name="EMP_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+		</field>
+		<field name="EMP_COMPANY_NO" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+		</field>
+		<field name="FULL_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="FULL_NAME"/>
+		</field>
+		<field name="POSITION_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+		</field>
+		<field name="DEPARTMENTS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="DEPARTMENTS"/>
+		</field>
+		<field name="LOCATION_DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="LOCATION_DESCRIPTION"/>
+		</field>
+		<field name="REGULAR_HOURS" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="REGULAR_HOURS"/>
+		</field>
+		<field name="TOTAL_HOURS" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="TOTAL_HOURS"/>
+		</field>
+		<field name="OVER_TIME" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="OVER_TIME"/>
+		</field>
+		<field name="DOUBLE_TIME" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="DOUBLE_TIME"/>
+		</field>
+		<field name="TIME_LOST" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="TIME_LOST"/>
+		</field>
+		<group name="EMP_ID">
+			<groupExpression><![CDATA[$F{EMP_ID}]]></groupExpression>
+		</group>
+		<group name="EMP_COMPANY_NO">
+			<groupExpression><![CDATA[$F{EMP_COMPANY_NO}]]></groupExpression>
+		</group>
+		<group name="FULL_NAME">
+			<groupExpression><![CDATA[$F{FULL_NAME}]]></groupExpression>
+		</group>
+		<group name="POSITION_NAME">
+			<groupExpression><![CDATA[$F{POSITION_NAME}]]></groupExpression>
+		</group>
+		<group name="DEPARTMENTS">
+			<groupExpression><![CDATA[$F{DEPARTMENTS}]]></groupExpression>
+		</group>
+		<group name="LOCATION_DESCRIPTION">
+			<groupExpression><![CDATA[$F{LOCATION_DESCRIPTION}]]></groupExpression>
+		</group>
+		<group name="REGULAR_HOURS">
+			<groupExpression><![CDATA[$F{REGULAR_HOURS}]]></groupExpression>
+		</group>
+		<group name="TOTAL_HOURS">
+			<groupExpression><![CDATA[$F{TOTAL_HOURS}]]></groupExpression>
+		</group>
+		<group name="OVER_TIME">
+			<groupExpression><![CDATA[$F{OVER_TIME}]]></groupExpression>
+		</group>
+		<group name="DOUBLE_TIME">
+			<groupExpression><![CDATA[$F{DOUBLE_TIME}]]></groupExpression>
+		</group>
+		<group name="TIME_LOST">
+			<groupExpression><![CDATA[$F{TIME_LOST}]]></groupExpression>
+		</group>
+	</subDataset>
+	<subDataset name="Dataset1" uuid="be2276c3-b664-4553-ae62-6ac0e3956b2a">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors"/>
+		<queryString language="SQL">
+			<![CDATA[select tu.emp_id, rownum
+, tu.emp_company_no
+, tu.full_name
+, fro.position_name
+,tu.work_date
+, tu.work_location_name Departments
+, wl.location_description
+, tu.payroll_hours Regular_Hours
+, tu.total_hours
+, tu.over_time
+, tu.double_time
+, tu.time_lost
+from hr_att_timeclock_upload tu
+join hr_rcm_employee emp on tu.emp_id=emp.id
+join hr_hcf_worklocation wl on emp.position_location_id= wl.id
+join hr_hcf_worklocationposition F on wl.id= F.id
+join hr_hcf_position fro on F.position_id=fro.id
+order by emp_company_no asc]]>
+		</queryString>
+		<field name="ROWNUM" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+		<field name="EMP_COMPANY_NO" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+		</field>
+		<field name="FULL_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="FULL_NAME"/>
+		</field>
+		<field name="POSITION_NAME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
+		</field>
+		<field name="WORK_DATE" class="java.sql.Timestamp">
+			<property name="com.jaspersoft.studio.field.label" value="WORK_DATE"/>
+		</field>
+		<field name="DEPARTMENTS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="DEPARTMENTS"/>
+		</field>
+		<field name="LOCATION_DESCRIPTION" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="LOCATION_DESCRIPTION"/>
+		</field>
+		<field name="REGULAR_HOURS" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="REGULAR_HOURS"/>
+		</field>
+		<field name="TOTAL_HOURS" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="TOTAL_HOURS"/>
+		</field>
+		<field name="OVER_TIME" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="OVER_TIME"/>
+		</field>
+		<field name="DOUBLE_TIME" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="DOUBLE_TIME"/>
+		</field>
+		<field name="TIME_LOST" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="TIME_LOST"/>
+		</field>
+		<field name="EMP_ID" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+		</field>
+		<group name="ROWNUM">
+			<groupExpression><![CDATA[$F{ROWNUM}]]></groupExpression>
+		</group>
+		<group name="FULL_NAME">
+			<groupExpression><![CDATA[$F{FULL_NAME}]]></groupExpression>
+		</group>
+		<group name="POSITION_NAME">
+			<groupExpression><![CDATA[$F{POSITION_NAME}]]></groupExpression>
+		</group>
+		<group name="WORK_DATE">
+			<groupExpression><![CDATA[$F{WORK_DATE}]]></groupExpression>
+		</group>
+		<group name="REGULAR_HOURS">
+			<groupExpression><![CDATA[$F{REGULAR_HOURS}]]></groupExpression>
+		</group>
+		<group name="OVER_TIME">
+			<groupExpression><![CDATA[$F{OVER_TIME}]]></groupExpression>
+		</group>
+		<group name="DOUBLE_TIME">
+			<groupExpression><![CDATA[$F{DOUBLE_TIME}]]></groupExpression>
+		</group>
+		<group name="TIME_LOST">
+			<groupExpression><![CDATA[$F{TIME_LOST}]]></groupExpression>
+		</group>
+	</subDataset>
+	<parameter name="EARNINGS_PERIOD_ID" class="java.math.BigDecimal"/>
+	<parameter name="WORK_LOCATION" class="java.lang.String"/>
+	<parameter name="P_ORG_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[select distinct
+emp.emp_company_no as emp_company_no
+,epn.earning_name as PERIOD
+,emp.id as emp_id
+,emp.full_name as full_name
+,p.position_name as Designation
+,dep.unit_name as Department
+,initcap(wloc.location_description) as work_location
+,sum(case when supload.time_in is not null then 1 else 0 end) Days_Worked
+,sum(supload.normal_time)as Normal_hours
+,sum(supload.over_time)as Overtime
+,sum(supload.double_time) as double_time
+,sum(supload.time_lost) as time_lost
+from hr_rcm_employee emp
+join hr_hcf_worklocationposition wlp
+on emp.position_location_id= wlp.id
+join hr_hcf_worklocation wloc
+on wloc.id=wlp.wklocation_id
+join hr_hcf_position p
+on p.id=wlp.position_id
+join hr_hcf_orgstructuredtl dep
+on dep.id=p.orgdtl_id
+join hr_att_timeclock_upload supload
+on emp.id=supload.emp_id
+join pa_pmg_payrolldtl py
+on emp.emp_company_no=py.emp_company_no_hist
+join pa_pcf_earningperiod earn
+on py.earnings_period_id=earn.id
+join vw_earning_period_name epn
+on earn.id=epn.earning_id
+group by emp.emp_company_no, epn.earning_name, emp.id, emp.full_name, p.position_name,
+dep.unit_name, wloc.location_description, initcap(wloc.location_description)]]>
+	</queryString>
+	<field name="EMP_COMPANY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
+	</field>
+	<field name="PERIOD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PERIOD"/>
+	</field>
+	<field name="EMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EMP_ID"/>
+	</field>
+	<field name="FULL_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FULL_NAME"/>
+	</field>
+	<field name="DESIGNATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DESIGNATION"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="WORK_LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION"/>
+	</field>
+	<field name="DAYS_WORKED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DAYS_WORKED"/>
+	</field>
+	<field name="NORMAL_HOURS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="NORMAL_HOURS"/>
+	</field>
+	<field name="OVERTIME" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="OVERTIME"/>
+	</field>
+	<field name="DOUBLE_TIME" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DOUBLE_TIME"/>
+	</field>
+	<field name="TIME_LOST" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TIME_LOST"/>
+	</field>
+	<variable name="SUM_TIME_LOST" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TIME_LOST}]]></variableExpression>
+	</variable>
+	<variable name="SUM_DOUBLE_TIME" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{DOUBLE_TIME}]]></variableExpression>
+	</variable>
+	<variable name="SUM_OVERTIME" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{OVERTIME}]]></variableExpression>
+	</variable>
+	<variable name="COUNT_EMPLOYEES" class="java.lang.String" calculation="Count">
+		<variableExpression><![CDATA[$F{FULL_NAME}]]></variableExpression>
+	</variable>
+	<variable name="SUM_NORMAL_HOURS" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{NORMAL_HOURS}]]></variableExpression>
+	</variable>
+	<variable name="EMP#" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$F{EMP_COMPANY_NO}+"("+$F{EMP_ID}+")"]]></variableExpression>
+	</variable>
+	<group name="worklocation">
+		<groupExpression><![CDATA[$F{WORK_LOCATION}]]></groupExpression>
+		<groupHeader>
+			<band height="31"/>
+		</groupHeader>
+	</group>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{DEPARTMENT}]]></groupExpression>
+		<groupHeader>
+			<band height="29"/>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="22" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="107" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="5" width="802" height="25" uuid="49e67e0d-83a6-43e3-8c94-27a155ac0e7b"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[GAFSONS INDUSTRIES LIMITED ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="24" width="802" height="25" uuid="b088fb3f-4e64-480b-95d6-70416f21fbbf"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[EMPLOYEE SUMMARY TIME SHEET]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="60" width="40" height="20" uuid="8d6a2342-2107-44a3-a832-596d8acc98df"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Payroll:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="370" y="60" width="210" height="20" uuid="ba0d4c56-6bbc-402f-b705-824ce438ef13"/>
+				<textFieldExpression><![CDATA[$F{PERIOD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="94" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="50" width="100" height="43" uuid="cb3f64d3-4462-484f-b856-a7712ca61741"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[EMP #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="50" width="120" height="43" uuid="4cb67354-c8e7-4f2f-a8ed-52b1a6e621ed">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d4597794-aead-4705-a3c6-886b3b97f7d6"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[EMPLOYEE NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="50" width="131" height="43" uuid="23034980-0bfb-4423-9709-ecf9da350899">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="12a3729a-b774-4db1-8429-0ad68b628b68"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DESIGNATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="351" y="50" width="100" height="43" uuid="640a87e6-d6b0-466c-9b0b-c57f18e44fdc">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9fb5d25f-34e0-47b8-941a-c2a51bd1b176"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DAYS WORKED]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="451" y="50" width="351" height="20" uuid="fdc05412-d197-486c-9ccd-16a57af96631"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL HRS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="451" y="70" width="97" height="23" uuid="c5248dc0-408b-45d6-983f-cc181097f8e9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="89867e96-ef05-4cc0-9073-fe1921cfc02d"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NORMAL HOURS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="548" y="70" width="79" height="23" uuid="c771adc3-1b38-4ed5-aafb-f6cfe14b5b47">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5be93a1f-dcb6-492b-9bff-a71f134f22a6"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[OVERTIME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="627" y="70" width="103" height="23" uuid="fb87eb4f-69b4-4ac2-a9d2-fe6f4cce8bcc">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cc1f1d7e-2fc4-45e0-9bdd-7f068620fd84"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DOUBLE TIME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="730" y="70" width="72" height="23" uuid="d54638f2-1fd9-4f63-91e7-44f3a5ffa6ed">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="68b15f4b-ecec-48f1-b8a3-3972ef479ad4"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TIME LOST]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="162" splitType="Stretch">
+			<staticText>
+				<reportElement x="2" y="-53" width="170" height="22" uuid="1871e1bc-37df-4640-be5b-58fc6a73c93c"/>
+				<text><![CDATA[WORK LOCATION: ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="-24" width="170" height="22" uuid="316600a8-7e6f-4873-a2ea-6f07196137f0"/>
+				<text><![CDATA[DEPARTMENT:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="5" width="100" height="20" uuid="a2ee171c-a318-4564-863f-d9b6a17e45a3"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{EMP#}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="5" width="120" height="20" uuid="c51a4291-8840-425e-a356-0e4ebc7eedd3">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d4597794-aead-4705-a3c6-886b3b97f7d6"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{FULL_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="5" width="131" height="20" uuid="cac2caa4-e967-4a74-a591-1737ba873e57">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="12a3729a-b774-4db1-8429-0ad68b628b68"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{DESIGNATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="94" y="-53" width="166" height="22" uuid="b0d006fc-0e2c-414d-b031-55beff1fa68f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ccf923a5-9dbd-4118-b4ea-8b962e6d2764"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{WORK_LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="78" y="-23" width="182" height="21" uuid="9bc4f8b0-4d8e-4f7d-b1d7-d132d08219b6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4d545b72-c0f5-4715-b050-335e0d8cd91c"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="351" y="5" width="100" height="20" uuid="d3191d58-82e9-46f1-9672-907908eb9945">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9fb5d25f-34e0-47b8-941a-c2a51bd1b176"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{DAYS_WORKED}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="451" y="5" width="97" height="20" uuid="33de9823-d485-446a-a093-5679270c72c3">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="89867e96-ef05-4cc0-9073-fe1921cfc02d"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{NORMAL_HOURS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="627" y="5" width="103" height="20" uuid="6911ae1e-569e-4a37-8ea9-d60916bbb512">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cc1f1d7e-2fc4-45e0-9bdd-7f068620fd84"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{DOUBLE_TIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="548" y="5" width="79" height="20" uuid="231401db-72de-4fc8-928e-06a1c2fb1c01">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5be93a1f-dcb6-492b-9bff-a71f134f22a6"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{OVERTIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="730" y="5" width="72" height="20" uuid="2844cbe6-6ad9-42bf-8b38-bc73ec5366dc">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="68b15f4b-ecec-48f1-b8a3-3972ef479ad4"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{TIME_LOST}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="380" y="25" width="71" height="30" uuid="5973a4cd-c858-4180-849b-bfd4a9870db0"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dept Totals:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="351" y="55" width="100" height="30" uuid="bf8b4183-6eb3-4ae0-bbf7-7f3d22c8d414"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Location Totals:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="451" y="25" width="97" height="30" uuid="4f3f1001-1810-4d6c-8cb1-6631cf033283"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{SUM_NORMAL_HOURS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="548" y="25" width="79" height="30" uuid="0da5cbec-c77e-4bb3-b645-99974b8fcc7b"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{SUM_OVERTIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="627" y="25" width="103" height="30" uuid="f3427e7f-eaf2-4343-91c3-374499500948"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{SUM_DOUBLE_TIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="730" y="25" width="72" height="30" uuid="20d77092-f3f0-4f5f-ad9f-ea7072b84e0a"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{SUM_TIME_LOST}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="548" y="56" width="80" height="28" uuid="409d0360-593c-4fe4-a295-32bf84fbcf91"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{SUM_OVERTIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="731" y="56" width="71" height="28" uuid="1e41a0ed-be69-410d-98af-cff19faf5f30"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{SUM_TIME_LOST}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="451" y="55" width="97" height="29" uuid="edb3a4d7-8315-45ec-a5bd-ead1d0a8fc35"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{SUM_NORMAL_HOURS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="628" y="56" width="103" height="28" uuid="f145d8bc-22a3-4401-948a-03f7288de271"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{SUM_DOUBLE_TIME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="126" width="100" height="30" uuid="6c2b1c8f-3809-404b-9820-5c8ebcba7760"/>
+				<text><![CDATA[TOTAL EMPLOYEES:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="126" width="90" height="30" uuid="082196d3-d412-48ab-b808-0f7d78109bd3"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{COUNT_EMPLOYEES}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="20" width="802" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="9eebb105-4fd9-46ae-ae81-af9335d8c220"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="35" width="802" height="15" uuid="6b473fce-793f-42b6-849f-35dd5dad4ab0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="720" y="21" width="50" height="13" uuid="1710a9f8-51c3-4ed2-a1ce-3329c079d974"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="769" y="21" width="31" height="13" uuid="9aaa04ee-ba57-4dc1-9b2e-7e8e9f83b04d"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="5" y="20" width="162" height="13" uuid="309dfa2f-1518-49e7-930c-cbfa397047dd"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

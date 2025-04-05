@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report2" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f0bb8aa3-e9b9-47c1-a829-75cfa185fb5e">
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Standard_Letters/APR_LETTER"/>
+	<property name="ireport.jasperserver.url" value="http://apps.innosysgy.com:8081/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="P_MER_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT initcap(REMARKS) Remarks,rating_scale,percentage_range_lower,percentage_range_upper
+FROM HR_APP_MERITCONFIGDTL MD
+where MD.MERIT_CONFIG_ID=$P{P_MER_ID}]]>
+	</queryString>
+	<field name="REMARKS" class="java.lang.String"/>
+	<field name="RATING_SCALE" class="java.lang.String"/>
+	<field name="PERCENTAGE_RANGE_LOWER" class="java.math.BigDecimal"/>
+	<field name="PERCENTAGE_RANGE_UPPER" class="java.math.BigDecimal"/>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="172" y="0" width="383" height="30" uuid="1fc948ac-de3d-4eb8-b102-7de35714f03f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Rating Standards]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="0" width="171" height="30" uuid="ab47d5ed-cf9f-4b00-8d3d-7fdf1f63350c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Rating Factors]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="1" y="0" width="171" height="15" uuid="6d8053cd-d427-4262-b070-1bc757323667"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REMARKS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="172" y="0" width="383" height="15" uuid="9e311f3d-889d-4715-9a72-822480cd8003"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RATING_SCALE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Daily Cashier Listing" language="groovy" pageWidth="421" pageHeight="297" orientation="Landscape" columnWidth="381" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ad7bfe22-9479-4aec-ad61-dd0eb38ea70f">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/PAYMENT/GENERAL_RATES_RECEIPT"/>
+	<property name="ireport.jasperserver.url" value="http://190.80.71.15:8081/jasperserver/services/repository"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\Steffon Assing\\Dropbox\\Mayor and City Council\\Revenue Collection System Restart\\reports\\headers\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select a.USER_NAME as CASHIER, r.DATE_OPENED, r.DATE_CLOSED, r.STATUS, r.BATCH_TYPE, r.BATCH_NO
+from RECEIPT_BATCH r
+join APP_USER a
+on r.cashier=a.id]]>
+	</queryString>
+	<field name="CASHIER" class="java.lang.String"/>
+	<field name="DATE_OPENED" class="java.sql.Timestamp"/>
+	<field name="DATE_CLOSED" class="java.sql.Timestamp"/>
+	<field name="STATUS" class="java.math.BigDecimal"/>
+	<field name="BATCH_TYPE" class="java.lang.String"/>
+	<field name="BATCH_NO" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="121" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="381" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="67377bb4-429b-48d5-b35c-6dfae3264a5e"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="381" height="15" uuid="dd252cb7-4352-4815-b197-892c72bdd0d2"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="110" height="13" uuid="df0d11b7-0923-4665-9928-817de563a61f"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="362" y="2" width="20" height="13" uuid="aeb01442-d6a4-4724-ac2c-4b98ed62ab39"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="320" y="2" width="42" height="13" uuid="64b5027e-b644-4f42-a92d-755eadc1a378"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

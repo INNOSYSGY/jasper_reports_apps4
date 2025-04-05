@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="demotion_letter" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d111958f-d3e1-4df4-9642-83ae3a9ff047">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/demotion_letter"/>
+	<property name="ireport.jasperserver.url" value="http://apps.innosysgy.com:8081/jasperserver/services/repository"/>
+	<parameter name="EMPLOYEE_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EFFECTIVE_DATE" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_IN_ORG_ID" class="java.math.BigDecimal"/>
+	<parameter name="JOB" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT TRIM(INITCAP(TO_CHAR(SYSDATE, 'dd Month')))
+  || ' '
+  || TO_CHAR(SYSDATE,', yyyy') CURRENT_DATE,
+  CASE LOWER(TO_CHAR(B.SEX_CODE))
+    WHEN 'f'
+    THEN 'Mrs'
+    WHEN 'm'
+    THEN 'Mr'
+  END
+  || '. '
+  || INITCAP(LTRIM(RTRIM(SURNAME)))
+  || ',' SALUTATION,
+  'Consequence to your performance, management wishes to inform you that your position was unsuccessful as a '
+  || C.POSITION_NAME
+  || ' within the '
+  || TRIM(SUBSTR(LTRIM(A.ORG_STRUCTURE, 'Level: '), 2))
+  || ' due to your substandard performance.' FIRST_PARA,
+  'You are therefore demoted to your original position of '
+  ||
+  (SELECT D.POSITION_HELD
+  FROM HR_RCM_EMPHISTORY D
+  WHERE D.TO_DATE=
+    NVL((SELECT MAX(E.TO_DATE) FROM HR_RCM_EMPHISTORY E WHERE E.IND_ID=D.IND_ID
+    ), SYSDATE)
+  AND D.IND_ID=B.ID
+  )
+  || ' within the '
+  ||
+  (SELECT F.DEPARTMENT
+  FROM HR_RCM_EMPHISTORY F
+  WHERE F.TO_DATE=
+    NVL((SELECT MAX(G.TO_DATE) FROM HR_RCM_EMPHISTORY G WHERE G.IND_ID=F.IND_ID
+    ), SYSDATE)
+  AND F.IND_ID=B.ID
+  )
+  || ' effective '
+  || TRIM(TO_CHAR($P{EFFECTIVE_DATE}, 'DD Month'))
+  || TO_CHAR($P{EFFECTIVE_DATE}, ', YYYY')
+  || '.' SECOND_PARA,
+  'The terms of your employment will remain the same. ' THIRD_PARA,
+  'We wish you the very best for a rewarding career with the organization.' FOURTH_PARA,
+  'Yours sincerely,' ENDING,
+  $P{JOB} JOB
+FROM HR_RCM_EMPLOYEE A
+JOIN HR_RCM_INDIVIDUAL B
+ON A.IND_ID = B.ID
+JOIN VW_POSITION_LOCATION_V3 C
+ON A.ID    =C.EMP_ID
+WHERE B.ID = $P{EMPLOYEE_ID}]]>
+	</queryString>
+	<field name="CURRENT_DATE" class="java.lang.String"/>
+	<field name="SALUTATION" class="java.lang.String"/>
+	<field name="FIRST_PARA" class="java.lang.String"/>
+	<field name="SECOND_PARA" class="java.lang.String"/>
+	<field name="THIRD_PARA" class="java.lang.String"/>
+	<field name="FOURTH_PARA" class="java.lang.String"/>
+	<field name="ENDING" class="java.lang.String"/>
+	<field name="JOB" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="101" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="100" uuid="167c6fcd-53a1-4df1-9c54-87e1b21afec9"/>
+				<subreportParameter name="P_IN_ORG_ID">
+					<subreportParameterExpression><![CDATA[$P{P_IN_ORG_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="80" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="10" width="180" height="20" uuid="f81d5ecf-237f-466c-9891-02a0f5170430"/>
+				<textFieldExpression><![CDATA[$F{CURRENT_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="45" width="180" height="20" uuid="a1617d21-f04f-4065-b90a-86b549893cfb"/>
+				<textFieldExpression><![CDATA[$F{SALUTATION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="35" uuid="bd7f0ebf-2d11-4c15-892e-c3c66f4f298d"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Re: Demotion Letter]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="286" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="572" height="43" uuid="3d002662-07c6-443a-82bd-abc1067c57f6"/>
+				<textFieldExpression><![CDATA[$F{FIRST_PARA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="43" width="572" height="41" uuid="8f164883-c2f6-489c-9592-0ec90f51f67f"/>
+				<textFieldExpression><![CDATA[$F{SECOND_PARA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="84" width="572" height="24" uuid="94f05762-923e-4963-9a94-20cb1b8bc045"/>
+				<textFieldExpression><![CDATA[$F{THIRD_PARA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="108" width="572" height="31" uuid="56244a51-5715-4d50-9403-f2e5c26685b3"/>
+				<textFieldExpression><![CDATA[$F{FOURTH_PARA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="158" width="124" height="20" uuid="2c1a1baa-9a7b-47fc-b630-698106f90647"/>
+				<textFieldExpression><![CDATA[$F{ENDING}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="207" width="237" height="20" uuid="21eb25c6-e830-4d00-a1d6-dae7a8ab68f0"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<text><![CDATA[...............................................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="335" y="207" width="237" height="20" uuid="9071d8a5-9b4d-45db-b1b2-a04a551e9533"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<text><![CDATA[...............................................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="335" y="227" width="100" height="20" uuid="4f1ae500-6a16-4788-a2f1-23c054152d85"/>
+				<textElement>
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<text><![CDATA[Employee]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="227" width="237" height="20" uuid="93397c8f-e134-4d75-9d93-6eb459a40137"/>
+				<textFieldExpression><![CDATA[$F{JOB}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="266" width="180" height="20" uuid="d1d65993-5d82-40b3-8e27-364c4b6147a5"/>
+				<textFieldExpression><![CDATA["Dated " + $F{CURRENT_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="335" y="266" width="180" height="20" uuid="97a71788-41b6-4208-86ea-67d01aa53afa"/>
+				<textFieldExpression><![CDATA["Dated " + $F{CURRENT_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

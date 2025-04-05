@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Daily Cashier Listing" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ad7bfe22-9479-4aec-ad61-dd0eb38ea70f">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/PAYMENT/RECEIPT_LISTING"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.1.18:8081/jasperserver/services/repository"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\Steffon Assing\\Dropbox\\Mayor and City Council\\Revenue Collection System Restart\\reports\\headers\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select p.property_number,
+(SELECT reference_value FROM REFERENCES WHERE id= p.ward) Ward,
+pr.receipt_number,
+pr.payee payor,
+pkg_property.f_get_arrears_due(p.id) as "Arrears Demand" ,
+pkg_property.f_get_demand_due_current(p.id) "Current Demand",
+pkg_property.f_get_interest_due(p.id) "Interest Due",
+pr.revenue_source,
+(select sum(VW_PAYMENT_RECEIPT.AMOUNT) from VW_PAYMENT_RECEIPT where revenue_source = 'RATES - PREPAID' and VW_PAYMENT_RECEIPT.PROPERTY_ID = p.id) Prepayment,
+  NVL(pkg_property.f_get_arrears_due(p.id),0)
++ NVL(pkg_property.f_get_demand_due_current(p.id),0)
++ NVL(pkg_property.f_get_interest_due(p.id),0)
++ NVL((select sum(VW_PAYMENT_RECEIPT.AMOUNT) from VW_PAYMENT_RECEIPT where revenue_source = 'RATES - PREPAID' and VW_PAYMENT_RECEIPT.PROPERTY_ID = p.id),0)
+as total
+from property p
+join vw_payment_receipt pr on pr.property_id=p.id]]>
+	</queryString>
+	<field name="PROPERTY_NUMBER" class="java.lang.String"/>
+	<field name="WARD" class="java.lang.String"/>
+	<field name="RECEIPT_NUMBER" class="java.lang.String"/>
+	<field name="PAYOR" class="java.lang.String"/>
+	<field name="Arrears Demand" class="java.math.BigDecimal"/>
+	<field name="Current Demand" class="java.math.BigDecimal"/>
+	<field name="Interest Due" class="java.math.BigDecimal"/>
+	<field name="REVENUE_SOURCE" class="java.lang.String"/>
+	<field name="PREPAYMENT" class="java.math.BigDecimal"/>
+	<field name="TOTAL" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="79" uuid="715e716e-3381-4ee1-b4c0-4673a39f4bc2"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/RESOURCES/LETTER_HEADER"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="70" height="20" uuid="d0a4efbb-698f-455e-b728-4107bf0b3359"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Property #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="0" width="70" height="20" uuid="a679c311-c3bb-4ec6-96ad-2b7d9ff4068e"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Receipt #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="140" y="0" width="160" height="20" uuid="aeeb6446-3905-4544-8333-e6eabac74795"/>
+				<text><![CDATA[PAYOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="0" width="50" height="25" uuid="d0688df9-79d3-43c6-ad58-33efabc9bae9"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Arrears Demand]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="350" y="0" width="50" height="25" uuid="d6d50b78-51df-443d-a6d4-234e4844b98f"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Current Demand]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="0" width="50" height="25" uuid="b65e1f9b-f3fa-438b-9ef8-f4fac89f2dd2"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Interest Due]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="450" y="0" width="55" height="25" uuid="609ee60f-5ebb-4adb-8f3d-4dff96ad57f9"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Pre-payments]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="505" y="0" width="67" height="25" uuid="de9a13f5-bba6-453a-a406-e4ca6f1e0945"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="70" height="20" uuid="b423d1b7-0502-4c3b-bd89-93b9cae718de"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{PROPERTY_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="70" y="0" width="70" height="20" uuid="bc6fd6b2-76e1-467c-bee7-0a8c0e8ea9d7"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{RECEIPT_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="0" width="160" height="20" uuid="b38bb863-83e8-49e9-8aff-50119b1dcfe6"/>
+				<textFieldExpression><![CDATA[$F{PAYOR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="300" y="0" width="50" height="20" uuid="54ec8bab-6253-443b-b37f-583d7136e79c"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{Arrears Demand}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="350" y="0" width="50" height="20" uuid="6db0cdcb-0cc9-48ce-a366-f1171c7466fb"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{Current Demand}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="400" y="0" width="50" height="20" uuid="9b1e63ac-e48a-415f-9658-2ce0a8b93cdc"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{Interest Due}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="450" y="0" width="55" height="20" uuid="53234572-5fba-4336-be62-5145d251c0e5"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{PREPAYMENT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement x="505" y="0" width="67" height="20" uuid="b9f4b965-bbef-4e7d-ac50-8a0a99f54194"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="15" forecolor="#CCCCCC" backcolor="#CCCCCC" uuid="67377bb4-429b-48d5-b35c-6dfae3264a5e"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="15" uuid="dd252cb7-4352-4815-b197-892c72bdd0d2"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="139" height="13" uuid="df0d11b7-0923-4665-9928-817de563a61f"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="543" y="0" width="29" height="13" uuid="aeb01442-d6a4-4724-ac2c-4b98ed62ab39"/>
+				<textElement>
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="486" y="0" width="57" height="13" uuid="64b5027e-b644-4f42-a92d-755eadc1a378"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Appraisal Configuration Form" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85bcab7d-a21c-457c-8b26-54349766927e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/Standard_Letters/APR_LETTER"/>
+	<property name="ireport.jasperserver.url" value="http://hrmis:8081/jasperserver/services/repository"/>
+	<subDataset name="Factors" uuid="2d4711e1-f3d7-4a17-968a-5e32bff05dbf">
+		<parameter name="P_MERIT_CONFIG_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[Select A.Id,A.Merit_Config_Id,
+A.Performance_Factors,
+A.Comments,
+A.Notes,
+b.questions
+From Hr_App_Meritconfigpfactors A
+left outer Join Hr_App_Meritquestion B
+On A.Id=B.Performance_Factors_Id
+Where Trunc(Sysdate) Between Trunc(A.Start_Date) And Trunc(Nvl(A.End_Date,Sysdate))
+--and
+--Trunc(Sysdate) --Between Trunc(b.Start_Date) And Trunc(Nvl(b.End_Date,Sysdate))
+and a.merit_config_id=$P{P_MERIT_CONFIG_ID}
+order by a.performance_factors,b.questions]]>
+		</queryString>
+		<field name="ID" class="java.math.BigDecimal"/>
+		<field name="MERIT_CONFIG_ID" class="java.math.BigDecimal"/>
+		<field name="PERFORMANCE_FACTORS" class="java.lang.String"/>
+		<field name="COMMENTS" class="java.lang.String"/>
+		<field name="NOTES" class="java.lang.String"/>
+		<field name="QUESTIONS" class="java.lang.String"/>
+		<group name="PERFORMANCE_FACTORS">
+			<groupExpression><![CDATA[$F{PERFORMANCE_FACTORS}]]></groupExpression>
+		</group>
+	</subDataset>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="APP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[Select A.Id,A.Org_Id,
+(Select TRIM(Value_Description)
+From Hr_Hcf_Lookup L
+Where Id=A.Employment_Class_Id) Employment_Class,
+A.Employment_Class_Id,
+A.Date_Effective,A.End_Date,
+A.DURATION_IN_MTHS
+FROM HR_APP_MERITCONFIG A
+where a.id=$P{APP_ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="ORG_ID" class="java.math.BigDecimal"/>
+	<field name="EMPLOYMENT_CLASS" class="java.lang.String"/>
+	<field name="EMPLOYMENT_CLASS_ID" class="java.lang.String"/>
+	<field name="DATE_EFFECTIVE" class="java.sql.Timestamp"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="DURATION_IN_MTHS" class="java.math.BigDecimal"/>
+	<group name="Appraisal" isStartNewPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{ID}]]></groupExpression>
+		<groupHeader>
+			<band height="73">
+				<subreport>
+					<reportElement x="0" y="0" width="572" height="67" uuid="ee55f034-6067-49f1-8c5f-168047c63adc"/>
+					<subreportParameter name="P_IN_ORG_ID">
+						<subreportParameterExpression><![CDATA[$F{ORG_ID}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:/reports/PeoplePay/RESOURCE/LETTER_HEAD_PORTRAIT"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="41">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="572" height="20" uuid="73d77327-914c-4f9d-a388-5b955091b015"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Appraisal Configuration for Employment Class: "+$F{EMPLOYMENT_CLASS}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="286" height="20" uuid="67c6efe6-1398-44cd-b262-a8bf7fde6960"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<paragraph rightIndent="4"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Duration Period: "+$F{DURATION_IN_MTHS}+" Months"]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="101">
+				<staticText>
+					<reportElement x="0" y="0" width="286" height="20" uuid="e2c88c14-599d-45f9-b7d7-3429491b0138"/>
+					<textElement>
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[PERFORMANCE FACTORS]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement key="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="20" width="572" height="80" isPrintWhenDetailOverflows="true" uuid="25390c41-84cd-4946-9ed8-458584ccead4"/>
+					<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<datasetRun subDataset="Factors" uuid="0d9ab7c0-d1be-47b3-adbb-07ddd4422c87">
+							<datasetParameter name="P_MERIT_CONFIG_ID">
+								<datasetParameterExpression><![CDATA[$F{ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:column width="571" uuid="d8549ae4-e6f3-4038-80bf-d7c6387b9ee3">
+							<jr:groupHeader groupName="PERFORMANCE_FACTORS">
+								<jr:cell height="38" rowSpan="1">
+									<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+										<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="571" height="15" isPrintWhenDetailOverflows="true" uuid="d780993b-7107-481f-a307-93e6ca12ae56"/>
+										<textElement verticalAlignment="Top">
+											<font fontName="Arial" pdfFontName="Helvetica-Bold"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{PERFORMANCE_FACTORS}]]></textFieldExpression>
+									</textField>
+									<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+										<reportElement x="0" y="15" width="571" height="23" uuid="2ba4b0fc-b9e6-476e-bad6-9e99f53661c6"/>
+										<textElement>
+											<font fontName="Arial" size="9"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{COMMENTS}]]></textFieldExpression>
+									</textField>
+								</jr:cell>
+							</jr:groupHeader>
+							<jr:groupFooter groupName="PERFORMANCE_FACTORS">
+								<jr:cell height="22" rowSpan="1">
+									<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+										<reportElement x="0" y="5" width="571" height="15" uuid="9b7a5d80-fe60-4d00-8256-4c49f0628f94"/>
+										<textElement verticalAlignment="Middle">
+											<font fontName="Arial" size="9"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{NOTES}]]></textFieldExpression>
+									</textField>
+								</jr:cell>
+							</jr:groupFooter>
+							<jr:detailCell height="16" rowSpan="1">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="571" height="15" uuid="6b6293a6-5092-4d9f-ad43-7f5675f7c6a1"/>
+									<textElement>
+										<font fontName="Arial"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{QUESTIONS}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:table>
+				</componentElement>
+			</band>
+			<band/>
+			<band/>
+			<band/>
+			<band/>
+			<band/>
+			<band/>
+			<band/>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+			<band/>
+			<band/>
+			<band/>
+			<band/>
+			<band/>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="16" width="572" height="15" uuid="b2a773d7-a277-4610-901a-ea782d2775b0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[PeoplePay Human Resource Management Information System®]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="1" width="572" height="15" uuid="7d30e0ec-507f-43bf-834f-4ecf54b5e269"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Appraisal Configuration"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="572" height="1" uuid="b683e5cf-f6d6-4171-9e4e-9426e63b89b8"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

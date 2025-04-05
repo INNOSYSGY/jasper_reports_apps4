@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GCAA Leave Approval Letter" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2007f4bf-d81b-424a-ad5d-0fdc0389832a">
+	<property name="ireport.zoom" value="1.1000000000000003"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="394"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay/01_HR/GCAA_LEAVE_APPROVAL"/>
+	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<parameter name="EMP_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    pl.employee_name, pl.position_name,e.ORG_STRUCTURE AS DEPARTMENT, pl.department_name as dp2,
+    (select t.employee_name from apps.vw_position_location_v3 t where  t.emp_id = e.REPORT_TO_FUNCTIONAL  ) CCTO,
+(SELECT t.position_name FROM apps.vw_position_location_v3 t where  t.emp_id = e.REPORT_TO_FUNCTIONAL  ) CCPOSITION_OF_Approver,
+(SELECT t.position_name FROM apps.vw_position_location_v3 t where  t.emp_id = e.REPORT_TO) CCPOS,
+'Dear '|| CASE
+                 WHEN pl.sex_code = 'M'  THEN 'Mr.'
+                 WHEN pl.sex_code = 'F' THEN 'Mrs.'
+               END ||' '||SURNAME_HIST|| ',' as  GREETING,
+'Please be informed that approval has been granted for you to proceed on  ' ||apps.pkg_global_fnts.fn_num_towords(DAYS_TAKEN)||   ' ('||DAYS_TAKEN||') ' ||
+CASE
+    WHEN DAYS_TAKEN = 1 THEN 'day '
+    ELSE 'days '
+END
+||a.LEAVE_TYPE|| '  from '||TO_CHAR(FROMDATE, 'ddth fmMonth, yyyy')|| ' to '|| TO_CHAR(TODATE, 'ddth fmMonth, yyyy')|| ' both days inclusive .' approve,
+'You are expected to resume duty on  ' ||
+   TO_CHAR(NVL(RESUMPTION_DATE,TODATE +1 ),' Day ddth fmMonth, yyyy'    )||'.' AS Resumption,
+   'You have '|| lt.pending ||' days remaining to your credit.' as credit,
+'Kindly report your resumption of duty promptly to the Human Resources Department via your immediate supervisor.' as mgmt,
+TO_CHAR(SYSDATE, 'YY')
+FROM apps.hr_lv_leavehistory a join  apps.tbluser b on b.user_name = a.verified_by
+join apps.hr_hcf_organisation o on o.id = a.org_id
+join apps.hr_rcm_employee e on e.id = a.emp_id
+join apps.hr_lv_leavetrack lt on lt.emp_id = a.emp_id
+join apps.hr_rcm_individual i on e.ind_id = i.id
+join apps.vw_position_location_v3 pl on e.id = pl.emp_id
+WHERE a.LEAVE_TYPE = 'Annual Leave' AND a.EMP_ID =$P{EMP_ID}]]>
+	</queryString>
+	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="DEPARTMENT" class="java.lang.String"/>
+	<field name="DP2" class="java.lang.String"/>
+	<field name="CCTO" class="java.lang.String"/>
+	<field name="CCPOSITION_OF_APPROVER" class="java.lang.String"/>
+	<field name="CCPOS" class="java.lang.String"/>
+	<field name="GREETING" class="java.lang.String"/>
+	<field name="APPROVE" class="java.lang.String"/>
+	<field name="RESUMPTION" class="java.lang.String"/>
+	<field name="CREDIT" class="java.lang.String"/>
+	<field name="MGMT" class="java.lang.String"/>
+	<field name="TO_CHAR(SYSDATE,&apos;YY&apos;)" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="57" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="555" height="57" uuid="cbc64683-2e8e-468b-8035-add904cb73ba"/>
+				<imageExpression><![CDATA["repo:gcaaheader.png"]]></imageExpression>
+			</image>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="691" splitType="Stretch">
+			<staticText>
+				<reportElement x="238" y="27" width="100" height="20" uuid="deafd665-b8a4-4cb3-b83f-686e5a418179"/>
+				<textElement>
+					<font fontName="Georgia" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Leave Approval]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="48" y="86" width="90" height="20" uuid="d0cfa7f5-7d97-42d9-9ad6-2932399084c0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[20]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="48" y="139" width="90" height="20" uuid="24d39d70-4f1b-4db4-8497-f79cd762823a"/>
+				<textElement textAlignment="Right">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Name:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="138" y="140" width="361" height="20" uuid="97bd1404-89fa-4312-8eee-cadf1c017a42"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="48" y="159" width="90" height="20" uuid="fa35721d-d413-49c1-853d-73eb6f8218a4"/>
+				<textElement textAlignment="Right">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Designation:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="138" y="160" width="361" height="20" uuid="e83ddd75-93fa-4df7-a406-e4d7e41c1d10"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POSITION_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="48" y="199" width="90" height="20" uuid="1bf05cda-4e6e-49c2-bee0-7eb1553f7183"/>
+				<textElement textAlignment="Right">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Thru:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="48" y="245" width="451" height="20" uuid="36c5b3c6-b88e-42e7-8518-06fa721e1da9"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GREETING}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="48" y="277" width="451" height="66" uuid="17b359e8-5bf8-4da4-92c4-551d1863087d"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{APPROVE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="48" y="343" width="451" height="75" uuid="107dfdff-fddb-46ee-9862-41fec76aa2d9"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RESUMPTION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="48" y="418" width="451" height="63" uuid="468597b4-34fd-4a71-bf70-a191b3a9f25f"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CREDIT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="48" y="481" width="451" height="35" uuid="a6153567-8afb-4ec5-a631-aace12eb7310"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MGMT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="48" y="529" width="451" height="20" uuid="b441acc3-84af-49e7-be79-3a43ec6555b0"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Regards.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="48" y="564" width="451" height="20" uuid="89bc0fad-113e-4742-ab8e-4dfc6b05ad53"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Ms. Carol Primus]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="48" y="584" width="451" height="20" uuid="48b94f5a-7314-4f15-aaaf-43cf8351b026"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Human Resources Manager]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="48" y="179" width="90" height="20" uuid="3d0efa1f-b5e1-4a29-a4c6-d585c3173242"/>
+				<textElement textAlignment="Right">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Directorate:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="138" y="86" width="100" height="20" uuid="b9483eb3-5840-45e8-8ed4-662c1cd7df7f"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TO_CHAR(SYSDATE,'YY')}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="138" y="180" width="361" height="20" uuid="5c7bd52e-7a8c-4d18-b5e7-4741ddf19e08"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DP2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="139" y="200" width="360" height="20" uuid="fd4dff44-1313-4ef3-bb6a-a770c24d8cbb"/>
+				<textElement>
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CCPOSITION_OF_APPROVER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="555" height="54" uuid="2d717805-1643-42ea-8f1c-642d88b87602"/>
+				<imageExpression><![CDATA["repo:gcaaheader.png"]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+</jasperReport>
