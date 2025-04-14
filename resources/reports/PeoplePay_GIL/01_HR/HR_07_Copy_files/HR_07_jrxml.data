@@ -4,18 +4,17 @@
 	<property name="ireport.zoom" value="1.3310000000000004"/>
 	<property name="ireport.x" value="323"/>
 	<property name="ireport.y" value="0"/>
-	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/01_HR/HR_07_Copy"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/PeoplePay_GIL/01_HR/HR_07_COPY"/>
 	<property name="ireport.jasperserver.url" value="http://172.17.4.191:8082/jasperserver/"/>
 	<property name="ireport.jasperserver.user" value="jasperadmin"/>
-	<property name="com.jaspersoft.studio.report.unit.description" value="Listing of Active Employee By Period"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Listing of Active Employees As At"/>
 	<property name="com.jaspersoft.studio.report.description" value="Main jrxml"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="gafoors local"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="LocalHostVM"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="ireport.jasperserver.report.resource" value="/reports/PeoplePay_GIL/01_HR/HR_07_Copy_files/HR_07_jrxml"/>
+	<parameter name="DATE_START" class="java.sql.Date"/>
 	<parameter name="IN_ORG_ID" class="java.math.BigDecimal">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
-	<parameter name="DATE_START" class="java.util.Date"/>
 	<parameter name="DATE_END" class="java.util.Date">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
@@ -53,87 +52,37 @@ end age
     JOIN HR_HCF_ORGANISATION HO ON E.ORG_ID=HO.ID
     left outer join VW_ORG_WORKLOCATION_POSITION p on E.POSITION_LOCATION_ID=p.id
  where
-e.employment_status like 'ACTIVE'    
- and E.DATE_EMPLOYED between  $P{DATE_START} and $P{DATE_END}
-or DATE_SEPARATED between $P{DATE_START} and $P{DATE_END}
+    trunc($P{DATE_END}) between trunc(E.DATE_EMPLOYED) and trunc(nvl(DATE_SEPARATED,$P{DATE_END}))
+     trunc($P{DATE_START} ) between trunc(E.DATE_EMPLOYED) and trunc(nvl(DATE_SEPARATED,$P{DATE_START} ))
+   and e.org_id=$P{IN_ORG_ID}
    and e.employment_class like nvl($P{P_EMP_CLASS},'%')
      order by p.work_location,(NVL(I.SURNAME,'') || ', ' ||NVL(I.FIRST_NAME,'')||' '||NVL(I.MIDDLE_NAME,''))]]>
 	</queryString>
-	<field name="DATE_SEPARATED" class="java.sql.Timestamp">
-		<property name="com.jaspersoft.studio.field.label" value="DATE_SEPARATED"/>
-	</field>
-	<field name="SEPARATED_STATUS" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="SEPARATED_STATUS"/>
-	</field>
-	<field name="ID" class="java.math.BigDecimal">
-		<property name="com.jaspersoft.studio.field.label" value="ID"/>
-	</field>
-	<field name="ENAME" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="ENAME"/>
-	</field>
-	<field name="DOB" class="java.sql.Timestamp">
-		<property name="com.jaspersoft.studio.field.label" value="DOB"/>
-	</field>
-	<field name="SEX_CODE" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="SEX_CODE"/>
-	</field>
-	<field name="DATE_EMPLOYED" class="java.sql.Timestamp">
-		<property name="com.jaspersoft.studio.field.label" value="DATE_EMPLOYED"/>
-	</field>
-	<field name="EMP_COMPANY_NO" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="EMP_COMPANY_NO"/>
-	</field>
-	<field name="EMPLOYMENT_STATUS" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_STATUS"/>
-	</field>
-	<field name="NIS_NO" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="NIS_NO"/>
-	</field>
-	<field name="TAX_NO" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="TAX_NO"/>
-	</field>
-	<field name="NATIONAL_ID" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="NATIONAL_ID"/>
-	</field>
-	<field name="POSITION_NAME" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="POSITION_NAME"/>
-	</field>
-	<field name="WORK_LOCATION" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="WORK_LOCATION"/>
-	</field>
-	<field name="EMPLOYMENT_CLASS" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="EMPLOYMENT_CLASS"/>
-	</field>
-	<field name="LOT_STREET" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="LOT_STREET"/>
-	</field>
-	<field name="VILAGE_WARD" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="VILAGE_WARD"/>
-	</field>
-	<field name="COUNTY" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="COUNTY"/>
-	</field>
-	<field name="ORG_ADDRESS" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="ORG_ADDRESS"/>
-	</field>
-	<field name="FAXNUM" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="FAXNUM"/>
-	</field>
-	<field name="TELNUM" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="TELNUM"/>
-	</field>
-	<field name="NIS_REG_NO" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="NIS_REG_NO"/>
-	</field>
-	<field name="TAX_REG_NO" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="TAX_REG_NO"/>
-	</field>
-	<field name="ORGANISATION_NAME" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.label" value="ORGANISATION_NAME"/>
-	</field>
-	<field name="AGE" class="java.math.BigDecimal">
-		<property name="com.jaspersoft.studio.field.label" value="AGE"/>
-	</field>
+	<field name="DATE_SEPARATED" class="java.sql.Timestamp"/>
+	<field name="SEPARATED_STATUS" class="java.lang.String"/>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="ENAME" class="java.lang.String"/>
+	<field name="DOB" class="java.sql.Timestamp"/>
+	<field name="SEX_CODE" class="java.lang.String"/>
+	<field name="DATE_EMPLOYED" class="java.sql.Timestamp"/>
+	<field name="EMP_COMPANY_NO" class="java.lang.String"/>
+	<field name="EMPLOYMENT_STATUS" class="java.lang.String"/>
+	<field name="NIS_NO" class="java.lang.String"/>
+	<field name="TAX_NO" class="java.lang.String"/>
+	<field name="NATIONAL_ID" class="java.lang.String"/>
+	<field name="POSITION_NAME" class="java.lang.String"/>
+	<field name="WORK_LOCATION" class="java.lang.String"/>
+	<field name="EMPLOYMENT_CLASS" class="java.lang.String"/>
+	<field name="LOT_STREET" class="java.lang.String"/>
+	<field name="VILAGE_WARD" class="java.lang.String"/>
+	<field name="COUNTY" class="java.lang.String"/>
+	<field name="ORG_ADDRESS" class="java.lang.String"/>
+	<field name="FAXNUM" class="java.lang.String"/>
+	<field name="TELNUM" class="java.lang.String"/>
+	<field name="NIS_REG_NO" class="java.lang.String"/>
+	<field name="TAX_REG_NO" class="java.lang.String"/>
+	<field name="ORGANISATION_NAME" class="java.lang.String"/>
+	<field name="AGE" class="java.math.BigDecimal"/>
 	<variable name="Record_Count" class="java.lang.Number" calculation="Sum">
 		<variableExpression><![CDATA[1]]></variableExpression>
 		<initialValueExpression><![CDATA[1]]></initialValueExpression>
@@ -178,7 +127,7 @@ or DATE_SEPARATED between $P{DATE_START} and $P{DATE_END}
 					<font fontName="Arial" size="12" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Listing of Employees active between "+new SimpleDateFormat("MMMMM dd, yyyy").format($P{DATE_START})+" " +" and "+" "+new SimpleDateFormat("MMMMM dd, yyyy").format($P{DATE_END})]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Listing of Employees as at "+new SimpleDateFormat("MMMMM dd, yyyy").format($P{DATE_END})]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>

@@ -83,8 +83,8 @@ where
 from(
 select 
     c.*,
-    nvl(c.basic_salary, 0) + nvl(c.allow_amount,0) salary,
-    nvl(c.basic_salary, 0) + nvl(c.allow_amount,0) total_salary
+    nvl(c.basic_salary, 0) + nvl(c.allow_cmlt_amount,0) salary,
+    nvl(c.basic_salary, 0) + nvl(c.allow_cmlt_amount,0) + nvl(c.allow_non_cmlt_amount,0)  total_salary
 from(
 select 
     b.*, 
@@ -147,7 +147,8 @@ where
     emp.date_employed, 
     inc_code.inc_desc income_codes,
     emp.confirmed,
-    ent.amount allow_amount,
+    ent.cmlt_amount allow_cmlt_amount,
+    ent.non_cmlt_amount allow_non_cmlt_amount,
         CASE
             WHEN EXISTS (
             SELECT 1
@@ -170,16 +171,19 @@ where
         left join hr_apu_standardincrease std on std.id = rec.increase_id
         join vw_salary_increase_approver se on se.increase_id = rec.increase_id
         left join (select 
-                            ent_curr.emp_id, sum(ent_curr.amount) amount
+        					ent_curr.emp_id,
+        					sum(ent_curr.amount) amount,
+        					case when inc_curr.income_code = 'CUMMALL' then  sum(ent_curr.amount) end cmlt_amount,
+        					case when inc_curr.income_code != 'CUMMALL' then  sum(ent_curr.amount) end non_cmlt_amount
                         from
                             hr_rcm_empentitle ent_curr
                             join pa_pcf_incomecode inc_curr on ent_curr.income_code_id = inc_curr.id 
                         where
                             ent_curr.admin_status = 'SYS'
-                            and inc_curr.income_code = 'CUMMALL'
+                            --and inc_curr.income_code = 'CUMMALL'
                             and (ent_curr.end_date >= trunc(sysdate) or ent_curr.end_date is null)
-                            group by ent_curr.emp_id) ent on (ent.emp_id = emp.id)
-        left join (select 
+                            group by ent_curr.emp_id, inc_curr.income_code) ent on (ent.emp_id = emp.id)
+         left join (select 
                             ent_curr.emp_id,  listagg(to_char(inc_curr.description), ';') within group (order by ent_curr.emp_id) inc_desc
                         from
                             hr_rcm_empentitle ent_curr
@@ -435,6 +439,14 @@ where
 	<field name="CONFIRMED" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="CONFIRMED"/>
 		<property name="com.jaspersoft.studio.field.label" value="CONFIRMED"/>
+	</field>
+	<field name="ALLOW_CMLT_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ALLOW_CMLT_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="ALLOW_CMLT_AMOUNT"/>
+	</field>
+	<field name="ALLOW_NON_CMLT_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ALLOW_NON_CMLT_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="ALLOW_NON_CMLT_AMOUNT"/>
 	</field>
 	<field name="SIG_PHOTO" class="java.io.InputStream">
 		<property name="com.jaspersoft.studio.field.name" value="SIG_PHOTO"/>
@@ -1061,7 +1073,7 @@ where
 ))]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="FixRelativeToBottom" x="350" y="243" width="118" height="15" uuid="4ec9a964-a52d-4944-90f0-07f3f13edac6">
+				<reportElement positionType="Float" x="345" y="313" width="118" height="15" uuid="4ec9a964-a52d-4944-90f0-07f3f13edac6">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -1069,7 +1081,7 @@ where
 				<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
 					<font size="9" isBold="true" isUnderline="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["= "+$F{SALARY_FORMATTED}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["= "+ $F{TOTAL_SALARY_FORMATTED}]]></textFieldExpression>
 			</textField>
 		</band>
 		<band height="189">

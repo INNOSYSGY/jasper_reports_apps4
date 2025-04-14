@@ -1,250 +1,541 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Demand Letter" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="711c7968-db05-47f6-b40b-24bc1fdd1b56">
-	<property name="ireport.zoom" value="1.3310000000000008"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="General Rate Demand Notice" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ca24be3b-0324-49b5-b459-65bf9a8241b1">
+	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="454"/>
+	<property name="ireport.y" value="0"/>
 	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/FORMS/DEMAND_LETTER"/>
-	<property name="ireport.jasperserver.url" value="http://apps3.innosysgy.com:8080/jasperserver/services/repository"/>
+	<property name="ireport.jasperserver.url" value="http://190.80.71.15:8081/jasperserver/services/repository"/>
+	<parameter name="DEMAND_YEAR" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
 	<parameter name="ID" class="java.math.BigDecimal">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<parameter name="WARD_ID" class="java.math.BigDecimal">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
-	<parameter name="DEMAND_YEAR" class="java.math.BigDecimal">
-		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
-	</parameter>
 	<queryString>
-		<![CDATA[select b.ndc_name||' - Lot '||initcap(a.lot)||' '||initcap(a.street)||' '||
-(Select r.village_name from ndc_village  r where r.id = a.ndc_id) address,
-a.id property_id,
-a.property_number,
-f.owner_name,
-
-(select ref_value from ref z where z.id = d.property_class) property_class
-from property a join ndc b on b.id = a.ndc_id
-join property_valuation c on c.property_id = a.id
-join property_valuation_detail d on d.property_valuation_id = c.id
-join property_owner e on e.property_id = a.id
-join owner f on f.id = e.owner_id
-where c.effective_end is null]]>
+		<![CDATA[select
+                        p.id property_id,
+                        p.property_number,
+                        p.property_type,
+                        (SELECT  REFERENCE_VALUE
+                        from RCMS_DEV.references
+                         where id=p.property_type) component,
+                        p.address,
+                        p.owners,
+                        pd.start_date demand_start_date,
+                        pd.end_date demand_end_date,
+                        to_char(pd.start_date,'yyyy') demand_year,
+                        pd.demand_amount,
+                        pd.amount_due total_due_on_demand,
+                        pd.amount_paid  total_paid_demand,
+                        pd.demand_status,
+                        pv.id property_value_id,
+                        pvd.value Value_datail_value,
+                        pvd.property_type value_type,
+                        pr.rate_percent,
+                        pr.expected_rate,
+                        pr.property_type rate_type,
+                        pda.arrears_amount,
+                        pda.amount_paid total_paid_on_arrears,
+                        pda.receipt_completed arrears_receipt_completed
+from RCMS_DEV.vw_property p
+                                        join RCMS_DEV.property_demand pd
+                                        on p.id=pd.property_id
+                                        join RCMS_DEV.property_value pv
+                                        on pd.property_value_id=pv.id
+join RCMS_DEV.property_value_detail pvd
+on pv.id=pvd.property_value_id
+join RCMS_DEV.property_rate pr
+on pvd.property_value_id=pr.property_value_id
+left join RCMS_DEV.property_demand_arrears pda
+on pd.id=pda.property_demand_id
+where p.id=$P{ID}
+order by pr.rate_percent]]>
 	</queryString>
-	<field name="ADDRESS" class="java.lang.String"/>
 	<field name="PROPERTY_ID" class="java.math.BigDecimal"/>
 	<field name="PROPERTY_NUMBER" class="java.lang.String"/>
-	<field name="OWNER_NAME" class="java.lang.String"/>
-	<field name="PROPERTY_CLASS" class="java.lang.String"/>
-	<group name="property_id">
+	<field name="PROPERTY_TYPE" class="java.lang.String"/>
+	<field name="COMPONENT" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="OWNERS" class="java.lang.String"/>
+	<field name="DEMAND_START_DATE" class="java.sql.Timestamp"/>
+	<field name="DEMAND_END_DATE" class="java.sql.Timestamp"/>
+	<field name="DEMAND_YEAR" class="java.lang.String"/>
+	<field name="DEMAND_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="TOTAL_DUE_ON_DEMAND" class="java.math.BigDecimal"/>
+	<field name="TOTAL_PAID_DEMAND" class="java.math.BigDecimal"/>
+	<field name="DEMAND_STATUS" class="java.lang.String"/>
+	<field name="PROPERTY_VALUE_ID" class="java.math.BigDecimal"/>
+	<field name="VALUE_DATAIL_VALUE" class="java.math.BigDecimal"/>
+	<field name="VALUE_TYPE" class="java.lang.String"/>
+	<field name="RATE_PERCENT" class="java.math.BigDecimal"/>
+	<field name="EXPECTED_RATE" class="java.math.BigDecimal"/>
+	<field name="RATE_TYPE" class="java.math.BigDecimal"/>
+	<field name="ARREARS_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="TOTAL_PAID_ON_ARREARS" class="java.math.BigDecimal"/>
+	<field name="ARREARS_RECEIPT_COMPLETED" class="java.lang.String"/>
+	<variable name="TOTAL_DUE_ON_DEMAND_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Rate" incrementType="Group" incrementGroup="Rate" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DUE_ON_DEMAND}]]></variableExpression>
+	</variable>
+	<variable name="Total_Demand" class="java.lang.Number" incrementType="Group" incrementGroup="Rate" calculation="Sum">
+		<variableExpression><![CDATA[$V{TOTAL_DUE_ON_DEMAND_2}]]></variableExpression>
+	</variable>
+	<variable name="Overall_Valuation" class="java.lang.Number" incrementType="Group" incrementGroup="Rate" calculation="Sum">
+		<variableExpression><![CDATA[$F{VALUE_DATAIL_VALUE}]]></variableExpression>
+	</variable>
+	<variable name="VALUE_DATAIL_VALUE_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Statement Account" incrementType="Group" incrementGroup="Rate" calculation="Sum">
+		<variableExpression><![CDATA[$F{VALUE_DATAIL_VALUE}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_DUE_ON_DEMAND_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Statement Account" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DUE_ON_DEMAND}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_DUE_ON_DEMAND_3" class="java.math.BigDecimal" resetType="Group" resetGroup="Rate" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DUE_ON_DEMAND}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="ARREARS_AMOUNT_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Statement Account" calculation="Sum">
+		<variableExpression><![CDATA[$F{ARREARS_AMOUNT}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_DUE_ON_DEMAND_4" class="java.math.BigDecimal" resetType="Group" resetGroup="Property_2" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_DUE_ON_DEMAND}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<group name="Property_2" keepTogether="true">
 		<groupExpression><![CDATA[$F{PROPERTY_ID}]]></groupExpression>
 		<groupHeader>
-			<band height="527">
+			<band height="182">
 				<staticText>
-					<reportElement x="-1" y="0" width="572" height="15" uuid="a533240b-40b5-48ba-bee3-6dc7fbba5cd2"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Arial" size="10" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
-					</textElement>
-					<text><![CDATA[Statement of Accounts]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="0" y="304" width="572" height="15" uuid="172b4e33-38af-4658-a02f-81e0164f0e52"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Arial" size="10" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
-					</textElement>
-					<text><![CDATA[Payment of Accounts]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="178" y="333" width="116" height="20" uuid="832ea966-d14f-4f87-9014-2fa219f6ca91"/>
-					<textElement textAlignment="Right">
-						<font fontName="Arial" size="10"/>
-					</textElement>
-					<text><![CDATA[1st Installment Due:]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="178" y="353" width="116" height="20" uuid="7d58aa9a-69a6-4945-8bce-9630b44bf696"/>
-					<textElement textAlignment="Right">
-						<font fontName="Arial" size="10"/>
-					</textElement>
-					<text><![CDATA[2nd Installment Due:]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="178" y="373" width="116" height="20" uuid="a6bdd4ad-3b12-4c2d-ab6f-8bc89255d92a"/>
-					<textElement textAlignment="Right">
-						<font fontName="Arial" size="10"/>
-					</textElement>
-					<text><![CDATA[3rd Installment Due:]]></text>
-				</staticText>
-				<textField isBlankWhenNull="true">
-					<reportElement x="294" y="333" width="224" height="20" uuid="ca7a9d82-ed6b-4a17-84f1-03ae2d9e1c52"/>
+					<reportElement x="12" y="50" width="100" height="20" uuid="53e0c9a3-c24e-4501-ba89-448b17a1a9fa"/>
 					<textElement>
-						<font fontName="Arial" size="10"/>
-						<paragraph leftIndent="4" rightIndent="4"/>
-					</textElement>
-					<textFieldExpression><![CDATA["February 1 , 2017"]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement x="294" y="353" width="224" height="20" uuid="bca89edf-6642-4120-b848-bbc11b9f63ee"/>
-					<textElement>
-						<font fontName="Arial" size="10"/>
-						<paragraph leftIndent="4" rightIndent="4"/>
-					</textElement>
-					<textFieldExpression><![CDATA["April 1, 2017"]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement x="294" y="373" width="224" height="20" uuid="900f2781-c510-4c72-82ac-77e462286e4f"/>
-					<textElement>
-						<font fontName="Arial" size="10"/>
-						<paragraph leftIndent="4" rightIndent="4"/>
-					</textElement>
-					<textFieldExpression><![CDATA["July 1, 2017"]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement x="178" y="393" width="116" height="20" uuid="e341fccd-d0eb-4021-8a9f-0b50525f9b6f"/>
-					<textElement textAlignment="Right">
-						<font fontName="Arial" size="10"/>
-					</textElement>
-					<text><![CDATA[4th  Installment Due:]]></text>
-				</staticText>
-				<textField isBlankWhenNull="true">
-					<reportElement x="294" y="393" width="224" height="20" uuid="132eb442-3315-4976-abcb-a6d7a982862b"/>
-					<textElement>
-						<font fontName="Arial" size="10"/>
-						<paragraph leftIndent="4" rightIndent="4"/>
-					</textElement>
-					<textFieldExpression><![CDATA["October 1, 2017"]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement x="23" y="15" width="100" height="15" uuid="2cac8d04-fd2f-49eb-8bbb-5e371bf47d16"/>
-					<textElement>
-						<font fontName="Arial" size="10" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
-					</textElement>
-					<text><![CDATA[Property Information]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="23" y="30" width="100" height="15" uuid="b2098e0c-80ec-4784-95b0-c4750f718476"/>
-					<textElement>
-						<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
-					</textElement>
-					<text><![CDATA[Owner(s)]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="23" y="47" width="100" height="15" uuid="53e0c9a3-c24e-4501-ba89-448b17a1a9fa"/>
-					<textElement>
-						<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<font fontName="Arial" size="9"/>
 					</textElement>
 					<text><![CDATA[Address:]]></text>
 				</staticText>
-				<staticText>
-					<reportElement x="23" y="78" width="100" height="15" uuid="ca2dbc39-4ce7-46da-80ea-a1ee0d03308a"/>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="122" y="50" width="240" height="20" uuid="d1a66047-c005-4d6a-a2a4-350f5f0dff0f"/>
 					<textElement>
-						<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+						<font fontName="Arial" size="9"/>
 					</textElement>
-					<text><![CDATA[Account #:]]></text>
+					<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="12" y="109" width="100" height="20" uuid="1a5ddb91-c773-47c1-a106-56a58ef40bdb"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[Component]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="25" y="94" width="98" height="15" uuid="1a5ddb91-c773-47c1-a106-56a58ef40bdb"/>
-					<textElement>
-						<font fontName="Arial" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
-					</textElement>
-					<text><![CDATA[Components:]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="0" y="127" width="572" height="15" uuid="dc177d21-4c0c-4302-bddc-2bdbadef2b29"/>
+					<reportElement x="199" y="139" width="152" height="20" uuid="dc177d21-4c0c-4302-bddc-2bdbadef2b29"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Arial" size="10" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[Rate Assessment]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="101" y="478" width="362" height="15" uuid="0f981c72-a3ff-4190-9cae-a692f8ceb64a"/>
-					<textElement textAlignment="Center">
-						<font fontName="Arial"/>
+					<reportElement x="104" y="159" width="60" height="20" uuid="02060028-da73-410d-bd1b-cb6e688fb244"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isUnderline="true"/>
 					</textElement>
-					<text><![CDATA[Friday      :  8:15 am to 02:30 pm]]></text>
+					<text><![CDATA[Valuation ]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="101" y="493" width="362" height="15" uuid="bc20101c-87a3-4475-bd93-d28c82948f9e"/>
-					<textElement textAlignment="Center">
-						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<reportElement x="174" y="159" width="65" height="20" uuid="5fed62ff-0a4f-4de9-8882-4239a79311e0"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isUnderline="true"/>
 					</textElement>
-					<text><![CDATA[email:NDC@.gov.gy]]></text>
+					<text><![CDATA[Exemption]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="244" y="159" width="65" height="20" uuid="9c5bf8e3-5f5e-4ebf-8019-134e679dbf2c"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Net Value]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="315" y="158" width="65" height="20" uuid="afe6faa9-35a0-4dfa-a946-95d88702be48"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Rate%]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="385" y="158" width="65" height="20" uuid="e0ed5137-6d8a-4095-bf15-4c2da7fc93ee"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Demand]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="12" y="81" width="100" height="20" uuid="ca2dbc39-4ce7-46da-80ea-a1ee0d03308a"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[Account #:]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="123" y="47" width="448" height="15" uuid="49f9c175-2223-40b6-a779-8830f10bc7ac"/>
-					<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement x="123" y="32" width="340" height="15" uuid="77c8558f-2863-4467-a432-bcd3621c9252"/>
-					<textFieldExpression><![CDATA[$F{OWNER_NAME}]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement x="123" y="94" width="275" height="15" uuid="d6760792-5176-460c-8660-ecf7822e2dd5"/>
-					<textFieldExpression><![CDATA[$F{PROPERTY_CLASS}]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement x="123" y="78" width="275" height="15" uuid="a59c8852-a421-41a6-87dd-14f89811e952"/>
+					<reportElement x="122" y="81" width="193" height="20" uuid="c67c2f85-8758-4ab2-a358-9a61fcb78319"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
 					<textFieldExpression><![CDATA[$F{PROPERTY_NUMBER}]]></textFieldExpression>
 				</textField>
-				<subreport>
-					<reportElement x="52" y="142" width="471" height="78" uuid="c1486e5c-b378-4fc7-ab2b-42f441e45101"/>
-					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-					<subreportExpression><![CDATA["repo:/reports/RCMS/FORMS/Demand_Letter_files/demand_details"]]></subreportExpression>
-				</subreport>
-				<staticText>
-					<reportElement x="0" y="442" width="572" height="20" uuid="535e7af9-4f27-4f19-a01a-dcf9c4c9c995"/>
-					<textElement textAlignment="Center">
-						<font fontName="Arial"/>
+				<textField isStretchWithOverflow="true">
+					<reportElement x="122" y="0" width="240" height="37" uuid="d16d3934-39e3-4684-97a6-e857582ca298"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
 					</textElement>
-					<text><![CDATA[PAYMENTS CAN BE MADE AT YOUR LOCAL NDC OFFICE, OR AT RATESANDTAXES.GY. ]]></text>
+					<textFieldExpression><![CDATA[$F{OWNERS}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="12" y="0" width="100" height="20" uuid="b2098e0c-80ec-4784-95b0-c4750f718476"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<text><![CDATA[Owner(s)]]></text>
 				</staticText>
+				<textField>
+					<reportElement x="122" y="109" width="181" height="20" uuid="74a12791-570d-4baa-9479-3ad0b0d1240a"/>
+					<textElement>
+						<font fontName="Arial" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PROPERTY_TYPE}]]></textFieldExpression>
+				</textField>
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="50"/>
+			<band height="197">
+				<staticText>
+					<reportElement mode="Transparent" x="201" y="0" width="151" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="6bf7af1a-02d6-429b-85e9-223c9e457e2c"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[Payment on Account]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="104" y="20" width="100" height="20" uuid="81f767c6-3749-4db0-9105-d2f1a52a8c5b"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[1st Installment Due:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="104" y="40" width="100" height="20" uuid="60bd5148-06bc-45e5-a2ed-61be2108fdf9"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[2nd Installment Due:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="104" y="60" width="100" height="20" uuid="32616098-b1c2-4b42-93da-dc8df4e20361"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[3rd Installment Due:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="315" y="20" width="157" height="20" uuid="94522bee-531b-46ed-b474-6873a37bfb4a"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA['February 1, '+$F{DEMAND_YEAR}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="315" y="40" width="157" height="20" uuid="d384abf6-f908-4ee4-98fc-4c4f13797c54"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA['April 1, '+$F{DEMAND_YEAR}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="315" y="60" width="157" height="20" uuid="9567c306-8c5f-40e2-9217-51210dd1704c"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA['July 1, '+$F{DEMAND_YEAR}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="104" y="80" width="100" height="20" uuid="0c3cc362-97cb-4f18-b07e-857221d7e464"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[4th Installment Due:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="315" y="80" width="157" height="20" uuid="78ce7f14-7dc3-49e4-9c3e-56f32f574e1b"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA['October 1, '+$F{DEMAND_YEAR}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="54" y="115" width="362" height="20" uuid="dfe7f7c4-d646-456a-882a-fe4c5b75b95b"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[PAYMENTS CAN BE MAADE ATTHE TREASURERS OFFICE,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="54" y="135" width="362" height="20" uuid="d31bf77d-808c-411d-a796-fbcb6c1132a7"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[CITY HALL REGENT STREET GEORGETOWN]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="54" y="155" width="362" height="20" uuid="fdd48916-fd70-42f0-8d1c-dd6e706c5fec"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Monday - Thursday : 8:15 am to 04:00 pm]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="100" y="175" width="312" height="20" uuid="0f981c72-a3ff-4190-9cae-a692f8ceb64a"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Friday      : 8:15 am to 03:00 pm]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Rate">
+		<groupExpression><![CDATA[$F{PROPERTY_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="23">
+				<textField>
+					<reportElement x="12" y="1" width="88" height="20" uuid="cb70775e-c024-4b83-a09c-5d9f796b0ef9"/>
+					<textElement>
+						<font fontName="Arial" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{VALUE_TYPE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="317" y="1" width="63" height="20" uuid="ac05d842-b33e-4df7-ae3d-f794d6ec1cd4"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{RATE_PERCENT}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="106" y="3" width="58" height="20" uuid="b0a588b1-9350-4682-b5c7-87a34535135c"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{VALUE_DATAIL_VALUE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="244" y="1" width="65" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="5e6935e0-019e-4fa4-a771-52c37c3be1ed"/>
+					<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{VALUE_DATAIL_VALUE}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Rate" pattern="#,##0" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="385" y="3" width="65" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="b8b24498-163e-47b5-842d-f19c35b44075"/>
+					<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_DUE_ON_DEMAND_3}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="Statement Account" keepTogether="true">
+		<groupExpression><![CDATA[$F{PROPERTY_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="53">
+				<staticText>
+					<reportElement x="12" y="0" width="90" height="20" uuid="abc06bcb-129f-4891-a46b-491ec4bd68ae"/>
+					<textElement>
+						<font fontName="Arial" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Total:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="201" y="30" width="150" height="20" uuid="03253959-8ad4-458b-aaf1-a3e6a0f1130e"/>
+					<textElement>
+						<font fontName="Arial" size="10" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Statement of Account]]></text>
+				</staticText>
+				<textField evaluationTime="Group" evaluationGroup="Statement Account" pattern="#,##0" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="104" y="0" width="60" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="db647c18-326b-4217-ace6-671f981eb4b4"/>
+					<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{VALUE_DATAIL_VALUE_1}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Statement Account" pattern="#,##0" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="385" y="0" width="65" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="3aeb329f-a1d8-45fa-babc-340bb409a97f"/>
+					<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_DUE_ON_DEMAND_1}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="22">
+				<printWhenExpression><![CDATA[$V{ARREARS_AMOUNT_1}<1]]></printWhenExpression>
+				<staticText>
+					<reportElement x="114" y="0" width="150" height="22" uuid="798e8aa6-1ef0-4346-948c-5038a466d45c"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Arrears Demand Due]]></text>
+				</staticText>
+				<textField evaluationTime="Group" evaluationGroup="Statement Account" pattern="#,##0" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="285" y="2" width="95" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="6affcbcd-ddb6-4bca-96b0-0c7ff296bc22"/>
+					<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{ARREARS_AMOUNT_1}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="24">
+				<textField>
+					<reportElement x="112" y="2" width="152" height="20" uuid="320f1394-0331-427f-a42b-5c6944401a2e"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Demand for '+$F{DEMAND_YEAR}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Statement Account" pattern="#,##0" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="280" y="2" width="100" height="20" forecolor="#000000" backcolor="#FFFFFF" uuid="0d24b925-7b1d-4d40-93bc-aa919e90157d"/>
+					<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+						<font fontName="Arial" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_DUE_ON_DEMAND_4}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="21">
+				<staticText>
+					<reportElement x="112" y="0" width="52" height="20" uuid="133daddd-4554-4678-97da-26212f4ed3dc"/>
+					<textElement verticalAlignment="Middle" markup="none">
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Interest as ]]></text>
+				</staticText>
+				<textField pattern="MMMMM dd, yyyy">
+					<reportElement x="164" y="1" width="100" height="19" uuid="a16a4538-3ffe-4ba4-bc93-2645e928ef68"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="72">
+				<staticText>
+					<reportElement x="114" y="0" width="150" height="20" uuid="60c54896-4cda-4565-ab0e-820d7a2c96d1"/>
+					<textElement>
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Total Due:]]></text>
+				</staticText>
+				<elementGroup>
+					<elementGroup>
+						<staticText>
+							<reportElement x="54" y="30" width="362" height="20" uuid="d1c08214-7b1e-46fc-a16d-531fa9d52dcf"/>
+							<textElement>
+								<font fontName="Arial"/>
+							</textElement>
+							<text><![CDATA[Please note that Interest on arrears will be recalculated]]></text>
+						</staticText>
+						<staticText>
+							<reportElement x="54" y="50" width="362" height="22" uuid="922549f0-db4f-4eca-9b9e-3f67f77256e9"/>
+							<textElement>
+								<font fontName="Arial"/>
+							</textElement>
+							<text><![CDATA[and applied on the date of payment]]></text>
+						</staticText>
+					</elementGroup>
+				</elementGroup>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="280" y="0" width="100" height="20" uuid="801290d9-26ca-4934-a9ea-8f5f5d272751"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{ARREARS_AMOUNT_1}+$V{TOTAL_DUE_ON_DEMAND_4}]]></textFieldExpression>
+				</textField>
+			</band>
 		</groupFooter>
 	</group>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band splitType="Stretch"/>
+		<band height="1" splitType="Stretch"/>
 	</title>
 	<pageHeader>
-		<band height="126" splitType="Stretch">
+		<band height="168" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="74" width="572" height="20" uuid="77ded1af-ee82-4dfc-9aca-2b79bedf8447"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="12" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
+				<reportElement x="220" y="76" width="160" height="20" uuid="77ded1af-ee82-4dfc-9aca-2b79bedf8447"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[GENERAL RATE DEMAND]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="94" width="572" height="15" uuid="a4059aa8-a6c0-4cc7-98c6-af0d54bf9069"/>
+				<reportElement x="126" y="96" width="346" height="20" uuid="a4059aa8-a6c0-4cc7-98c6-af0d54bf9069"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
-				<text><![CDATA[RATING AREA OF NDC AS DEFINED BY THE ]]></text>
+				<text><![CDATA[RATING AREA OF GEORGETOWN AS DEFINED BY THE ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="111" width="572" height="15" uuid="745d6718-7aa3-4307-87f7-d0f240b39482"/>
+				<reportElement x="126" y="116" width="346" height="20" uuid="745d6718-7aa3-4307-87f7-d0f240b39482"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[MUNICIPAL AND DISTRICT COUNCILS ACT,]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="239" y="136" width="100" height="20" uuid="b6424175-1f36-4f55-8fcf-8779e2d79183"/>
+				<textElement>
+					<font fontName="Arial" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[CHAPTER 28:01]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="127" y="49" width="100" height="20" uuid="0db78162-a7ba-43fc-85d2-71102055dcf4"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Rating Period:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="174" y="49" width="100" height="20" uuid="dda6cd2f-fd4d-4d79-9673-3185e424b4c1"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA['January 1, '+$F{DEMAND_YEAR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="274" y="49" width="165" height="20" uuid="26c71dfd-358a-41b9-90a5-954e4eb2f752"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[' to December 31, '+$F{DEMAND_YEAR}]]></textFieldExpression>
+			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="29" width="572" height="20" uuid="8c15df51-6b22-4fe4-9134-10a23d8694ca"/>
+				<reportElement x="0" y="31" width="555" height="20" uuid="8c15df51-6b22-4fe4-9134-10a23d8694ca"/>
 				<textElement textAlignment="Center">
 					<font fontName="Arial" size="12" isBold="true" isUnderline="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
-				<textFieldExpression><![CDATA['GENERAL RATE DEMAND NOTICE 2017']]></textFieldExpression>
+				<textFieldExpression><![CDATA['GENERAL RATE DEMAND NOTICE '+$F{DEMAND_YEAR}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="0" y="0" width="571" height="20" uuid="b001b316-1962-4da0-9b4b-67c5a742ae65"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
-				</textElement>
-				<text><![CDATA[NEIGHBOURHOOD DEMOCRATIC COUNCIL]]></text>
-			</staticText>
 		</band>
 	</pageHeader>
 	<columnHeader>
@@ -254,7 +545,7 @@ where c.effective_end is null]]>
 		<band splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band splitType="Stretch"/>
+		<band height="8" splitType="Stretch"/>
 	</pageFooter>
 	<summary>
 		<band splitType="Stretch"/>

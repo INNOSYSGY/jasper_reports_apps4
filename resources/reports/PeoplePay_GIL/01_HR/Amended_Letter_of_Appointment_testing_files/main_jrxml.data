@@ -17,6 +17,33 @@
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="150"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="844"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
 	<subDataset name="ENTITLEMENTS" uuid="fb881a82-2465-4627-b2b8-72f1d6e6745b">
 		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gafoors Prod"/>
@@ -50,20 +77,43 @@ where
 	<parameter name="IN_SALARY_INCREASE_ID" class="java.math.BigDecimal"/>
 	<queryString language="SQL">
 		<![CDATA[select
-    'Management is pleased to inform you that you have been given an increase in salary with effect from ' || to_char(case when d.date_employed between d.date_effective and d.new_salary_date then d.date_employed else d.date_effective end, 'fmMonth DD, YYYY') || ', under the following terms and conditions:-' par1, 
-    '1. HOURS OF WORK:' heading1,
-    'Mondays to Fridays '|| d.normal_shift || case when d.lunch_hour = 0.5 then ' less half hour lunch<br>' when d.lunch_hour = 1 then ' less hour lunch<br>' when d.lunch_hour = 2 then ' less two hour lunch<br>' else '<br>' end || d.normal_shift_duration || case when  upper(d.position_name) like upper('%surveillance%') or upper(d.position_name) like upper('%guard%')  then ' hours × 6 days ' else ' hours × 5 days ' end || case when d.payment_type = 'MONTHLY' then '= ' || d.normal_shift_duration * 5 || ' hours × 52 weeks ÷ 12 months'  when d.payment_type = 'WEEKLY' then null end par1_1,
-    case when  upper(d.position_name) like upper('%surveillance%') or upper(d.position_name) like upper('%guard%')  then 'Basic pay per week - '|| d.standard_hours || ' hours × ' || to_char(d.hourly_rate, 'FML999G999G999G999G990D00')  || ' per hour' else  'Basic Salary ' || d.standard_hours || ' hours × ' || to_char(d.hourly_rate, 'FML999G999G999G999G990D00') end par1_2,
-    case when d.extra_hours is not null then 'Extra Hours ' || d.extra_hours || '  × ' || to_char(d.hourly_rate, 'FML999G999G999G999G990D00') || ' × 1.5' else null end par1_3,
-    'Saturdays - ' || d.saturday_shift  || case when d.sat_less_lunch_hour = 1 then ' less hour lunch<br>' else '<br>' end || case when d.payment_type = 'MONTHLY' then d.saturday_shift_duration ||  ' hours × 52 weeks ÷ 12 months <br>' when d.payment_type = 'WEEKLY' then null end || d.total_saturday_hours || ' hours × ' || to_char(d.hourly_rate, 'FML999G999G999G999G990D00') || ' × 1.5' par1_4,
-    '2. SALARY:' heading2,
-    'You will receive a ' || case when d.payment_type = 'MONTHLY' then 'total salary of ' when d.payment_type = 'WEEKLY' then 'total wage of ' end  || to_char(round(case when  upper(d.position_name) like upper('%surveillance%') or upper(d.position_name) like upper('%guard%')  then d.total_salary - 1320 else d.total_salary end), 'FML999G999G999G999G990D00') || '(' || initcap(pkg_global_fnts.fn_num_towords(round(case when  upper(d.position_name) like upper('%surveillance%') or upper(d.position_name) like upper('%guard%')  then d.total_salary - 1320 else d.total_salary end))) || ' Dollars) ' || case when d.payment_type = 'MONTHLY' then 'per month.' when d.payment_type = 'WEEKLY' then  'per week.' end par2_1, 
-    case when d.payment_type = 'MONTHLY' then 'Salary ' when d.payment_type = 'WEEKLY' then 'Wage ' end  || case when  upper(d.position_name) like upper('%surveillance%') or upper(d.position_name) like upper('%guard%')  then ' ' else null end ||  'would be subject to N.I.S, P.A.Y.E and other statutory deductions.' par2_2,
-    'Because of the nature of your job you would be required to work beyond these stated hours from time to time to meet deadlines for which <u>overtime will be paid once authorized by your supervisor. However, you are to keep a document as copy attached for such overtime. Have your supervisor sign for such hours worked the same day. Without this document, no claim will be honored.</u>' par2_3,
-    '3. OTHER TERMS & CONDITION:' heading3,
-    'To remind you if you wish to resign you must give two(2) weeks’ notice after first six(6) months of employment and one(1) month’s notice over a year of employment or salary in lieu therefore.' par3_1,
-    'All other terms and conditions of service remain the same as per your Letter of Appointment.' par3_2,
-
+	d.normal_shift,
+	d.normal_shift_duration,
+	    case 
+        when d.lunch_hour = 0.5 then ' less half hour lunch<br>' 
+        when d.lunch_hour = 1 then ' less hour lunch<br>' 
+        when d.lunch_hour = 2 then ' less two hour lunch<br>' 
+        else '<br>' 
+        end standard_lunch_time,
+        case when  upper(d.position_name) like upper('%surveillance%') or upper(d.position_name) like upper('%guard%')  
+                then ' hours × 6 days ' 
+                else ' hours × 5 days ' end days_hours_worked,
+    case when d.payment_type = 'MONTHLY' 
+                then '= ' || d.normal_shift_duration * 5 || ' hours × 52 weeks ÷ 12 months'  
+              when d.payment_type = 'WEEKLY' then null end monthly_weekly_hours_worked,
+    case when  upper(d.position_name) like upper('%surveillance%') or upper(d.position_name) like upper('%guard%')  
+            then 'Basic pay per week - '|| d.standard_hours || ' hours × ' || to_char(d.hourly_rate, 'FML999G999G999G999G990D00')  || ' per hour' 
+            else  'Basic Salary ' || d.standard_hours || ' hours × ' || to_char(d.hourly_rate, 'FML999G999G999G999G990D00') 
+            end standard_hours_worked,
+    case when d.extra_hours is not null 
+                then 'Extra Hours ' || d.extra_hours || '  × ' || to_char(d.hourly_rate, 'FML999G999G999G999G990D00') || ' × 1.5' 
+            else null 
+            end extra_hours_worked,
+    d.saturday_shift,
+    case when d.sat_less_lunch_hour = 1 then ' less hour lunch<br>' 
+        else '<br>' 
+        end saturday_lunch,
+    case when d.payment_type = 'MONTHLY' then d.saturday_shift_duration ||  ' hours × 52 weeks ÷ 12 months <br>' 
+        when d.payment_type = 'WEEKLY' then null
+        end saturday_monthly_weekly_hours_worked,
+    d.total_saturday_hours || ' hours × ' || to_char(d.hourly_rate, 'FML999G999G999G999G990D00') || ' × 1.5' saturday_extra_hours,
+    case when d.payment_type = 'MONTHLY' then 'total salary of ' 
+				when d.payment_type = 'WEEKLY' then 'total wage of ' 
+			end salary_or_wage,
+	to_char(case when  upper(d.position_name) like upper('%surveillance%') or upper(d.position_name) like upper('%guard%')  
+        then d.total_salary - 1320 else d.total_salary end, 'FML999G999G999G999G990D00') || '(' || initcap(pkg_global_fnts.fn_num_towords(round(case when  upper(d.position_name) like upper('%surveillance%') or upper(d.position_name) like upper('%guard%')  then d.total_salary - 1320 else d.total_salary end))) || ' Dollars) ' salary_to_words,
+    case when d.payment_type = 'MONTHLY' then 'Salary ' when d.payment_type = 'WEEKLY' then 'Wage ' end salary_wage,  
+    
     case when trunc(sysdate) < add_months(d.date_employed, 3) then 'This will be three(3) months from the date of this letter, unless compelling reasons arise for an extension of this period. If your performance is excellent, this probationary period may be reduced. However, until a letter is issued, your position remains "on probation".' else null end probation_clause,
     case when upper(d.income_codes) like upper('%Attendance Incentive%') then 'Incentive is O-N-L-Y payable on full attendance of a six(6) days work week.' else null end att_inc,
     case when d.confirmed = 0 then 'On Confirmation you will receive a total sum of ' || to_char(round(d.total_salary + (d.total_salary * 0.06)), 'FML999G999G999G999G990D00') || ' (' || initcap(pkg_global_fnts.fn_num_towords(round(d.total_salary + (d.total_salary * 0.06))))  || ' Dollars). A new Letter of Appointment will be given stating the new rate of pay per hour.' else null end confirm_clause,
@@ -75,18 +125,20 @@ where
     case when  upper(d.position_name) like upper('%surveillance%') or upper(d.position_name) like upper('%guard%')  then 'Cumulative overtime ' || d.extra_hours || ' hours × ' || to_char(d.hourly_rate, 'FML999G999G999G999G990D00') || ' per hour' else null end cond_4,
      case when  upper(d.position_name) like upper('%surveillance%') or upper(d.position_name) like upper('%guard%')  then 1 else 0 end show_frame,
     d.*,
-    to_char(floor(d.basic_salary), 'FML999G999G999G999G990D00') basic_salary_formatted,
-    to_char(d.extra_hours_salary, 'FML999G999G999G999G990D00') extra_hours_salary_formatted,
-    to_char(d.total_saturday_salary, 'FML999G999G999G999G990D00') total_saturday_salary_formatted,
-    to_char(d.salary, 'FML999G999G999G999G990D00') salary_formatted,
-    to_char(round(floor(d.total_salary),-1), 'FML999G999G999G999G990D00') total_salary_formatted
+    to_char(d.basic_salary) basic_salary_formatted,
+    to_char(d.extra_hours_salary) extra_hours_salary_formatted,
+    to_char(d.total_saturday_salary) total_saturday_salary_formatted,
+    to_char(d.salary,'FML999G999G999G999G990D00') salary_formatted,
+    to_char(d.total_salary) total_salary_formatted,
+    d.date_effective,
+    d.allow_cmlt_amount,
+    d.allow_non_cmlt_amount,
+    d.non_cmlt_description
 from(
 select 
     c.*,
-    nvl(c.basic_salary, 0) + nvl(c.extra_hours_salary, 0) + case when  upper(c.position_name) like upper('%surveillance%') or upper(c.position_name) like upper('%guard%')  then 0 else nvl(c.total_saturday_salary,0) end salary,
-    --nvl(c.personal_rate,0) + nvl(c.cumulative_allowance, 0) salary,
-    --nvl(c.personal_rate,0) + nvl(c.cumulative_allowance, 0) + nvl(c.entitlements,0) total_salary
-    nvl(c.basic_salary,0) + nvl(c.extra_hours_salary,0) + case when  upper(c.position_name) like upper('%surveillance%') or upper(c.position_name) like upper('%guard%')  then 0 else nvl(c.total_saturday_salary,0) end + nvl(c.entitlements,0) total_salary
+    nvl(c.basic_salary, 0) + nvl(c.allow_cmlt_amount,0) salary,
+    nvl(c.basic_salary, 0) + nvl(c.allow_cmlt_amount,0) + nvl(c.allow_non_cmlt_amount,0)  total_salary
 from(
 select 
     b.*, 
@@ -149,7 +201,10 @@ where
     emp.date_employed, 
     inc_code.inc_desc income_codes,
     emp.confirmed,
-    CASE
+    ent.cmlt_amount allow_cmlt_amount,
+    ent.non_cmlt_amount allow_non_cmlt_amount,
+    ent.non_cmlt_description non_cmlt_description,
+        CASE
             WHEN EXISTS (
             SELECT 1
             FROM vw_salary_increase_approver d
@@ -171,16 +226,20 @@ where
         left join hr_apu_standardincrease std on std.id = rec.increase_id
         join vw_salary_increase_approver se on se.increase_id = rec.increase_id
         left join (select 
-                            ent_curr.emp_id, sum(ent_curr.amount) amount
+        					ent_curr.emp_id,
+        					sum(ent_curr.amount) amount,
+        					case when inc_curr.income_code != 'CUMMALL' then inc_curr.description end non_cmlt_description,
+        					case when inc_curr.income_code = 'CUMMALL' then  sum(ent_curr.amount) end cmlt_amount,
+        					case when inc_curr.income_code != 'CUMMALL' then  sum(ent_curr.amount) end non_cmlt_amount
                         from
                             hr_rcm_empentitle ent_curr
                             join pa_pcf_incomecode inc_curr on ent_curr.income_code_id = inc_curr.id 
                         where
                             ent_curr.admin_status = 'SYS'
-                            and inc_curr.income_code != 'CUMMALL'
+                            --and inc_curr.income_code = 'CUMMALL'
                             and (ent_curr.end_date >= trunc(sysdate) or ent_curr.end_date is null)
-                            group by ent_curr.emp_id) ent on (ent.emp_id = emp.id)
-        left join (select 
+                            group by ent_curr.emp_id, inc_curr.income_code, inc_curr.description) ent on (ent.emp_id = emp.id)
+         left join (select 
                             ent_curr.emp_id,  listagg(to_char(inc_curr.description), ';') within group (order by ent_curr.emp_id) inc_desc
                         from
                             hr_rcm_empentitle ent_curr
@@ -213,57 +272,61 @@ where
     )
 )a)b)c)d order by d.name asc]]>
 	</queryString>
-	<field name="PAR1" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="PAR1"/>
-		<property name="com.jaspersoft.studio.field.label" value="PAR1"/>
+	<field name="NORMAL_SHIFT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NORMAL_SHIFT"/>
+		<property name="com.jaspersoft.studio.field.label" value="NORMAL_SHIFT"/>
 	</field>
-	<field name="HEADING1" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="HEADING1"/>
-		<property name="com.jaspersoft.studio.field.label" value="HEADING1"/>
+	<field name="NORMAL_SHIFT_DURATION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NORMAL_SHIFT_DURATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="NORMAL_SHIFT_DURATION"/>
 	</field>
-	<field name="PAR1_1" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="PAR1_1"/>
-		<property name="com.jaspersoft.studio.field.label" value="PAR1_1"/>
+	<field name="STANDARD_LUNCH_TIME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="STANDARD_LUNCH_TIME"/>
+		<property name="com.jaspersoft.studio.field.label" value="STANDARD_LUNCH_TIME"/>
 	</field>
-	<field name="PAR1_2" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="PAR1_2"/>
-		<property name="com.jaspersoft.studio.field.label" value="PAR1_2"/>
+	<field name="DAYS_HOURS_WORKED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DAYS_HOURS_WORKED"/>
+		<property name="com.jaspersoft.studio.field.label" value="DAYS_HOURS_WORKED"/>
 	</field>
-	<field name="PAR1_3" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="PAR1_3"/>
-		<property name="com.jaspersoft.studio.field.label" value="PAR1_3"/>
+	<field name="MONTHLY_WEEKLY_HOURS_WORKED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="MONTHLY_WEEKLY_HOURS_WORKED"/>
+		<property name="com.jaspersoft.studio.field.label" value="MONTHLY_WEEKLY_HOURS_WORKED"/>
 	</field>
-	<field name="PAR1_4" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="PAR1_4"/>
-		<property name="com.jaspersoft.studio.field.label" value="PAR1_4"/>
+	<field name="STANDARD_HOURS_WORKED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="STANDARD_HOURS_WORKED"/>
+		<property name="com.jaspersoft.studio.field.label" value="STANDARD_HOURS_WORKED"/>
 	</field>
-	<field name="HEADING2" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="HEADING2"/>
-		<property name="com.jaspersoft.studio.field.label" value="HEADING2"/>
+	<field name="EXTRA_HOURS_WORKED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EXTRA_HOURS_WORKED"/>
+		<property name="com.jaspersoft.studio.field.label" value="EXTRA_HOURS_WORKED"/>
 	</field>
-	<field name="PAR2_1" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="PAR2_1"/>
-		<property name="com.jaspersoft.studio.field.label" value="PAR2_1"/>
+	<field name="SATURDAY_SHIFT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SATURDAY_SHIFT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SATURDAY_SHIFT"/>
 	</field>
-	<field name="PAR2_2" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="PAR2_2"/>
-		<property name="com.jaspersoft.studio.field.label" value="PAR2_2"/>
+	<field name="SATURDAY_LUNCH" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SATURDAY_LUNCH"/>
+		<property name="com.jaspersoft.studio.field.label" value="SATURDAY_LUNCH"/>
 	</field>
-	<field name="PAR2_3" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="PAR2_3"/>
-		<property name="com.jaspersoft.studio.field.label" value="PAR2_3"/>
+	<field name="SATURDAY_MONTHLY_WEEKLY_HOURS_WORKED" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SATURDAY_MONTHLY_WEEKLY_HOURS_WORKED"/>
+		<property name="com.jaspersoft.studio.field.label" value="SATURDAY_MONTHLY_WEEKLY_HOURS_WORKED"/>
 	</field>
-	<field name="HEADING3" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="HEADING3"/>
-		<property name="com.jaspersoft.studio.field.label" value="HEADING3"/>
+	<field name="SATURDAY_EXTRA_HOURS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SATURDAY_EXTRA_HOURS"/>
+		<property name="com.jaspersoft.studio.field.label" value="SATURDAY_EXTRA_HOURS"/>
 	</field>
-	<field name="PAR3_1" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="PAR3_1"/>
-		<property name="com.jaspersoft.studio.field.label" value="PAR3_1"/>
+	<field name="SALARY_OR_WAGE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALARY_OR_WAGE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALARY_OR_WAGE"/>
 	</field>
-	<field name="PAR3_2" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="PAR3_2"/>
-		<property name="com.jaspersoft.studio.field.label" value="PAR3_2"/>
+	<field name="SALARY_TO_WORDS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALARY_TO_WORDS"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALARY_TO_WORDS"/>
+	</field>
+	<field name="SALARY_WAGE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALARY_WAGE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALARY_WAGE"/>
 	</field>
 	<field name="PROBATION_CLAUSE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="PROBATION_CLAUSE"/>
@@ -357,15 +420,15 @@ where
 		<property name="com.jaspersoft.studio.field.name" value="LUNCH_HOUR"/>
 		<property name="com.jaspersoft.studio.field.label" value="LUNCH_HOUR"/>
 	</field>
-	<field name="NORMAL_SHIFT" class="java.lang.String">
+	<field name="COLUMN_38" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NORMAL_SHIFT"/>
 		<property name="com.jaspersoft.studio.field.label" value="NORMAL_SHIFT"/>
 	</field>
-	<field name="NORMAL_SHIFT_DURATION" class="java.math.BigDecimal">
+	<field name="COLUMN_39" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="NORMAL_SHIFT_DURATION"/>
 		<property name="com.jaspersoft.studio.field.label" value="NORMAL_SHIFT_DURATION"/>
 	</field>
-	<field name="SATURDAY_SHIFT" class="java.lang.String">
+	<field name="COLUMN_40" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="SATURDAY_SHIFT"/>
 		<property name="com.jaspersoft.studio.field.label" value="SATURDAY_SHIFT"/>
 	</field>
@@ -437,6 +500,18 @@ where
 		<property name="com.jaspersoft.studio.field.name" value="CONFIRMED"/>
 		<property name="com.jaspersoft.studio.field.label" value="CONFIRMED"/>
 	</field>
+	<field name="ALLOW_CMLT_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ALLOW_CMLT_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="ALLOW_CMLT_AMOUNT"/>
+	</field>
+	<field name="ALLOW_NON_CMLT_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ALLOW_NON_CMLT_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="ALLOW_NON_CMLT_AMOUNT"/>
+	</field>
+	<field name="NON_CMLT_DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NON_CMLT_DESCRIPTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="NON_CMLT_DESCRIPTION"/>
+	</field>
 	<field name="SIG_PHOTO" class="java.io.InputStream">
 		<property name="com.jaspersoft.studio.field.name" value="SIG_PHOTO"/>
 		<property name="com.jaspersoft.studio.field.label" value="SIG_PHOTO"/>
@@ -501,6 +576,22 @@ where
 		<property name="com.jaspersoft.studio.field.name" value="TOTAL_SALARY_FORMATTED"/>
 		<property name="com.jaspersoft.studio.field.label" value="TOTAL_SALARY_FORMATTED"/>
 	</field>
+	<field name="COLUMN_77" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="DATE_EFFECTIVE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATE_EFFECTIVE"/>
+	</field>
+	<field name="COLUMN_78" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ALLOW_CMLT_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="ALLOW_CMLT_AMOUNT"/>
+	</field>
+	<field name="COLUMN_79" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ALLOW_NON_CMLT_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="ALLOW_NON_CMLT_AMOUNT"/>
+	</field>
+	<field name="COLUMN_80" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NON_CMLT_DESCRIPTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="NON_CMLT_DESCRIPTION"/>
+	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -519,7 +610,7 @@ where
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="898" splitType="Stretch">
+		<band height="150" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="5" width="468" height="15" uuid="b22b0646-9479-49d7-9d03-bc5fbd47f5a9">
@@ -599,699 +690,294 @@ where
 				<textElement markup="html">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{PAR1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Management is pleased to inform you that you have been given an increase in salary with effect from " + new java.text.SimpleDateFormat("MMMM d, yyyy").format($F{DATE_EFFECTIVE}) + ", under the following terms and conditions:-"]]></textFieldExpression>
 			</textField>
+		</band>
+		<band height="479">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="0" y="150" width="468" height="15" uuid="6e926bc9-99cd-4f05-9478-faba2df590ee">
+				<reportElement positionType="Float" x="-1" y="10" width="468" height="15" uuid="225729c2-a157-4c4c-bebb-f32bfa91cc10">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="html">
 					<font size="9" isBold="true" isUnderline="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{HEADING1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["1. HOURS OF WORK:"]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="0" y="485" width="468" height="15" uuid="093307b7-8d0b-4183-a9df-d3ea5c5be89a">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="33" width="314" height="15" uuid="7ec47ba6-1063-4c63-80c2-004e4da84571">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="html">
-					<font size="9" isBold="true" isUnderline="true"/>
+					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{HEADING2}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["a) Mondays to Fridays " +$F{NORMAL_SHIFT} + " " + $F{STANDARD_LUNCH_TIME} + "\n" + $F{DAYS_HOURS_WORKED} + " = " + $F{MONTHLY_WEEKLY_HOURS_WORKED}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="0" y="630" width="468" height="15" uuid="953fd5db-2d74-4863-8b05-fd1e0fac5103">
+				<reportElement positionType="FixRelativeToBottom" x="310" y="33" width="157" height="15" uuid="e71339c4-839b-4eab-a427-b3622a79a030">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["= "+$F{MONTHLY_HOURS}+ " hours"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="54" width="316" height="15" uuid="b470c906-c086-4cb1-9dd9-9b2c81e093fb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["b) " + $F{STANDARD_HOURS_WORKED}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="FixRelativeToBottom" x="349" y="66" width="118" height="15" uuid="56ee47ab-420e-4e71-a66c-e1796671077b">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["= "+$F{BASIC_SALARY_FORMATTED}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="FixRelativeToBottom" x="349" y="83" width="118" height="15" uuid="51e72964-5d90-4079-8fd4-9760cd194b5a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["= "+$F{EXTRA_HOURS_SALARY_FORMATTED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="1" y="117" width="314" height="15" uuid="4eda8628-b237-4eb3-a58d-f16bca98e67b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
 				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["d) Saturdays - " +  $F{SATURDAY_SHIFT} + $F{SATURDAY_LUNCH} + "\n " + $F{STANDARD_HOURS_WORKED} + $F{SATURDAY_MONTHLY_WEEKLY_HOURS_WORKED} + "\n " + $F{SATURDAY_EXTRA_HOURS}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="316" y="107" width="51" height="41" uuid="1eb033b4-1cc6-438d-89d2-af69a0e7d6ac"/>
+				<imageExpression><![CDATA[$F{SIG_PHOTO}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="379" y="117" width="90" height="15" uuid="f64f1692-cef0-4631-8399-aaa0ef90f620">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Top" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["= "+$F{TOTAL_SATURDAY_HOURS}+ " hours"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="FixRelativeToBottom" x="388" y="133" width="78" height="15" uuid="f0ef7040-fed1-4894-b962-6026cc4ef2f2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
+					<font size="9" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["= "+ $F{TOTAL_SATURDAY_SALARY_FORMATTED}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="FixRelativeToBottom" x="376" y="50" width="90" height="15" uuid="26c7e342-14e1-4dba-95de-551157c42ea1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["= "+$F{STANDARD_HOURS}+ " hours"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="FixRelativeToBottom" x="375" y="98" width="90" height="15" uuid="9aaff5b0-ef9e-4c32-b6a7-217d494fb607">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["= <u>"+$F{EXTRA_HOURS}+ "</u> hours"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="2" y="82" width="288" height="15" uuid="aefe8dc2-285e-42d9-bde5-89d210a5eaf5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EXTRA_HOURS}.intValue() > 0 ? "d)" : "c)" + $F{EXTRA_HOURS_WORKED}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="348" y="186" width="118" height="15" uuid="f2c88299-ce93-4687-8907-d6b029faa0a5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
 					<font size="9" isBold="true" isUnderline="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{HEADING3}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["= "+ $F{TOTAL_SALARY_FORMATTED}]]></textFieldExpression>
 			</textField>
-			<frame>
-				<reportElement positionType="Float" x="0" y="673" width="468" height="15" uuid="124b57d2-e1f3-4e77-be5d-c7058e05c897">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="20" y="-10" width="448" height="15" uuid="a808dec3-2c08-453f-b38b-0034d544f685">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{PAR3_1}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="Float" x="0" y="-10" width="20" height="15" uuid="145999e2-e300-4197-b2cf-18cc3ae11ee7">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA["a)"]]></textFieldExpression>
-				</textField>
-			</frame>
-			<frame>
-				<reportElement positionType="Float" x="0" y="683" width="468" height="15" uuid="01ffa7e8-e697-47b2-ad81-bf369081e413">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="20" y="0" width="448" height="15" uuid="e53bab55-765e-40e1-9a01-0b4efdc38b63">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{PAR3_2}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="Float" x="0" y="0" width="20" height="15" uuid="c8b940cd-828f-4462-9094-b07488647757">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA["b)"]]></textFieldExpression>
-				</textField>
-			</frame>
-			<frame>
-				<reportElement positionType="Float" x="0" y="405" width="468" height="40" uuid="2dd583b5-55aa-4127-964b-a691f386de23">
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="1" y="210" width="464" height="15" uuid="bf89d84c-d0fb-4036-afdf-20d441a67f7e">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="8d5edfd2-5edb-4439-bdf7-279d24b01e04">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[( $F{PAYMENT_TYPE}.equals("MONTHLY") ? "Total Salary" :
+				<textElement markup="html">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{PAYMENT_TYPE}.equals("MONTHLY") ? "Total Salary" :
     ( $F{PAYMENT_TYPE}.equals("WEEKLY") ? "Total Weekly Wage" : ""
-))]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="FixRelativeToBottom" x="350" y="0" width="118" height="15" uuid="07945083-8362-40d4-8010-ccbef13667b6">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
-						<font size="9" isBold="true" isUnderline="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA["= "+$F{TOTAL_SALARY_FORMATTED}]]></textFieldExpression>
-				</textField>
-			</frame>
-			<frame>
-				<reportElement positionType="Float" x="0" y="370" width="468" height="15" isRemoveLineWhenBlank="true" uuid="e8655e59-7d39-45b9-b95e-fa286d02dd40">
-					<printWhenExpression><![CDATA[$F{ENTITLEMENTS}.intValue() > 0]]></printWhenExpression>
-				</reportElement>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="c93a7305-7d3e-4517-80af-9575cad82cf4">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[( $F{PAYMENT_TYPE}.equals("MONTHLY") ? "Salary" :
-    ( $F{PAYMENT_TYPE}.equals("WEEKLY") ? "Wage" : ""
-))]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement x="350" y="0" width="118" height="15" uuid="b6dc69f7-9064-4d7e-9106-31bbe3fc88da">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
-						<font size="9" isBold="false" isUnderline="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA["= "+$F{SALARY_FORMATTED}]]></textFieldExpression>
-				</textField>
-			</frame>
+)) + "= "+ $F{TOTAL_SALARY_FORMATTED}]]></textFieldExpression>
+			</textField>
 			<componentElement>
-				<reportElement positionType="Float" x="0" y="385" width="467" height="15" isRemoveLineWhenBlank="true" uuid="a8cb7f02-28ba-4c81-a9c0-169684bc83dd">
+				<reportElement x="2" y="160" width="466" height="15" uuid="2c0e1d4f-768d-439f-a2f4-9f1f036c066e">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<printWhenExpression><![CDATA[$F{ENTITLEMENTS}.intValue() > 0]]></printWhenExpression>
 				</reportElement>
-				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
-					<datasetRun subDataset="ENTITLEMENTS" uuid="d2d3de89-71ce-40fa-bdba-55a0db27cddc">
-						<datasetParameter name="IN_EMP_ID">
-							<datasetParameterExpression><![CDATA[$F{EMP_ID}]]></datasetParameterExpression>
-						</datasetParameter>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="ENTITLEMENTS" uuid="02f2d442-528a-461d-a8c3-2e37413e5cb3">
 						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 					</datasetRun>
-					<jr:listContents height="15" width="467">
-						<textField isBlankWhenNull="true">
-							<reportElement positionType="Float" x="20" y="0" width="220" height="15" isRemoveLineWhenBlank="true" uuid="e2c242a5-db19-4d68-92c7-f7e4a956611e">
-								<property name="com.jaspersoft.studio.unit.height" value="px"/>
-								<property name="com.jaspersoft.studio.unit.x" value="px"/>
-							</reportElement>
-							<textElement>
-								<font size="9" isBold="true"/>
-							</textElement>
-							<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
-						</textField>
-						<textField isBlankWhenNull="true">
-							<reportElement positionType="Float" x="340" y="0" width="127" height="15" isRemoveLineWhenBlank="true" uuid="a5b4c753-39dd-482f-ab09-57ac96d96de4">
-								<property name="com.jaspersoft.studio.unit.height" value="px"/>
-								<property name="com.jaspersoft.studio.unit.x" value="px"/>
-							</reportElement>
-							<textElement textAlignment="Right">
-								<font size="9" isBold="true" isUnderline="true"/>
-							</textElement>
-							<textFieldExpression><![CDATA["= "+$F{AMOUNT}]]></textFieldExpression>
-						</textField>
-					</jr:listContents>
-				</jr:list>
+					<jr:column width="100" uuid="d2527ba3-f151-4055-96a4-3e32f76ba444">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:detailCell style="Table_TD" height="15">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<textField>
+								<reportElement x="0" y="0" width="100" height="15" uuid="5a928b5b-bedb-4f5f-8dad-6d1884844d90"/>
+								<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="100" uuid="b0e77dcd-c75e-45c1-9e3c-caef22fe33b7">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:detailCell style="Table_TD" height="15">
+							<textField>
+								<reportElement x="0" y="0" width="100" height="15" uuid="694b0e69-3586-4efd-b7e4-fc0d26a5ded2"/>
+								<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
 			</componentElement>
-			<frame>
-				<reportElement positionType="Float" x="0" y="571" width="468" height="15" uuid="48e7fd18-97f6-4993-951f-dd9a0cc37a18">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="20" y="-10" width="448" height="15" uuid="997c949d-9479-4760-9275-080e53fd3559">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{PAR2_2}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="Float" x="0" y="-10" width="20" height="15" uuid="a9c8243a-4738-476f-a59d-f3bc8f46c677">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[( new Boolean ($F{ATT_INC} != null)? "c)" : "b)")]]></textFieldExpression>
-				</textField>
-			</frame>
-			<frame>
-				<reportElement positionType="Float" x="0" y="591" width="468" height="15" uuid="309dfed6-ea97-4329-92c3-3a2d34bd26e6">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="20" y="-10" width="448" height="15" uuid="c3063ed9-3dbd-4e69-85f1-99c09cd586c4">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{PAR2_3}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="Float" x="0" y="-10" width="20" height="15" uuid="01a544a7-62e1-4fbb-a794-1aabd7f7c4b2">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[( new Boolean ($F{ATT_INC} != null)? "d)" : "c)")]]></textFieldExpression>
-				</textField>
-			</frame>
-			<frame>
-				<reportElement positionType="Float" x="0" y="505" width="468" height="15" uuid="6d094e98-b30e-4883-bf43-8b39d600479d">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="20" y="10" width="448" height="15" uuid="0c10610f-ff9a-4dec-86d8-6928c786d70e">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{PAR2_1}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="Float" x="0" y="10" width="20" height="15" uuid="baef4fc5-dcee-43cb-9a71-5ef60811e6b6">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA["a)"]]></textFieldExpression>
-				</textField>
-			</frame>
-			<frame>
-				<reportElement positionType="Float" x="0" y="612" width="468" height="41" isRemoveLineWhenBlank="true" uuid="36d0e0c0-881b-4718-8628-74973bc27e4d">
-					<printWhenExpression><![CDATA[new Boolean ($F{PROBATION_CLAUSE} != null)]]></printWhenExpression>
-				</reportElement>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="Float" x="0" y="-10" width="468" height="15" uuid="819522c8-c286-47e2-a4d9-5efb8abad2f6">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9" isBold="true" isUnderline="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA["3. PROBATIONARY PERIOD:"]]></textFieldExpression>
-				</textField>
-				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="0" y="11" width="468" height="15" isRemoveLineWhenBlank="true" uuid="e5c54d50-3468-4d44-aa7a-539cdb926867">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{PROBATION_CLAUSE}]]></textFieldExpression>
-				</textField>
-			</frame>
-			<frame>
-				<reportElement positionType="Float" x="0" y="550" width="468" height="21" isRemoveLineWhenBlank="true" uuid="9a7b393b-9ef5-4a35-9173-14a60f86715c">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<printWhenExpression><![CDATA[new Boolean ($F{ATT_INC} != null)]]></printWhenExpression>
-				</reportElement>
-				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="20" y="-10" width="448" height="15" isRemoveLineWhenBlank="true" uuid="920af9e4-5213-4e2d-949d-a8830933dca2">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{ATT_INC}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="Float" x="0" y="-10" width="20" height="15" isRemoveLineWhenBlank="true" uuid="34589379-5cea-40ae-b99e-06181b4f7814">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA["b)"]]></textFieldExpression>
-				</textField>
-			</frame>
-			<frame>
-				<reportElement positionType="Float" x="0" y="440" width="468" height="45" isRemoveLineWhenBlank="true" uuid="463156d8-c45b-4249-8a2d-bbe031ba46d4">
-					<printWhenExpression><![CDATA[new Boolean ($F{PARIKA_1} != null)]]></printWhenExpression>
-				</reportElement>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="Float" x="20" y="10" width="448" height="15" isRemoveLineWhenBlank="true" uuid="3f630acd-09d4-4dd5-8526-2e03b9190b9b">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{PARIKA_1}]]></textFieldExpression>
-				</textField>
-				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="50" y="30" width="418" height="15" isRemoveLineWhenBlank="true" uuid="6aee3d9b-a79f-49d9-9646-ed7e766451f9">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement markup="html">
-						<font size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{PARIKA_2}]]></textFieldExpression>
-				</textField>
-				<image onErrorType="Icon">
-					<reportElement x="299" y="-20" width="62" height="40" uuid="da251233-8d4d-4dc6-9729-a8912def96dd"/>
-					<imageExpression><![CDATA[$F{SIG_PHOTO}]]></imageExpression>
-				</image>
-			</frame>
-			<frame>
-				<reportElement positionType="Float" x="0" y="170" width="468" height="77" isRemoveLineWhenBlank="true" uuid="f78cea71-4cbf-4ed1-8a1a-2ecdaa14f62e">
-					<printWhenExpression><![CDATA[$F{SHOW_FRAME}.intValue() == 0]]></printWhenExpression>
-				</reportElement>
-				<frame>
-					<reportElement positionType="Float" x="0" y="0" width="468" height="15" uuid="ce5b6f35-3229-4513-b548-a4844f2b4ff5"/>
-					<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-						<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="083ac066-5a9d-4916-b716-2a68d9a47f70">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA[$F{PAR1_1}]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="Float" x="0" y="0" width="20" height="15" uuid="fc9cde65-77fc-4807-9b8e-607359a63158">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["a)"]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="FixRelativeToBottom" x="310" y="0" width="157" height="15" uuid="943c6bd7-4314-4beb-85ed-53063c586ca1">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement verticalAlignment="Bottom" markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["= "+$F{MONTHLY_HOURS}+ " hours"]]></textFieldExpression>
-					</textField>
-				</frame>
-				<frame>
-					<reportElement positionType="Float" x="0" y="20" width="468" height="15" uuid="cf015365-85c7-45ad-89fe-cd529c917959"/>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="FixRelativeToBottom" x="350" y="0" width="118" height="15" uuid="cb1ef5be-40aa-40cd-83d1-2e8bfd8207df">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<property name="com.jaspersoft.studio.unit.y" value="px"/>
-						</reportElement>
-						<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["= "+$F{BASIC_SALARY_FORMATTED}]]></textFieldExpression>
-					</textField>
-					<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-						<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="f1079ebc-a44c-4527-8918-ae211f077a4e">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA[$F{PAR1_2}]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="Float" x="0" y="0" width="20" height="15" uuid="2d3edc65-c5c5-4e25-81e6-97c70a345e77">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["b)"]]></textFieldExpression>
-					</textField>
-				</frame>
-				<frame>
-					<reportElement positionType="Float" x="0" y="40" width="468" height="20" isRemoveLineWhenBlank="true" uuid="bfcdb614-40e9-4b27-8dd0-1c59bfa89806">
-						<printWhenExpression><![CDATA[$F{EXTRA_HOURS}.intValue() > 0]]></printWhenExpression>
-					</reportElement>
-					<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-						<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="67fcadad-1b3d-481a-b53e-c36d7fba6b03">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA[$F{PAR1_3}]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="Float" x="0" y="0" width="20" height="15" uuid="d5458aa3-10f4-4069-a51f-25728710d7fb">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["c)"]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="FixRelativeToBottom" x="350" y="0" width="118" height="15" uuid="acaf664c-8cec-4ee1-8649-9649a7829ac2">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<property name="com.jaspersoft.studio.unit.y" value="px"/>
-						</reportElement>
-						<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["= "+$F{EXTRA_HOURS_SALARY_FORMATTED}]]></textFieldExpression>
-					</textField>
-				</frame>
-				<frame>
-					<reportElement positionType="Float" x="0" y="60" width="468" height="15" isRemoveLineWhenBlank="true" uuid="7f967edb-369d-4f09-a952-d84225471e17">
-						<printWhenExpression><![CDATA[$F{TOTAL_SATURDAY_HOURS}.intValue() > 0]]></printWhenExpression>
-					</reportElement>
-					<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-						<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="473de182-3f0a-4e6b-9823-0a3fc105aec4">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA[$F{PAR1_4}]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="Float" x="0" y="0" width="20" height="15" uuid="0cee113f-b644-4a62-a702-e0ecbe506cb7">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA[$F{EXTRA_HOURS}.intValue() > 0 ? "d)" : "c)"]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement x="310" y="0" width="90" height="15" uuid="9b8d001f-8034-4ed8-a879-563f0dd154ee">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<property name="com.jaspersoft.studio.unit.y" value="px"/>
-						</reportElement>
-						<textElement verticalAlignment="Top" markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["= "+$F{TOTAL_SATURDAY_HOURS}+ " hours"]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="FixRelativeToBottom" x="390" y="0" width="78" height="15" uuid="3a9c4989-65cd-4413-aab2-f8b55245173e">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<property name="com.jaspersoft.studio.unit.y" value="px"/>
-						</reportElement>
-						<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
-							<font size="9" isUnderline="true"/>
-						</textElement>
-						<textFieldExpression><![CDATA["= "+ $F{TOTAL_SATURDAY_SALARY_FORMATTED}]]></textFieldExpression>
-					</textField>
-				</frame>
-			</frame>
-			<frame>
-				<reportElement positionType="Float" x="0" y="247" width="468" height="123" isRemoveLineWhenBlank="true" uuid="5d18ece8-9a8a-4c46-8a21-6d6f9350297d">
-					<printWhenExpression><![CDATA[$F{SHOW_FRAME}.intValue() == 1]]></printWhenExpression>
-				</reportElement>
-				<frame>
-					<reportElement positionType="Float" x="0" y="0" width="468" height="15" uuid="265a1035-eb0f-4bd2-9ddc-b7d5dfef2ec2"/>
-					<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-						<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="17c8d025-82c0-4be5-ac54-14d8e04e993d">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA[$F{PAR1_1}]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="Float" x="0" y="0" width="20" height="15" uuid="4ee18b11-567e-49d4-bc0f-36d4283602da">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["a)"]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="FixRelativeToBottom" x="310" y="0" width="90" height="15" uuid="db761188-61c6-41a9-9713-6e98e27cdd5a">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement verticalAlignment="Bottom" markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["= "+$F{MONTHLY_HOURS}+ " hours"]]></textFieldExpression>
-					</textField>
-				</frame>
-				<frame>
-					<reportElement positionType="Float" x="0" y="80" width="468" height="15" uuid="f6492c18-452b-4141-a571-4dd0ce21ed79"/>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="FixRelativeToBottom" x="350" y="0" width="118" height="15" uuid="e5a28e50-ec94-4e0c-ba79-e228b60681fd">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<property name="com.jaspersoft.studio.unit.y" value="px"/>
-						</reportElement>
-						<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["= "+$F{BASIC_SALARY_FORMATTED}]]></textFieldExpression>
-					</textField>
-					<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-						<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="ab27ad6e-da5d-48c9-bba0-eeee6bdb7a7f">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA[$F{PAR1_2}]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="Float" x="0" y="0" width="20" height="15" uuid="23c676ff-06de-49d6-8946-4f1159b366a9">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["e)"]]></textFieldExpression>
-					</textField>
-				</frame>
-				<frame>
-					<reportElement positionType="Float" x="0" y="20" width="468" height="15" uuid="b3a5356a-57ea-4156-a42a-7edf48a11bc5"/>
-					<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-						<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="67778452-79d7-4d0f-b64a-901de09462c2">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA[$F{COND_1}]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="Float" x="0" y="0" width="20" height="15" uuid="98bf9e8f-24d1-4a78-9704-a0bc23e8178b">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["b)"]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="FixRelativeToBottom" x="310" y="0" width="90" height="15" uuid="fc0454f0-90e3-4500-b2b6-b857d68d8780">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement verticalAlignment="Bottom" markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["= "+$F{STANDARD_HOURS}+ " hours"]]></textFieldExpression>
-					</textField>
-				</frame>
-				<frame>
-					<reportElement positionType="Float" x="0" y="40" width="468" height="15" uuid="0010041f-c610-41e1-b513-c438d88f8ade"/>
-					<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-						<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="a8e95cf2-bae0-4594-a778-c48b5e749f77">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA[$F{COND_2}]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="Float" x="0" y="0" width="20" height="15" uuid="fef229cb-8350-4bd2-9318-9b1200851050">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["c)"]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="FixRelativeToBottom" x="310" y="0" width="90" height="15" uuid="d4d63950-e69b-48e6-9b04-3328b9c09bf1">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement verticalAlignment="Bottom" markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["= <u>"+$F{EXTRA_HOURS}+ "</u> hours"]]></textFieldExpression>
-					</textField>
-				</frame>
-				<frame>
-					<reportElement positionType="Float" x="0" y="60" width="468" height="15" uuid="cdc51426-3279-4530-aa8e-4ed257594aa9"/>
-					<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-						<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="61841f80-be02-423e-a39c-af7cfe8999cb">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA[$F{COND_3}]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="Float" x="0" y="0" width="20" height="15" uuid="aab563f5-39db-406e-b238-001258367f47">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["d)"]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="FixRelativeToBottom" x="310" y="0" width="90" height="15" uuid="3d5f3392-3f78-48bd-a1aa-7b08e23ca94a">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement verticalAlignment="Bottom" markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["= "+SUM($F{STANDARD_HOURS}, $F{EXTRA_HOURS} )+ " hours"]]></textFieldExpression>
-					</textField>
-				</frame>
-				<frame>
-					<reportElement positionType="Float" x="0" y="100" width="468" height="15" uuid="e7f95fb0-e5ca-4310-8a4b-9c528f92f45c"/>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="FixRelativeToBottom" x="350" y="0" width="118" height="15" uuid="15afc92a-a737-43dc-9920-cca7d002532f">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<property name="com.jaspersoft.studio.unit.y" value="px"/>
-						</reportElement>
-						<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["= "+$F{EXTRA_HOURS_SALARY_FORMATTED}]]></textFieldExpression>
-					</textField>
-					<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-						<reportElement positionType="Float" x="20" y="0" width="290" height="15" uuid="7c4207ce-46f5-4246-bb6b-e78edf2a8f8c">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA[$F{COND_4}]]></textFieldExpression>
-					</textField>
-					<textField isBlankWhenNull="true">
-						<reportElement positionType="Float" x="0" y="0" width="20" height="15" uuid="3177cf23-0403-4d6f-89cb-701a3c42771e">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						</reportElement>
-						<textElement markup="html">
-							<font size="9"/>
-						</textElement>
-						<textFieldExpression><![CDATA["f)"]]></textFieldExpression>
-					</textField>
-				</frame>
-			</frame>
 		</band>
-		<band height="213">
+		<band height="180">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="1" y="0" width="468" height="15" uuid="95d732cc-7745-4cff-b4f4-426305522f6b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement markup="html">
+					<font fontName="SansSerif" size="9" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["2. SALARY:"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="131" width="468" height="15" uuid="5f9e74f9-9f65-4a2a-93c2-c2f8bc25a04d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font fontName="SansSerif" size="9" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["3. OTHER TERMS & CONDITION:"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="15" width="436" height="15" uuid="2499f264-ce7d-4105-92a1-584e7981ccdd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["a) You will receive a " + $F{SALARY_OR_WAGE} + $F{SALARY_TO_WORDS}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="1" y="145" width="430" height="15" uuid="2d1154a7-c397-45cb-9c3f-134998f11f75">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["a) To remind you if you wish to resign you must give two(2) weeks’ notice after first six(6) months of employment and one(1) month’s notice over a year of employment or salary in lieu therefore."]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="1" y="163" width="430" height="15" uuid="4c97cccc-4c4a-4d62-afdf-265899d7d463">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["b) All other terms and conditions of service remain the same as per your Letter of Appointment."]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="32" width="436" height="15" uuid="42d4e8a8-c3ad-440b-b9cb-b5650216d596">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( new Boolean ($F{ATT_INC} != null)? "b)" + $F{ATT_INC} : "b) " + $F{SALARY_WAGE} + " would be subject to N.I.S, P.A.Y.E and other statutory deductions.")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="49" width="460" height="46" uuid="e0101cbd-f514-44cd-af6c-ced43f6862cd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA["c) Because of the nature of your job you would be required to work beyond these stated hours from time to time to meet deadlines for which <u>overtime will be paid once authorized by your supervisor. However, you are to keep a document as copy attached for such overtime. Have your supervisor sign for such hours worked the same day. Without this document, no claim will be honored."]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="-2" y="107" width="124" height="15" uuid="82685524-e27f-4626-9429-49df1f2d1e7a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["c) " + $F{COND_2}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="150" y="107" width="124" height="15" uuid="5bbbb39a-179e-4655-b75e-f36b23374264">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["b) " + $F{COND_1}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="189">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement positionType="Float" x="0" y="134" width="468" height="15" uuid="80c1008c-202d-45d8-90e5-b73c386cf6d9">
+				<reportElement positionType="Float" x="0" y="117" width="468" height="15" uuid="80c1008c-202d-45d8-90e5-b73c386cf6d9">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement markup="html">
@@ -1300,7 +986,7 @@ where
 				<text><![CDATA[I accept this Letter based on the above terms.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="0" y="164" width="140" height="15" uuid="38bac96c-3434-4c57-820c-286e831e2447">
+				<reportElement positionType="Float" x="0" y="159" width="140" height="15" uuid="38bac96c-3434-4c57-820c-286e831e2447">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" markup="html">
@@ -1309,7 +995,7 @@ where
 				<text><![CDATA[.......................................................]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="0" y="179" width="140" height="15" uuid="ccc4389f-01ab-40d7-838a-80afce6bb6f8">
+				<reportElement positionType="Float" x="0" y="174" width="140" height="15" uuid="ccc4389f-01ab-40d7-838a-80afce6bb6f8">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" markup="html">
@@ -1318,7 +1004,7 @@ where
 				<text><![CDATA[Employee]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="260" y="164" width="140" height="15" uuid="13bca0ab-e1da-4c68-970f-eb9712d54a17">
+				<reportElement positionType="Float" x="260" y="159" width="140" height="15" uuid="13bca0ab-e1da-4c68-970f-eb9712d54a17">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" markup="html">
@@ -1327,7 +1013,7 @@ where
 				<text><![CDATA[.......................................................]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="260" y="179" width="140" height="15" uuid="ada7bb09-ce6d-4615-bf58-160df4a670af">
+				<reportElement positionType="Float" x="260" y="174" width="140" height="15" uuid="ada7bb09-ce6d-4615-bf58-160df4a670af">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" markup="html">
@@ -1336,7 +1022,7 @@ where
 				<text><![CDATA[Date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="22" width="100" height="15" uuid="e6134c1f-d43e-4e89-bd84-6a5369d3f177">
+				<reportElement x="0" y="5" width="100" height="15" uuid="e6134c1f-d43e-4e89-bd84-6a5369d3f177">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -1345,7 +1031,7 @@ where
 				<text><![CDATA[Regards]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="66" width="120" height="15" uuid="34efa3e4-545d-4f6d-959c-9fc2707512be">
+				<reportElement x="0" y="49" width="120" height="15" uuid="34efa3e4-545d-4f6d-959c-9fc2707512be">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -1354,7 +1040,7 @@ where
 				<text><![CDATA[...............................................]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="-1" y="81" width="120" height="15" uuid="baf082d7-9efc-490f-893e-60827e36bd73">
+				<reportElement x="-1" y="64" width="120" height="15" uuid="baf082d7-9efc-490f-893e-60827e36bd73">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -1363,7 +1049,7 @@ where
 				<text><![CDATA[David E. Falconer]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="-1" y="96" width="180" height="15" uuid="5ac92040-002c-445c-b99c-b8bb4e8ddc53">
+				<reportElement x="-1" y="79" width="180" height="15" uuid="5ac92040-002c-445c-b99c-b8bb4e8ddc53">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>

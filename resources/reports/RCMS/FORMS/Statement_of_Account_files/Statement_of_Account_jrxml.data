@@ -1,30 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report3" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6e27cffd-a99c-4126-91bb-ae2a40118f1d">
-	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/FORMS/Statement_of_Account"/>
-	<property name="ireport.jasperserver.url" value="http://apps.innosysgy.com:8082/jasperserver/services/repository"/>
-	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/RCMS/FORMS/Statement_Of_Account"/>
+	<property name="ireport.jasperserver.url" value="http://apps.innosysgy.com:8081/jasperserver/services/repository"/>
+	<property name="ireport.zoom" value="1.464100000000001"/>
+	<property name="ireport.x" value="14"/>
+	<property name="ireport.y" value="88"/>
 	<parameter name="PROP_ID" class="java.math.BigDecimal">
-		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
-	</parameter>
-	<parameter name="ID" class="java.math.BigDecimal">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[SELECT date_paid, a.location, a.property_id, a.total_paid,
-initcap(nvl(a.payee_full_name,a.alternate_payee))payee_full_name,
+trim(Initcap(a.payee_full_name)) payee_full_name,
+ a.alternate_payee,
 total_transactions_amount, b.property_number,
 a.total_demand_due, a.total_interest_due, a.total_property_debt, discount_value
 from payment_header a
 join property b on b.id = a.property_id
-where b.id =$P{ID}]]>
+where a.property_id = $P{PROP_ID}]]>
 	</queryString>
 	<field name="DATE_PAID" class="java.sql.Timestamp"/>
 	<field name="LOCATION" class="java.lang.String"/>
 	<field name="PROPERTY_ID" class="java.math.BigDecimal"/>
 	<field name="TOTAL_PAID" class="java.math.BigDecimal"/>
 	<field name="PAYEE_FULL_NAME" class="java.lang.String"/>
+	<field name="ALTERNATE_PAYEE" class="java.lang.String"/>
 	<field name="TOTAL_TRANSACTIONS_AMOUNT" class="java.math.BigDecimal"/>
 	<field name="PROPERTY_NUMBER" class="java.lang.String"/>
 	<field name="TOTAL_DEMAND_DUE" class="java.math.BigDecimal"/>
@@ -66,6 +65,14 @@ where b.id =$P{ID}]]>
 	</title>
 	<pageHeader>
 		<band height="113" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="85" uuid="88ce1ad8-4a9e-43c1-966e-17f27f62112c"/>
+				<subreportParameter name="PROP_ID">
+					<subreportParameterExpression><![CDATA[$P{PROP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:/reports/RCMS/FORMS/Statement_Of_Account_files/owner_info"]]></subreportExpression>
+			</subreport>
 			<textField>
 				<reportElement x="0" y="93" width="216" height="20" uuid="1638657e-1fa3-42b6-8f31-4198a71126cf"/>
 				<textElement>
@@ -87,14 +94,6 @@ where b.id =$P{ID}]]>
 				</textElement>
 				<textFieldExpression><![CDATA["Total Owing:"]]></textFieldExpression>
 			</textField>
-			<subreport>
-				<reportElement x="0" y="0" width="555" height="93" uuid="12cb2733-5858-480a-abfe-9c113149c7c6"/>
-				<subreportParameter name="ID">
-					<subreportParameterExpression><![CDATA[$P{ID}]]></subreportParameterExpression>
-				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["repo:/reports/RCMS/FORMS/Statement_of_Account_files/owner"]]></subreportExpression>
-			</subreport>
 		</band>
 	</pageHeader>
 	<columnHeader>
@@ -159,7 +158,7 @@ where b.id =$P{ID}]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{DATE_PAID}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField>
 				<reportElement x="96" y="0" width="120" height="20" uuid="0743c8e0-c78e-443f-ab3c-a3ad63c07c51"/>
 				<textElement>
 					<font fontName="Arial"/>
